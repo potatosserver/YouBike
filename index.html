@@ -899,6 +899,8 @@
             }
         });
         setInterval(updateVehicleData, 60000);
+        // 新增：每10秒依定位更新排序與卡片距離
+        setInterval(updateCardDistances, 10000);
     </script>
 </body>
 </html>
