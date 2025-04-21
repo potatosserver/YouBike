@@ -3,7 +3,8 @@
 **簡介**
 
 此專案為一個簡單的網頁應用程式，提供使用者可以搜尋高雄市的 YouBike 站點資訊，並查看各站點的車輛狀況。
-使用者可以透過輸入站點名稱或選擇行政區，快速查詢 YouBike 2.0 站點的資訊，包括：
+
+使用者可以透過輸入站點名稱或定位，快速查詢 YouBike 2.0 站點的資訊，包括：
 * 站點名稱
 * 地區
 * 地址
@@ -13,11 +14,11 @@
 
 ## 使用方式
 
-請前往 [https://potatosserver.github.io/YouBike/](https://potatosserver.github.io/YouBike/) 即可使用本服務。
+請前往 [potatosserver.github.io/YouBike](https://potatosserver.github.io/YouBike/) 即可使用本服務。
 
 ## 資料來源
 
-- [資料來自高雄市資料開放平台API](https://api.kcg.gov.tw/ServiceList/Detail/b4dd9c40-9027-4125-8666-06bef1756092) 及   
+- [資料來自高雄市資料開放平台API](https://api.kcg.gov.tw/ServiceList/Detail/b4dd9c40-9027-4125-8666-06bef1756092)
 -  [YouBike 官網](https://www.youbike.com.tw)
 
 ## 版權與聲明
