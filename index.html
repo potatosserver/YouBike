@@ -626,12 +626,12 @@
                     const cardContent = `
                         ${pinButton}
                         <h3>${station.name || '未知站點'}</h3>
-                        <p>距離: ${distance.toFixed(2)} 公里</p>
+                        <p class="distance">距離: ${distance.toFixed(2)} 公里</p>
                         <p>地區: ${station.district || '未知區域'}</p>
                         <p>地址: ${station.address || '未知地址'}</p>
-                        <p>YouBike 2.0: ${vehicle?.available_2_0 !== undefined ? vehicle.available_2_0 : '未知'}</p>
-                        <p>YouBike 2.0E: ${vehicle?.available_e !== undefined ? vehicle.available_e : '未知'}</p>
-                        <p>可停空位數: ${vehicle?.empty_spaces !== undefined ? vehicle.empty_spaces : '未知'}</p>
+                        <p>YouBike 2.0: <span class="vehicle_yb2">${vehicle?.available_2_0 !== undefined ? vehicle.available_2_0 : '未知'}</span></p>
+                        <p>YouBike 2.0E: <span class="vehicle_ybe">${vehicle?.available_e !== undefined ? vehicle.available_e : '未知'}</span></p>
+                        <p>可停空位數: <span class="vehicle_empty">${vehicle?.empty_spaces !== undefined ? vehicle.empty_spaces : '未知'}</span></p>
                     `;
 
                     const card = document.createElement('div');
@@ -796,6 +796,7 @@
                 latitude: position.coords.latitude,
                 longitude: position.coords.longitude
             };
+            updateCardDistances();
         }
         function handleGeoUpdateError(error) {
             console.error("Geolocation update error:", error);
@@ -830,6 +831,45 @@
             }
         }
 
+        function updateCardDistances() {
+            const cards = document.querySelectorAll('.station');
+            cards.forEach(card => {
+                const lat = parseFloat(card.dataset.lat);
+                const lng = parseFloat(card.dataset.lng);
+                const newDistance = calculateDistance(
+                    userLocation ? userLocation.latitude : defaultLatitude,
+                    userLocation ? userLocation.longitude : defaultLongitude,
+                    lat, lng
+                );
+                const distanceEl = card.querySelector('.distance');
+                if(distanceEl) {
+                    distanceEl.textContent = "距離: " + newDistance.toFixed(2) + " 公里";
+                }
+            });
+            // 更新排序
+            updateResultsOrder();
+        }
+
+        function updateVehicleData() {
+            const stationElements = document.querySelectorAll('.station');
+            if (!stationElements.length) return;
+            const stationIds = Array.from(stationElements).map(el => el.dataset.id);
+            queryVehicleData(stationIds).then(vehicleData => {
+                stationElements.forEach(card => {
+                    const id = card.dataset.id;
+                    const data = vehicleData[id] || {};
+                    const yb2El = card.querySelector('.vehicle_yb2');
+                    const ybeEl = card.querySelector('.vehicle_ybe');
+                    const emptyEl = card.querySelector('.vehicle_empty');
+                    if(yb2El) yb2El.textContent = (data.available_2_0 !== undefined ? data.available_2_0 : '未知');
+                    if(ybeEl) ybeEl.textContent = (data.available_e !== undefined ? data.available_e : '未知');
+                    if(emptyEl) emptyEl.textContent = (data.empty_spaces !== undefined ? data.empty_spaces : '未知');
+                });
+            }).catch(error => {
+                console.error("Vehicle data update failed:", error);
+            });
+        }
+
         const toggleDarkModeButton = document.getElementById('toggleDarkMode');
         toggleDarkModeButton.addEventListener('click', () => {
             document.body.classList.toggle('dark-mode');
@@ -858,7 +898,7 @@
                 searchYouBike();
             }
         });
-        setInterval(searchYouBike, 60000);
+        setInterval(updateVehicleData, 60000);
     </script>
 </body>
 </html>
