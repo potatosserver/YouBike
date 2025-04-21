@@ -6,6 +6,7 @@
 
 使用者可以透過輸入站點名稱或定位，快速查詢 YouBike 2.0 站點的資訊，包括：
 * 站點名稱
+* 距離
 * 地區
 * 地址
 * YouBike 2.0 數量
@@ -15,7 +16,8 @@
 ## 使用方式
 
 請前往 [potatosserver.github.io/YouBike](https://potatosserver.github.io/YouBike/) 即可使用本服務。
-
+可開啟定位啟用最近站點與距離計算。
+點擊卡片可開啟站點的Google地圖。
 ## 資料來源
 
 - [資料來自高雄市資料開放平台API](https://api.kcg.gov.tw/ServiceList/Detail/b4dd9c40-9027-4125-8666-06bef1756092)
