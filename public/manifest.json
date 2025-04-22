@@ -2,7 +2,7 @@
   "name": "YouBike PWA",
   "short_name": "YouBike",
   "description": "A Progressive Web App for YouBike station search and information.",
-  "start_url": "/src/index.html",
+  "start_url": "./src/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4CAF50",
