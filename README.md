@@ -13,6 +13,12 @@
 * YouBike 2.0E 數量
 * 可停空位數
 
+**其他功能**
+* 附件站點
+* 定位開關
+* 黑暗模式
+* 自動更新
+
 ## 使用方式
 
 請前往 [potatosserver.github.io/YouBike](https://potatosserver.github.io/YouBike/) 即可使用本服務。
