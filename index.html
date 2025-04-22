@@ -449,19 +449,19 @@
         const useLocation = useLocationSetting === null ? true : useLocationSetting === "true";
         document.getElementById('toggleUseLocation').checked = useLocation;
 
+        // 修改定位開關事件處理器：如果開啟定位，僅呼叫 getLocation()（後續由 handleGeolocationSuccess 處理新資料與排序）；關閉時維持原邏輯更新資料與排序
         document.getElementById('toggleUseLocation').addEventListener('change', function(){
             localStorage.setItem("useLocation", this.checked);
             if(this.checked) {
-                // 啟用定位
+                // 啟用定位：先獲得新資料再進行排序，交由 handleGeolocationSuccess 處理
                 getLocation();
             } else {
-                // 停用定位，使用預設座標
+                // 停用定位，使用預設座標，直接更新資料與排序
                 userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
                 searchYouBike();
+                updateVehicleData();
+                setTimeout(updateResultsOrder, 1500);
             }
-            // 直接重載兩個 API 並在處理完畢後重新排序卡片
-            updateVehicleData();
-            setTimeout(updateResultsOrder, 1500);
         });
 
         function togglePinStation(stationId, event) {
@@ -785,12 +785,14 @@
             return R * c;
         }
 
-        function handleGeolocationSuccess(position) {
+        // 修改 handleGeolocationSuccess：先獲取新資料再進行排序
+        async function handleGeolocationSuccess(position) {
             userLocation = {
                 latitude: position.coords.latitude,
                 longitude: position.coords.longitude
             };
-            searchYouBike();
+            await searchYouBike();
+            updateResultsOrder();
         }
 
         function handleGeolocationError(error) {
