@@ -426,6 +426,7 @@
     </div>
     <script>
         let userLocation = null;
+        let sortingLocked = false; // 新增：排序鎖定旗標
         let initialLoad = true;
         let locationDenied = false;
         let geolocationErrorMessage = null;
@@ -449,14 +450,13 @@
         const useLocation = useLocationSetting === null ? true : useLocationSetting === "true";
         document.getElementById('toggleUseLocation').checked = useLocation;
 
-        // 修改定位開關事件處理器：如果開啟定位，僅呼叫 getLocation()（後續由 handleGeolocationSuccess 處理新資料與排序）；關閉時維持原邏輯更新資料與排序
+        // 修改定位開關事件處理器：若開啟則立即鎖定排序再呼叫 getLocation()
         document.getElementById('toggleUseLocation').addEventListener('change', function(){
             localStorage.setItem("useLocation", this.checked);
             if(this.checked) {
-                // 啟用定位：先獲得新資料再進行排序，交由 handleGeolocationSuccess 處理
+                sortingLocked = true; // 立即鎖定排序
                 getLocation();
             } else {
-                // 停用定位，使用預設座標，直接更新資料與排序
                 userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
                 searchYouBike();
                 updateVehicleData();
@@ -729,7 +729,9 @@
             return allVehicleData;
         }
 
+        // 修改 updateResultsOrder：若排序被鎖定則不進行重新排序
         function updateResultsOrder() {
+            if(sortingLocked) return;
             const cards = Array.from(document.querySelectorAll(".station"));
             cards.sort((a, b) => {
                 const aPinned = pinnedStations.has(a.dataset.id);
@@ -785,13 +787,14 @@
             return R * c;
         }
 
-        // 修改 handleGeolocationSuccess：先獲取新資料再進行排序
+        // 修改 handleGeolocationSuccess：資料請求完成後解除鎖定並進行排序
         async function handleGeolocationSuccess(position) {
             userLocation = {
                 latitude: position.coords.latitude,
                 longitude: position.coords.longitude
             };
             await searchYouBike();
+            sortingLocked = false; // 解鎖排序
             updateResultsOrder();
         }
 
