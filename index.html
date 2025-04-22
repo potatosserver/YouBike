@@ -459,6 +459,9 @@
                 userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
                 searchYouBike();
             }
+            // 直接重載兩個 API 並在處理完畢後重新排序卡片
+            updateVehicleData();
+            setTimeout(updateResultsOrder, 1500);
         });
 
         function togglePinStation(stationId, event) {
