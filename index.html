@@ -378,6 +378,10 @@
         input:checked + .slider:before {
             transform: translateX(26px);
         }
+        /* 修正 PWA 圖片變形問題 */
+        #githubButton img, #installButton img {
+            object-fit: contain;
+        }
     </style>
 </head>
 <body>
@@ -415,7 +419,7 @@
         </a>
         <!-- 新增手動安裝按鈕 -->
         <button id="installButton" style="position: fixed; bottom: 140px; right: 20px; z-index: 1000; width: 50px; height: 50px; background: white; color: black; border: none; border-radius: 50%; cursor: pointer;">
-            <img src="https://cdn-icons-png.flaticon.com/512/1828/1828884.png" alt="安裝" style="width:100%; height:100%; object-fit: contain;">
+            <img src="https://www.apple.com/v/app-store/b/images/overview/icon_appstore__ev0z770zyxoy_large_2x.png" alt="安裝" style="width:100%; height:100%;">
         </button>
         <!-- 顏色模式變換按鈕 -->
         <button id="toggleDarkMode" title="切換暗色模式">🌙</button>
@@ -920,27 +924,21 @@
         // 新增：每10秒依定位更新排序與卡片距離
         setInterval(updateCardDistances, 10000);
 
-        // 新增安裝事件處理 (修改原本事件處理)
+        // 新增安裝事件
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
             document.getElementById('installButton').style.display = 'block';
         });
+
         document.getElementById('installButton').addEventListener('click', async () => {
-            // 如果已安裝 (透過 display-mode 或 navigator.standalone 判斷)
-            if (!deferredPrompt && (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone)) {
-                console.log("App 已安裝，開啟安裝好的 app");
-                // 直接導向 App 主頁，依需求修改 URL
-                window.location.href = window.location.origin;
-            } else if (deferredPrompt) {
+            if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
                 console.log('User response to the install prompt:', outcome);
                 deferredPrompt = null;
                 document.getElementById('installButton').style.display = 'none';
-            } else {
-                console.log("無法提示安裝或無法檢測到已安裝狀態");
             }
         });
     </script>
