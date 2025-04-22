@@ -413,6 +413,8 @@
                 <img src="https://cdn-icons-png.flaticon.com/512/25/25231.png" alt="GitHub" style="width:35px; height:35px;">
             </button>
         </a>
+        <!-- 新增手動安裝按鈕 -->
+        <button id="installButton" style="position: fixed; bottom: 140px; right: 20px; z-index: 1000; width: 50px; height: 50px; background: white; color: black; border: none; border-radius: 50%; cursor: pointer;">安裝</button>
         <!-- 顏色模式變換按鈕 -->
         <button id="toggleDarkMode" title="切換暗色模式">🌙</button>
     </div>
@@ -915,7 +917,24 @@
         setInterval(updateVehicleData, 60000);
         // 新增：每10秒依定位更新排序與卡片距離
         setInterval(updateCardDistances, 10000);
+
+        // 新增安裝事件
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installButton').style.display = 'block';
+        });
+
+        document.getElementById('installButton').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log('User response to the install prompt:', outcome);
+                deferredPrompt = null;
+                document.getElementById('installButton').style.display = 'none';
+            }
+        });
     </script>
 </body>
 </html>
-``` 
