@@ -948,7 +948,18 @@
           console.log('User response to the install prompt:', outcome);
           deferredPrompt = null;
           document.getElementById('installButton').style.display = 'none';
+        } else {
+          // 如果已安裝則開啟App（以重新導向至首頁為例）
+          window.location.href = location.origin + '/YouBike/index.html';
         }
+      });
+
+      // 新增：監聽appinstalled事件，更新安裝按鈕文字
+      window.addEventListener('appinstalled', () => {
+        console.log('App 已安裝');
+        deferredPrompt = null;
+        const installBtn = document.getElementById('installButton');
+        installBtn.innerHTML = '<img src="https://potatosserver.github.io/YouBike/icons/open.png" alt="開啟" style="width:35px; height:35px;" />';
       });
     </script>
   </body>
