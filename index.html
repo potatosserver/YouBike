@@ -949,8 +949,14 @@
           deferredPrompt = null;
           document.getElementById('installButton').style.display = 'none';
         } else {
-          // 如果已安裝則開啟App（以重新導向至首頁為例）
-          window.location.href = location.origin + '/YouBike/index.html';
+          // 檢查是否處於獨立模式
+          if (window.matchMedia('(display-mode: standalone)').matches) {
+            console.log('App 已在獨立模式運行');
+            // app 已啟動，可在此處額外執行開啟 app 所需的操作
+          } else {
+            // 無法程式化打開已安裝 app，請用戶從主畫面啟動
+            alert('無法自動開啟 App，請從主畫面啟動');
+          }
         }
       });
 
