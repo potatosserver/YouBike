@@ -1,5 +1,6 @@
 {
-  "name": "YouBike PWA",
+  "name": "YouBike Station Finder",
+  "version": "1.0.0",
   "short_name": "YouBike",
   "description": "A Progressive Web App for YouBike station search and information.",
   "start_url": "./index.html",
