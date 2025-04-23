@@ -630,8 +630,7 @@
           organizedOutput.forEach(item => {
             const station = item.station_info;
             const vehicle = item.vehicle_info;
-            const pinButton = `<span class="pin-button ${pinnedStations.has(station.id) ? 'pinned' : ''}" data-id="${station.id}" onclick="togglePinStation('${station.id}', event)">${pinnedStations.has(station.id) ? '★' : '☆'}</span>`;
-            const distance = calculateDistance(
+            const pinButton = `<span class="pin-button ${pinnedStations.has(station.id) ? 'pinned' : ''}" data-id="${station.id}" onclick="togglePinStation('${station.id}', event)">${pinnedStations.has(station.id) ? '★' : '☆'}</span>`;            const distance = calculateDistance(
               userLocation ? userLocation.latitude : defaultLatitude,
               userLocation ? userLocation.longitude : defaultLongitude,
               station.coords[0],
@@ -664,6 +663,10 @@
             });
             resultsDiv.appendChild(card);
           });
+          // 新增：統一排序控制流程
+          sortingLocked = false;
+          updateResultsOrder();
+          sortingLocked = true;
           showMainContent();
         } catch (error) {
           console.error("Fetch error:", error);
