@@ -788,21 +788,15 @@
 
       // 修改 handleGeolocationSuccess：資料請求完成後解除鎖定並進行排序
       async function handleGeolocationSuccess(position) {
-        // 若原本位置為預設座標或尚未有位置，代表要由預設轉為真實座標
-        if (!userLocation || (userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude)) {
-          sortingLocked = true; // 鎖定排序
-          userLocation = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          };
-          await searchYouBike(); // 立即請求新資訊
-          sortingLocked = false; // 解鎖排序
-          updateResultsOrder(); // 重新排序
+        const wasDefault = !userLocation || (userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude);
+        userLocation = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        };
+        if (wasDefault) {
+          await searchYouBike();
+          updateResultsOrder(); // 資料抓取後再進行排序
         } else {
-          userLocation = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          };
           updateCardDistances();
         }
       }
@@ -832,22 +826,16 @@
 
       // 修改 handleGeoUpdateSuccess：若先前定位失敗過則先鎖定排序,等待資料更新好後再解鎖排序
       function handleGeoUpdateSuccess(position) {
-        // 當從預設座標轉為真實座標時，鎖定排序並請求新資訊
-        if (userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude) {
-          sortingLocked = true; // 鎖定排序
-          userLocation = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          };
+        const wasDefault = userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude;
+        userLocation = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        };
+        if (wasDefault) {
           searchYouBike().then(() => {
-            sortingLocked = false; // 解鎖排序
-            updateResultsOrder(); // 重新排序
+            updateResultsOrder(); // 資料抓取後再進行排序
           });
         } else {
-          userLocation = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          };
           updateCardDistances();
         }
       }
