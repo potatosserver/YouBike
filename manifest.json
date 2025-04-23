@@ -1,6 +1,6 @@
 {
   "name": "YouBike Station Finder",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "short_name": "YouBike",
   "description": "A Progressive Web App for YouBike station search and information.",
   "start_url": "./index.html",
