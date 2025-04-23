@@ -788,13 +788,23 @@
 
       // 修改 handleGeolocationSuccess：資料請求完成後解除鎖定並進行排序
       async function handleGeolocationSuccess(position) {
-        userLocation = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        };
-        await searchYouBike();
-        sortingLocked = false; // 解鎖排序
-        updateResultsOrder();
+        // 若原本位置為預設座標或尚未有位置，代表要由預設轉為真實座標
+        if (!userLocation || (userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude)) {
+          sortingLocked = true; // 鎖定排序
+          userLocation = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          };
+          await searchYouBike(); // 立即請求新資訊
+          sortingLocked = false; // 解鎖排序
+          updateResultsOrder(); // 重新排序
+        } else {
+          userLocation = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          };
+          updateCardDistances();
+        }
       }
 
       function handleGeolocationError(error) {
@@ -822,16 +832,17 @@
 
       // 修改 handleGeoUpdateSuccess：若先前定位失敗過則先鎖定排序,等待資料更新好後再解鎖排序
       function handleGeoUpdateSuccess(position) {
-        if (locationDenied) {
-          sortingLocked = true;
+        // 當從預設座標轉為真實座標時，鎖定排序並請求新資訊
+        if (userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude) {
+          sortingLocked = true; // 鎖定排序
           userLocation = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude
           };
-          updateCardDistances();
-          sortingLocked = false;
-          updateResultsOrder();
-          locationDenied = false;
+          searchYouBike().then(() => {
+            sortingLocked = false; // 解鎖排序
+            updateResultsOrder(); // 重新排序
+          });
         } else {
           userLocation = {
             latitude: position.coords.latitude,
