@@ -820,13 +820,27 @@
         searchYouBike();
       }
 
+      // 修改 handleGeoUpdateSuccess：若先前定位失敗過則先鎖定排序,等待資料更新好後再解鎖排序
       function handleGeoUpdateSuccess(position) {
-        userLocation = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        };
-        updateCardDistances();
+        if (locationDenied) {
+          sortingLocked = true;
+          userLocation = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          };
+          updateCardDistances();
+          sortingLocked = false;
+          updateResultsOrder();
+          locationDenied = false;
+        } else {
+          userLocation = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          };
+          updateCardDistances();
+        }
       }
+
       function handleGeoUpdateError(error) {
         console.error("Geolocation update error:", error);
       }
