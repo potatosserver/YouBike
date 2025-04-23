@@ -862,19 +862,43 @@
           return;
         }
         if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(handleGeolocationSuccess, handleGeolocationError, {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
-          });
+          // 新增：手動超時計時器，首次定位超過 10 秒即觸發逾時
+          let timeoutTriggered = false;
+          const geoTimeout = setTimeout(() => {
+            timeoutTriggered = true;
+            handleGeolocationError({ code: 3, message: "首次定位超時" });
+          }, 10000);
+          
+          navigator.geolocation.getCurrentPosition(
+            function (position) {
+              if (!timeoutTriggered) {
+                clearTimeout(geoTimeout);
+                handleGeolocationSuccess(position);
+              }
+            },
+            function (error) {
+              if (!timeoutTriggered) {
+                clearTimeout(geoTimeout);
+                handleGeolocationError(error);
+              }
+            },
+            {
+              enableHighAccuracy: true,
+              timeout: 10000,
+              maximumAge: 0
+            }
+          );
           setInterval(() => {
-            // 每次發送前再檢查開關狀態
             if (document.getElementById('toggleUseLocation').checked) {
-              navigator.geolocation.getCurrentPosition(handleGeoUpdateSuccess, handleGeoUpdateError, {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
-              });
+              navigator.geolocation.getCurrentPosition(
+                handleGeoUpdateSuccess,
+                handleGeoUpdateError,
+                {
+                  enableHighAccuracy: true,
+                  timeout: 10000,
+                  maximumAge: 0
+                }
+              );
             }
           }, 10000);
         } else {
