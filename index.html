@@ -1004,6 +1004,12 @@
         const installBtn = document.getElementById('installButton');
         installBtn.innerHTML = '<img src="https://potatosserver.github.io/YouBike/icons/open.png" alt="開啟" style="width:35px; height:35px;" />';
       });
+
+      // 在適當位置新增點擊標題時清空輸入框處理 - 例如在其他事件綁定後面
+      document.querySelector('h1').addEventListener('click', function() {
+        keywordInput.value = ''; // 清除輸入框
+        searchYouBike(); // 載入首頁畫面資訊
+      });
     </script>
   </body>
 </html>
