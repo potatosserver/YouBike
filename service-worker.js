@@ -4,10 +4,8 @@ self.addEventListener('install', (event) => {
             return cache.addAll([
                 '/',
                 '/YouBike/index.html',
-                '/YouBike/nightly.html',
                 '/YouBike/main.js',
                 '/YouBike/manifest.json',
-                // Add any other assets you want to cache
             ]);
         })
     );

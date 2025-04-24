@@ -984,6 +984,7 @@
 
       let deferredPrompt;
       window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('beforeinstallprompt event fired:', { e, userAgent: navigator.userAgent });
         e.preventDefault();
         deferredPrompt = e;
         document.getElementById('installButton').style.display = 'block';
@@ -1001,7 +1002,11 @@
 			console.log('App 已在獨立模式運行');
 		} else {
 			const errorMessage = '無法開啟 PWA：未取得安裝提示，請從主畫面啟動。';
-			console.error('PWA button error:', errorMessage);
+			console.error('PWA button error:', errorMessage, {
+        deferredPrompt,
+        displayMode: window.matchMedia('(display-mode: standalone)').matches,
+        userAgent: navigator.userAgent
+      });
 			alert(errorMessage);
 		}
 	} catch (error) {
