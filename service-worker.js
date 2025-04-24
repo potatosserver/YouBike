@@ -7,7 +7,6 @@ self.addEventListener('install', (event) => {
                 '/YouBike/nightly.html',
                 '/YouBike/main.js',
                 '/YouBike/manifest.json',
-                // Add any other assets you want to cache
             ]);
         })
     );
@@ -15,12 +14,24 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('fetch', (event) => {
     event.respondWith(
-        caches.match(event.request).then((response) => {
-            if (response) return response;
-            return fetch(event.request).catch((error) => {
-                console.error('PWA fetch failed:', error);
+        caches.match(event.request).then((cachedResponse) => {
+            const fetchPromise = fetch(event.request).then((networkResponse) => {
+                if (!networkResponse || networkResponse.status !== 200 || networkResponse.type !== 'basic') {
+                    return networkResponse;
+                }
+
+                const responseToCache = networkResponse.clone();
+                caches.open('youbike-cache-v1').then((cache) => {
+                    cache.put(event.request, responseToCache);
+                });
+
+                return networkResponse;
+            }).catch((error) => {
+                console.error('Service Worker Fetch failed:', error);
                 throw error;
             });
+
+            return cachedResponse || fetchPromise;
         })
     );
 });
