@@ -649,16 +649,19 @@
           organizedOutput.forEach(item => {
             const station = item.station_info;
             const vehicle = item.vehicle_info;
-            const pinButton = `<span class="pin-button ${pinnedStations.has(station.id) ? 'pinned' : ''}" data-id="${station.id}" onclick="togglePinStation('${station.id}', event)">${pinnedStations.has(station.id) ? '★' : '☆'}</span>`;            const distance = calculateDistance(
+            const pinButton = `<span class="pin-button ${pinnedStations.has(station.id) ? 'pinned' : ''}" data-id="${station.id}" onclick="togglePinStation('${station.id}', event)">${pinnedStations.has(station.id) ? '★' : '☆'}</span>`;
+            const distance = calculateDistance(
               userLocation ? userLocation.latitude : defaultLatitude,
               userLocation ? userLocation.longitude : defaultLongitude,
               station.coords[0],
               station.coords[1]
             );
+            // 更改：根據距離決定顯示單位
+            const displayDistance = distance < 1 ? Math.round(distance * 1000) + " 公尺" : distance.toFixed(2) + " 公里";
             const cardContent = `
                         ${pinButton}
                         <h3>${station.name || '未知站點'}</h3>
-                        <p class="distance">距離: ${distance.toFixed(2)} 公里</p>
+                        <p class="distance">距離: ${displayDistance}</p>
                         <p>地址: ${station.address || '未知地址'}</p>
                         <p>YouBike 2.0: <span class="vehicle_yb2">${vehicle?.available_2_0 !== undefined ? vehicle.available_2_0 : '未知'}</span></p>
                         <p>YouBike 2.0E: <span class="vehicle_ybe">${vehicle?.available_e !== undefined ? vehicle.available_e : '未知'}</span></p>
@@ -912,7 +915,8 @@
           );
           const distanceEl = card.querySelector('.distance');
           if (distanceEl) {
-            distanceEl.textContent = "距離: " + newDistance.toFixed(2) + " 公里";
+            // 更改：若距離小於1公里則以公尺顯示
+            distanceEl.textContent = "距離: " + (newDistance < 1 ? Math.round(newDistance * 1000) + " 公尺" : newDistance.toFixed(2) + " 公里");
           }
         });
         updateResultsOrder();
