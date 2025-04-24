@@ -663,10 +663,11 @@
             });
             resultsDiv.appendChild(card);
           });
-          // 新增：統一排序控制流程
+          // 新增：資料獲取完成後進行排序
           sortingLocked = false;
           updateResultsOrder();
           sortingLocked = true;
+          
           showMainContent();
         } catch (error) {
           console.error("Fetch error:", error);
