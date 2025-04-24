@@ -982,36 +982,39 @@
         }
       }, 60000);
 
-      let deferredPrompt;
-      window.addEventListener('beforeinstallprompt', (e) => {
-        console.log('beforeinstallprompt event fired:', { e, userAgent: navigator.userAgent });
-        e.preventDefault();
-        deferredPrompt = e;
-        document.getElementById('installButton').style.display = 'block';
-      });
-
-      document.getElementById('installButton').addEventListener('click', async () => {
-	try {
-		if (deferredPrompt) {
-			await deferredPrompt.prompt();
-			const { outcome } = await deferredPrompt.userChoice;
-			console.log('User response to the install prompt:', outcome);
-			deferredPrompt = null;
-			document.getElementById('installButton').style.display = 'none';
-		} else if (window.matchMedia('(display-mode: standalone)').matches) {
-			console.log('App 已在獨立模式運行');
-		} else {
-			const errorMessage = '無法開啟 PWA：未取得安裝提示，請從主畫面啟動。';
-			console.error('PWA button error:', errorMessage, {
-        deferredPrompt,
-        displayMode: window.matchMedia('(display-mode: standalone)').matches,
-        userAgent: navigator.userAgent
-      });
-			alert(errorMessage);
-		}
-	} catch (error) {
-		console.error('安裝按鈕發生錯誤:', error);
-	}
+      let deferredPrompt; 
+      document.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('beforeinstallprompt', (e) => {
+          console.log('beforeinstallprompt event fired:', { e, userAgent: navigator.userAgent });
+          e.preventDefault();
+          deferredPrompt = e;
+          document.getElementById('installButton').style.display = 'block';
+        });
+        
+        document.getElementById('installButton').addEventListener('click', async () => {
+        	try {
+        		if (deferredPrompt) {
+        			await deferredPrompt.prompt();
+        			const { outcome } = await deferredPrompt.userChoice;
+        			console.log('User response to the install prompt:', outcome);
+        			deferredPrompt = null;
+        			document.getElementById('installButton').style.display = 'none';
+        		} else if (window.matchMedia('(display-mode: standalone)').matches) {
+        			console.log('App 已在獨立模式運行');
+        		} else {
+        			const errorMessage = '無法開啟 PWA：未取得安裝提示，請從主畫面啟動。';
+        			console.error('PWA button error:', errorMessage, {
+              deferredPrompt: deferredPrompt,
+              displayMode: window.matchMedia('(display-mode: standalone)').matches,
+              userAgent: navigator.userAgent,
+              manifestHref: document.querySelector('link[rel="manifest"]')?.href
+            });
+        			alert(errorMessage);
+        		}
+        	} catch (error) {
+        		console.error('安裝按鈕發生錯誤:', error);
+        	}
+        });
       });
 
       window.addEventListener('appinstalled', () => {
