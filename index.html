@@ -39,9 +39,10 @@
         margin-right: auto;
         max-width: 500px;
         width: 100%;
+        position: relative; /* 新增：設定容器相對定位 */
       }
       #keyword {
-        padding: 10px;
+        padding: 10px 0px 10px 10px; /* changed: 調整右側內距讓放大鏡顯示在內部 */
         width: calc(100% - 120px);
         max-width: 400px;
         border: 1px solid #ccc;
@@ -57,6 +58,15 @@
         outline: none;
         border-color: #007BFF;
         box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+      }
+      #searchIcon {
+        position: absolute; /* 讓搜尋圖示以絕對定位放置 */
+        right: 10px;        /* 距離右側 10px */
+        top: 40%;           /* 距離上方 50% */
+        transform: translateY(-50%); /* 垂直置中 */
+      }
+      #searchIcon:hover {
+        color: #0056b3;
       }
       button {
         padding: 10px 20px;
@@ -392,7 +402,10 @@
       <h1>高雄 YouBike 搜尋</h1>
       <div id="searchContainer">
         <input type="text" id="keyword" placeholder="請輸入站點名稱、地址" value="" />
-        <button id="searchButton">搜尋</button>
+        <!-- 刪除原本的搜尋按鈕 -->
+        <!-- <button id="searchButton">搜尋</button> -->
+        <!-- 新增：放大鏡圖示 -->
+        <span id="searchIcon" title="搜尋">🔍</span>
       </div>
       <div id="locationSwitchContainer" style="text-align: center; margin: 10px 0;">
         <label class="switch">
@@ -433,7 +446,7 @@
       const resultsDiv = document.getElementById('results');
       const loadingDiv = document.getElementById('loading');
       const keywordInput = document.getElementById('keyword');
-      const searchButton = document.getElementById('searchButton');
+      // const searchButton = document.getElementById('searchButton');
 
       const maxResults = 100;
       const defaultSearchArea = "";
@@ -944,7 +957,7 @@
         searchYouBike();
       }
 
-      searchButton.addEventListener('click', searchYouBike);
+      // searchButton.addEventListener('click', searchYouBike);
 
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
@@ -952,7 +965,7 @@
         }
       });
       setInterval(updateVehicleData, 60000);
-      // 新增：每1分鐘重新抓取站點資料（僅限啟用定位時）
+      // 新增：每1分鐘重新抓取站點資料（僅限啟用定位時）　
       setInterval(() => {
         if (document.getElementById('toggleUseLocation').checked) {
           searchYouBike(false);
@@ -993,6 +1006,10 @@
         keywordInput.value = '';
         searchYouBike();
       });
+
+      // 新增：放大鏡圖示點擊事件綁定搜尋功能
+      const searchIcon = document.getElementById('searchIcon');
+      searchIcon.addEventListener('click', searchYouBike);
     </script>
   </body>
 </html>
