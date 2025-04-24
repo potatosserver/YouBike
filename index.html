@@ -42,9 +42,10 @@
         position: relative; /* 新增：設定容器相對定位 */
       }
       #keyword {
-        padding: 10px 0px 10px 10px; /* changed: 調整右側內距讓放大鏡顯示在內部 */
-        width: calc(100% - 120px);
-        max-width: 400px;
+        /* ...existing code... 原設定：padding: 10px 0px 10px 10px; width: calc(100% - 120px); */
+        padding: 10px;             /* 使用均等內距 */
+        width: 100%;               /* 改成 100% 寬度 */
+        padding-right: 10px;       /* 新增右側內距以容納搜尋圖示 */
         border: 1px solid #ccc;
         border-radius: 5px 0 0 5px;
         margin-right: 0;
@@ -62,8 +63,8 @@
       #searchIcon {
         position: absolute; /* 讓搜尋圖示以絕對定位放置 */
         right: 10px;        /* 距離右側 10px */
-        top: 40%;           /* 距離上方 50% */
-        transform: translateY(-50%); /* 垂直置中 */
+        top: 50%;           /* 修改：從 40% 更改為 50% 以垂直置中 */
+        transform: translateY(-65%); /* 垂直置中 */
       }
       #searchIcon:hover {
         color: #0056b3;
