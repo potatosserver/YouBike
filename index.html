@@ -952,7 +952,12 @@
         }
       });
       setInterval(updateVehicleData, 60000);
-      setInterval(updateCardDistances, 10000);
+      // 新增：每1分鐘重新抓取站點資料（僅限啟用定位時）
+      setInterval(() => {
+        if (document.getElementById('toggleUseLocation').checked) {
+          searchYouBike(false);
+        }
+      }, 60000);
 
       let deferredPrompt;
       window.addEventListener('beforeinstallprompt', (e) => {
