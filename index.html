@@ -664,9 +664,7 @@
             resultsDiv.appendChild(card);
           });
           // 新增：資料獲取完成後進行排序
-          sortingLocked = false;
           updateResultsOrder();
-          sortingLocked = true;
           
           showMainContent();
         } catch (error) {
@@ -721,7 +719,6 @@
       }
 
       function updateResultsOrder() {
-        if (sortingLocked) return;
         const cards = Array.from(document.querySelectorAll(".station"));
         cards.sort((a, b) => {
           const aPinned = pinnedStations.has(a.dataset.id);
@@ -918,6 +915,8 @@
               if (ybeEl) ybeEl.textContent = (data.available_e !== undefined ? data.available_e : '未知');
               if (emptyEl) emptyEl.textContent = (data.empty_spaces !== undefined ? data.empty_spaces : '未知');
             });
+            // 調用排序
+            updateResultsOrder();
           })
           .catch(error => {
             console.error("Vehicle data update failed:", error);
