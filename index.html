@@ -649,7 +649,7 @@
           organizedOutput.forEach(item => {
             const station = item.station_info;
             const vehicle = item.vehicle_info;
-            const pinButton = `<span class="pin-button ${pinnedStations.has(station.id) ? 'pinned' : ''}" data-id="${station.id}" onclick="togglePinStation('${station.id}', event)">${pinnedStations.has(station.id) ? '★' : '☆'}</span>`;
+            const pinButton = `<span class="pin-button ${pinnedStations.has(station.id) ? 'pinned' : ''}" data-id="${station.id}" onclick="togglePinStation('${station.id}', event)">${pinnedStations.has(station.id) ? '★' : '☆'}</span>`; 
             const distance = calculateDistance(
               userLocation ? userLocation.latitude : defaultLatitude,
               userLocation ? userLocation.longitude : defaultLongitude,
@@ -994,21 +994,23 @@
         document.getElementById('installButton').addEventListener('click', async () => {
         	try {
         		if (deferredPrompt) {
+        			// 使用安裝提示邏輯
         			await deferredPrompt.prompt();
         			const { outcome } = await deferredPrompt.userChoice;
         			console.log('User response to the install prompt:', outcome);
         			deferredPrompt = null;
         			document.getElementById('installButton').style.display = 'none';
         		} else if (window.matchMedia('(display-mode: standalone)').matches) {
-        			console.log('App 已在獨立模式運行');
+        			// 當處於獨立模式，表示 App 已啟動，可提示用戶改從作業系統啟動
+        			alert("App 已安裝，請從主畫面或開始清單中打開應用程式。");
         		} else {
-        			const errorMessage = '無法開啟 PWA：未取得安裝提示，請從主畫面啟動。';
+        			const errorMessage = '無法打開 PWA：未取得安裝提示，請從主畫面啟動。請確認網站符合 PWA 安裝條件(HTTPS、正確的 manifest 等)。';
         			console.error('PWA button error:', errorMessage, {
-              deferredPrompt: deferredPrompt,
-              displayMode: window.matchMedia('(display-mode: standalone)').matches,
-              userAgent: navigator.userAgent,
-              manifestHref: document.querySelector('link[rel="manifest"]')?.href
-            });
+        				deferredPrompt: deferredPrompt,
+        				displayMode: window.matchMedia('(display-mode: standalone)').matches,
+        				userAgent: navigator.userAgent,
+        				manifestHref: document.querySelector('link[rel="manifest"]')?.href
+        			});
         			alert(errorMessage);
         		}
         	} catch (error) {
