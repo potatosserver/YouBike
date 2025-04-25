@@ -1002,9 +1002,9 @@
         			document.getElementById('installButton').style.display = 'none';
         		} else if (window.matchMedia('(display-mode: standalone)').matches) {
         			// 當處於獨立模式，表示 App 已啟動，可提示用戶改從作業系統啟動
-        			alert("App 已安裝，請從主畫面或開始清單中打開應用程式。");
+        			alert("App 已在運行中。");
         		} else {
-        			const errorMessage = '無法打開 PWA：未取得安裝提示，請從主畫面啟動。請確認網站符合 PWA 安裝條件(HTTPS、正確的 manifest 等)。';
+        			const errorMessage = 'App 已安裝，請從主畫面或開始清單中打開應用程式。';
         			console.error('PWA button error:', errorMessage, {
         				deferredPrompt: deferredPrompt,
         				displayMode: window.matchMedia('(display-mode: standalone)').matches,
