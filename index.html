@@ -982,7 +982,7 @@
         }
       }, 60000);
 
-      let deferredPrompt; 
+      let deferredPrompt;
       document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('beforeinstallprompt', (e) => {
           console.log('beforeinstallprompt event fired:', { e, userAgent: navigator.userAgent });
@@ -990,32 +990,24 @@
           deferredPrompt = e;
           document.getElementById('installButton').style.display = 'block';
         });
-        
         document.getElementById('installButton').addEventListener('click', async () => {
-        	try {
-        		if (deferredPrompt) {
-        			// 使用安裝提示邏輯
-        			await deferredPrompt.prompt();
-        			const { outcome } = await deferredPrompt.userChoice;
-        			console.log('User response to the install prompt:', outcome);
-        			deferredPrompt = null;
-        			document.getElementById('installButton').style.display = 'none';
-        		} else if (window.matchMedia('(display-mode: standalone)').matches) {
-        			// 當處於獨立模式，表示 App 已啟動，可提示用戶改從作業系統啟動
-        			alert("App 已在運行中。");
-        		} else {
-        			const errorMessage = 'App 已安裝，請從主畫面或開始清單中打開應用程式。';
-        			console.error('PWA button error:', errorMessage, {
-        				deferredPrompt: deferredPrompt,
-        				displayMode: window.matchMedia('(display-mode: standalone)').matches,
-        				userAgent: navigator.userAgent,
-        				manifestHref: document.querySelector('link[rel="manifest"]')?.href
-        			});
-        			alert(errorMessage);
-        		}
-        	} catch (error) {
-        		console.error('安裝按鈕發生錯誤:', error);
-        	}
+          try {
+            if (deferredPrompt) {
+              await deferredPrompt.prompt();
+              const { outcome } = await deferredPrompt.userChoice;
+              console.log('User response to the install prompt:', outcome);
+              deferredPrompt = null;
+              document.getElementById('installButton').style.display = 'none';
+            } else if (window.matchMedia('(display-mode: standalone)').matches) {
+              alert("App 已在運行中。");
+            } else {
+              const errorMessage = 'App 已安裝，請從主畫面或開始清單中打開應用程式。';
+              console.error('PWA button error:', errorMessage, { deferredPrompt: deferredPrompt, displayMode: window.matchMedia('(display-mode: standalone)').matches, userAgent: navigator.userAgent, manifestHref: document.querySelector('link[rel="manifest"]')?.href });
+              alert(errorMessage);
+            }
+          } catch (error) {
+            console.error('安裝按鈕發生錯誤:', error);
+          }
         });
       });
 
