@@ -26,9 +26,13 @@
 
 ## 使用方式
 
-請前往 [potatosserver.github.io/YouBike](https://potatosserver.github.io/YouBike/) 即可使用本服務。
-可開啟定位啟用最近站點與距離計算。
-點擊卡片可開啟站點的Google地圖。
+1. 請前往 [potatosserver.github.io/YouBike](https://potatosserver.github.io/YouBike/) 即可使用本服務。
+2.在搜尋框輸入關鍵字查詢
+3. 可開啟定位啟用最近站點與距離計算。
+4. 點擊卡片可開啟站點的Google地圖。
+5. 可使用卡片右上角的星星釘選車站
+6. 點擊右下角的按鈕，切換色彩模式及安裝PWA應用程式
+
 ## 資料來源
 
 - [資料來自高雄市資料開放平台API](https://api.kcg.gov.tw/ServiceList/Detail/b4dd9c40-9027-4125-8666-06bef1756092)
