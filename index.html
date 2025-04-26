@@ -561,12 +561,8 @@
       let kcgDataCache = null; // 用於緩存第一個 API 的資料
 
       async function searchYouBike(showLoadingIndicator = true) {
-        // 新增：若非手動觸發則先記錄目前捲動位置
-        let preservedScroll = null;
-        if (!showLoadingIndicator) {
-          preservedScroll = window.scrollY;
-        }
         if (showLoadingIndicator) showLoading();
+        const keyword = keywordInput.value.trim().toLowerCase();
         try {
           // 新增離線模式判斷與快取讀取
           if (navigator.onLine) {
@@ -741,9 +737,6 @@
           if (showLoadingIndicator) {
             // 僅在手動觸發時顯示 mainContent，避免自動更新時捲動畫面
             showMainContent();
-          } else {
-            // 還原使用者先前的捲動位置，避免自動更新時捲動畫面至頂端
-            window.scrollTo(0, preservedScroll);
           }
         } catch (error) {
           console.error("Fetch error:", error);
