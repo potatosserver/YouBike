@@ -732,7 +732,10 @@
           await new Promise(resolve => setTimeout(resolve, 0));
 
           dataLoaded = true; // 資料已載入完成
-          showMainContent();
+          if (showLoadingIndicator) {
+            // 僅在手動觸發時顯示 mainContent，避免自動更新時捲動畫面
+            showMainContent();
+          }
         } catch (error) {
           console.error("Fetch error:", error);
           resultsDiv.innerHTML = `發生錯誤: ${error.message}`;
