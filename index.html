@@ -544,23 +544,24 @@
           }
         }, 50);
       })();
+      let kcgDataCache = null; // 用於緩存第一個 API 的資料
+
       async function searchYouBike(showLoadingIndicator = true) {
         if (showLoadingIndicator) showLoading();
         const keyword = keywordInput.value.trim().toLowerCase();
         try {
-          const kcgUrl = "https://api.kcg.gov.tw/api/service/Get/b4dd9c40-9027-4125-8666-06bef1756092";
-          const kcgResponse = await fetch(kcgUrl, {
-            headers: { "User-Agent": "Mozilla/5.0" }
-          });
-          if (!kcgResponse.ok) throw new Error(`HTTP error! status: ${kcgResponse.status}`);
-          const kcgData = await kcgResponse.json();
-          const kcgRetVal = kcgData?.data?.data?.retVal;
-          if (!Array.isArray(kcgRetVal)) {
-            resultsDiv.innerHTML = "<p>找不到資料，請檢查 API 回應格式或資料來源。</p>";
-            if (showLoadingIndicator) hideLoading();
-            return;
+          if (!kcgDataCache) {
+            // 第一次載入時請求第一個 API
+            const kcgUrl = "https://api.kcg.gov.tw/api/service/Get/b4dd9c40-9027-4125-8666-06bef1756092";
+            const kcgResponse = await fetch(kcgUrl, {
+              headers: { "User-Agent": "Mozilla/5.0" }
+            });
+            if (!kcgResponse.ok) throw new Error(`HTTP error! status: ${kcgResponse.status}`);
+            const kcgData = await kcgResponse.json();
+            kcgDataCache = kcgData?.data?.data?.retVal || [];
           }
-          let kcgResults = kcgRetVal;
+
+          let kcgResults = kcgDataCache; // 使用緩存的資料
           if (keyword) {
             kcgResults = kcgResults.filter(station => {
               const stationName = station.sna ? station.sna.toLowerCase() : '';
@@ -646,7 +647,7 @@
             usedStations = [...pinnedList, ...nonPinnedList];
           }
           const stationIds = usedStations.map(station => String(station.sno));
-          const vehData = await queryVehicleData(stationIds);
+          const vehData = await queryVehicleData(stationIds); // 請求第二個 API
           const organizedOutput = usedStations.map(site => {
             const info = {
               id: String(site.sno),
