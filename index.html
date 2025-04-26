@@ -514,25 +514,27 @@
       }
       let mainContentShown = false;
       function showMainContent() {
+        // 如果尚未顯示則執行
         if (!mainContentShown) {
           const overlay = document.getElementById("loadingOverlay");
           const mainContent = document.getElementById("mainContent");
           if (navigator.onLine) {
-            // 線上模式，原有動畫
-            overlay.style.opacity = "0";
+            // 線上模式下：
+            overlay.style.opacity = "0"; // 開始淡出
             setTimeout(() => {
-              overlay.style.display = "none";
-              mainContent.style.display = "block";
+              overlay.style.display = "none"; // 隱藏 overlay
+              mainContent.style.display = "block"; // 顯示主內容
             }, 500);
           } else {
-            // 離線模式，更新訊息並延後隱藏
+            // 離線模式下：
             document.getElementById("loadingText").textContent = "目前離線模式，請稍候...";
-            overlay.style.opacity = "1"; // 確保 Loading 畫面清晰可見
+            overlay.style.opacity = "1"; // 確保 Loading 畫面保持清晰
             setTimeout(() => {
               overlay.style.display = "none";
               mainContent.style.display = "block";
             }, 3000);
           }
+          // 標記主內容已顯示
           mainContentShown = true;
         }
       }
@@ -559,8 +561,12 @@
       let kcgDataCache = null; // 用於緩存第一個 API 的資料
 
       async function searchYouBike(showLoadingIndicator = true) {
+        // 新增：若非手動觸發則先記錄目前捲動位置
+        let preservedScroll = null;
+        if (!showLoadingIndicator) {
+          preservedScroll = window.scrollY;
+        }
         if (showLoadingIndicator) showLoading();
-        const keyword = keywordInput.value.trim().toLowerCase();
         try {
           // 新增離線模式判斷與快取讀取
           if (navigator.onLine) {
@@ -735,6 +741,9 @@
           if (showLoadingIndicator) {
             // 僅在手動觸發時顯示 mainContent，避免自動更新時捲動畫面
             showMainContent();
+          } else {
+            // 還原使用者先前的捲動位置，避免自動更新時捲動畫面至頂端
+            window.scrollTo(0, preservedScroll);
           }
         } catch (error) {
           console.error("Fetch error:", error);
