@@ -583,7 +583,7 @@
           }
 
           if (!kcgDataCache || !kcgDataCache.length) {
-            throw new Error('無法載入站點資料');
+            console.warn('無法載入站點資料，僅使用本地儲存資料');
           }
         } catch (error) {
           console.error('載入站點資料失敗:', error);
@@ -918,8 +918,9 @@
           getLocation();
         } else {
           userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-          await searchYouBike(); // 確保資料載入完成後才顯示主內容
+          searchYouBike(); // 確保資料載入完成後顯示主內容
         }
+        showMainContent(); // 確保主內容顯示
       });
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
