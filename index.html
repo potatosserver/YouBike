@@ -520,7 +520,6 @@
           setTimeout(() => {
             overlay.style.display = "none";
             mainContent.style.display = "block";
-            hideLoading(); // 確保載入畫面隱藏
           }, 500);
           mainContentShown = true;
         }
@@ -545,71 +544,23 @@
           }
         }, 50);
       })();
-      let kcgDataCache = null; // 用於緩存第一個 API 的資料
-      let isOffline = !navigator.onLine; // 初始檢查是否離線
-
-      // 檢測網路狀態變化
-      window.addEventListener('online', () => {
-        isOffline = false;
-        console.log('已連接到網路');
-        showNetworkStatusMessage("已連接到網路，載入中...");
-        loadKcgData().then(() => searchYouBike());
-      });
-
-      window.addEventListener('offline', () => {
-        isOffline = true;
-        console.log('目前處於離線模式');
-        showNetworkStatusMessage("目前處於離線模式，載入中...");
-        if (!kcgDataCache) {
-          const cachedData = localStorage.getItem('kcgDataCache');
-          if (cachedData) {
-            kcgDataCache = JSON.parse(cachedData);
-            console.log('從本地儲存載入站點資料');
-          }
-        }
-        searchYouBike(false); // 確保即使離線也能顯示資料
-      });
-
-      async function loadKcgData() {
-        try {
-          const cachedData = localStorage.getItem('kcgDataCache');
-          if (cachedData) {
-            kcgDataCache = JSON.parse(cachedData);
-            console.log('從本地儲存載入站點資料');
-          }
-
-          if (!isOffline && (!kcgDataCache || !kcgDataCache.length)) {
-            console.log('從 API 載入站點資料');
-            const kcgUrl = "https://api.kcg.gov.tw/api/service/Get/b4dd9c40-9027-4125-8666-06bef1756092";
-            const kcgResponse = await fetch(kcgUrl, {
-              headers: { "User-Agent": "Mozilla/5.0" }
-            });
-            if (!kcgResponse.ok) throw new Error(`HTTP error! status: ${kcgResponse.status}`);
-            const kcgData = await kcgResponse.json();
-            kcgDataCache = kcgData?.data?.data?.retVal || [];
-            localStorage.setItem('kcgDataCache', JSON.stringify(kcgDataCache)); // 儲存到本地儲存
-          }
-
-          if (!kcgDataCache || !kcgDataCache.length) {
-            console.warn('無法載入站點資料，僅使用本地儲存資料');
-          }
-        } catch (error) {
-          console.error('載入站點資料失敗:', error);
-          if (!kcgDataCache) {
-            kcgDataCache = []; // 確保有預設值
-          }
-        }
-      }
-
       async function searchYouBike(showLoadingIndicator = true) {
         if (showLoadingIndicator) showLoading();
         const keyword = keywordInput.value.trim().toLowerCase();
         try {
-          if (!kcgDataCache) {
-            await loadKcgData(); // 確保資料已載入
+          const kcgUrl = "https://api.kcg.gov.tw/api/service/Get/b4dd9c40-9027-4125-8666-06bef1756092";
+          const kcgResponse = await fetch(kcgUrl, {
+            headers: { "User-Agent": "Mozilla/5.0" }
+          });
+          if (!kcgResponse.ok) throw new Error(`HTTP error! status: ${kcgResponse.status}`);
+          const kcgData = await kcgResponse.json();
+          const kcgRetVal = kcgData?.data?.data?.retVal;
+          if (!Array.isArray(kcgRetVal)) {
+            resultsDiv.innerHTML = "<p>找不到資料，請檢查 API 回應格式或資料來源。</p>";
+            if (showLoadingIndicator) hideLoading();
+            return;
           }
-
-          let kcgResults = kcgDataCache; // 使用緩存的資料
+          let kcgResults = kcgRetVal;
           if (keyword) {
             kcgResults = kcgResults.filter(station => {
               const stationName = station.sna ? station.sna.toLowerCase() : '';
@@ -630,50 +581,131 @@
             );
             return distA - distB;
           });
-
+          let limit = keyword ? 50 : 20;
+          let usedStations;
+          if (!keyword) {
+            const pinnedFromLocal = kcgResults.filter(station => pinnedStations.has(String(station.sno)));
+            const unpinned = kcgResults.filter(station => !pinnedStations.has(String(station.sno)));
+            pinnedFromLocal.sort((a, b) => {
+              const distA = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                a.lat, a.lng
+              );
+              const distB = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                b.lat, b.lng
+              );
+              return distA - distB;
+            });
+            unpinned.sort((a, b) => {
+              const distA = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                a.lat, a.lng
+              );
+              const distB = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                b.lat, b.lng
+              );
+              return distA - distB;
+            });
+            usedStations = [...pinnedFromLocal, ...unpinned].slice(0, limit);
+          } else {
+            usedStations = kcgResults.slice(0, limit);
+            const pinnedList = usedStations.filter(station => pinnedStations.has(String(station.sno)));
+            const nonPinnedList = usedStations.filter(station => !pinnedStations.has(String(station.sno)));
+            pinnedList.sort((a, b) => {
+              const distA = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                a.lat, a.lng
+              );
+              const distB = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                b.lat, b.lng
+              );
+              return distA - distB;
+            });
+            nonPinnedList.sort((a, b) => {
+              const distA = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                a.lat, a.lng
+              );
+              const distB = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                b.lat, b.lng
+              );
+              return distA - distB;
+            });
+            usedStations = [...pinnedList, ...nonPinnedList];
+          }
+          const stationIds = usedStations.map(station => String(station.sno));
+          const vehData = await queryVehicleData(stationIds);
+          const organizedOutput = usedStations.map(site => {
+            const info = {
+              id: String(site.sno),
+              name: site.sna,
+              coords: [site.lat, site.lng],
+              district: site.sarea,
+              address: site.ar
+            };
+            const vehicle = Object.entries(vehData).find(([key]) => key === info.id)?.[1] || {};
+            return { station_info: info, vehicle_info: vehicle };
+          });
           resultsDiv.innerHTML = '';
-          kcgResults.forEach(station => {
+          organizedOutput.forEach(item => {
+            const station = item.station_info;
+            const vehicle = item.vehicle_info;
+            const pinButton = `<span class="pin-button ${pinnedStations.has(station.id) ? 'pinned' : ''}" data-id="${station.id}" onclick="togglePinStation('${station.id}', event)">${pinnedStations.has(station.id) ? '★' : '☆'}</span>`; 
             const distance = calculateDistance(
               userLocation ? userLocation.latitude : defaultLatitude,
               userLocation ? userLocation.longitude : defaultLongitude,
-              station.lat, station.lng
+              station.coords[0],
+              station.coords[1]
             );
             const displayDistance = distance < 1 ? Math.round(distance * 1000) + " 公尺" : distance.toFixed(2) + " 公里";
-
             const cardContent = `
-              <h3>${station.sna || '未知站點'}</h3>
-              <p class="distance">距離: ${displayDistance}</p>
-              <p>地址: ${station.ar || '未知地址'}</p>
-              ${!isOffline ? `
-                <p>YouBike 2.0: <span class="vehicle_yb2">載入中...</span></p>
-                <p>YouBike 2.0E: <span class="vehicle_ybe">載入中...</span></p>
-                <p>可停空位數: <span class="vehicle_empty">載入中...</span></p>
-              ` : ''}
-            `;
-
+                        ${pinButton}
+                        <h3>${station.name || '未知站點'}</h3>
+                        <p class="distance">距離: ${displayDistance}</p>
+                        <p>地址: ${station.address || '未知地址'}</p>
+                        <p>YouBike 2.0: <span class="vehicle_yb2">${vehicle?.available_2_0 !== undefined ? vehicle.available_2_0 : '未知'}</span></p>
+                        <p>YouBike 2.0E: <span class="vehicle_ybe">${vehicle?.available_e !== undefined ? vehicle.available_e : '未知'}</span></p>
+                        <p>可停空位數: <span class="vehicle_empty">${vehicle?.empty_spaces !== undefined ? vehicle.empty_spaces : '未知'}</span></p>
+                    `;
             const card = document.createElement('div');
             card.className = 'station';
-            card.dataset.id = station.sno;
-            card.dataset.lat = station.lat;
-            card.dataset.lng = station.lng;
+            card.dataset.id = station.id;
+            card.dataset.lat = station.coords[0];
+            card.dataset.lng = station.coords[1];
+            card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
             card.innerHTML = cardContent;
+            card.addEventListener("click", () => {
+              const lat = parseFloat(station.coords[0]), lng = parseFloat(station.coords[1]);
+              if (!isNaN(lat) && !isNaN(lng)) {
+                const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
+                window.open(googleMapsUrl, "_blank");
+              } else {
+                showModal("站點座標無效，無法開啟地圖。");
+              }
+            });
             resultsDiv.appendChild(card);
           });
-
-          if (!isOffline) {
-            const stationIds = kcgResults.map(station => String(station.sno));
-            const vehData = await queryVehicleData(stationIds);
-            updateVehicleDataUI(vehData);
-          }
+          updateResultsOrder();
+          showMainContent();
         } catch (error) {
-          console.error("搜尋失敗:", error);
+          console.error("Fetch error:", error);
           resultsDiv.innerHTML = `發生錯誤: ${error.message}`;
         } finally {
           if (showLoadingIndicator) hideLoading();
-          if (!mainContentShown) showMainContent(); // 確保主內容僅顯示一次
         }
       }
-
       async function queryVehicleData(stationIds) {
         if (stationIds.length > 60) {
           stationIds = stationIds.slice(0, 60);
@@ -904,19 +936,6 @@
             console.error("Vehicle data update failed:", error);
           });
       }
-      function updateVehicleDataUI(vehicleData) {
-        const stationElements = document.querySelectorAll('.station');
-        stationElements.forEach(card => {
-          const id = card.dataset.id;
-          const data = vehicleData[id] || {};
-          const yb2El = card.querySelector('.vehicle_yb2');
-          const ybeEl = card.querySelector('.vehicle_ybe');
-          const emptyEl = card.querySelector('.vehicle_empty');
-          if (yb2El) yb2El.textContent = (data.available_2_0 !== undefined ? data.available_2_0 : '未知');
-          if (ybeEl) ybeEl.textContent = (data.available_e !== undefined ? data.available_e : '未知');
-          if (emptyEl) emptyEl.textContent = (data.empty_spaces !== undefined ? data.empty_spaces : '未知');
-        });
-      }
       const toggleDarkModeButton = document.getElementById('toggleDarkMode');
       toggleDarkModeButton.addEventListener('click', () => {
         document.body.classList.toggle('dark-mode');
@@ -929,20 +948,12 @@
         toggleDarkModeButton.innerHTML = '<span style="color:#ffd700; font-size:32px;">☀️</span>';
       }
       modalButton.addEventListener('click', hideModal);
-      document.addEventListener('DOMContentLoaded', async () => {
-        try {
-          await loadKcgData(); // 頁面載入時先載入站點資料
-        } catch (error) {
-          console.warn('離線模式下無法載入新資料，使用本地儲存資料');
-        }
-        if (useLocation) {
-          getLocation();
-        } else {
-          userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-          await searchYouBike(); // 確保資料載入完成後顯示主內容
-        }
-        if (!mainContentShown) showMainContent(); // 確保主內容顯示
-      });
+      if (useLocation) {
+        getLocation();
+      } else {
+        userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+        searchYouBike();
+      }
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
           searchYouBike();
@@ -968,6 +979,7 @@
               const { outcome } = await deferredPrompt.userChoice;
               console.log('User response to the install prompt:', outcome);
               deferredPrompt = null;
+              document.getElementById('installButton').style.display = 'none';
             } else if (window.matchMedia('(display-mode: standalone)').matches) {
               alert("App 已在運行中。");
             } else {
@@ -992,16 +1004,6 @@
       });
       const searchIcon = document.getElementById('searchIcon');
       searchIcon.addEventListener('click', searchYouBike);
-
-      function showNetworkStatusMessage(message) {
-        const loadingOverlay = document.getElementById("loadingOverlay");
-        const loadingText = document.getElementById("loadingText");
-        loadingText.textContent = message;
-        loadingOverlay.style.display = "flex";
-        setTimeout(() => {
-          loadingOverlay.style.display = "none";
-        }, 2000); // 顯示 2 秒後自動隱藏
-      }
     </script>
   </body>
 </html>
