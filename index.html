@@ -514,27 +514,25 @@
       }
       let mainContentShown = false;
       function showMainContent() {
-        // 如果尚未顯示則執行
         if (!mainContentShown) {
           const overlay = document.getElementById("loadingOverlay");
           const mainContent = document.getElementById("mainContent");
           if (navigator.onLine) {
-            // 線上模式下：
-            overlay.style.opacity = "0"; // 開始淡出
+            // 線上模式，原有動畫
+            overlay.style.opacity = "0";
             setTimeout(() => {
-              overlay.style.display = "none"; // 隱藏 overlay
-              mainContent.style.display = "block"; // 顯示主內容
+              overlay.style.display = "none";
+              mainContent.style.display = "block";
             }, 500);
           } else {
-            // 離線模式下：
+            // 離線模式，更新訊息並延後隱藏
             document.getElementById("loadingText").textContent = "目前離線模式，請稍候...";
-            overlay.style.opacity = "1"; // 確保 Loading 畫面保持清晰
+            overlay.style.opacity = "1"; // 確保 Loading 畫面清晰可見
             setTimeout(() => {
               overlay.style.display = "none";
               mainContent.style.display = "block";
             }, 3000);
           }
-          // 標記主內容已顯示
           mainContentShown = true;
         }
       }
@@ -734,10 +732,7 @@
           await new Promise(resolve => setTimeout(resolve, 0));
 
           dataLoaded = true; // 資料已載入完成
-          if (showLoadingIndicator) {
-            // 僅在手動觸發時顯示 mainContent，避免自動更新時捲動畫面
-            showMainContent();
-          }
+          showMainContent();
         } catch (error) {
           console.error("Fetch error:", error);
           resultsDiv.innerHTML = `發生錯誤: ${error.message}`;
@@ -1042,6 +1037,18 @@
       });
       const searchIcon = document.getElementById('searchIcon');
       searchIcon.addEventListener('click', searchYouBike);
+
+      // 修改 window.load 事件，僅在資料未載入完成時才強制呼叫 showMainContent
+      window.addEventListener('load', () => {
+        if (!dataLoaded) {
+          // 若主要內容未載入完成，延遲一段時間後再呼叫 showMainContent
+          setTimeout(() => {
+            if (!dataLoaded) { 
+              showMainContent();
+            }
+          }, 3000);
+        }
+      });
     </script>
   </body>
 </html>
