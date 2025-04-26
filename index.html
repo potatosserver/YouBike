@@ -728,6 +728,9 @@
             resultsDiv.appendChild(card);
           });
           updateResultsOrder();
+          // 新增：等待一次事件迴圈，確保卡片 DOM 更新完成
+          await new Promise(resolve => setTimeout(resolve, 0));
+
           dataLoaded = true; // 資料已載入完成
           showMainContent();
         } catch (error) {
