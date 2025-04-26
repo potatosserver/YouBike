@@ -516,11 +516,22 @@
         if (!mainContentShown) {
           const overlay = document.getElementById("loadingOverlay");
           const mainContent = document.getElementById("mainContent");
-          overlay.style.opacity = "0";
-          setTimeout(() => {
-            overlay.style.display = "none";
-            mainContent.style.display = "block";
-          }, 500);
+          if (navigator.onLine) {
+            // 線上模式，原有動畫
+            overlay.style.opacity = "0";
+            setTimeout(() => {
+              overlay.style.display = "none";
+              mainContent.style.display = "block";
+            }, 500);
+          } else {
+            // 離線模式，更新訊息並延後隱藏
+            document.getElementById("loadingText").textContent = "目前離線模式，請稍候...";
+            overlay.style.opacity = "1"; // 確保 Loading 畫面清晰可見
+            setTimeout(() => {
+              overlay.style.display = "none";
+              mainContent.style.display = "block";
+            }, 3000);
+          }
           mainContentShown = true;
         }
       }
