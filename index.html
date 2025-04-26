@@ -662,7 +662,7 @@
           resultsDiv.innerHTML = `發生錯誤: ${error.message}`;
         } finally {
           if (showLoadingIndicator) hideLoading();
-          showMainContent(); // 確保主內容顯示
+          if (!mainContentShown) showMainContent(); // 確保主內容僅顯示一次
         }
       }
 
@@ -918,9 +918,8 @@
           getLocation();
         } else {
           userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-          searchYouBike();
+          await searchYouBike(); // 確保資料載入完成後才顯示主內容
         }
-        showMainContent(); // 確保主內容顯示
       });
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
