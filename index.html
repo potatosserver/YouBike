@@ -1037,18 +1037,6 @@
       });
       const searchIcon = document.getElementById('searchIcon');
       searchIcon.addEventListener('click', searchYouBike);
-
-      // 修改 window.load 事件，僅在資料未載入完成時才強制呼叫 showMainContent
-      window.addEventListener('load', () => {
-        if (!dataLoaded) {
-          // 若主要內容未載入完成，延遲一段時間後再呼叫 showMainContent
-          setTimeout(() => {
-            if (!dataLoaded) { 
-              showMainContent();
-            }
-          }, 3000);
-        }
-      });
     </script>
   </body>
 </html>
