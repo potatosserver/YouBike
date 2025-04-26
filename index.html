@@ -520,6 +520,7 @@
           setTimeout(() => {
             overlay.style.display = "none";
             mainContent.style.display = "block";
+            hideLoading(); // 確保載入畫面隱藏
           }, 500);
           mainContentShown = true;
         }
@@ -559,7 +560,14 @@
         isOffline = true;
         console.log('目前處於離線模式');
         showNetworkStatusMessage("目前處於離線模式，載入中...");
-        searchYouBike();
+        if (!kcgDataCache) {
+          const cachedData = localStorage.getItem('kcgDataCache');
+          if (cachedData) {
+            kcgDataCache = JSON.parse(cachedData);
+            console.log('從本地儲存載入站點資料');
+          }
+        }
+        searchYouBike(false); // 確保即使離線也能顯示資料
       });
 
       async function loadKcgData() {
