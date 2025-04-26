@@ -1032,6 +1032,16 @@
       });
       const searchIcon = document.getElementById('searchIcon');
       searchIcon.addEventListener('click', searchYouBike);
+
+      // 新增：確保PWA模式下即使未透過 searchYouBike 也能顯示載入畫面
+      window.addEventListener('load', () => {
+        if (!mainContentShown) {
+          // 若主要內容還未呈現，強制呼叫顯示
+          setTimeout(() => {
+            showMainContent();
+          }, 3000);
+        }
+      });
     </script>
   </body>
 </html>
