@@ -545,7 +545,7 @@
         }, 50);
       })();
       let kcgDataCache = null; // 用於緩存第一個 API 的資料
-      let isOffline = false;
+      let isOffline = !navigator.onLine; // 初始檢查是否離線
 
       // 檢測網路狀態變化
       window.addEventListener('online', () => {
@@ -558,12 +558,16 @@
         console.log('目前處於離線模式');
       });
 
-      async function searchYouBike(showLoadingIndicator = true) {
-        if (showLoadingIndicator) showLoading();
-        const keyword = keywordInput.value.trim().toLowerCase();
+      async function loadKcgData() {
         try {
-          if (!kcgDataCache) {
-            // 第一次載入時請求第一個 API
+          const cachedData = localStorage.getItem('kcgDataCache');
+          if (cachedData) {
+            kcgDataCache = JSON.parse(cachedData);
+            console.log('從本地儲存載入站點資料');
+          }
+
+          if (!kcgDataCache || !kcgDataCache.length) {
+            console.log('從 API 載入站點資料');
             const kcgUrl = "https://api.kcg.gov.tw/api/service/Get/b4dd9c40-9027-4125-8666-06bef1756092";
             const kcgResponse = await fetch(kcgUrl, {
               headers: { "User-Agent": "Mozilla/5.0" }
@@ -571,6 +575,22 @@
             if (!kcgResponse.ok) throw new Error(`HTTP error! status: ${kcgResponse.status}`);
             const kcgData = await kcgResponse.json();
             kcgDataCache = kcgData?.data?.data?.retVal || [];
+            localStorage.setItem('kcgDataCache', JSON.stringify(kcgDataCache)); // 儲存到本地儲存
+          }
+        } catch (error) {
+          console.error('載入站點資料失敗:', error);
+          if (!kcgDataCache) {
+            kcgDataCache = []; // 確保有預設值
+          }
+        }
+      }
+
+      async function searchYouBike(showLoadingIndicator = true) {
+        if (showLoadingIndicator) showLoading();
+        const keyword = keywordInput.value.trim().toLowerCase();
+        try {
+          if (!kcgDataCache) {
+            await loadKcgData(); // 確保資料已載入
           }
 
           let kcgResults = kcgDataCache; // 使用緩存的資料
@@ -963,12 +983,16 @@
         toggleDarkModeButton.innerHTML = '<span style="color:#ffd700; font-size:32px;">☀️</span>';
       }
       modalButton.addEventListener('click', hideModal);
-      if (useLocation) {
-        getLocation();
-      } else {
-        userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-        searchYouBike();
-      }
+      document.addEventListener('DOMContentLoaded', async () => {
+        await loadKcgData(); // 頁面載入時先載入站點資料
+        if (useLocation) {
+          getLocation();
+        } else {
+          userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+          searchYouBike();
+        }
+        showMainContent(); // 確保主內容顯示
+      });
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
           searchYouBike();
