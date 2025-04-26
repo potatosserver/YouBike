@@ -469,6 +469,7 @@
       let initialLoad = true;
       let locationDenied = false;
       let geolocationErrorMessage = null;
+      let dataLoaded = false; // 新增：記錄資料是否已載入完成
       const defaultLatitude = 22.6315725;
       const defaultLongitude = 120.3025079;
       const overlay = document.querySelector('.overlay');
@@ -727,6 +728,7 @@
             resultsDiv.appendChild(card);
           });
           updateResultsOrder();
+          dataLoaded = true; // 資料已載入完成
           showMainContent();
         } catch (error) {
           console.error("Fetch error:", error);
@@ -1033,12 +1035,14 @@
       const searchIcon = document.getElementById('searchIcon');
       searchIcon.addEventListener('click', searchYouBike);
 
-      // 新增：確保PWA模式下即使未透過 searchYouBike 也能顯示載入畫面
+      // 修改 window.load 事件，僅在資料未載入完成時才強制呼叫 showMainContent
       window.addEventListener('load', () => {
-        if (!mainContentShown) {
-          // 若主要內容還未呈現，強制呼叫顯示
+        if (!dataLoaded) {
+          // 若主要內容未載入完成，延遲一段時間後再呼叫 showMainContent
           setTimeout(() => {
-            showMainContent();
+            if (!dataLoaded) { 
+              showMainContent();
+            }
           }, 3000);
         }
       });
