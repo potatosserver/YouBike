@@ -545,6 +545,18 @@
         }, 50);
       })();
       let kcgDataCache = null; // 用於緩存第一個 API 的資料
+      let isOffline = false;
+
+      // 檢測網路狀態變化
+      window.addEventListener('online', () => {
+        isOffline = false;
+        console.log('已連接到網路');
+      });
+
+      window.addEventListener('offline', () => {
+        isOffline = true;
+        console.log('目前處於離線模式');
+      });
 
       async function searchYouBike(showLoadingIndicator = true) {
         if (showLoadingIndicator) showLoading();
@@ -676,9 +688,11 @@
                         <h3>${station.name || '未知站點'}</h3>
                         <p class="distance">距離: ${displayDistance}</p>
                         <p>地址: ${station.address || '未知地址'}</p>
-                        <p>YouBike 2.0: <span class="vehicle_yb2">${vehicle?.available_2_0 !== undefined ? vehicle.available_2_0 : '未知'}</span></p>
-                        <p>YouBike 2.0E: <span class="vehicle_ybe">${vehicle?.available_e !== undefined ? vehicle.available_e : '未知'}</span></p>
-                        <p>可停空位數: <span class="vehicle_empty">${vehicle?.empty_spaces !== undefined ? vehicle.empty_spaces : '未知'}</span></p>
+                        ${!isOffline ? `
+                          <p>YouBike 2.0: <span class="vehicle_yb2">${vehicle?.available_2_0 !== undefined ? vehicle.available_2_0 : '未知'}</span></p>
+                          <p>YouBike 2.0E: <span class="vehicle_ybe">${vehicle?.available_e !== undefined ? vehicle.available_e : '未知'}</span></p>
+                          <p>可停空位數: <span class="vehicle_empty">${vehicle?.empty_spaces !== undefined ? vehicle.empty_spaces : '未知'}</span></p>
+                        ` : ''}
                     `;
             const card = document.createElement('div');
             card.className = 'station';
