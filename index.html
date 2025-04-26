@@ -896,6 +896,19 @@
             console.error("Vehicle data update failed:", error);
           });
       }
+      function updateVehicleDataUI(vehicleData) {
+        const stationElements = document.querySelectorAll('.station');
+        stationElements.forEach(card => {
+          const id = card.dataset.id;
+          const data = vehicleData[id] || {};
+          const yb2El = card.querySelector('.vehicle_yb2');
+          const ybeEl = card.querySelector('.vehicle_ybe');
+          const emptyEl = card.querySelector('.vehicle_empty');
+          if (yb2El) yb2El.textContent = (data.available_2_0 !== undefined ? data.available_2_0 : '未知');
+          if (ybeEl) ybeEl.textContent = (data.available_e !== undefined ? data.available_e : '未知');
+          if (emptyEl) emptyEl.textContent = (data.empty_spaces !== undefined ? data.empty_spaces : '未知');
+        });
+      }
       const toggleDarkModeButton = document.getElementById('toggleDarkMode');
       toggleDarkModeButton.addEventListener('click', () => {
         document.body.classList.toggle('dark-mode');
