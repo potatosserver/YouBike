@@ -979,7 +979,6 @@
               const { outcome } = await deferredPrompt.userChoice;
               console.log('User response to the install prompt:', outcome);
               deferredPrompt = null;
-              document.getElementById('installButton').style.display = 'none';
             } else if (window.matchMedia('(display-mode: standalone)').matches) {
               alert("App 已在運行中。");
             } else {
