@@ -684,11 +684,13 @@
             const vehicle = isOnline ? (Object.entries(vehData).find(([key]) => key === info.id)?.[1] || {}) : {};
             return { station_info: info, vehicle_info: vehicle };
           });
-          resultsDiv.innerHTML = '';
+          // 將下列重建 DOM 的邏輯改成更新已存在的 DOM
+          // 原本的： resultsDiv.innerHTML = ''; ... 建立所有卡片 ...
           organizedOutput.forEach(item => {
             const station = item.station_info;
             const vehicle = item.vehicle_info;
-            const pinButton = `<span class="pin-button ${pinnedStations.has(station.id) ? 'pinned' : ''}" data-id="${station.id}" onclick="togglePinStation('${station.id}', event)">${pinnedStations.has(station.id) ? '★' : '☆'}</span>`;
+            let card = document.querySelector(`.station[data-id="${station.id}"]`);
+            const pinButtonHtml = `<span class="pin-button ${pinnedStations.has(station.id) ? 'pinned' : ''}" data-id="${station.id}" onclick="togglePinStation('${station.id}', event)">${pinnedStations.has(station.id) ? '★' : '☆'}</span>`;
             const distance = calculateDistance(
               userLocation ? userLocation.latitude : defaultLatitude,
               userLocation ? userLocation.longitude : defaultLongitude,
@@ -696,36 +698,50 @@
               station.coords[1]
             );
             const displayDistance = distance < 1 ? Math.round(distance * 1000) + " 公尺" : distance.toFixed(2) + " 公里";
-            // 僅在線上模式顯示車子數量
             const vehicleInfoHtml = isOnline ? `
                         <p>YouBike 2.0: <span class="vehicle_yb2">${vehicle?.available_2_0 !== undefined ? vehicle.available_2_0 : '未知'}</span></p>
                         <p>YouBike 2.0E: <span class="vehicle_ybe">${vehicle?.available_e !== undefined ? vehicle.available_e : '未知'}</span></p>
                         <p>可停空位數: <span class="vehicle_empty">${vehicle?.empty_spaces !== undefined ? vehicle.empty_spaces : '未知'}</span></p>
                       ` : '';
             const cardContent = `
-                        ${pinButton}
+                        ${pinButtonHtml}
                         <h3>${station.name || '未知站點'}</h3>
                         <p class="distance">距離: ${displayDistance}</p>
                         <p>地址: ${station.address || '未知地址'}</p>
                         ${vehicleInfoHtml}
                     `;
-            const card = document.createElement('div');
-            card.className = 'station';
-            card.dataset.id = station.id;
-            card.dataset.lat = station.coords[0];
-            card.dataset.lng = station.coords[1];
-            card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
-            card.innerHTML = cardContent;
-            card.addEventListener("click", () => {
-              const lat = parseFloat(station.coords[0]), lng = parseFloat(station.coords[1]);
-              if (!isNaN(lat) && !isNaN(lng)) {
-                const googleMapsUrl = `https://www.google.com/maps?q=${lat},${lng}`;
-                window.open(googleMapsUrl, "_blank");
-              } else {
-                showModal("站點座標無效，無法開啟地圖。");
-              }
-            });
-            resultsDiv.appendChild(card);
+            if (card) {
+              // 更新已存在卡片
+              card.innerHTML = cardContent;
+              card.dataset.lat = station.coords[0];
+              card.dataset.lng = station.coords[1];
+              card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
+            } else {
+              // 建立新的卡片
+              card = document.createElement('div');
+              card.className = 'station';
+              card.dataset.id = station.id;
+              card.dataset.lat = station.coords[0];
+              card.dataset.lng = station.coords[1];
+              card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
+              card.innerHTML = cardContent;
+              card.addEventListener("click", () => {
+                const lat = parseFloat(station.coords[0]), lng = parseFloat(station.coords[1]);
+                if (!isNaN(lat) && !isNaN(lng)) {
+                  window.open(`https://www.google.com/maps?q=${lat},${lng}`, "_blank");
+                } else {
+                  showModal("站點座標無效，無法開啟地圖。");
+                }
+              });
+              resultsDiv.appendChild(card);
+            }
+          });
+          // 移除不再存在的卡片
+          const validIds = organizedOutput.map(item => item.station_info.id);
+          Array.from(resultsDiv.children).forEach(card => {
+            if (!validIds.includes(card.dataset.id)) {
+              resultsDiv.removeChild(card);
+            }
           });
           updateResultsOrder();
           // 新增：等待一次事件迴圈，確保卡片 DOM 更新完成
