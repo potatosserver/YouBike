@@ -24,6 +24,8 @@
 * 黑暗模式
 * 自動定時更新
 
+**提供離線功能，但需要在PWA應用中開啟**
+
 ## 使用方式
 
 1. 請前往 [potatosserver.github.io/YouBike](https://potatosserver.github.io/YouBike/) 即可使用本服務。
