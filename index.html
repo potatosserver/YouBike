@@ -1047,9 +1047,9 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (window.matchMedia('(display-mode: standalone)').matches) {
                 alert("App 已在運行中。");
             } else {
-                // 新增：使用深層連結方式開啟 PWA
-                // 請查看 manifest.json 中的 start_url 欄位，確認應用程式的啟動 URL
-                utl();
+                const errorMessage = 'App 已安裝，請從主畫面或開始清單中打開應用程式。';
+                console.error('PWA button error:', errorMessage, { deferredPrompt, displayMode: window.matchMedia('(display-mode: standalone)').matches, userAgent: navigator.userAgent, manifestHref: document.querySelector('link[rel="manifest"]')?.href });
+                alert(errorMessage);
             }
             updateInstallButton();  // 點擊後更新狀態
         } catch (error) {
@@ -1071,9 +1071,6 @@ document.querySelector('h1').addEventListener('click', function() {
 });
 const searchIcon = document.getElementById('searchIcon');
 searchIcon.addEventListener('click', searchYouBike);
-function utl() {
-    window.location.href = window.location.origin + '/YouBike/index.html?deepLink=true';
-}
 
     </script>
   </body>
