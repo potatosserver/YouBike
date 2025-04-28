@@ -1072,9 +1072,7 @@ document.querySelector('h1').addEventListener('click', function() {
 const searchIcon = document.getElementById('searchIcon');
 searchIcon.addEventListener('click', searchYouBike);
 function utl() {
-    // 使用深層連結開啟 PWA
-    // 注意：請打開 manifest.json 查看 start_url 欄位，範例 URL 如下
-    window.location.href = window.location.origin + '/YouBike/?deepLink=true';
+    window.location.href = window.location.origin + '/YouBike/index.html?deepLink=true';
 }
 
     </script>
