@@ -4,6 +4,7 @@
   "short_name": "YouBike",
   "description": "A Progressive Web App for YouBike station search and information.",
   "start_url": "./index.html?deepLink=true",
+  "scope": "/YouBike/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#ffaa00",
