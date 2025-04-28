@@ -1020,6 +1020,12 @@
       }, 60000);
       let deferredPrompt;
       document.addEventListener('DOMContentLoaded', () => {
+        // 新增：依是否安裝決定 PWA 按鈕圖片
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+          const installBtn = document.getElementById('installButton');
+          installBtn.innerHTML = '<img src="https://potatosserver.github.io/YouBike/icons/open.png" alt="開啟" style="width:35px; height:35px;" />';
+          installBtn.title = "開啟應用程式";
+        }
         window.addEventListener('beforeinstallprompt', (e) => {
           e.preventDefault();
           deferredPrompt = e;
