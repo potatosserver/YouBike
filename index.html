@@ -1018,50 +1018,66 @@
           searchYouBike(false);
         }
       }, 60000);
-      let deferredPrompt;
-      document.addEventListener('DOMContentLoaded', () => {
-        // 新增：依是否安裝決定 PWA 按鈕圖片
-        if (window.matchMedia('(display-mode: standalone)').matches) {
-          const installBtn = document.getElementById('installButton');
-          installBtn.innerHTML = '<img src="https://potatosserver.github.io/YouBike/icons/open.png" alt="開啟" style="width:35px; height:35px;" />';
-          installBtn.title = "開啟應用程式";
-        }
-        window.addEventListener('beforeinstallprompt', (e) => {
-          e.preventDefault();
-          deferredPrompt = e;
-          document.getElementById('installButton').style.display = 'block';
-        });
-        document.getElementById('installButton').addEventListener('click', async () => {
-          try {
+      // 新增：統一更新 PWA 按鈕圖示的函式
+function updateInstallButton() {
+    const installBtn = document.getElementById('installButton');
+    if (deferredPrompt) {
+        installBtn.innerHTML = '<img src="https://potatosserver.github.io/YouBike/icons/install.png" alt="安裝" style="width:35px; height:35px;" />';
+        installBtn.title = "安裝應用程式";
+    } else if (window.matchMedia('(display-mode: standalone)').matches) {
+        installBtn.innerHTML = '<img src="https://potatosserver.github.io/YouBike/icons/open.png" alt="開啟" style="width:35px; height:35px;" />';
+        installBtn.title = "開啟應用程式";
+    } else {
+        installBtn.innerHTML = '<img src="https://potatosserver.github.io/YouBike/icons/open.png" alt="開啟" style="width:35px; height:35px;" />';
+        installBtn.title = "開啟應用程式";
+    }
+}
+
+let deferredPrompt;
+document.addEventListener('DOMContentLoaded', () => {
+    // 呼叫統一的更新函式
+    updateInstallButton();
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        document.getElementById('installButton').style.display = 'block';
+        updateInstallButton();  // 更新後台邏輯
+    });
+    document.getElementById('installButton').addEventListener('click', async () => {
+        try {
             if (deferredPrompt) {
-              await deferredPrompt.prompt();
-              const { outcome } = await deferredPrompt.userChoice;
-              console.log('User response to the install prompt:', outcome);
-              deferredPrompt = null;
+                await deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log('User response to the install prompt:', outcome);
+                deferredPrompt = null;
             } else if (window.matchMedia('(display-mode: standalone)').matches) {
-              alert("App 已在運行中。");
+                alert("App 已在運行中。");
             } else {
-              const errorMessage = 'App 已安裝，請從主畫面或開始清單中打開應用程式。';
-              console.error('PWA button error:', errorMessage, { deferredPrompt: deferredPrompt, displayMode: window.matchMedia('(display-mode: standalone)').matches, userAgent: navigator.userAgent, manifestHref: document.querySelector('link[rel="manifest"]')?.href });
-              alert(errorMessage);
+                const errorMessage = 'App 已安裝，請從主畫面或開始清單中打開應用程式。';
+                console.error('PWA button error:', errorMessage, { deferredPrompt, displayMode: window.matchMedia('(display-mode: standalone)').matches, userAgent: navigator.userAgent, manifestHref: document.querySelector('link[rel="manifest"]')?.href });
+                alert(errorMessage);
             }
-          } catch (error) {
+            updateInstallButton();  // 點擊後更新狀態
+        } catch (error) {
             console.error('安裝按鈕發生錯誤:', error);
-          }
-        });
-      });
-      window.addEventListener('appinstalled', () => {
-        console.log('App 已安裝');
-        deferredPrompt = null;
-        const installBtn = document.getElementById('installButton');
-        installBtn.innerHTML = '<img src="https://potatosserver.github.io/YouBike/icons/open.png" alt="開啟" />';
-      });
-      document.querySelector('h1').addEventListener('click', function() {
-        keywordInput.value = '';
-        searchYouBike();
-      });
-      const searchIcon = document.getElementById('searchIcon');
-      searchIcon.addEventListener('click', searchYouBike);
+        }
+    });
+});
+
+// appinstalled 事件中同樣更新
+window.addEventListener('appinstalled', () => {
+    console.log('App 已安裝');
+    deferredPrompt = null;
+    updateInstallButton();
+});
+
+document.querySelector('h1').addEventListener('click', function() {
+    keywordInput.value = '';
+    searchYouBike();
+});
+const searchIcon = document.getElementById('searchIcon');
+searchIcon.addEventListener('click', searchYouBike);
+
     </script>
   </body>
 </html>
