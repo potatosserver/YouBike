@@ -63,7 +63,7 @@
 ## 貢獻者
 
 * [AndrewCho0531](https://github.com/AndrewCho0531):邏輯編寫、UI設計
-* [KEVIN970712](https://github.com/KEVIN970712):題材發想、錯誤修正
+* [KEVIN970712](https://github.com/KEVIN970712):題材發想、錯誤修正、APK封裝
 
 ## 補充
 
