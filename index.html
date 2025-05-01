@@ -1018,12 +1018,9 @@ function updateInstallButton() {
     if (deferredPrompt) {
         installBtn.innerHTML = '<img src="https://potatosserver.github.io/YouBike/icons/install.png" alt="安裝" style="width:45px; height:45px;" />';
         installBtn.title = "安裝應用程式";
-    } else if (window.matchMedia('(display-mode: standalone)').matches) {
-        installBtn.innerHTML = '<img src="https://potatosserver.github.io/YouBike/icons/open.png" alt="開啟" style="width:45px; height:45px;" />';
-        installBtn.title = "開啟應用程式";
+        installBtn.style.display = 'block';
     } else {
-        installBtn.innerHTML = '<img src="https://potatosserver.github.io/YouBike/icons/open.png" alt="開啟" style="width:45px; height:45px;" />';
-        installBtn.title = "開啟應用程式";
+        installBtn.style.display = 'none';
     }
 }
 
