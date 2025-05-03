@@ -560,27 +560,37 @@
           if (navigator.onLine) {
             if (!kcgDataCache) {
               // 第一次載入時請求第1個 API
-              const kcgUrl = "https://api.kcg.gov.tw/api/service/Get/b4dd9c40-9027-4125-8666-06bef1756092";
+              const kcgUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
               const kcgResponse = await fetch(kcgUrl, {
-                headers: { "User-Agent": "Mozilla/5.0" }
+                headers : {
+                  'accept': '*/*',
+                  'accept-language': 'zh-TW,zh;q=0.9',
+                }
               });
               if (!kcgResponse.ok) throw new Error(`HTTP error! status: ${kcgResponse.status}`);
               const kcgData = await kcgResponse.json();
-              kcgDataCache = kcgData?.data?.data?.retVal || [];
+              // 修改部份：依照提供的格式直接取用 JSON 陣列，並轉換 lat、lng 為數字
+              kcgDataCache = Array.isArray(kcgData)
+                ? kcgData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
+                : [];
               // 將取得的資料儲存至 localStorage
               localStorage.setItem('cachedKcgData', JSON.stringify(kcgDataCache));
             }
           } else {
             if (!kcgDataCache) {
-              // 從 localStorage 讀取之前儲存的第1個 API 資料
-              kcgDataCache = JSON.parse(localStorage.getItem('cachedKcgData') || '[]');
+              // 從 localStorage 讀取之前儲存的第1個 API 資料並轉換 lat、lng 為數字
+              kcgDataCache = JSON.parse(localStorage.getItem('cachedKcgData') || '[]').map(item => ({
+                ...item,
+                lat: parseFloat(item.lat),
+                lng: parseFloat(item.lng)
+              }));
             }
           }
           let kcgResults = kcgDataCache;
           if (keyword) {
             kcgResults = kcgResults.filter(station => {
-              const stationName = station.sna ? station.sna.toLowerCase() : '';
-              const stationAddress = station.ar ? station.ar.toLowerCase() : '';
+              const stationName = station.name_tw ? station.name_tw.toLowerCase() : '';
+              const stationAddress = station.address_tw ? station.address_tw.toLowerCase() : '';
               return stationName.includes(keyword) || stationAddress.includes(keyword);
             });
           }
@@ -600,8 +610,8 @@
           let limit = keyword ? 50 : 20;
           let usedStations;
           if (!keyword) {
-            const pinnedFromLocal = kcgResults.filter(station => pinnedStations.has(String(station.sno)));
-            const unpinned = kcgResults.filter(station => !pinnedStations.has(String(station.sno)));
+            const pinnedFromLocal = kcgResults.filter(station => pinnedStations.has(String(station.station_no)));
+            const unpinned = kcgResults.filter(station => !pinnedStations.has(String(station.station_no)));
             pinnedFromLocal.sort((a, b) => {
               const distA = calculateDistance(
                 userLocation ? userLocation.latitude : defaultLatitude,
@@ -631,8 +641,8 @@
             usedStations = [...pinnedFromLocal, ...unpinned].slice(0, limit);
           } else {
             usedStations = kcgResults.slice(0, limit);
-            const pinnedList = usedStations.filter(station => pinnedStations.has(String(station.sno)));
-            const nonPinnedList = usedStations.filter(station => !pinnedStations.has(String(station.sno)));
+            const pinnedList = usedStations.filter(station => pinnedStations.has(String(station.station_no)));
+            const nonPinnedList = usedStations.filter(station => !pinnedStations.has(String(station.station_no)));
             pinnedList.sort((a, b) => {
               const distA = calculateDistance(
                 userLocation ? userLocation.latitude : defaultLatitude,
@@ -663,17 +673,17 @@
           }
           const isOnline = navigator.onLine;
           let vehData = {};
-          const stationIds = usedStations.map(station => String(station.sno));
+          const stationIds = usedStations.map(station => String(station.station_no));
           if (isOnline) {
             vehData = await queryVehicleData(stationIds); // 線上模式取得車子資訊
           }
           const organizedOutput = usedStations.map(site => {
             const info = {
-              id: String(site.sno),
-              name: site.sna,
+              id: String(site.station_no),
+              name: site.name_tw,
               coords: [site.lat, site.lng],
-              district: site.sarea,
-              address: site.ar
+              district: site.district_tw,
+              address: site.address_tw
             };
             const vehicle = isOnline ? (Object.entries(vehData).find(([key]) => key === info.id)?.[1] || {}) : {};
             return { station_info: info, vehicle_info: vehicle };
