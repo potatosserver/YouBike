@@ -1049,7 +1049,7 @@
       searchIcon.addEventListener('click', searchYouBike);
       function updateInstallButton() {
         const installBtn = document.getElementById('installButton');
-        if (window.matchMedia('(display-mode: standalone)').matches) {
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
           installBtn.style.display = 'none';
         } else {
           installBtn.innerHTML = '<img src="https://potatosserver.github.io/YouBike/icons/install.png" alt="安裝" style="width:45px; height:45px;" />';
@@ -1074,7 +1074,7 @@
               console.log('User response to the install prompt:', outcome);
               deferredPrompt = null;
             } else {
-              installBtn.style.display = 'none';
+              document.getElementById('installButton').style.display = 'none';
             }
             updateInstallButton();
           } catch (error) {
