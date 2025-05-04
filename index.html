@@ -457,6 +457,8 @@
       </button>
       <button id="toggleDarkMode" title="切換暗色模式">🌙</button>
     </div>
+    <!-- 修改浮動倒數更新按鈕（寬度小小的就好） -->
+    <button id="updateCountdown" style="position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; padding: 6px 12px; background-color: white; color: #007bff; border: 2px solid #007bff; border-radius: 25px; font-size: 0.8em; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: all 0.3s ease; width: 100px;">60秒後更新</button>
     <script>
       let userLocation = null;
       let sortingLocked = false;
@@ -1078,6 +1080,25 @@ document.querySelector('h1').addEventListener('click', function() {
 });
 const searchIcon = document.getElementById('searchIcon');
 searchIcon.addEventListener('click', searchYouBike);
+
+  // 新增倒數更新邏輯
+  let remainingSeconds = 61;
+  const updateButton = document.getElementById('updateCountdown');
+  setInterval(() => {
+      remainingSeconds--;
+      if (remainingSeconds <= 0) {
+          searchYouBike();
+          updateVehicleData();
+          remainingSeconds = 60;
+      }
+      updateButton.textContent = `${remainingSeconds}秒後更新`;
+  }, 1000);
+  updateButton.addEventListener('click', () => {
+      searchYouBike();
+      updateVehicleData();
+      remainingSeconds = 60;
+      updateButton.textContent = "60秒後更新"; // 新增：按下後立即更新文字
+  });
 
     </script>
   </body>
