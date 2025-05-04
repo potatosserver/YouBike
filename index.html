@@ -1018,25 +1018,30 @@
           searchYouBike();
         }
       });
+      // 新增全域變數以重置倒數
+      let remainingSeconds = 60;
+      let countdownInterval;
+
       function initUpdateCountdown() {
-        const updateButton = document.getElementById('updateCountdown');
-        updateButton.style.display = 'block';
-        let remainingSeconds = 60;
-        updateButton.textContent = `${remainingSeconds}秒後更新`;
-        updateButton.addEventListener('click', updateData);
-        setInterval(() => {
-          remainingSeconds--;
-          if (remainingSeconds <= 0) {
-            updateData();
-            remainingSeconds = 60;
-          } else {
-            updateButton.textContent = `${remainingSeconds}秒後更新`;
-          }
-        }, 1000);
+          const updateButton = document.getElementById('updateCountdown');
+          updateButton.style.display = 'block';
+          updateButton.textContent = `${remainingSeconds}秒後更新`;
+          updateButton.addEventListener('click', updateData);
+          if (countdownInterval) clearInterval(countdownInterval);
+          countdownInterval = setInterval(() => {
+            remainingSeconds--;
+            if (remainingSeconds <= 0) {
+              updateData();
+            } else {
+              updateButton.textContent = `${remainingSeconds}秒後更新`;
+            }
+          }, 1000);
       }
+
       function updateData() {
-        document.getElementById('updateCountdown').textContent = "60秒後更新";
-        searchYouBike();
+          remainingSeconds = 60; // 重設倒數
+          document.getElementById('updateCountdown').textContent = "60秒後更新";
+          searchYouBike();
       }
       updateData();
       updateInstallButton();
