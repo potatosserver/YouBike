@@ -1049,12 +1049,14 @@
       searchIcon.addEventListener('click', searchYouBike);
       function updateInstallButton() {
         const installBtn = document.getElementById('installButton');
-        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone || !deferredPrompt) {
-          installBtn.style.display = 'none';
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+            installBtn.style.display = 'none';
+        } else if (deferredPrompt) {
+            installBtn.innerHTML = '<img src="https://potatosserver.github.io/YouBike/icons/install.png" alt="安裝" style="width:45px; height:45px;" />';
+            installBtn.title = "安裝應用程式";
+            installBtn.style.display = 'block';
         } else {
-          installBtn.innerHTML = '<img src="https://potatosserver.github.io/YouBike/icons/install.png" alt="安裝" style="width:45px; height:45px;" />';
-          installBtn.title = "安裝應用程式";
-          installBtn.style.display = 'block';
+            installBtn.style.display = 'none';
         }
       }
       let deferredPrompt;
