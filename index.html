@@ -1073,12 +1073,8 @@
               const { outcome } = await deferredPrompt.userChoice;
               console.log('User response to the install prompt:', outcome);
               deferredPrompt = null;
-            } else if (window.matchMedia('(display-mode: standalone)').matches) {
-              alert("App 已在運行中。");
             } else {
-              const errorMessage = 'App 已安裝，請從主畫面或開始清單中打開應用程式。';
-              console.error('PWA button error:', errorMessage, { deferredPrompt, displayMode: window.matchMedia('(display-mode: standalone)').matches, userAgent: navigator.userAgent, manifestHref: document.querySelector('link[rel="manifest"]')?.href });
-              alert(errorMessage);
+              installBtn.style.display = 'none';
             }
             updateInstallButton();
           } catch (error) {
