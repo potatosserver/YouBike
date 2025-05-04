@@ -465,7 +465,7 @@
       let initialLoad = true;
       let locationDenied = false;
       let geolocationErrorMessage = null;
-      let dataLoaded = false; // 新增：記錄資料是否已載入完成
+      let dataLoaded = false; 
       const defaultLatitude = 22.6315725;
       const defaultLongitude = 120.3025079;
       const overlay = document.querySelector('.overlay');
@@ -514,16 +514,14 @@
           const overlay = document.getElementById("loadingOverlay");
           const mainContent = document.getElementById("mainContent");
           if (navigator.onLine) {
-            // 線上模式，原有動畫
             overlay.style.opacity = "0";
             setTimeout(() => {
               overlay.style.display = "none";
               mainContent.style.display = "block";
             }, 500);
           } else {
-            // 離線模式，更新訊息並延後隱藏
             document.getElementById("loadingText").textContent = "離線模式啟動中...";
-            overlay.style.opacity = "1"; // 確保 Loading 畫面清晰可見
+            overlay.style.opacity = "1"; 
             setTimeout(() => {
               overlay.style.display = "none";
               mainContent.style.display = "block";
@@ -552,16 +550,14 @@
           }
         }, 50);
       })();
-      let kcgDataCache = null; // 用於緩存第一個 API 的資料
+      let kcgDataCache = null; 
 
       async function searchYouBike(showLoadingIndicator = true) {
         if (showLoadingIndicator) showLoading();
         const keyword = keywordInput.value.trim().toLowerCase();
         try {
-          // 新增離線模式判斷與快取讀取
           if (navigator.onLine) {
             if (!kcgDataCache) {
-              // 第一次載入時請求第1個 API
               const kcgUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
               const kcgResponse = await fetch(kcgUrl, {
                 headers : {
@@ -1018,13 +1014,20 @@
           searchYouBike();
         }
       });
-      setInterval(updateVehicleData, 60000);
+      let remainingSeconds = 60;
+      const updateButton = document.getElementById('updateCountdown');
+
       setInterval(() => {
-        if (document.getElementById('toggleUseLocation').checked) {
-          searchYouBike(false);
-        }
-      }, 60000);
-      // 新增：統一更新 PWA 按鈕圖示的函式
+          remainingSeconds--;
+          if (remainingSeconds <= 0) {
+              updateData();
+          } else {
+              updateButton.textContent = `${remainingSeconds}秒後更新`;
+          }
+      }, 1000);
+      
+      updateButton.addEventListener('click', updateData);
+
 function updateInstallButton() {
     const installBtn = document.getElementById('installButton');
     if (deferredPrompt) {
@@ -1081,24 +1084,11 @@ document.querySelector('h1').addEventListener('click', function() {
 const searchIcon = document.getElementById('searchIcon');
 searchIcon.addEventListener('click', searchYouBike);
 
-  // 新增倒數更新邏輯
-  let remainingSeconds = 61;
-  const updateButton = document.getElementById('updateCountdown');
-  setInterval(() => {
-      remainingSeconds--;
-      if (remainingSeconds <= 0) {
-          searchYouBike();
-          updateVehicleData();
-          remainingSeconds = 60;
-      }
-      updateButton.textContent = `${remainingSeconds}秒後更新`;
-  }, 1000);
-  updateButton.addEventListener('click', () => {
-      searchYouBike();
-      updateVehicleData();
-      remainingSeconds = 60;
-      updateButton.textContent = "60秒後更新"; // 新增：按下後立即更新文字
-  });
+function updateData() {
+    searchYouBike();
+    remainingSeconds = 60;
+    updateButton.textContent = "60秒後更新";
+}
 
     </script>
   </body>
