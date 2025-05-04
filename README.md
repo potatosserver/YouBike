@@ -44,7 +44,6 @@
 
 ## 資料來源
 
-- [高雄市資料開放平台API](https://api.kcg.gov.tw/ServiceList/Detail/b4dd9c40-9027-4125-8666-06bef1756092)
 -  [YouBike 官網](https://www.youbike.com.tw)
 
 ## 版權與聲明
@@ -54,7 +53,7 @@
 
 ## 已知錯誤
 
-* api暫停服務
+* 暫無
 
 ## 貢獻
 
