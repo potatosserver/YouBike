@@ -29,7 +29,7 @@
 
 ## 使用方式
 
-1. 請前往 [potatosserver.github.io/YouBike](https://potatosserver.github.io/YouBike/) 即可使用本服務。
+1. 請前往 [potatosserver.github.io/YouBike](https://potatosserver.github.io/YouBike/) 或是從[Releases](https://github.com/potatosserver/YouBike/releases)下載APK安裝至Android手機即可使用本服務。
 2. 在搜尋框輸入關鍵字查詢
 3. 可開啟定位啟用最近站點與距離計算。
 4. 點擊卡片可開啟站點的Google地圖。
@@ -49,7 +49,7 @@
 ## 版權與聲明
 
 本專案皆可自由共享與修改，但不可用於盈利目的。  
-本工具不屬於高雄市政府及 YouBike 公司
+本工具不屬於 YouBike 微笑單車股份有限公司
 
 ## 已知錯誤
 
