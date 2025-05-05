@@ -27,6 +27,8 @@
 
 **離線模式提供定位功能，但需要在PWA或實體應用程式中開啟。離線模式僅提供附近站點，不會顯示車子數量**
 
+**使用VPN可能導致離線模式無法正確啟動，請關閉VPN**
+
 ## 使用方式
 
 1. 請前往 [potatosserver.github.io/YouBike](https://potatosserver.github.io/YouBike/) 或是從[Releases](https://github.com/potatosserver/YouBike/releases)下載APK安裝至Android手機即可使用本服務。
