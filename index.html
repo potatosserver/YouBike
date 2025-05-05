@@ -515,7 +515,28 @@
 #extraButtons.hiding {
     animation: popDown 0.5s forwards;
 }
-
+/* 修改：在 extraButtons 內的超連結以圖示顯示 */
+#extraButtons a {
+    width: 50px;
+    height: 50px;
+    background-color: white;
+    color: black;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+#extraButtons a:hover {
+    background-color: #f0f0f0;
+}
+/* 新增：收合動畫樣式 */
+#extraButtons.hiding {
+    animation: popDown 0.5s forwards;
+}
     </style>
   </head>
   <body>
@@ -544,10 +565,14 @@
         <p id="modalText"></p>
         <button id="modalButton">確定</button>
       </div>
-      <!-- 修改：更新 #extraButtons 內容，將原有兩個按鈕內的內容改為兩個超連結 -->
+      <!-- 修改：更新 #extraButtons 區塊，將內容調整為兩個以圖示顯示的超連結 -->
       <div id="extraButtons">
-        <a href="https://github.com/potatosserver/YouBike/tree/main" target="_blank">YouBike Repo</a>
-        <a href="https://github.com/potatosserver/YouBike_Python" target="_blank">YouBike Python</a>
+          <a href="https://github.com/potatosserver/YouBike/tree/main" target="_blank">
+              <img src="https://github.com/potatosserver/YouBike/blob/main/icons/html.png" alt="YouBike Repo" style="width:30px; height:30px;" />
+          </a>
+          <a href="https://github.com/potatosserver/YouBike_Python" target="_blank">
+              <img src="https://github.com/potatosserver/YouBike/blob/main/icons/python.png" alt="YouBike Python" style="width:30px; height:30px;" />
+          </a>
       </div>
       <a id="githubLink" title="GitHub Repository">
         <button id="githubButton" style="position: fixed; bottom: 80px; right: 20px; z-index: 1000; width: 50px; height: 50px; background: white; color: black; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">
