@@ -546,7 +546,7 @@
       </div>
     </div>
     <div id="mainContent" style="display:none;">
-      <h1>高雄 YouBike 搜尋</h1>
+      <h1>YouBike 搜尋</h1>
       <div id="searchContainer">
         <input type="text" id="keyword" placeholder="請輸入站點名稱、地址" value="" />
         <span id="searchIcon" title="搜尋">🔍</span>
@@ -683,7 +683,7 @@
           }
         }, 50);
       })();
-      let kcgDataCache = null; // 用於緩存第一個 API 的資料
+      let youbikeDataCache = null; // 用於緩存第一個 API 的資料
 
       async function searchYouBike(showLoadingIndicator = true) {
         if (showLoadingIndicator) showLoading();
@@ -691,43 +691,43 @@
         try {
           // 新增離線模式判斷與快取讀取
           if (navigator.onLine) {
-            if (!kcgDataCache) {
+            if (!youbikeDataCache) {
               // 第一次載入時請求第1個 API
-              const kcgUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
-              const kcgResponse = await fetch(kcgUrl, {
+              const youbikeUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
+              const response = await fetch(youbikeUrl, {
                 headers : {
                   'accept': '*/*',
                   'accept-language': 'zh-TW,zh;q=0.9',
                 }
               });
-              if (!kcgResponse.ok) throw new Error(`HTTP error! status: ${kcgResponse.status}`);
-              const kcgData = await kcgResponse.json();
+              if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+              const youbikeData = await response.json();
               // 修改部份：依照提供的格式直接取用 JSON 陣列，並轉換 lat、lng 為數字
-              kcgDataCache = Array.isArray(kcgData)
-                ? kcgData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
+              youbikeDataCache = Array.isArray(youbikeData)
+                ? youbikeData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
                 : [];
               // 將取得的資料儲存至 localStorage
-              localStorage.setItem('cachedKcgData', JSON.stringify(kcgDataCache));
+              localStorage.setItem('cachedYoubikeData', JSON.stringify(youbikeDataCache));
             }
           } else {
-            if (!kcgDataCache) {
+            if (!youbikeDataCache) {
               // 從 localStorage 讀取之前儲存的第1個 API 資料並轉換 lat、lng 為數字
-              kcgDataCache = JSON.parse(localStorage.getItem('cachedKcgData') || '[]').map(item => ({
+              youbikeDataCache = JSON.parse(localStorage.getItem('cachedYoubikeData') || '[]').map(item => ({
                 ...item,
                 lat: parseFloat(item.lat),
                 lng: parseFloat(item.lng)
               }));
             }
           }
-          let kcgResults = kcgDataCache;
+          let youbikeResults = youbikeDataCache;
           if (keyword) {
-            kcgResults = kcgResults.filter(station => {
+            youbikeResults = youbikeResults.filter(station => {
               const stationName = station.name_tw ? station.name_tw.toLowerCase() : '';
               const stationAddress = station.address_tw ? station.address_tw.toLowerCase() : '';
               return stationName.includes(keyword) || stationAddress.includes(keyword);
             });
           }
-          kcgResults = kcgResults.sort((a, b) => {
+          youbikeResults = youbikeResults.sort((a, b) => {
             const distA = calculateDistance(
               userLocation ? userLocation.latitude : defaultLatitude,
               userLocation ? userLocation.longitude : defaultLongitude,
@@ -743,8 +743,8 @@
           let limit = keyword ? 50 : 20;
           let usedStations;
           if (!keyword) {
-            const pinnedFromLocal = kcgResults.filter(station => pinnedStations.has(String(station.station_no)));
-            const unpinned = kcgResults.filter(station => !pinnedStations.has(String(station.station_no)));
+            const pinnedFromLocal = youbikeResults.filter(station => pinnedStations.has(String(station.station_no)));
+            const unpinned = youbikeResults.filter(station => !pinnedStations.has(String(station.station_no)));
             pinnedFromLocal.sort((a, b) => {
               const distA = calculateDistance(
                 userLocation ? userLocation.latitude : defaultLatitude,
@@ -773,7 +773,7 @@
             });
             usedStations = [...pinnedFromLocal, ...unpinned].slice(0, limit);
           } else {
-            usedStations = kcgResults.slice(0, limit);
+            usedStations = youbikeResults.slice(0, limit);
             const pinnedList = usedStations.filter(station => pinnedStations.has(String(station.station_no)));
             const nonPinnedList = usedStations.filter(station => !pinnedStations.has(String(station.station_no)));
             pinnedList.sort((a, b) => {
