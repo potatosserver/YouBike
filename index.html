@@ -1099,7 +1099,6 @@ searchIcon.addEventListener('click', searchYouBike);
   }, 1000);
   updateButton.addEventListener('click', () => {
       searchYouBike();
-      updateVehicleData();
       remainingSeconds = 60;
       updateButton.textContent = "60秒後更新"; // 新增：按下後立即更新文字
   });
@@ -1107,4 +1106,3 @@ searchIcon.addEventListener('click', searchYouBike);
     </script>
   </body>
 </html>
-`
