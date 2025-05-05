@@ -1022,12 +1022,7 @@
           searchYouBike();
         }
       });
-      setInterval(updateVehicleData, 60000);
-      setInterval(() => {
-        if (document.getElementById('toggleUseLocation').checked) {
-          searchYouBike(false);
-        }
-      }, 60000);
+
       // 新增：統一更新 PWA 按鈕圖示的函式
 function updateInstallButton() {
     const installBtn = document.getElementById('installButton');
@@ -1085,23 +1080,31 @@ document.querySelector('h1').addEventListener('click', function() {
 const searchIcon = document.getElementById('searchIcon');
 searchIcon.addEventListener('click', searchYouBike);
 
-  // 新增倒數更新邏輯
-  let remainingSeconds = 61;
-  const updateButton = document.getElementById('updateCountdown');
-  setInterval(() => {
-      remainingSeconds--;
-      if (remainingSeconds <= 0) {
-          searchYouBike();
-          updateVehicleData();
-          remainingSeconds = 60;
-      }
-      updateButton.textContent = `${remainingSeconds}秒後更新`;
-  }, 1000);
-  updateButton.addEventListener('click', () => {
-      searchYouBike();
-      remainingSeconds = 60;
-      updateButton.textContent = "60秒後更新"; // 新增：按下後立即更新文字
-  });
+// 修改倒數更新邏輯，統一使用 countdownTimer 變數
+let countdownTimer = {
+    remaining: 60,
+    updateButton: document.getElementById('updateCountdown'),
+    updateDisplay: function() {
+        this.updateButton.textContent = `${this.remaining}秒後更新`;
+    },
+    reset: function() {
+        this.remaining = 60;
+    }
+};
+countdownTimer.updateDisplay();
+setInterval(() => {
+    countdownTimer.remaining--;
+    if (countdownTimer.remaining <= 0) {
+        searchYouBike();
+        countdownTimer.reset();
+    }
+    countdownTimer.updateDisplay();
+}, 1000);
+countdownTimer.updateButton.addEventListener('click', () => {
+    searchYouBike();
+    countdownTimer.reset();
+    countdownTimer.updateDisplay();
+});
 
     </script>
   </body>
