@@ -1256,6 +1256,15 @@ countdownTimer.updateButton.addEventListener('click', () => {
     countdownTimer.updateDisplay();
 });
 
+  // 修改：全域點擊事件，點擊其他地方觸發收合動畫
+  document.addEventListener('click', () => {
+      if (extraButtons.classList.contains('show')) {
+          extraButtons.classList.add('hiding');
+          setTimeout(() => {
+              extraButtons.classList.remove('show', 'hiding');
+          }, 500);
+      }
+  });
     </script>
   </body>
 </html>
