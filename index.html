@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="zh-TW">
   <head>
@@ -458,8 +457,8 @@
       </button>
       <button id="toggleDarkMode" title="切換暗色模式">🌙</button>
     </div>
-    <!-- 修改浮動倒數更新按鈕（寬度小小的就好） -->
-    <button id="updateCountdown" style="position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; padding: 6px 12px; background-color: white; color: #007bff; border: 2px solid #007bff; border-radius: 25px; font-size: 0.8em; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: all 0.3s ease; width: 100px;">60秒後更新</button>
+    <!-- 修改：更新倒數按鈕初始隱藏 -->
+    <button id="updateCountdown" style="display:none; position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; padding: 6px 12px; background-color: white; color: #007bff; border: 2px solid #007bff; border-radius: 25px; font-size: 0.8em; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: all 0.3s ease; width: 100px;">60秒後更新</button>
     <script>
       let userLocation = null;
       let sortingLocked = false;
@@ -520,6 +519,8 @@
             setTimeout(() => {
               overlay.style.display = "none";
               mainContent.style.display = "block";
+              // 新增：顯示更新倒數按鈕
+              document.getElementById('updateCountdown').style.display = "block";
             }, 500);
           } else {
             // 離線模式，更新訊息並延後隱藏
@@ -528,6 +529,8 @@
             setTimeout(() => {
               overlay.style.display = "none";
               mainContent.style.display = "block";
+              // 新增：顯示更新倒數按鈕
+              document.getElementById('updateCountdown').style.display = "block";
             }, 3000);
           }
           mainContentShown = true;
@@ -1104,3 +1107,4 @@ searchIcon.addEventListener('click', searchYouBike);
     </script>
   </body>
 </html>
+`
