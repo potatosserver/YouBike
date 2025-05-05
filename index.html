@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>高雄 YouBike 站點搜尋</title>
+    <title>YouBike 站點搜尋</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
     <link rel="manifest" href="/YouBike/manifest.json" />
     <script>
@@ -533,6 +533,7 @@
 #extraButtons a:hover {
     background-color: #f0f0f0;
 }
+
 /* 新增：收合動畫樣式 */
 #extraButtons.hiding {
     animation: popDown 0.5s forwards;
@@ -1214,6 +1215,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // 新增：滾動頁面時收合 GitHub 按鈕
+    window.addEventListener('scroll', () => {
+        if (extraButtons.classList.contains('show')) {
+            extraButtons.classList.add('hiding');
+            setTimeout(() => {
+                extraButtons.classList.remove('show', 'hiding');
+            }, 500);
+        }
+    });
 });
 
 // appinstalled 事件中同樣更新
