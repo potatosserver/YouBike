@@ -418,7 +418,104 @@
         height: 45px;
         object-fit: contain;
       }
-      
+      /* 修改：GitHub 按鈕相同造型並位於其左側的 CSS */
+      #extraButtons {
+          position: fixed;
+          bottom: 80px;
+          right: 80px; /* 與 GitHub 按鈕 (right:20px) 貼合，間距約60px */
+          transform: translateX(100%);
+          transition: transform 0.5s ease;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          z-index: 1000;
+      }
+      #extraButtons.show {
+          transform: translateX(0);
+      }
+      #extraButtons a {
+          width: 50px;
+          height: 50px;
+          background-color: white;
+          color: black;
+          border: none;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          text-decoration: none;
+          transition: background-color 0.3s ease;
+      }
+      #extraButtons a:hover {
+          background-color: #f0f0f0;
+      }
+      /* 修改：#extraButtons 當未呼叫時完全隱藏，顯示後水平排列在 GitHub 按鈕左方 */
+#extraButtons {
+    display: none; /* 初始隱藏 */
+    position: fixed;
+    bottom: 80px;
+    right: 80px; /* 與 GitHub 按鈕（right:20px）左側貼合 */
+    transition: all 0.5s ease;
+    flex-direction: row; /* 水平排列 */
+    gap: 10px;
+    z-index: 1000;
+}
+#extraButtons.show {
+    display: flex;
+}
+
+/* 修改按鈕連結，增加圖片佔位欄位 */
+#extraButtons a {
+    width: 50px;
+    height: 50px;
+    background-color: white;
+    color: black;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+#extraButtons a:hover {
+    background-color: #f0f0f0;
+}
+
+/* 新增：彈出動畫 keyframes */
+@keyframes popUp {
+    0% { transform: translateX(100%) scale(0.5); opacity: 0; }
+    100% { transform: translateX(0) scale(1); opacity: 1; }
+}
+@keyframes popDown {
+    0% { transform: translateX(0) scale(1); opacity: 1; }
+    100% { transform: translateX(100%) scale(0.5); opacity: 0; }
+}
+/* 修改：GitHub 按鈕相同造型並位於其左側的 CSS，加入彈出動畫 */
+#extraButtons {
+    position: fixed;
+    bottom: 80px;
+    right: 80px; /* 與 GitHub 按鈕 (right:20px) 貼合，間距約60px */
+    transform: translateX(100%) scale(0.5);
+    opacity: 0;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+    display: flex;
+    flex-direction: row; /* 改為橫向排列 */
+    gap: 10px;
+    z-index: 1000;
+}
+#extraButtons.show {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+    animation: popUp 0.5s forwards;
+}
+/* 新增：收合動畫樣式 */
+#extraButtons.hiding {
+    animation: popDown 0.5s forwards;
+}
+
     </style>
   </head>
   <body>
@@ -447,7 +544,12 @@
         <p id="modalText"></p>
         <button id="modalButton">確定</button>
       </div>
-      <a href="https://github.com/potatosserver/YouBike" target="_blank" title="GitHub Repository">
+      <!-- 修改：更新 #extraButtons 內容，將原有兩個按鈕內的內容改為兩個超連結 -->
+      <div id="extraButtons">
+        <a href="https://github.com/potatosserver/YouBike/tree/main" target="_blank">YouBike Repo</a>
+        <a href="https://github.com/potatosserver/YouBike_Python" target="_blank">YouBike Python</a>
+      </div>
+      <a id="githubLink" title="GitHub Repository">
         <button id="githubButton" style="position: fixed; bottom: 80px; right: 20px; z-index: 1000; width: 50px; height: 50px; background: white; color: black; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">
           <img src="https://potatosserver.github.io/YouBike/icons/github.png" alt="GitHub" style="width:35px; height:35px;" />
         </button>
@@ -1064,6 +1166,29 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('安裝按鈕發生錯誤:', error);
         }
     });
+
+    // 新增：GitHub 按鈕點擊事件，切換左側超連結按鈕的動畫顯示
+    const extraButtons = document.getElementById('extraButtons');
+    const githubButton = document.getElementById('githubButton');
+    githubButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (extraButtons.classList.contains('show')) {
+            extraButtons.classList.add('hiding');
+            setTimeout(() => {
+                extraButtons.classList.remove('show', 'hiding');
+            }, 500);
+        } else {
+            extraButtons.classList.add('show');
+        }
+      });
+    // 新增：全域點擊事件，點擊任一物件皆縮回 extraButtons
+    document.addEventListener('click', () => {
+        if(extraButtons.classList.contains('show')){
+            extraButtons.classList.remove('show');
+        }
+    });
+
 });
 
 // appinstalled 事件中同樣更新
