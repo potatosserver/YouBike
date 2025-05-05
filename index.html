@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-TW">
   <head>
@@ -457,15 +458,15 @@
       </button>
       <button id="toggleDarkMode" title="切換暗色模式">🌙</button>
     </div>
-    <!-- 修改浮動倒數更新按鈕，預設隱藏 -->
-    <button id="updateCountdown" style="position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; padding: 6px 12px; background-color: white; color: #007bff; border: 2px solid #007bff; border-radius: 25px; font-size: 0.8em; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: all 0.3s ease; width: 100px; display: none;">60秒後更新</button>
+    <!-- 修改浮動倒數更新按鈕（寬度小小的就好） -->
+    <button id="updateCountdown" style="position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; padding: 6px 12px; background-color: white; color: #007bff; border: 2px solid #007bff; border-radius: 25px; font-size: 0.8em; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: all 0.3s ease; width: 100px;">60秒後更新</button>
     <script>
       let userLocation = null;
       let sortingLocked = false;
       let initialLoad = true;
       let locationDenied = false;
       let geolocationErrorMessage = null;
-      let dataLoaded = false; 
+      let dataLoaded = false; // 新增：記錄資料是否已載入完成
       const defaultLatitude = 22.6315725;
       const defaultLongitude = 120.3025079;
       const overlay = document.querySelector('.overlay');
@@ -514,21 +515,19 @@
           const overlay = document.getElementById("loadingOverlay");
           const mainContent = document.getElementById("mainContent");
           if (navigator.onLine) {
+            // 線上模式，原有動畫
             overlay.style.opacity = "0";
             setTimeout(() => {
               overlay.style.display = "none";
               mainContent.style.display = "block";
-              // 新增：初始化更新倒數按鈕
-              initUpdateCountdown();
             }, 500);
           } else {
+            // 離線模式，更新訊息並延後隱藏
             document.getElementById("loadingText").textContent = "離線模式啟動中...";
-            overlay.style.opacity = "1"; 
+            overlay.style.opacity = "1"; // 確保 Loading 畫面清晰可見
             setTimeout(() => {
               overlay.style.display = "none";
               mainContent.style.display = "block";
-              // 新增：初始化更新倒數按鈕
-              initUpdateCountdown();
             }, 3000);
           }
           mainContentShown = true;
@@ -554,14 +553,16 @@
           }
         }, 50);
       })();
-      let kcgDataCache = null; 
+      let kcgDataCache = null; // 用於緩存第一個 API 的資料
 
       async function searchYouBike(showLoadingIndicator = true) {
         if (showLoadingIndicator) showLoading();
         const keyword = keywordInput.value.trim().toLowerCase();
         try {
+          // 新增離線模式判斷與快取讀取
           if (navigator.onLine) {
             if (!kcgDataCache) {
+              // 第一次載入時請求第1個 API
               const kcgUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
               const kcgResponse = await fetch(kcgUrl, {
                 headers : {
@@ -1018,81 +1019,88 @@
           searchYouBike();
         }
       });
-      // 新增全域變數以重置倒數
-      let remainingSeconds = 60;
-      let countdownInterval;
-
-      function initUpdateCountdown() {
-          const updateButton = document.getElementById('updateCountdown');
-          updateButton.style.display = 'block';
-          updateButton.textContent = `${remainingSeconds}秒後更新`;
-          updateButton.addEventListener('click', updateData);
-          if (countdownInterval) clearInterval(countdownInterval);
-          countdownInterval = setInterval(() => {
-            remainingSeconds--;
-            if (remainingSeconds <= 0) {
-              updateData();
-            } else {
-              updateButton.textContent = `${remainingSeconds}秒後更新`;
-            }
-          }, 1000);
-      }
-
-      function updateData() {
-          remainingSeconds = 60; // 重設倒數
-          document.getElementById('updateCountdown').textContent = "60秒後更新";
-          searchYouBike();
-      }
-      updateData();
-      updateInstallButton();
-      const searchIcon = document.getElementById('searchIcon');
-      searchIcon.addEventListener('click', searchYouBike);
-      function updateInstallButton() {
-        const installBtn = document.getElementById('installButton');
-        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-            installBtn.style.display = 'none';
-        } else if (deferredPrompt) {
-            installBtn.innerHTML = '<img src="https://potatosserver.github.io/YouBike/icons/install.png" alt="安裝" style="width:45px; height:45px;" />';
-            installBtn.title = "安裝應用程式";
-            installBtn.style.display = 'block';
-        } else {
-            installBtn.style.display = 'none';
+      setInterval(updateVehicleData, 60000);
+      setInterval(() => {
+        if (document.getElementById('toggleUseLocation').checked) {
+          searchYouBike(false);
         }
-      }
-      let deferredPrompt;
-      document.addEventListener('DOMContentLoaded', () => {
-        updateInstallButton();
-        window.addEventListener('beforeinstallprompt', (e) => {
-          e.preventDefault();
-          deferredPrompt = e;
-          document.getElementById('installButton').style.display = 'block';
-          updateInstallButton();
-        });
-        document.getElementById('installButton').addEventListener('click', async () => {
-          try {
+      }, 60000);
+      // 新增：統一更新 PWA 按鈕圖示的函式
+function updateInstallButton() {
+    const installBtn = document.getElementById('installButton');
+    if (deferredPrompt) {
+        installBtn.innerHTML = '<img src="https://potatosserver.github.io/YouBike/icons/install.png" alt="安裝" style="width:45px; height:45px;" />';
+        installBtn.title = "安裝應用程式";
+        installBtn.style.display = 'block';
+    } else {
+        installBtn.style.display = 'none';
+    }
+}
+
+let deferredPrompt;
+document.addEventListener('DOMContentLoaded', () => {
+    // 呼叫統一的更新函式
+    updateInstallButton();
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        document.getElementById('installButton').style.display = 'block';
+        updateInstallButton();  // 更新後台邏輯
+    });
+    document.getElementById('installButton').addEventListener('click', async () => {
+        try {
             if (deferredPrompt) {
-              await deferredPrompt.prompt();
-              const { outcome } = await deferredPrompt.userChoice;
-              console.log('User response to the install prompt:', outcome);
-              deferredPrompt = null;
+                await deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log('User response to the install prompt:', outcome);
+                deferredPrompt = null;
+            } else if (window.matchMedia('(display-mode: standalone)').matches) {
+                alert("App 已在運行中。");
             } else {
-              document.getElementById('installButton').style.display = 'none';
+                const errorMessage = 'App 已安裝，請從主畫面或開始清單中打開應用程式。';
+                console.error('PWA button error:', errorMessage, { deferredPrompt, displayMode: window.matchMedia('(display-mode: standalone)').matches, userAgent: navigator.userAgent, manifestHref: document.querySelector('link[rel="manifest"]')?.href });
+                alert(errorMessage);
             }
-            updateInstallButton();
-          } catch (error) {
+            updateInstallButton();  // 點擊後更新狀態
+        } catch (error) {
             console.error('安裝按鈕發生錯誤:', error);
-          }
-        });
-      });
-      window.addEventListener('appinstalled', () => {
-        console.log('App 已安裝');
-        deferredPrompt = null;
-        updateInstallButton();
-      });
-      document.querySelector('h1').addEventListener('click', function() {
-        keywordInput.value = '';
-        searchYouBike();
-      });
+        }
+    });
+});
+
+// appinstalled 事件中同樣更新
+window.addEventListener('appinstalled', () => {
+    console.log('App 已安裝');
+    deferredPrompt = null;
+    updateInstallButton();
+});
+
+document.querySelector('h1').addEventListener('click', function() {
+    keywordInput.value = '';
+    searchYouBike();
+});
+const searchIcon = document.getElementById('searchIcon');
+searchIcon.addEventListener('click', searchYouBike);
+
+  // 新增倒數更新邏輯
+  let remainingSeconds = 61;
+  const updateButton = document.getElementById('updateCountdown');
+  setInterval(() => {
+      remainingSeconds--;
+      if (remainingSeconds <= 0) {
+          searchYouBike();
+          updateVehicleData();
+          remainingSeconds = 60;
+      }
+      updateButton.textContent = `${remainingSeconds}秒後更新`;
+  }, 1000);
+  updateButton.addEventListener('click', () => {
+      searchYouBike();
+      updateVehicleData();
+      remainingSeconds = 60;
+      updateButton.textContent = "60秒後更新"; // 新增：按下後立即更新文字
+  });
+
     </script>
   </body>
 </html>
