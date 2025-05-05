@@ -418,11 +418,10 @@
         height: 45px;
         object-fit: contain;
       }
-      /* 修改：GitHub 按鈕相同造型並位於其左側的 CSS */
       #extraButtons {
           position: fixed;
           bottom: 80px;
-          right: 80px; /* 與 GitHub 按鈕 (right:20px) 貼合，間距約60px */
+          right: 80px;
           transform: translateX(100%);
           transition: transform 0.5s ease;
           display: flex;
@@ -450,22 +449,19 @@
       #extraButtons a:hover {
           background-color: #f0f0f0;
       }
-      /* 修改：#extraButtons 當未呼叫時完全隱藏，顯示後水平排列在 GitHub 按鈕左方 */
 #extraButtons {
-    display: none; /* 初始隱藏 */
+    display: none;
     position: fixed;
     bottom: 80px;
-    right: 80px; /* 與 GitHub 按鈕（right:20px）左側貼合 */
+    right: 80px;
     transition: all 0.5s ease;
-    flex-direction: row; /* 水平排列 */
+    flex-direction: row;
     gap: 10px;
     z-index: 1000;
 }
 #extraButtons.show {
     display: flex;
 }
-
-/* 修改按鈕連結，增加圖片佔位欄位 */
 #extraButtons a {
     width: 50px;
     height: 50px;
@@ -483,8 +479,6 @@
 #extraButtons a:hover {
     background-color: #f0f0f0;
 }
-
-/* 新增：彈出動畫 keyframes */
 @keyframes popUp {
     0% { transform: translateX(100%) scale(0.5); opacity: 0; }
     100% { transform: translateX(0) scale(1); opacity: 1; }
@@ -493,16 +487,15 @@
     0% { transform: translateX(0) scale(1); opacity: 1; }
     100% { transform: translateX(100%) scale(0.5); opacity: 0; }
 }
-/* 修改：GitHub 按鈕相同造型並位於其左側的 CSS，加入彈出動畫 */
 #extraButtons {
     position: fixed;
     bottom: 80px;
-    right: 80px; /* 與 GitHub 按鈕 (right:20px) 貼合，間距約60px */
+    right: 80px;
     transform: translateX(100%) scale(0.5);
     opacity: 0;
     transition: transform 0.5s ease, opacity 0.5s ease;
     display: flex;
-    flex-direction: row; /* 改為橫向排列 */
+    flex-direction: row;
     gap: 10px;
     z-index: 1000;
 }
@@ -511,11 +504,9 @@
     opacity: 1;
     animation: popUp 0.5s forwards;
 }
-/* 新增：收合動畫樣式 */
 #extraButtons.hiding {
     animation: popDown 0.5s forwards;
 }
-/* 修改：在 extraButtons 內的超連結以圖示顯示 */
 #extraButtons a {
     width: 50px;
     height: 50px;
@@ -533,8 +524,6 @@
 #extraButtons a:hover {
     background-color: #f0f0f0;
 }
-
-/* 新增：收合動畫樣式 */
 #extraButtons.hiding {
     animation: popDown 0.5s forwards;
 }
@@ -566,7 +555,6 @@
         <p id="modalText"></p>
         <button id="modalButton">確定</button>
       </div>
-      <!-- 修改：更新 #extraButtons 區塊，將內容調整為兩個以圖示顯示的超連結 -->
       <div id="extraButtons">
           <a href="https://github.com/potatosserver/YouBike" target="_blank">
               <img src="https://potatosserver.github.io/YouBike/icons/html.png" alt="YouBike Repo" style="width:30px; height:30px;" />
@@ -585,7 +573,6 @@
       </button>
       <button id="toggleDarkMode" title="切換暗色模式">🌙</button>
     </div>
-    <!-- 修改：更新倒數按鈕初始隱藏 -->
     <button id="updateCountdown" style="display:none; position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; padding: 6px 12px; background-color: white; color: #007bff; border: 2px solid #007bff; border-radius: 25px; font-size: 0.8em; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: all 0.3s ease; width: 100px;">60秒後更新</button>
     <script>
       let userLocation = null;
@@ -593,7 +580,7 @@
       let initialLoad = true;
       let locationDenied = false;
       let geolocationErrorMessage = null;
-      let dataLoaded = false; // 新增：記錄資料是否已載入完成
+      let dataLoaded = false;
       const defaultLatitude = 22.6315725;
       const defaultLongitude = 120.3025079;
       const overlay = document.querySelector('.overlay');
@@ -642,22 +629,18 @@
           const overlay = document.getElementById("loadingOverlay");
           const mainContent = document.getElementById("mainContent");
           if (navigator.onLine) {
-            // 線上模式，原有動畫
             overlay.style.opacity = "0";
             setTimeout(() => {
               overlay.style.display = "none";
               mainContent.style.display = "block";
-              // 新增：顯示更新倒數按鈕
               document.getElementById('updateCountdown').style.display = "block";
             }, 500);
           } else {
-            // 離線模式，更新訊息並延後隱藏
             document.getElementById("loadingText").textContent = "離線模式啟動中...";
-            overlay.style.opacity = "1"; // 確保 Loading 畫面清晰可見
+            overlay.style.opacity = "1"; 
             setTimeout(() => {
               overlay.style.display = "none";
               mainContent.style.display = "block";
-              // 新增：顯示更新倒數按鈕
               document.getElementById('updateCountdown').style.display = "block";
             }, 3000);
           }
@@ -684,16 +667,14 @@
           }
         }, 50);
       })();
-      let youbikeDataCache = null; // 用於緩存第一個 API 的資料
+      let youbikeDataCache = null;
 
       async function searchYouBike(showLoadingIndicator = true) {
         if (showLoadingIndicator) showLoading();
         const keyword = keywordInput.value.trim().toLowerCase();
         try {
-          // 新增離線模式判斷與快取讀取
           if (navigator.onLine) {
             if (!youbikeDataCache) {
-              // 第一次載入時請求第1個 API
               const youbikeUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
               const response = await fetch(youbikeUrl, {
                 headers : {
@@ -703,16 +684,13 @@
               });
               if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
               const youbikeData = await response.json();
-              // 修改部份：依照提供的格式直接取用 JSON 陣列，並轉換 lat、lng 為數字
               youbikeDataCache = Array.isArray(youbikeData)
                 ? youbikeData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
                 : [];
-              // 將取得的資料儲存至 localStorage
               localStorage.setItem('cachedYoubikeData', JSON.stringify(youbikeDataCache));
             }
           } else {
             if (!youbikeDataCache) {
-              // 從 localStorage 讀取之前儲存的第1個 API 資料並轉換 lat、lng 為數字
               youbikeDataCache = JSON.parse(localStorage.getItem('cachedYoubikeData') || '[]').map(item => ({
                 ...item,
                 lat: parseFloat(item.lat),
@@ -809,7 +787,7 @@
           let vehData = {};
           const stationIds = usedStations.map(station => String(station.station_no));
           if (isOnline) {
-            vehData = await queryVehicleData(stationIds); // 線上模式取得車子資訊
+            vehData = await queryVehicleData(stationIds);
           }
           const organizedOutput = usedStations.map(site => {
             const info = {
@@ -822,8 +800,6 @@
             const vehicle = isOnline ? (Object.entries(vehData).find(([key]) => key === info.id)?.[1] || {}) : {};
             return { station_info: info, vehicle_info: vehicle };
           });
-          // 將下列重建 DOM 的邏輯改成更新已存在的 DOM
-          // 原本的： resultsDiv.innerHTML = ''; ... 建立所有卡片 ...
           organizedOutput.forEach(item => {
             const station = item.station_info;
             const vehicle = item.vehicle_info;
@@ -849,13 +825,11 @@
                         ${vehicleInfoHtml}
                     `;
             if (card) {
-              // 更新已存在卡片
               card.innerHTML = cardContent;
               card.dataset.lat = station.coords[0];
               card.dataset.lng = station.coords[1];
               card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
             } else {
-              // 建立新的卡片
               card = document.createElement('div');
               card.className = 'station';
               card.dataset.id = station.id;
@@ -874,7 +848,6 @@
               resultsDiv.appendChild(card);
             }
           });
-          // 移除不再存在的卡片
           const validIds = organizedOutput.map(item => item.station_info.id);
           Array.from(resultsDiv.children).forEach(card => {
             if (!validIds.includes(card.dataset.id)) {
@@ -882,12 +855,10 @@
             }
           });
           updateResultsOrder();
-          // 新增：等待一次事件迴圈，確保卡片 DOM 更新完成
           await new Promise(resolve => setTimeout(resolve, 0));
 
-          dataLoaded = true; // 資料已載入完成
+          dataLoaded = true;
           if (showLoadingIndicator) {
-            // 僅在手動觸發時顯示 mainContent，避免自動更新時捲動畫面
             showMainContent();
           }
         } catch (error) {
@@ -1151,7 +1122,6 @@
         }
       });
 
-      // 新增：統一更新 PWA 按鈕圖示的函式
 function updateInstallButton() {
     const installBtn = document.getElementById('installButton');
     if (deferredPrompt) {
@@ -1165,13 +1135,12 @@ function updateInstallButton() {
 
 let deferredPrompt;
 document.addEventListener('DOMContentLoaded', () => {
-    // 呼叫統一的更新函式
     updateInstallButton();
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
         document.getElementById('installButton').style.display = 'block';
-        updateInstallButton();  // 更新後台邏輯
+        updateInstallButton();
     });
     document.getElementById('installButton').addEventListener('click', async () => {
         try {
@@ -1187,13 +1156,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('PWA button error:', errorMessage, { deferredPrompt, displayMode: window.matchMedia('(display-mode: standalone)').matches, userAgent: navigator.userAgent, manifestHref: document.querySelector('link[rel="manifest"]')?.href });
                 alert(errorMessage);
             }
-            updateInstallButton();  // 點擊後更新狀態
+            updateInstallButton();
         } catch (error) {
             console.error('安裝按鈕發生錯誤:', error);
         }
     });
 
-    // 新增：GitHub 按鈕點擊事件，切換左側超連結按鈕的動畫顯示
     const extraButtons = document.getElementById('extraButtons');
     const githubButton = document.getElementById('githubButton');
     githubButton.addEventListener('click', (event) => {
@@ -1208,14 +1176,11 @@ document.addEventListener('DOMContentLoaded', () => {
             extraButtons.classList.add('show');
         }
       });
-    // 新增：全域點擊事件，點擊任一物件皆縮回 extraButtons
     document.addEventListener('click', () => {
         if(extraButtons.classList.contains('show')){
             extraButtons.classList.remove('show');
         }
     });
-
-    // 新增：滾動頁面時收合 GitHub 按鈕
     window.addEventListener('scroll', () => {
         if (extraButtons.classList.contains('show')) {
             extraButtons.classList.add('hiding');
@@ -1225,22 +1190,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-
-// appinstalled 事件中同樣更新
 window.addEventListener('appinstalled', () => {
     console.log('App 已安裝');
     deferredPrompt = null;
     updateInstallButton();
 });
-
 document.querySelector('h1').addEventListener('click', function() {
     keywordInput.value = '';
     searchYouBike();
 });
 const searchIcon = document.getElementById('searchIcon');
 searchIcon.addEventListener('click', searchYouBike);
-
-// 修改倒數更新邏輯，統一使用 countdownTimer 變數
 let countdownTimer = {
     remaining: 60,
     updateButton: document.getElementById('updateCountdown'),
@@ -1265,8 +1225,6 @@ countdownTimer.updateButton.addEventListener('click', () => {
     countdownTimer.reset();
     countdownTimer.updateDisplay();
 });
-
-  // 修改：全域點擊事件，點擊其他地方觸發收合動畫
   document.addEventListener('click', () => {
       if (extraButtons.classList.contains('show')) {
           extraButtons.classList.add('hiding');
