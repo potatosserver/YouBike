@@ -533,19 +533,8 @@
     <div id="loadingOverlay">
       <div id="loadingContent">
         <p id="loadingText">載入中</p>
-        <div id="noticeBox" style="margin-top: 10px; background: #fff; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
-          <ul style="list-style: none; margin: 0; padding: 0;">
-              <li>注意交通安全</li>
-              <li>❌勿超速或逆向騎乘</li>
-              <li>❌勿隨意變換車道在行人道上騎乘</li>
-              <li>❌勿在車輛行駛中使用手機</li>
-              <li>❌騎乘中勿緊急煞車</li>
-              <li>✔️記得調整座墊至適宜高度</li>
-              <li>✔️確認前後車燈功能正常</li>
-              <li>✔️記得投保公共自行車傷害險</li>
-              <li>✔️記得帶走置物籃內的隨身物品</li>
-          </ul>
-        </div>
+      </div>
+    </div>
     <div id="mainContent" style="display:none;">
       <h1>YouBike 搜尋</h1>
       <div id="searchContainer">
@@ -1200,17 +1189,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 500);
         }
     });
-    
-    // 新增隨機挑選注意事項的邏輯
-    const noticeItems = document.querySelectorAll('#noticeBox ul li');
-    if (noticeItems.length > 0) {
-        const randomIndex = Math.floor(Math.random() * noticeItems.length);
-        noticeItems.forEach((item, index) => {
-            if (index !== randomIndex) {
-                item.style.display = 'none';
-            }
-        });
-    }
 });
 window.addEventListener('appinstalled', () => {
     console.log('App 已安裝');
