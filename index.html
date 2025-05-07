@@ -609,7 +609,6 @@
     <div id="loadingOverlay">
       <div id="loadingContent">
         <p id="loadingText">載入中</p>
-        <!-- 新增隨機提示訊息區塊 -->
         <div id="noticeBox" style="margin-top: 10px; background: #fff; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"></div>
       </div>
     </div>
@@ -748,8 +747,6 @@
           }
         }, 50);
       })();
-      
-      // 新增隨機提示訊息邏輯
       (function showRandomNotice(){
         const notices = [
           "❌勿超速或逆向騎乘",
@@ -1211,7 +1208,6 @@
       const settingsPanel = document.getElementById('settingsPanel');
       settingsButton.addEventListener('click', (event) => {
         event.stopPropagation();
-        // 當點擊設定按鈕時，先檢查並收合其他展開的按鈕 (例如 extraButtons)
         if (extraButtons.classList.contains('show')) {
             extraButtons.classList.add('hiding');
             setTimeout(() => {
@@ -1219,7 +1215,7 @@
             }, 500);
         }
         if (settingsPanel.classList.contains('show')) {
-          settingsPanel.classList.add('hiding'); // 加入收合動畫
+          settingsPanel.classList.add('hiding');
           setTimeout(() => {
             settingsPanel.classList.remove('show', 'hiding');
           }, 500);
@@ -1229,7 +1225,7 @@
       });
       document.addEventListener('click', () => {
         if (settingsPanel.classList.contains('show')) {
-          settingsPanel.classList.add('hiding'); // 點擊空白處時加入收合動畫
+          settingsPanel.classList.add('hiding');
           setTimeout(() => {
             settingsPanel.classList.remove('show', 'hiding');
           }, 500);
@@ -1296,7 +1292,6 @@ document.addEventListener('DOMContentLoaded', () => {
     githubButton.addEventListener('click', (event) => {
         event.preventDefault();
         event.stopPropagation();
-        // 當點擊 GitHub 按鈕時，先檢查並收合其他展開的按鈕 (例如 settingsPanel)
         if (settingsPanel.classList.contains('show')) {
             settingsPanel.classList.add('hiding');
             setTimeout(() => {
@@ -1324,7 +1319,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 extraButtons.classList.remove('show', 'hiding');
             }, 500);
         }
-        // 新增：捲動時收合 settingsPanel
         if (settingsPanel.classList.contains('show')) {
             settingsPanel.classList.add('hiding');
             setTimeout(() => {
