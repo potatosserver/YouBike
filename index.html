@@ -3,6 +3,9 @@
   <head>
     <meta name="google-site-verification" content="9o55RpXAKN7kR9cYHHvHkWuktV3JVcCYF5mt9XZULCY" />
     <meta charset="UTF-8" />
+    <meta name="author" content="卓稟鈞(AndrewCho)">
+    <meta name="description" content="YouBike 站點搜尋，提供即時的 YouBike 站點資訊和定位功能。" />
+    <meta name="keywords" content="YouBike, 站點搜尋, 即時資訊, 定位功能, Github, github.io" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>YouBike 站點搜尋</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -426,7 +429,7 @@
       }
       #extraButtons {
           position: fixed;
-          bottom: 80px;
+          bottom: 120px;
           right: 80px;
           transform: translateX(100%);
           transition: transform 0.5s ease;
@@ -458,7 +461,7 @@
 #extraButtons {
     display: none;
     position: fixed;
-    bottom: 80px;
+    bottom: 120px;
     right: 80px;
     transition: all 0.5s ease;
     flex-direction: row;
@@ -495,7 +498,7 @@
 }
 #extraButtons {
     position: fixed;
-    bottom: 80px;
+    bottom: 120px;
     right: 80px;
     transform: translateX(100%) scale(0.5);
     opacity: 0;
@@ -533,6 +536,73 @@
 #extraButtons.hiding {
     animation: popDown 0.5s forwards;
 }
+      #settingsButton {
+        position: fixed;
+        bottom: 60px;
+        right: 20px;
+        z-index: 1000;
+        width: 50px;
+        height: 50px;
+        background: white;
+        color: black;
+        border: none;
+        border-radius: 50%;
+        cursor: pointer;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        transition: transform 0.2s ease;
+      }
+      #settingsButton:hover {
+        transform: scale(1.1);
+      }
+      #settingsPanel {
+        position: fixed;
+        bottom: 60px;
+        right: 80px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        background: white;
+        border-radius: 50%;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        transition: transform 0.5s ease, opacity 0.5s ease;
+        transform: translateX(50px) scale(0.5);
+        opacity: 0;
+        z-index: 1000;
+      }
+      #settingsPanel.show {
+        display: flex;
+        transform: translateX(0) scale(1);
+        opacity: 1;
+        animation: popUp 0.5s forwards;
+      }
+      #settingsPanel.hiding {
+        animation: popDown 0.5s forwards;
+      }
+      #darkModeToggle {
+        display: flex; 
+        align-items: center;
+        justify-content: center; 
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #007BFF, #0056b3);
+        border: none;
+        color: white;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 24px;
+        transition: background 0.3s ease, transform 0.2s ease;
+      }
+      #darkModeToggle:hover {
+        background: linear-gradient(135deg, #0056b3, #003f7f);
+        transform: scale(1.1);
+      }
+
     </style>
   </head>
   <body>
@@ -544,7 +614,7 @@
       </div>
     </div>
     <div id="mainContent" style="display:none;">
-      <h1>YouBike 搜尋</h1>
+      <h1>YouBike 站點搜尋</h1>
       <div id="searchContainer">
         <input type="text" id="keyword" placeholder="請輸入站點名稱、地址" value="" />
         <span id="searchIcon" title="搜尋">🔍</span>
@@ -572,14 +642,17 @@
           </a>
       </div>
       <a id="githubLink" title="GitHub Repository">
-        <button id="githubButton" style="position: fixed; bottom: 80px; right: 20px; z-index: 1000; width: 50px; height: 50px; background: white; color: black; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+        <button id="githubButton" style="position: fixed; bottom: 120px; right: 20px; z-index: 1000; width: 50px; height: 50px; background: white; color: black; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">
           <img src="https://potatosserver.github.io/YouBike/icons/github.png" alt="GitHub" style="width:35px; height:35px;" />
         </button>
       </a>
-      <button id="installButton" style="position: fixed; bottom: 140px; right: 20px; z-index: 1000; width: 50px; height: 50px; background: white; color: black; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+      <button id="installButton" style="position: fixed; bottom: 180px; right: 20px; z-index: 1000; width: 50px; height: 50px; background: white; color: black; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">
         <img src="https://potatosserver.github.io/YouBike/icons/install.png" alt="安裝" style="width:45px; height:45px;" />
       </button>
-      <button id="toggleDarkMode" title="切換暗色模式">🌙</button>
+      <button id="settingsButton" title="設定" style="position: fixed; bottom: 60px; right: 20px; z-index: 1000; width: 50px; height: 50px; background: white; color: black; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: transform 0.2s ease;">⚙️</button>
+      <div id="settingsPanel">
+        <button id="darkModeToggle" title="切換暗色模式">🌙</button>
+      </div>
     </div>
     <button id="updateCountdown" style="display:none; position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; padding: 6px 12px; background-color: white; color: #007bff; border: 2px solid #007bff; border-radius: 25px; font-size: 0.8em; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: all 0.3s ease; width: 100px;">60秒後更新</button>
     <script>
@@ -1060,7 +1133,7 @@
             },
             {
               enableHighAccuracy: true,
-              timeout: 10000,
+              timeout: 0,
               maximumAge: 0
             }
           );
@@ -1123,17 +1196,48 @@
             console.error("Vehicle data update failed:", error);
           });
       }
-      const toggleDarkModeButton = document.getElementById('toggleDarkMode');
-      toggleDarkModeButton.addEventListener('click', () => {
+      const darkModeToggle = document.getElementById('darkModeToggle');
+      darkModeToggle.addEventListener('click', () => {
         document.body.classList.toggle('dark-mode');
         const isDark = document.body.classList.contains("dark-mode");
         localStorage.setItem("dark_mode", isDark);
-        toggleDarkModeButton.innerHTML = isDark ? '<span style="color:#ffd700; font-size:32px;">☀️</span>' : '🌙';
+        darkModeToggle.innerHTML = isDark ? '<span style="color:#ffd700; font-size:32px;">☀️</span>' : '🌙';
       });
       if (localStorage.getItem("dark_mode") === "true") {
         document.body.classList.add("dark-mode");
-        toggleDarkModeButton.innerHTML = '<span style="color:#ffd700; font-size:32px;">☀️</span>';
+        darkModeToggle.innerHTML = '<span style="color:#ffd700; font-size:32px;">☀️</span>';
       }
+      const settingsButton = document.getElementById('settingsButton');
+      const settingsPanel = document.getElementById('settingsPanel');
+      settingsButton.addEventListener('click', (event) => {
+        event.stopPropagation();
+        // 當點擊設定按鈕時，先檢查並收合其他展開的按鈕 (例如 extraButtons)
+        if (extraButtons.classList.contains('show')) {
+            extraButtons.classList.add('hiding');
+            setTimeout(() => {
+                extraButtons.classList.remove('show', 'hiding');
+            }, 500);
+        }
+        if (settingsPanel.classList.contains('show')) {
+          settingsPanel.classList.add('hiding'); // 加入收合動畫
+          setTimeout(() => {
+            settingsPanel.classList.remove('show', 'hiding');
+          }, 500);
+        } else {
+          settingsPanel.classList.add('show');
+        }
+      });
+      document.addEventListener('click', () => {
+        if (settingsPanel.classList.contains('show')) {
+          settingsPanel.classList.add('hiding'); // 點擊空白處時加入收合動畫
+          setTimeout(() => {
+            settingsPanel.classList.remove('show', 'hiding');
+          }, 500);
+        }
+      });
+      settingsPanel.addEventListener('click', (event) => {
+        event.stopPropagation();
+      });
       modalButton.addEventListener('click', hideModal);
       if (useLocation) {
         getLocation();
@@ -1192,6 +1296,13 @@ document.addEventListener('DOMContentLoaded', () => {
     githubButton.addEventListener('click', (event) => {
         event.preventDefault();
         event.stopPropagation();
+        // 當點擊 GitHub 按鈕時，先檢查並收合其他展開的按鈕 (例如 settingsPanel)
+        if (settingsPanel.classList.contains('show')) {
+            settingsPanel.classList.add('hiding');
+            setTimeout(() => {
+                settingsPanel.classList.remove('show', 'hiding');
+            }, 500);
+        }
         if (extraButtons.classList.contains('show')) {
             extraButtons.classList.add('hiding');
             setTimeout(() => {
@@ -1211,6 +1322,13 @@ document.addEventListener('DOMContentLoaded', () => {
             extraButtons.classList.add('hiding');
             setTimeout(() => {
                 extraButtons.classList.remove('show', 'hiding');
+            }, 500);
+        }
+        // 新增：捲動時收合 settingsPanel
+        if (settingsPanel.classList.contains('show')) {
+            settingsPanel.classList.add('hiding');
+            setTimeout(() => {
+                settingsPanel.classList.remove('show', 'hiding');
             }, 500);
         }
     });
