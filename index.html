@@ -536,72 +536,55 @@
 #extraButtons.hiding {
     animation: popDown 0.5s forwards;
 }
-      #settingsButton {
-        position: fixed;
-        bottom: 60px;
-        right: 20px;
-        z-index: 1000;
-        width: 50px;
-        height: 50px;
-        background: white;
-        color: black;
-        border: none;
-        border-radius: 50%;
-        cursor: pointer;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        transition: transform 0.2s ease;
-      }
-      #settingsButton:hover {
-        transform: scale(1.1);
-      }
-      #settingsPanel {
-        position: fixed;
-        bottom: 60px;
-        right: 80px;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        width: 50px;
-        height: 50px;
-        background: white;
-        border-radius: 50%;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        transition: transform 0.5s ease, opacity 0.5s ease;
-        transform: translateX(50px) scale(0.5);
-        opacity: 0;
-        z-index: 1000;
-      }
-      #settingsPanel.show {
-        display: flex;
-        transform: translateX(0) scale(1);
-        opacity: 1;
-        animation: popUp 0.5s forwards;
-      }
-      #settingsPanel.hiding {
-        animation: popDown 0.5s forwards;
-      }
-      #darkModeToggle {
-        display: flex; 
-        align-items: center;
-        justify-content: center; 
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, #007BFF, #0056b3);
-        border: none;
-        color: white;
-        border-radius: 50%;
-        cursor: pointer;
-        font-size: 24px;
-        transition: background 0.3s ease, transform 0.2s ease;
-      }
-      #darkModeToggle:hover {
-        background: linear-gradient(135deg, #0056b3, #003f7f);
-        transform: scale(1.1);
-      }
+#settingsPanel {
+    position: fixed;
+    bottom: 60px;
+    right: 80px; /* 調整至適合位置 */
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    z-index: 1000;
+    transform: translateX(100%) scale(0.5);
+    opacity: 0;
+    transition: transform 0.5s ease, opacity 0.5s ease;
+}
+#settingsPanel.show {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+    animation: popUpSettings 0.5s forwards;
+}
+#darkModeToggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    background: linear-gradient(135deg, #007BFF, #0056b3);
+    border: none;
+    color: white;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 24px;
+    transition: background 0.3s ease, transform 0.2s ease;
+}
+#darkModeToggle:hover, #langToggle:hover {
+    background-color: #f0f0f0;
+    transform: scale(1.1);
+}
+/* 新增針對 settingsPanel 的動畫 */
+@keyframes popUpSettings {
+    0% { transform: translateX(150%) scale(0.5); opacity: 0; }
+    100% { transform: translateX(0) scale(1); opacity: 1; }
+}
+/* 新增 settingsPanel 收合動畫 */
+@keyframes popDownSettings {
+    0% { transform: translateX(0) scale(1); opacity: 1; }
+    100% { transform: translateX(150%) scale(0.5); opacity: 0; }
+}
+
+#settingsPanel.hiding {
+    animation: popDownSettings 0.5s forwards;
+}
 
     </style>
   </head>
@@ -618,12 +601,12 @@
         <input type="text" id="keyword" placeholder="請輸入站點名稱、地址" value="" />
         <span id="searchIcon" title="搜尋">🔍</span>
       </div>
-      <div id="locationSwitchContainer" style="text-align: center; margin: 10px 0;">
-        <label class="switch">
+      <div id="locationSwitchContainer" style="display: flex; align-items: center; justify-content: center; margin: 10px 0;">
+        <label class="switch" style="margin: 0;">
           <input type="checkbox" id="toggleUseLocation" />
           <span class="slider"></span>
         </label>
-        <span style="margin-left:10px;">使用定位</span>
+        <span id="locationSwitchText" style="margin-left: 10px;"></span>
       </div>
       <div id="results"></div>
       <div id="loading">載入中，請稍候...</div>
@@ -648,9 +631,11 @@
       <button id="installButton" style="position: fixed; bottom: 180px; right: 20px; z-index: 1000; width: 50px; height: 50px; background: white; color: black; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">
         <img src="https://potatosserver.github.io/YouBike/icons/install.png" alt="安裝" style="width:45px; height:45px;" />
       </button>
-      <button id="settingsButton" title="設定" style="position: fixed; bottom: 60px; right: 20px; z-index: 1000; width: 50px; height: 50px; background: white; color: black; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: transform 0.2s ease;">⚙️</button>
+      <button id="settingsButton" title="設定" style="position: fixed; bottom: 60px; right: 20px; z-index: 1200; width: 50px; height: 50px; background: white; color: black; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: transform 0.2s ease;">⚙️</button>
       <div id="settingsPanel">
         <button id="darkModeToggle" title="切換暗色模式">🌙</button>
+        <!-- 新增語言切換按鈕 -->
+        <button id="langToggle" title="Switch Language" style="width:50px; height:50px; border-radius:50%; margin-left:5px;">EN</button>
       </div>
     </div>
     <button id="updateCountdown" style="display:none; position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; padding: 6px 12px; background-color: white; color: #007bff; border: 2px solid #007bff; border-radius: 25px; font-size: 0.8em; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: all 0.3s ease; width: 100px;">60秒後更新</button>
@@ -884,13 +869,14 @@
           if (isOnline) {
             vehData = await queryVehicleData(stationIds);
           }
+          // 修改站點資訊依語言切換: 若為英文則取英文屬性
           const organizedOutput = usedStations.map(site => {
             const info = {
               id: String(site.station_no),
-              name: site.name_tw,
+              name: currentLang === "en" ? site.name_en : site.name_tw,
               coords: [site.lat, site.lng],
-              district: site.district_tw,
-              address: site.address_tw
+              district: currentLang === "en" ? site.district_en : site.district_tw,
+              address: currentLang === "en" ? site.address_en : site.address_tw
             };
             const vehicle = isOnline ? (Object.entries(vehData).find(([key]) => key === info.id)?.[1] || {}) : {};
             return { station_info: info, vehicle_info: vehicle };
@@ -906,19 +892,27 @@
               station.coords[0],
               station.coords[1]
             );
-            const displayDistance = distance < 1 ? Math.round(distance * 1000) + " 公尺" : distance.toFixed(2) + " 公里";
+            const displayDistance = distance < 1 ? Math.round(distance * 1000) + (currentLang === "en" ? " m" : " 公尺")
+                                                 : distance.toFixed(2) + (currentLang === "en" ? " km" : " 公里");
+            // 定義翻譯文字
+            const distanceLabel = currentLang === "en" ? "Distance:" : "距離:";
+            const addressLabel = currentLang === "en" ? "Address:" : "地址:";
+            const slotsLabel = currentLang === "en" ? "Available Slots:" : "可停空位數:";
+            const unknownStation = currentLang === "en" ? "Unknown Station" : "未知站點";
+            const unknownAddress = currentLang === "en" ? "Unknown Address" : "未知地址";
+            const unknownValue = currentLang === "en" ? "Unknown" : "未知";
             const vehicleInfoHtml = isOnline ? `
-                        <p>YouBike 2.0: <span class="vehicle_yb2">${vehicle?.available_2_0 !== undefined ? vehicle.available_2_0 : '未知'}</span></p>
-                        <p>YouBike 2.0E: <span class="vehicle_ybe">${vehicle?.available_e !== undefined ? vehicle.available_e : '未知'}</span></p>
-                        <p>可停空位數: <span class="vehicle_empty">${vehicle?.empty_spaces !== undefined ? vehicle.empty_spaces : '未知'}</span></p>
-                      ` : '';
+                          <p>YouBike 2.0: <span class="vehicle_yb2">${vehicle?.available_2_0 !== undefined ? vehicle.available_2_0 : unknownValue}</span></p>
+                          <p>YouBike 2.0E: <span class="vehicle_ybe">${vehicle?.available_e !== undefined ? vehicle.available_e : unknownValue}</span></p>
+                          <p>${slotsLabel} <span class="vehicle_empty">${vehicle?.empty_spaces !== undefined ? vehicle.empty_spaces : unknownValue}</span></p>
+                        ` : '';
             const cardContent = `
-                        ${pinButtonHtml}
-                        <h3>${station.name || '未知站點'}</h3>
-                        <p class="distance">距離: ${displayDistance}</p>
-                        <p>地址: ${station.address || '未知地址'}</p>
-                        ${vehicleInfoHtml}
-                    `;
+                          ${pinButtonHtml}
+                          <h3>${station.name || unknownStation}</h3>
+                          <p class="distance">${distanceLabel} ${displayDistance}</p>
+                          <p>${addressLabel} ${station.address || unknownAddress}</p>
+                          ${vehicleInfoHtml}
+                      `;
             if (card) {
               card.innerHTML = cardContent;
               card.dataset.lat = station.coords[0];
@@ -937,7 +931,7 @@
                 if (!isNaN(lat) && !isNaN(lng)) {
                   window.open(`https://www.google.com/maps?q=${lat},${lng}`, "_blank");
                 } else {
-                  showModal("站點座標無效，無法開啟地圖。");
+                  showModal(currentLang === "en" ? "Invalid station coordinates, cannot open map." : "站點座標無效，無法開啟地圖。");
                 }
               });
               resultsDiv.appendChild(card);
@@ -1204,6 +1198,41 @@
         document.body.classList.add("dark-mode");
         darkModeToggle.innerHTML = '<span style="color:#ffd700; font-size:32px;">☀️</span>';
       }
+      
+      // 設定目前語言，預設為中文
+      let currentLang = localStorage.getItem("lang") || "zh";
+      
+      // 更新頁面上所有與定位開關相關的文字，確保英文模式下不顯示中文
+      function updateLanguageTexts() {
+        // 更新定位開關文字
+        const locationSwitchSpan = document.querySelector('#locationSwitchText');
+        if (locationSwitchSpan) {
+          locationSwitchSpan.textContent = currentLang === "en" ? "Use Location" : "使用定位";
+        }
+        // 更新標題文字
+        const heading = document.querySelector('h1');
+        if (heading) {
+          heading.textContent = currentLang === "en" ? "YouBike Station Search" : "YouBike 站點搜尋";
+        }
+        // 更新搜尋框 placeholder
+        const keywordInput = document.getElementById('keyword');
+        if (keywordInput) {
+          keywordInput.placeholder = currentLang === "en" ? "Please enter station name or address" : "請輸入站點名稱、地址";
+        }
+      }
+      updateLanguageTexts();
+      
+      // 語言切換按鈕事件：直接更新文字，不再重新載入頁面
+      const langToggle = document.getElementById('langToggle');
+      langToggle.addEventListener('click', (event) => {
+        event.stopPropagation();
+        currentLang = currentLang === "en" ? "zh" : "en";
+        localStorage.setItem("lang", currentLang);
+        updateLanguageTexts();
+        // 直接呼叫 searchYouBike 更新站點卡片文字，不顯示 loading 效果
+        searchYouBike(false);
+      });
+      
       const settingsButton = document.getElementById('settingsButton');
       const settingsPanel = document.getElementById('settingsPanel');
       settingsButton.addEventListener('click', (event) => {
