@@ -202,7 +202,8 @@
         display: block;
       }
       .modal button {
-        margin-top: 10px;
+        margin: 10px auto;
+        display: block;
         padding: 10px 20px;
         background-color: #007BFF;
         color: white;
@@ -585,6 +586,9 @@
 #settingsPanel.hiding {
     animation: popDownSettings 0.5s forwards;
 }
+#updateCountdown {
+    white-space: nowrap;
+}
 
     </style>
   </head>
@@ -715,18 +719,21 @@
       }
       (function simulateLoadingPercentage() {
         const loadingText = document.getElementById("loadingText");
+        // 根據 localStorage 語言設定決定前置文字
+        let lang = localStorage.getItem("lang") || "zh";
+        let prefix = lang === "en" ? "Loading:" : "載入中：";
         let progress = 0;
         let lockedProgress = null;
         loadingTextInterval = setInterval(() => {
           if (!mainContentShown) {
             if (progress < 85) {
               progress++;
-              loadingText.textContent = "載入中：" + progress + "%";
+              loadingText.textContent = prefix + progress + "%";
             } else {
               if (lockedProgress === null) {
                 lockedProgress = 85 + Math.floor(Math.random() * 11);
               }
-              loadingText.textContent = "載入中：" + lockedProgress + "%";
+              loadingText.textContent = prefix + lockedProgress + "%";
             }
           } else {
             clearInterval(loadingTextInterval);
@@ -734,15 +741,26 @@
         }, 50);
       })();
       (function showRandomNotice(){
-        const notices = [
-          "❌勿超速或逆向騎乘",
-          "❌勿隨意變換車道在行人道上騎乘",
-          "❌勿在車輛行駛中使用手機",
-          "❌騎乘中勿緊急煞車",
-          "✔️記得調整座墊至適宜高度",
-          "✔️確認前後車燈功能正常",
-          "✔️記得投保公共自行車傷害險",
-          "✔️記得帶走置物籃內的隨身物品"
+        // 根據語言設定決定主要事項的文字
+        let lang = localStorage.getItem("lang") || "zh";
+        const notices = lang === "en" ? [
+              "❌Do not speed or ride in reverse",
+              "❌Do not change lanes arbitrarily on sidewalks",
+              "❌Do not use your phone while riding",
+              "❌Avoid harsh braking while riding",
+              "✔️Remember to adjust the seat to a proper height",
+              "✔️Ensure that both front and rear lights are working",
+              "✔️Remember to get bicycle accident insurance",
+              "✔️Take your belongings from the basket"
+        ] : [
+              "❌勿超速或逆向騎乘",
+              "❌勿隨意變換車道在行人道上騎乘",
+              "❌勿在車輛行駛中使用手機",
+              "❌騎乘中勿緊急煞車",
+              "✔️記得調整座墊至適宜高度",
+              "✔️確認前後車燈功能正常",
+              "✔️記得投保公共自行車傷害險",
+              "✔️記得帶走置物籃內的隨身物品"
         ];
         const randomIndex = Math.floor(Math.random() * notices.length);
         document.getElementById('noticeBox').textContent = notices[randomIndex];
@@ -908,7 +926,6 @@
                           <p>${slotsLabel} <span class="vehicle_empty">${vehicle?.empty_spaces !== undefined ? vehicle.empty_spaces : unknownValue}</span></p>
                         ` : '';
             const cardContent = `
-                          ${pinButtonHtml}
                           <h3>${station.name || unknownStation}</h3>
                           <p class="distance">${distanceLabel} ${displayDistance}</p>
                           <p>${addressLabel} ${station.address || unknownAddress}</p>
@@ -1169,7 +1186,14 @@
           );
           const distanceEl = card.querySelector('.distance');
           if (distanceEl) {
-            distanceEl.textContent = "距離: " + (newDistance < 1 ? Math.round(newDistance * 1000) + " 公尺" : newDistance.toFixed(2) + " 公里");
+            const distanceLabel = currentLang === "en" ? "Distance:" : "距離:";
+            const unit = newDistance < 1 
+                            ? (currentLang === "en" ? " m" : " 公尺") 
+                            : (currentLang === "en" ? " km" : " 公里");
+            const displayDistance = newDistance < 1 
+                            ? Math.round(newDistance * 1000) 
+                            : newDistance.toFixed(2);
+            distanceEl.textContent = distanceLabel + " " + displayDistance + unit;
           }
         });
         updateResultsOrder();
@@ -1231,7 +1255,12 @@
         // 新增更新按鈕文字 (更新倒數計時按鈕)
         const updateCountdownBtn = document.getElementById('updateCountdown');
         if (updateCountdownBtn) {
-          updateCountdownBtn.textContent = currentLang === "en" ? "60 sec update" : "60秒後更新";
+          updateCountdownBtn.textContent = currentLang === "en" ? "60 sec update " : "60秒後更新";
+        }
+        // 更新 loading 文字
+        const loadingDiv = document.getElementById('loading');
+        if (loadingDiv) {
+          loadingDiv.textContent = currentLang === "en" ? "Loading, please wait..." : "載入中，請稍候...";
         }
       }
       updateLanguageTexts();
@@ -1386,7 +1415,7 @@ let countdownTimer = {
     updateButton: document.getElementById('updateCountdown'),
     updateDisplay: function() {
         this.updateButton.textContent = currentLang === "en" 
-            ? `${this.remaining} sec update` 
+            ? `${this.remaining} sec update ` 
             : `${this.remaining}秒後更新`;
     },
     reset: function() {
