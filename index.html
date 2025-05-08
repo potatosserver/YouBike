@@ -167,6 +167,8 @@
         display: none;
         opacity: 0;
         transition: opacity 0.5s ease;
+        white-space: nowrap;  /* 新增: 避免文字換行 */
+        width: auto;         /* 新增: 動態調整寬度 */
       }
       #loading.show {
         opacity: 1;
