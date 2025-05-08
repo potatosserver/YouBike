@@ -1067,16 +1067,24 @@
         let errorMessage = "";
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            errorMessage = "未提供定位權限，將使用捷運美麗島站作為中心定位。";
+            errorMessage = currentLang === "en" 
+              ? "Location permission not provided, using MRT Formosa Boulevard station as center." 
+              : "未提供定位權限，將使用捷運美麗島站作為中心定位。";
             break;
           case error.POSITION_UNAVAILABLE:
-            errorMessage = "定位資訊不可用，將使用捷運美麗島站作為中心定位直到定位成功。";
+            errorMessage = currentLang === "en" 
+              ? "Position unavailable, using MRT Formosa Boulevard station as center until succeeded." 
+              : "定位資訊不可用，將使用捷運美麗島站作為中心定位直到定位成功。";
             break;
           case error.TIMEOUT:
-            errorMessage = "定位逾時，將使用捷運美麗島站作為中心定位直到定位成功。";
+            errorMessage = currentLang === "en" 
+              ? "Location timeout, using MRT Formosa Boulevard station as center until succeeded." 
+              : "定位逾時，將使用捷運美麗島站作為中心定位直到定位成功。";
             break;
           default:
-            errorMessage = "定位錯誤，將使用捷運美麗島站作為中心定位直到定位成功。";
+            errorMessage = currentLang === "en" 
+              ? "Location error, using MRT Formosa Boulevard station as center until succeeded." 
+              : "定位錯誤，將使用捷運美麗島站作為中心定位直到定位成功。";
             break;
         }
         showModal(errorMessage);
@@ -1125,7 +1133,7 @@
             },
             {
               enableHighAccuracy: true,
-              timeout: 0,
+              timeout: 10000, // 最大等待10秒
               maximumAge: 0
             }
           );
@@ -1219,6 +1227,11 @@
         const keywordInput = document.getElementById('keyword');
         if (keywordInput) {
           keywordInput.placeholder = currentLang === "en" ? "Please enter station name or address" : "請輸入站點名稱、地址";
+        }
+        // 新增更新按鈕文字 (更新倒數計時按鈕)
+        const updateCountdownBtn = document.getElementById('updateCountdown');
+        if (updateCountdownBtn) {
+          updateCountdownBtn.textContent = currentLang === "en" ? "60 sec update" : "60秒後更新";
         }
       }
       updateLanguageTexts();
@@ -1372,7 +1385,9 @@ let countdownTimer = {
     remaining: 60,
     updateButton: document.getElementById('updateCountdown'),
     updateDisplay: function() {
-        this.updateButton.textContent = `${this.remaining}秒後更新`;
+        this.updateButton.textContent = currentLang === "en" 
+            ? `${this.remaining} sec update` 
+            : `${this.remaining}秒後更新`;
     },
     reset: function() {
         this.remaining = 60;
