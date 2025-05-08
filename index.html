@@ -708,7 +708,8 @@
               document.getElementById('updateCountdown').style.display = "block";
             }, 500);
           } else {
-            document.getElementById("loadingText").textContent = "離線模式啟動中...";
+            const lang = localStorage.getItem("lang") || "zh";
+            document.getElementById("loadingText").textContent = lang === "en" ? "Offline mode starting..." : "離線模式啟動中...";
             overlay.style.opacity = "1"; 
             setTimeout(() => {
               overlay.style.display = "none";
@@ -721,7 +722,6 @@
       }
       (function simulateLoadingPercentage() {
         const loadingText = document.getElementById("loadingText");
-        // 根據 localStorage 語言設定決定前置文字
         let lang = localStorage.getItem("lang") || "zh";
         let prefix = lang === "en" ? "Loading:" : "載入中：";
         let progress = 0;
@@ -743,7 +743,6 @@
         }, 50);
       })();
       (function showRandomNotice(){
-        // 根據語言設定決定主要事項的文字
         let lang = localStorage.getItem("lang") || "zh";
         const notices = lang === "en" ? [
               "❌Do not speed or ride in reverse",
