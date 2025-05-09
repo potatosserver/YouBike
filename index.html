@@ -559,7 +559,8 @@
       </div>
     </div>
     <div id="mainContent" style="display:none;">
-      <h1>YouBike 站點搜尋</h1>
+      <!-- 更新標題元素：改為使用 id 並移除硬編碼文字 -->
+      <h1 id="heading"></h1>
       <div id="searchContainer">
         <input type="text" id="keyword" placeholder="請輸入站點名稱、地址" value="" />
         <span id="searchIcon" title="搜尋">🔍</span>
@@ -1199,28 +1200,23 @@
       
       // 更新頁面上所有與定位開關相關的文字，確保英文模式下不顯示中文
       function updateLanguageTexts() {
-        document.title = currentLang === "en" ? "YouBike Station Search" : "YouBike 站點搜尋"; // 新增更新 title
-        // 更新定位開關文字
+        document.title = currentLang === "en" ? "YouBike Station Search" : "YouBike 站點搜尋"; // 更新頁面 title
         const locationSwitchSpan = document.querySelector('#locationSwitchText');
         if (locationSwitchSpan) {
           locationSwitchSpan.textContent = currentLang === "en" ? "Use Location" : "使用定位";
         }
-        // 更新標題文字
-        const heading = document.querySelector('h1');
+        const heading = document.getElementById('heading');
         if (heading) {
-          heading.textContent = currentLang === "en" ? "YouBike Station Search" : "YouBike 站點搜尋";
+            heading.textContent = currentLang === "en" ? "YouBike Station Search" : "YouBike 站點搜尋";
         }
-        // 更新搜尋框 placeholder
         const keywordInput = document.getElementById('keyword');
         if (keywordInput) {
           keywordInput.placeholder = currentLang === "en" ? "Please enter station name or address" : "請輸入站點名稱、地址";
         }
-        // 新增更新按鈕文字 (更新倒數計時按鈕)
         const updateCountdownBtn = document.getElementById('updateCountdown');
         if (updateCountdownBtn) {
           updateCountdownBtn.textContent = currentLang === "en" ? "60 sec update " : "60秒後更新";
         }
-        // 更新 loading 文字
         const loadingDiv = document.getElementById('loading');
         if (loadingDiv) {
           loadingDiv.textContent = currentLang === "en" ? "Loading, please wait..." : "載入中，請稍候...";
