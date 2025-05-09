@@ -11,27 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="manifest" href="/YouBike/manifest.json" />
-    <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-
-      gtag('config', 'G-P76SPCP21D');
-    </script>
-    <script>
-      if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function () {
-          navigator.serviceWorker
-            .register("../YouBike/service-worker.js")
-            .then(function (registration) {
-              console.log('Service Worker registered with scope:', registration.scope);
-            })
-            .catch(function (error) {
-              console.error('Service Worker registration failed:', error);
-            });
-        });
-      }
-    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-P76SPCP21D"></script>
     <style>
       body {
         font-family: 'Noto Sans TC', Arial, sans-serif;
@@ -1429,6 +1409,21 @@ countdownTimer.updateButton.addEventListener('click', () => {
           }, 500);
       }
   });
+    </script>
+    <script defer>
+      // Register Service Worker non-blocking
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+          navigator.serviceWorker
+            .register("../YouBike/service-worker.js")
+            .then(function (registration) {
+              console.log('Service Worker registered with scope:', registration.scope);
+            })
+            .catch(function (error) {
+              console.error('Service Worker registration failed:', error);
+            });
+        });
+      }
     </script>
   </body>
 </html>
