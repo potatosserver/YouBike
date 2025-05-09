@@ -17,24 +17,23 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  // 先發起網路請求以背景更新快取
+  const networkFetch = fetch(event.request).then(networkResponse => {
+    if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+      caches.open(CACHE_NAME).then(cache => {
+        cache.put(event.request, networkResponse.clone());
+      });
+    }
+    return networkResponse;
+  }).catch(() => {
+    // 網路失敗時，可捕捉處理(例如回傳 undefined)
+  });
+
   event.respondWith(
-    caches.match(event.request)
-      .then(cachedResponse => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-        return fetch(event.request).then(response => {
-          if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response;
-          }
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME)
-            .then(cache => {
-              cache.put(event.request, responseToCache);
-            });
-          return response;
-        });
-      })
+    caches.match(event.request).then(cachedResponse => {
+      // 若有快取則立即回應，否則回傳網路請求結果
+      return cachedResponse || networkFetch;
+    })
   );
 });
 
