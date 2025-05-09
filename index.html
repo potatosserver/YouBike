@@ -1290,12 +1290,14 @@
         event.stopPropagation();
       });
       modalButton.addEventListener('click', hideModal);
-      if (useLocation) {
-        getLocation();
-      } else {
-        userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-        searchYouBike();
-      }
+      window.addEventListener('load', () => {
+        if (useLocation) {
+          getLocation();
+        } else {
+          userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+          searchYouBike();
+        }
+      });
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
           searchYouBike();
