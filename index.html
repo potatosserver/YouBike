@@ -1368,8 +1368,9 @@ window.addEventListener('appinstalled', () => {
     deferredPrompt = null;
     updateInstallButton();
 });
-document.querySelector('h1').addEventListener('click', function() {
+document.getElementById('heading').addEventListener('click', function() {
     keywordInput.value = '';
+    countdownTimer.reset(); // 重設倒數計時
     searchYouBike();
 });
 const searchIcon = document.getElementById('searchIcon');
