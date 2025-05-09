@@ -1199,6 +1199,7 @@
       
       // 更新頁面上所有與定位開關相關的文字，確保英文模式下不顯示中文
       function updateLanguageTexts() {
+        document.title = currentLang === "en" ? "YouBike Station Search" : "YouBike 站點搜尋"; // 新增更新 title
         // 更新定位開關文字
         const locationSwitchSpan = document.querySelector('#locationSwitchText');
         if (locationSwitchSpan) {
