@@ -760,9 +760,12 @@
           let youbikeResults = youbikeDataCache;
           if (keyword) {
             youbikeResults = youbikeResults.filter(station => {
-              const stationName = station.name_tw ? station.name_tw.toLowerCase() : '';
-              const stationAddress = station.address_tw ? station.address_tw.toLowerCase() : '';
-              return stationName.includes(keyword) || stationAddress.includes(keyword);
+              const stationNameTW = station.name_tw ? station.name_tw.toLowerCase() : '';
+              const stationAddressTW = station.address_tw ? station.address_tw.toLowerCase() : '';
+              const stationNameEN = station.name_en ? station.name_en.toLowerCase() : '';
+              const stationAddressEN = station.address_en ? station.address_en.toLowerCase() : '';
+              return stationNameTW.includes(keyword) || stationAddressTW.includes(keyword) ||
+                     stationNameEN.includes(keyword) || stationAddressEN.includes(keyword);
             });
           }
           youbikeResults = youbikeResults.sort((a, b) => {
@@ -1047,23 +1050,23 @@
         switch (error.code) {
           case error.PERMISSION_DENIED:
             errorMessage = currentLang === "en" 
-              ? "Location permission not provided, using MRT Formosa Boulevard station as center." 
-              : "未提供定位權限，將使用捷運美麗島站作為中心定位。";
+              ? "Location permission was denied; using default coordinates." 
+              : "未提供定位權限，將使用預設座標進行定位。";
             break;
           case error.POSITION_UNAVAILABLE:
             errorMessage = currentLang === "en" 
-              ? "Position unavailable, using MRT Formosa Boulevard station as center until succeeded." 
-              : "定位資訊不可用，將使用捷運美麗島站作為中心定位直到定位成功。";
+              ? "Location information is unavailable; using default coordinates until the location is determined." 
+              : "定位資訊不可用，將使用預設座標進行定位直到定位成功。";
             break;
           case error.TIMEOUT:
             errorMessage = currentLang === "en" 
-              ? "Location timeout, using MRT Formosa Boulevard station as center until succeeded." 
-              : "定位逾時，將使用捷運美麗島站作為中心定位直到定位成功。";
+              ? "The location request timed out; using default coordinates until a successful location is acquired." 
+              : "定位逾時，將使用預設座標進行定位直到定位成功。";
             break;
           default:
             errorMessage = currentLang === "en" 
-              ? "Location error, using MRT Formosa Boulevard station as center until succeeded." 
-              : "定位錯誤，將使用捷運美麗島站作為中心定位直到定位成功。";
+              ? "A location error occurred; using default coordinates until a valid location is determined." 
+              : "定位錯誤，將使用預設座標進行定位直到定位成功。";
             break;
         }
         showModal(errorMessage);
@@ -1130,7 +1133,7 @@
             }
           }, 10000);
         } else {
-          showModal("您的瀏覽器不支援地理位置功能。站點將以預設地點 (捷運美麗島站) 為中心顯示。");
+          showModal("您的瀏覽器不支援地理位置功能。站點將以將使用預設座標進行定位。");
           userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
           searchYouBike();
           hideLoading();
