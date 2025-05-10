@@ -77,8 +77,9 @@ android {
         compileSdk 35
         minSdkVersion 23
         targetSdkVersion 35
-        applicationId "co.median.android.xkdbbd"
+        applicationId "com.github.youbike"
         versionCode 9
+	versionName "1.1.1"
         multiDexEnabled true
         vectorDrawables.useSupportLibrary = true
 
