@@ -1,0 +1,5 @@
+src/main/res/raw/ filter=lfs diff=lfs merge=lfs -text
+src/main/res/raw/spinner_animation.json filter=lfs diff=lfs merge=lfs -text
+src/main/res/raw/spinner_animation_dark.json filter=lfs diff=lfs merge=lfs -text
+src/main/res/raw/splash_animation.json filter=lfs diff=lfs merge=lfs -text
+src/main/res/raw/splash_animation_dark.json filter=lfs diff=lfs merge=lfs -text
