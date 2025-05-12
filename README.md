@@ -1,5 +1,4 @@
 # YouBike 站點搜尋
-![icon-192x192-modified](https://github.com/user-attachments/assets/2fea6474-d815-42bc-b25e-9aeac087dd88)
 
 **一個簡單、美觀、低流量的YouBike站點搜尋器**
 
