@@ -125,15 +125,10 @@
         top: 10px;
         right: 10px;
         font-size: 24px;
-        background: none;
-        border: none;
         cursor: pointer;
         color: #007BFF;
         transition: transform 0.2s ease, color 0.2s ease;
-        width: auto;
-        height: auto;
-        border-radius: 0;
-        display: inline;
+        user-select: none;  /* 防止文字被選取 */
       }
       .station .pin-button:hover {
         transform: scale(1.2);
@@ -624,7 +619,7 @@
       const keywordInput = document.getElementById('keyword');
       const maxResults = 100;
       const defaultSearchArea = "";
-      const pinnedStations = new Set(JSON.parse(localStorage.getItem('pinnedStations') || '[]'));
+      const pinnedStations = new Set(JSON.parse(localStorage.getItem('pinnedStations') || '[]').map(id => String(id)));
       const useLocationSetting = localStorage.getItem("useLocation");
       const useLocation = useLocationSetting === null ? true : useLocationSetting === "true";
       document.getElementById('toggleUseLocation').checked = useLocation;
@@ -642,17 +637,33 @@
       });
       function togglePinStation(stationId, event) {
         event.stopPropagation();
-        if (pinnedStations.has(stationId)) {
-          pinnedStations.delete(stationId);
+        
+        // 統一轉換為字串類型
+        const id = String(stationId);
+        
+        // 更新 pinnedStations Set
+        if (pinnedStations.has(id)) {
+          pinnedStations.delete(id);
         } else {
-          pinnedStations.add(stationId);
+          pinnedStations.add(id);
         }
-        localStorage.setItem('pinnedStations', JSON.stringify([...pinnedStations]));
-        const pinButton = document.querySelector(`.pin-button[data-id="${stationId}"]`);
+        
+        // 立即更新 localStorage
+        try {
+          localStorage.setItem('pinnedStations', JSON.stringify([...pinnedStations]));
+        } catch (e) {
+          console.error('Failed to save pinned stations:', e);
+        }
+      
+        // 更新按鈕狀態
+        const pinButton = document.querySelector(`.pin-button[data-id="${id}"]`);
         if (pinButton) {
-          pinButton.classList.toggle('pinned');
-          pinButton.textContent = pinnedStations.has(stationId) ? '★' : '☆';
+          const isPinned = pinnedStations.has(id);
+          pinButton.classList.toggle('pinned', isPinned);
+          pinButton.textContent = isPinned ? '★' : '☆';
         }
+        
+        // 重新排序結果
         updateResultsOrder();
       }
       let mainContentShown = false;
@@ -868,7 +879,14 @@
             const station = item.station_info;
             const vehicle = item.vehicle_info;
             let card = document.querySelector(`.station[data-id="${station.id}"]`);
-            const pinButtonHtml = `<span class="pin-button ${pinnedStations.has(station.id) ? 'pinned' : ''}" data-id="${station.id}" onclick="togglePinStation('${station.id}', event)">${pinnedStations.has(station.id) ? '★' : '☆'}</span>`;
+            
+            // 確保釘選狀態判斷一致
+            const isPinned = pinnedStations.has(String(station.id));
+            const pinButtonHtml = `<span 
+              class="pin-button ${isPinned ? 'pinned' : ''}" 
+              data-id="${station.id}" 
+              onclick="togglePinStation('${station.id}', event)"
+            >${isPinned ? '★' : '☆'}</span>`;
             const distance = calculateDistance(
               userLocation ? userLocation.latitude : defaultLatitude,
               userLocation ? userLocation.longitude : defaultLongitude,
@@ -892,6 +910,7 @@
             const isDefaultLocation = userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude;
             const distanceHTML = !isDefaultLocation ? `<p class="distance">${distanceLabel} ${displayDistance}</p>` : "";
             const cardContent = `
+                          ${pinButtonHtml}
                           <h3>${station.name || unknownStation}</h3>
                           ${distanceHTML}
                           <p>${addressLabel} ${station.address || unknownAddress}</p>
