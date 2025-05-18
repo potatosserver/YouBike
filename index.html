@@ -11,88 +11,116 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="manifest" href="/YouBike/manifest.json" />
     <link rel="icon" type="image/x-icon" href="https://potatosserver.github.io/YouBike/icons/icon.ico" />
     <style>
       body {
         font-family: 'Noto Sans TC', Arial, sans-serif;
-        margin: 0;
-        background: #f4f4f4;
-        color: #333;
+        margin: 0; /* Remove default body margin */
+        background: #f4f4f4; /* Default light mode background */
+        color: #333; /* Default light mode text color */
         transition: background 0.5s ease, color 0.5s ease;
-        padding-top: 20px;
+        padding-top: 20px; /* Add padding to the top */
       }
       h1 {
         color: #007BFF;
         text-align: center;
         margin-bottom: 20px;
       }
+      /* Material 3 風格的搜尋欄容器 */
       #searchContainer {
         display: flex;
         align-items: center;
         margin-left: auto;
         margin-right: auto;
         max-width: 500px;
-        width: calc(100% - 40px);
+        width: calc(100% - 40px); /* Adjust width for padding */
         position: relative;
-        background-color: #fff;
-        border: 1px solid #ccc;
-        border-radius: 25px;
-        padding: 5px 15px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        padding: 8px 16px; /* Adjusted internal padding */
+        box-sizing: border-box; /* Ensure padding doesn't increase total width */
+        background-color: white; /* Default background */
+        border-radius: 28px; /* Large rounded corners */
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* subtle elevation */
+        transition: box-shadow 0.3s ease;
       }
+
+      body.dark-mode #searchContainer {
+          background-color: #1e1e1e; /* Dark mode background */
+          box-shadow: 0 2px 4px rgba(255,255,255,0.1); /* Dark mode subtle elevation */
+      }
+
+      /* Material 3 風格的搜尋輸入框 */
       #keyword {
-        padding: 10px;
-        width: 100%;
-        padding-right: 40px;
-        border: none;
-        border-radius: 20px;
-        margin-right: 0;
+        padding: 0; /* Remove input's own padding, controlled by container */
+        width: calc(100% - 34px); /* Adjust width to leave space for icon and spacing */
+        border: none; /* Remove border */
+        border-radius: 0; /* Rounded corners controlled by container */
+        margin: 0; /* Remove margin */
         font-size: 16px;
-        background-color: #fff;
-        color: #333;
-        box-shadow: none;
+        box-shadow: none; /* Shadow controlled by container */
         word-wrap: break-word;
         overflow-wrap: break-word;
         display: block;
+        background-color: transparent; /* Transparent background to show container background */
+        color: #333; /* Default text color */
       }
+
+      body.dark-mode #keyword {
+          color: #ffffff; /* Dark mode text color */
+      }
+
       #keyword::placeholder {
-        color: #888;
+        color: #888; /* Placeholder text color */
       }
       #keyword:focus {
-        outline: none;
-        box-shadow: none;
+        outline: none; /* Remove default focus outline */
+        /* Add Material 3 style focus effect here if needed */
       }
+
+      /* Search icon style (Material Icons) */
       #searchIcon {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #888;
+        position: static; /* Let icon flow naturally in flex layout */
+        margin-left: 10px; /* Spacing between input and icon */
+        font-size: 24px; /* Material Icons default size */
         cursor: pointer;
-        font-size: 24px;
-        width: 24px;
-        height: 24px;
-        display: flex;
+        color: #555; /* Default icon color */
+        transition: color 0.3s ease;
+        flex-shrink: 0; /* Prevent icon from shrinking */
+        /* Styles needed for Material Icons */
+        display: inline-flex; /* Use flex to center icon */
         align-items: center;
         justify-content: center;
+        width: 24px; /* Set width */
+        height: 24px; /* Set height */
       }
-      #searchIcon svg {
-          fill: currentColor;
+
+      body.dark-mode #searchIcon {
+          color: #ccc; /* Dark mode icon color */
       }
+
       #searchIcon:hover {
-        color: #555;
+        color: #007BFF; /* Hover color */
       }
+
+      /* Remove the button styles as the search icon is now part of the input container */
       button {
-        display: none;
+        display: none; /* Hide the search button */
       }
+
+      /* Adjust spacing below the search container */
+      #searchContainer + #locationSwitchContainer {
+           margin-top: 10px; /* Adjust spacing below the search container */
+      }
+
+
       #results {
         margin-top: 20px;
         display: flex;
         flex-wrap: wrap;
         gap: 20px;
         justify-content: center;
-        padding: 0 20px;
+        padding: 0 20px; /* Add padding to results container */
       }
       .station {
         background-color: white;
@@ -209,6 +237,7 @@
       .modal button:hover {
         background-color: #0056b3;
       }
+      /* Dark mode styles */
       body.dark-mode {
         background: #333;
         color: #ffffff;
@@ -217,27 +246,27 @@
       body.dark-mode h1 {
         color: #90CAF9;
       }
-      body.dark-mode #searchContainer {
-         background-color: #1e1e1e;
-         border: 1px solid #555;
-         box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
-      }
       body.dark-mode #keyword {
-        background-color: #1e1e1e;
+        /* In dark mode, keyword background should be transparent to show searchContainer background */
+        background-color: transparent;
         color: #ffffff;
-        border-color: #90caf9;
+        border-color: #90caf9; /* This border-color won't show because border: none */
       }
       body.dark-mode #keyword::placeholder {
-         color: #888;
+         color: #888; /* Adjust placeholder color for dark mode */
       }
       body.dark-mode #keyword:focus {
-        box-shadow: none;
+         /* Dark mode focus effect */
+      }
+       body.dark-mode #searchContainer {
+          background-color: #1e1e1e; /* Dark mode container background */
+          box-shadow: 0 2px 4px rgba(255,255,255,0.1); /* Dark mode subtle elevation */
       }
        body.dark-mode #searchIcon {
-        color: #90CAF9;
+          color: #ccc; /* Dark mode icon color */
       }
       body.dark-mode #searchIcon:hover {
-        color: #ffffff;
+        color: #ffffff; /* White icon on hover in dark mode */
       }
       body.dark-mode button {
         background-color: #90caf9;
@@ -309,50 +338,68 @@
       body.dark-mode #toggleDarkMode:hover {
         background: linear-gradient(135deg, #64b5f6, #42a5f5);
       }
+      /* Adjustments for narrow screens */
       @media (max-width: 768px) {
         .station {
           width: calc(50% - 20px);
         }
+        /* Adjusted search container for horizontal layout */
         #searchContainer {
-           width: calc(100% - 40px);
-           flex-direction: row;
-           padding: 5px 15px;
+            /* Removed flex-direction: column; to keep items in a row */
+            padding: 8px 12px; /* Adjust padding */
+            /* Ensure display: flex and align-items: center; are effective */
         }
         #keyword {
-          width: 100%;
+          /* Adjusted width to leave space for the icon */
+          width: calc(100% - 34px); /* Assuming 24px icon + 10px margin */
           margin-right: 0;
-          padding-right: 40px;
-          border-radius: 20px;
+          margin-bottom: 0; /* No margin-bottom in row layout */
+          border-radius: 28px; /* Keep rounded corners like default */
+          display: block;
+          padding: 0 12px; /* Padding controlled by container */
         }
-        #searchIcon {
-           right: 15px;
+         #searchIcon {
+             position: static; /* Remain in static flow within flex container */
+             margin-left: 10px; /* Space between input and icon */
+             margin-top: 0; /* No margin-top in row layout */
+             align-self: auto; /* Default alignment in flex row */
+             /* Ensure font-size, width, height are set for the icon */
+             font-size: 24px; /* Material Icons size */
+             width: 24px;
+             height: 24px;
+             display: inline-flex;
+             align-items: center;
+             justify-content: center;
+         }
+
+        button {
+          width: 100%;
+          border-radius: 0 0 5px 5px;
+          display: block;
         }
+
         #results {
           gap: 10px;
-          padding: 0 10px;
         }
         .station {
           margin-bottom: 10px;
-          width: calc(50% - 10px);
         }
       }
       @media (max-width: 480px) {
         .station {
           width: 100%;
         }
-         #searchContainer {
-           width: calc(100% - 20px);
-           padding: 5px 10px;
-        }
-        #keyword {
-           padding-right: 40px;
-        }
-        #searchIcon {
-           right: 10px;
-        }
-         #results {
-          padding: 0 10px;
-        }
+        #searchContainer {
+             padding: 10px; /* Smaller screen spacing */
+         }
+         #keyword {
+             /* Adjusted width for smaller screens if needed, keeping room for icon */
+             width: calc(100% - 34px); /* Assuming 24px icon + 10px margin */
+             padding: 0 10px; /* Padding controlled by container */
+         }
+          #searchIcon {
+             /* Icon styles remain consistent with 768px breakpoint */
+         }
       }
       #loadingOverlay {
         position: fixed;
@@ -424,31 +471,10 @@
         height: 45px;
         object-fit: contain;
       }
-      #installButton {
-        position: fixed;
-        bottom: 140px;
-        right: 20px;
-        z-index: 1000;
-        width: 50px;
-        height: 50px;
-        background: white;
-        color: black;
-        border: none;
-        border-radius: 50%;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        padding: 0;
-      }
-      #installButton img {
-        display: block;
-        margin: 0 auto;
-        width: 45px;
-        height: 45px;
-        object-fit: contain;
-      }
+      /* Removed installButton styles */
+      /* #installButton { ... } */
+      /* #installButton img { ... } */
+
       #extraButtons {
           position: fixed;
           bottom: 120px;
@@ -456,7 +482,7 @@
           transform: translateX(100%);
           transition: transform 0.5s ease;
           display: flex;
-          flex-direction: row;
+          flex-direction: row; /* Changed to horizontal layout */
           gap: 10px;
           z-index: 1000;
       }
@@ -531,7 +557,7 @@
       #settingsPanel {
           position: fixed;
           bottom: 60px;
-          right: 80px;
+          right: 80px; /* Adjusted to suitable position */
           display: flex;
           flex-direction: row;
           gap: 10px;
@@ -563,10 +589,12 @@
           background-color: #f0f0f0;
           transform: scale(1.1);
       }
+      /* Added animation for settingsPanel */
       @keyframes popUpSettings {
           0% { transform: translateX(150%) scale(0.5); opacity: 0; }
           100% { transform: translateX(0) scale(1); opacity: 1; }
       }
+      /* Added settingsPanel collapse animation */
       @keyframes popDownSettings {
           0% { transform: translateX(0) scale(1); opacity: 1; }
           100% { transform: translateX(150%) scale(0.5); opacity: 0; }
@@ -592,11 +620,7 @@
       <h1 id="heading"></h1>
       <div id="searchContainer">
         <input type="text" id="keyword" placeholder="請輸入站點名稱、地址" value="" />
-        <span id="searchIcon" title="搜尋">
-            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
-                <path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 35-8 69t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/>
-            </svg>
-        </span>
+        <span id="searchIcon" class="material-icons" title="搜尋">search</span>
       </div>
       <div id="locationSwitchContainer" style="display: flex; align-items: center; justify-content: center; margin: 10px 0;">
         <label class="switch" style="margin: 0;">
@@ -621,14 +645,11 @@
           </a>
       </div>
       </div>
-      <a id="githubLink" title="GitHub Repository">
+      <a id="githubLink" title="GitHub Repository" href="https://github.com/KEVIN970712/YouBike" target="_blank">
         <button id="githubButton" style="position: fixed; bottom: 120px; right: 20px; z-index: 1000; width: 50px; height: 50px; background: white; color: black; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">
           <img loading="lazy" src="https://potatosserver.github.io/YouBike/icons/github.webp" alt="GitHub" style="width:35px; height:35px;" />
         </button>
       </a>
-      <button id="installButton" style="position: fixed; bottom: 180px; right: 20px; z-index: 1000; width: 50px; height: 50px; background: white; color: black; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-        <img loading="lazy" src="https://potatosserver.github.io/YouBike/icons/install.webp" alt="安裝" style="width:45px; height:45px;" />
-      </button>
       <button id="settingsButton" title="設定" style="position: fixed; bottom: 60px; right: 20px; z-index: 1200; width: 50px; height: 50px; background: white; color: black; border: none; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: transform 0.2s ease;">⚙️</button>
       <div id="settingsPanel">
         <button id="darkModeToggle" title="切換暗色模式">🌙</button>
@@ -1327,45 +1348,53 @@
         }
       });
 
-function updateInstallButton() {
-    const installBtn = document.getElementById('installButton');
-    if (deferredPrompt) {
-        installBtn.innerHTML = '<img src="https://potatosserver.github.io/YouBike/icons/install.webp" alt="安裝" style="width:45px; height:45px;" />';
-        installBtn.title = "安裝應用程式";
-        installBtn.style.display = 'block';
-    } else {
-        installBtn.style.display = 'none';
-    }
-}
-
-let deferredPrompt;
-document.addEventListener('DOMContentLoaded', () => {
-    updateInstallButton();
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        document.getElementById('installButton').style.display = 'block';
-        updateInstallButton();
-    });
-    document.getElementById('installButton').addEventListener('click', async () => {
-        try {
-            if (deferredPrompt) {
-                await deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                console.log('User response to the install prompt:', outcome);
-                deferredPrompt = null;
-            } else if (window.matchMedia('(display-mode: standalone)').matches) {
-                alert("App 已在運行中。");
-            } else {
-                const errorMessage = 'App 已安裝，請從主畫面或開始清單中打開應用程式。';
-                console.error('PWA button error:', errorMessage, { deferredPrompt, displayMode: window.matchMedia('(display-mode: standalone)').matches, userAgent: navigator.userAgent, manifestHref: document.querySelector('link[rel="manifest"]')?.href });
-                alert(errorMessage);
-            }
-            updateInstallButton();
-        } catch (error) {
-            console.error('安裝按鈕發生錯誤:', error);
-        }
-    });
+      // Removed installButton related JavaScript
+      /*
+      function updateInstallButton() {
+          const installBtn = document.getElementById('installButton');
+          if (deferredPrompt) {
+              installBtn.innerHTML = '<img src="https://kevin970712.github.io/YouBike/icons/install.webp" alt="安裝" style="width:45px; height:45px;" />';
+              installBtn.title = "安裝應用程式";
+              installBtn.style.display = 'block';
+          } else {
+              installBtn.style.display = 'none';
+          }
+      }
+      let deferredPrompt;
+      document.addEventListener('DOMContentLoaded', () => {
+          updateInstallButton();
+          window.addEventListener('beforeinstallprompt', (e) => {
+              e.preventDefault();
+              deferredPrompt = e;
+              document.getElementById('installButton').style.display = 'block';
+              updateInstallButton();
+          });
+          document.getElementById('installButton').addEventListener('click', async () => {
+              try {
+                  if (deferredPrompt) {
+                      await deferredPrompt.prompt();
+                      const { outcome } = await deferredPrompt.userChoice;
+                      console.log('User response to the install prompt:', outcome);
+                      deferredPrompt = null;
+                  } else if (window.matchMedia('(display-mode: standalone)').matches) {
+                      alert("App 已在運行中。");
+                  } else {
+                      const errorMessage = 'App 已安裝，請從主畫面或開始清單中打開應用程式。';
+                      console.error('PWA button error:', errorMessage, { deferredPrompt, displayMode: window.matchMedia('(display-mode: standalone)').matches, userAgent: navigator.userAgent, manifestHref: document.querySelector('link[rel="manifest"]')?.href });
+                      alert(errorMessage);
+                  }
+                  updateInstallButton();
+              } catch (error) {
+                  console.error('安裝按鈕發生錯誤:', error);
+              }
+          });
+      });
+      window.addEventListener('appinstalled', () => {
+          console.log('App 已安裝');
+          deferredPrompt = null;
+          updateInstallButton();
+      });
+      */
 
     const extraButtons = document.getElementById('extraButtons');
     const githubButton = document.getElementById('githubButton');
@@ -1406,12 +1435,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 500);
         }
     });
-});
-window.addEventListener('appinstalled', () => {
-    console.log('App 已安裝');
-    deferredPrompt = null;
-    updateInstallButton();
-});
+// Moved the closing bracket for the DOMContentLoaded event listener to the correct position
+// });
+
 document.getElementById('heading').addEventListener('click', function() {
     keywordInput.value = '';
     countdownTimer.reset();
@@ -1455,6 +1481,7 @@ countdownTimer.updateButton.addEventListener('click', () => {
   });
     </script>
     <script defer>
+      // Register Service Worker non-blocking
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', function () {
           navigator.serviceWorker
