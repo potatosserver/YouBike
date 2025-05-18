@@ -4,20 +4,23 @@
     <meta name="google-site-verification" content="9o55RpXAKN7kR9cYHHvHkWuktV3JVcCYF5mt9XZULCY" />
     <meta charset="UTF-8" />
     <meta name="author" content="卓稟鈞(AndrewCho)">
-    <meta name="description" content="一個專為 YouBike 設計的簡單、美觀且低流量站點搜尋器，提供快速查詢站點資訊功能，滿足即時需求，適合所有用戶使用。">    
+    <meta name="description" content="一個專為 YouBike 設計的簡單、美觀且低流量站點搜尋器，提供快速查詢站點資訊功能，滿足即時需求，適合所有用戶使用。">
     <meta name="keywords" content="YouBike, youBike, YouBike2.0, youBike2.0, ubike, ibike, obike, kbike, 微笑單車，公共自行車, 腳踏車，YouBike站點搜尋, 站點搜尋, YouBike 資訊, YouBike據點，ubike據點 ，附近站點, 附近YouBike站點, 全台YouBike, 台北YouBike, 新北YouBike, 桃園YouBike, 新竹YouBike, 苗栗YouBike, 臺中YouBike, 嘉義YouBike , 臺南YouBike, 高雄YouBike, 屏東YouBike, 臺東YouBike , YouBike即時資訊, 定位功能, Github, github.io" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>YouBike 站點搜尋 : 一個簡單、美觀、低流量的YouBike站點搜尋器</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <link rel="manifest" href="/YouBike/manifest.json" />
     <link rel="icon" type="image/x-icon" href="https://potatosserver.github.io/YouBike/icons/icon.ico" />
     <style>
       body {
         font-family: 'Noto Sans TC', Arial, sans-serif;
-        margin: 20px;
+        margin: 0;
         background: #f4f4f4;
+        color: #333;
         transition: background 0.5s ease, color 0.5s ease;
+        padding-top: 20px;
       }
       h1 {
         color: #007BFF;
@@ -30,54 +33,58 @@
         margin-left: auto;
         margin-right: auto;
         max-width: 500px;
-        width: 100%;
+        width: calc(100% - 40px);
         position: relative;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 25px;
+        padding: 5px 15px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
       }
       #keyword {
         padding: 10px;
         width: 100%;
-        padding-right: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px 0 0 5px;
+        padding-right: 40px;
+        border: none;
+        border-radius: 20px;
         margin-right: 0;
         font-size: 16px;
-        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+        color: #333;
+        box-shadow: none;
         word-wrap: break-word;
         overflow-wrap: break-word;
         display: block;
       }
+      #keyword::placeholder {
+        color: #888;
+      }
       #keyword:focus {
         outline: none;
-        border-color: #007BFF;
-        box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        box-shadow: none;
       }
       #searchIcon {
         position: absolute;
-        right: 10px;
+        right: 15px;
         top: 50%;
-        transform: translateY(-65%);
+        transform: translateY(-50%);
+        color: #888;
+        cursor: pointer;
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #searchIcon svg {
+          fill: currentColor;
       }
       #searchIcon:hover {
-        color: #0056b3;
+        color: #555;
       }
       button {
-        padding: 10px 20px;
-        background-color: #007BFF;
-        color: white;
-        border: none;
-        border-radius: 0 5px 5px 0;
-        cursor: pointer;
-        font-size: 16px;
-        transition: background-color 0.3s ease;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-        margin-left: 0;
-        width: auto;
-        min-width: 50px;
-        text-align: center;
-        display: block;
-      }
-      button:hover {
-        background-color: #0056b3;
+        display: none;
       }
       #results {
         margin-top: 20px;
@@ -85,6 +92,7 @@
         flex-wrap: wrap;
         gap: 20px;
         justify-content: center;
+        padding: 0 20px;
       }
       .station {
         background-color: white;
@@ -128,7 +136,7 @@
         cursor: pointer;
         color: #007BFF;
         transition: transform 0.2s ease, color 0.2s ease;
-        user-select: none;  /* 防止文字被選取 */
+        user-select: none;
       }
       .station .pin-button:hover {
         transform: scale(1.2);
@@ -150,8 +158,8 @@
         display: none;
         opacity: 0;
         transition: opacity 0.5s ease;
-        white-space: nowrap;  /* 新增: 避免文字換行 */
-        width: auto;         /* 新增: 動態調整寬度 */
+        white-space: nowrap;
+        width: auto;
       }
       #loading.show {
         opacity: 1;
@@ -209,13 +217,27 @@
       body.dark-mode h1 {
         color: #90CAF9;
       }
+      body.dark-mode #searchContainer {
+         background-color: #1e1e1e;
+         border: 1px solid #555;
+         box-shadow: 0 2px 5px rgba(255, 255, 255, 0.1);
+      }
       body.dark-mode #keyword {
         background-color: #1e1e1e;
         color: #ffffff;
         border-color: #90caf9;
       }
+      body.dark-mode #keyword::placeholder {
+         color: #888;
+      }
       body.dark-mode #keyword:focus {
-        box-shadow: 0 0 5px rgba(144, 202, 249, 0.5);
+        box-shadow: none;
+      }
+       body.dark-mode #searchIcon {
+        color: #90CAF9;
+      }
+      body.dark-mode #searchIcon:hover {
+        color: #ffffff;
       }
       body.dark-mode button {
         background-color: #90caf9;
@@ -291,31 +313,45 @@
         .station {
           width: calc(50% - 20px);
         }
+        #searchContainer {
+           width: calc(100% - 40px);
+           flex-direction: row;
+           padding: 5px 15px;
+        }
         #keyword {
           width: 100%;
           margin-right: 0;
-          margin-bottom: 10px;
-          border-radius: 5px 5px 0 0;
-          display: block;
+          padding-right: 40px;
+          border-radius: 20px;
         }
-        button {
-          width: 100%;
-          border-radius: 0 0 5px 5px;
-          display: block;
-        }
-        #searchContainer {
-          flex-direction: column;
+        #searchIcon {
+           right: 15px;
         }
         #results {
           gap: 10px;
+          padding: 0 10px;
         }
         .station {
           margin-bottom: 10px;
+          width: calc(50% - 10px);
         }
       }
       @media (max-width: 480px) {
         .station {
           width: 100%;
+        }
+         #searchContainer {
+           width: calc(100% - 20px);
+           padding: 5px 10px;
+        }
+        #keyword {
+           padding-right: 40px;
+        }
+        #searchIcon {
+           right: 10px;
+        }
+         #results {
+          padding: 0 10px;
         }
       }
       #loadingOverlay {
@@ -408,7 +444,7 @@
       }
       #installButton img {
         display: block;
-        margin: 0 auto; 
+        margin: 0 auto;
         width: 45px;
         height: 45px;
         object-fit: contain;
@@ -420,7 +456,7 @@
           transform: translateX(100%);
           transition: transform 0.5s ease;
           display: flex;
-          flex-direction: column;
+          flex-direction: row;
           gap: 10px;
           z-index: 1000;
       }
@@ -495,7 +531,7 @@
       #settingsPanel {
           position: fixed;
           bottom: 60px;
-          right: 80px; /* 調整至適合位置 */
+          right: 80px;
           display: flex;
           flex-direction: row;
           gap: 10px;
@@ -527,12 +563,10 @@
           background-color: #f0f0f0;
           transform: scale(1.1);
       }
-      /* 新增針對 settingsPanel 的動畫 */
       @keyframes popUpSettings {
           0% { transform: translateX(150%) scale(0.5); opacity: 0; }
           100% { transform: translateX(0) scale(1); opacity: 1; }
       }
-      /* 新增 settingsPanel 收合動畫 */
       @keyframes popDownSettings {
           0% { transform: translateX(0) scale(1); opacity: 1; }
           100% { transform: translateX(150%) scale(0.5); opacity: 0; }
@@ -555,11 +589,14 @@
       </div>
     </div>
     <div id="mainContent" style="display:none;">
-      <!-- 更新標題元素：改為使用 id 並移除硬編碼文字 -->
       <h1 id="heading"></h1>
       <div id="searchContainer">
         <input type="text" id="keyword" placeholder="請輸入站點名稱、地址" value="" />
-        <span id="searchIcon" title="搜尋">🔍</span>
+        <span id="searchIcon" title="搜尋">
+            <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+                <path d="M784-120 532-372q-30 24-69 38t-83 14q-109 0-184.5-75.5T120-580q0-109 75.5-184.5T380-840q109 0 184.5 75.5T640-580q0 35-8 69t-38 69l252 252-56 56ZM380-400q75 0 127.5-52.5T560-580q0-75-52.5-127.5T380-760q-75 0-127.5 52.5T200-580q0 75 52.5 127.5T380-400Z"/>
+            </svg>
+        </span>
       </div>
       <div id="locationSwitchContainer" style="display: flex; align-items: center; justify-content: center; margin: 10px 0;">
         <label class="switch" style="margin: 0;">
@@ -637,33 +674,28 @@
       });
       function togglePinStation(stationId, event) {
         event.stopPropagation();
-        
-        // 統一轉換為字串類型
+
         const id = String(stationId);
-        
-        // 更新 pinnedStations Set
+
         if (pinnedStations.has(id)) {
           pinnedStations.delete(id);
         } else {
           pinnedStations.add(id);
         }
-        
-        // 立即更新 localStorage
+
         try {
           localStorage.setItem('pinnedStations', JSON.stringify([...pinnedStations]));
         } catch (e) {
           console.error('Failed to save pinned stations:', e);
         }
-      
-        // 更新按鈕狀態
+
         const pinButton = document.querySelector(`.pin-button[data-id="${id}"]`);
         if (pinButton) {
           const isPinned = pinnedStations.has(id);
           pinButton.classList.toggle('pinned', isPinned);
           pinButton.textContent = isPinned ? '★' : '☆';
         }
-        
-        // 重新排序結果
+
         updateResultsOrder();
       }
       let mainContentShown = false;
@@ -681,7 +713,7 @@
           } else {
             const lang = localStorage.getItem("lang") || "zh";
             document.getElementById("loadingText").textContent = lang === "en" ? "Offline mode starting..." : "離線模式啟動中...";
-            overlay.style.opacity = "1"; 
+            overlay.style.opacity = "1";
             setTimeout(() => {
               overlay.style.display = "none";
               mainContent.style.display = "block";
@@ -737,7 +769,7 @@
         const randomIndex = Math.floor(Math.random() * notices.length);
         document.getElementById('noticeBox').textContent = notices[randomIndex];
       })();
-      
+
       let youbikeDataCache = null;
 
       async function searchYouBike(showLoadingIndicator = true) {
@@ -863,7 +895,6 @@
           if (isOnline) {
             vehData = await queryVehicleData(stationIds);
           }
-          // 修改站點資訊依語言切換: 若為英文則取英文屬性
           const organizedOutput = usedStations.map(site => {
             const info = {
               id: String(site.station_no),
@@ -879,12 +910,11 @@
             const station = item.station_info;
             const vehicle = item.vehicle_info;
             let card = document.querySelector(`.station[data-id="${station.id}"]`);
-            
-            // 確保釘選狀態判斷一致
+
             const isPinned = pinnedStations.has(String(station.id));
-            const pinButtonHtml = `<span 
-              class="pin-button ${isPinned ? 'pinned' : ''}" 
-              data-id="${station.id}" 
+            const pinButtonHtml = `<span
+              class="pin-button ${isPinned ? 'pinned' : ''}"
+              data-id="${station.id}"
               onclick="togglePinStation('${station.id}', event)"
             >${isPinned ? '★' : '☆'}</span>`;
             const distance = calculateDistance(
@@ -906,7 +936,6 @@
                           <p>YouBike 2.0E: <span class="vehicle_ybe">${vehicle?.available_e !== undefined ? vehicle.available_e : unknownValue}</span></p>
                           <p>${slotsLabel} <span class="vehicle_empty">${vehicle?.empty_spaces !== undefined ? vehicle.empty_spaces : unknownValue}</span></p>
                         ` : '';
-            // 當使用預設座標時不顯示距離
             const isDefaultLocation = userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude;
             const distanceHTML = !isDefaultLocation ? `<p class="distance">${distanceLabel} ${displayDistance}</p>` : "";
             const cardContent = `
@@ -1069,23 +1098,23 @@
         let errorMessage = "";
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            errorMessage = currentLang === "en" 
-              ? "Location permission was denied; using default coordinates." 
+            errorMessage = currentLang === "en"
+              ? "Location permission was denied; using default coordinates."
               : "未提供定位權限，將使用預設座標進行定位。";
             break;
           case error.POSITION_UNAVAILABLE:
-            errorMessage = currentLang === "en" 
-              ? "Location information is unavailable; using default coordinates until the location is determined." 
+            errorMessage = currentLang === "en"
+              ? "Location information is unavailable; using default coordinates until the location is determined."
               : "定位資訊不可用，將使用預設座標進行定位直到定位成功。";
             break;
           case error.TIMEOUT:
-            errorMessage = currentLang === "en" 
-              ? "The location request timed out; using default coordinates until a successful location is acquired." 
+            errorMessage = currentLang === "en"
+              ? "The location request timed out; using default coordinates until a successful location is acquired."
               : "定位逾時，將使用預設座標進行定位直到定位成功。";
             break;
           default:
-            errorMessage = currentLang === "en" 
-              ? "A location error occurred; using default coordinates until a valid location is determined." 
+            errorMessage = currentLang === "en"
+              ? "A location error occurred; using default coordinates until a valid location is determined."
               : "定位錯誤，將使用預設座標進行定位直到定位成功。";
             break;
         }
@@ -1135,7 +1164,7 @@
             },
             {
               enableHighAccuracy: true,
-              timeout: 10000, // 最大等待10秒
+              timeout: 10000,
               maximumAge: 0
             }
           );
@@ -1170,7 +1199,6 @@
             lat, lng
           );
           const distanceEl = card.querySelector('.distance');
-          // 當使用預設座標時，隱藏距離顯示
           if (distanceEl) {
             if (userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude) {
               distanceEl.textContent = "";
@@ -1217,11 +1245,9 @@
         document.body.classList.add("dark-mode");
         darkModeToggle.innerHTML = '<span style="color:#ffd700; font-size:32px;">☀️</span>';
       }
-      
-      // 設定目前語言，預設為中文
+
       let currentLang = localStorage.getItem("lang") || "zh";
-      
-      // 更新頁面上所有與定位開關相關的文字，確保英文模式下不顯示中文
+
       function updateLanguageTexts() {
         document.title = currentLang === "en" ? "YouBike Site Search : A simple, beautiful site search engine" : "YouBike 站點搜尋 : 一個簡單、美觀、低流量的YouBike站點搜尋器";
         const locationSwitchSpan = document.querySelector('#locationSwitchText');
@@ -1246,18 +1272,16 @@
         }
       }
       updateLanguageTexts();
-      
-      // 語言切換按鈕事件：直接更新文字，不再重新載入頁面
+
       const langToggle = document.getElementById('langToggle');
       langToggle.addEventListener('click', (event) => {
         event.stopPropagation();
         currentLang = currentLang === "en" ? "zh" : "en";
         localStorage.setItem("lang", currentLang);
         updateLanguageTexts();
-        // 直接呼叫 searchYouBike 更新站點卡片文字，不顯示 loading 效果
         searchYouBike(false);
       });
-      
+
       const settingsButton = document.getElementById('settingsButton');
       const settingsPanel = document.getElementById('settingsPanel');
       settingsButton.addEventListener('click', (event) => {
@@ -1390,7 +1414,7 @@ window.addEventListener('appinstalled', () => {
 });
 document.getElementById('heading').addEventListener('click', function() {
     keywordInput.value = '';
-    countdownTimer.reset(); // 重設倒數計時
+    countdownTimer.reset();
     searchYouBike();
 });
 const searchIcon = document.getElementById('searchIcon');
@@ -1399,8 +1423,8 @@ let countdownTimer = {
     remaining: 60,
     updateButton: document.getElementById('updateCountdown'),
     updateDisplay: function() {
-        this.updateButton.textContent = currentLang === "en" 
-            ? `${this.remaining} sec update ` 
+        this.updateButton.textContent = currentLang === "en"
+            ? `${this.remaining} sec update `
             : `${this.remaining}秒後更新`;
     },
     reset: function() {
@@ -1431,7 +1455,6 @@ countdownTimer.updateButton.addEventListener('click', () => {
   });
     </script>
     <script defer>
-      // Register Service Worker non-blocking
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', function () {
           navigator.serviceWorker
