@@ -1406,7 +1406,10 @@ body.dark-mode #closeCentralSettings:hover {
             const lat = parseFloat(firstCard.dataset.lat);
             const lng = parseFloat(firstCard.dataset.lng);
             if (!isNaN(lat) && !isNaN(lng) && leafletMap) {
-              leafletMap.setView([lat, lng], 16);
+              leafletMap.setView([lat, lng], 16, {
+                animate: true,
+                duration: 1
+              });
             }
           }
 
@@ -1519,11 +1522,9 @@ body.dark-mode #closeCentralSettings:hover {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude
         };
-        if (leafletMap) {
-          leafletMap.setView([userLocation.latitude, userLocation.longitude], 16);
-        }
+        
         if (wasDefault) {
-          await searchYouBike();
+          await searchYouBike(); // 這裡會通過 searchYouBike 來移動地圖
           updateResultsOrder();
         } else {
           updateCardDistances();
@@ -1603,9 +1604,7 @@ body.dark-mode #closeCentralSettings:hover {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude
         };
-        if (leafletMap) {
-          leafletMap.setView([userLocation.latitude, userLocation.longitude], 16);
-        }
+        
         if (wasDefault) {
           searchYouBike().then(() => {
             updateResultsOrder();
@@ -2021,7 +2020,7 @@ countdownTimer.updateButton.addEventListener('click', () => {
           getLocation();
         } else {
           userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-          searchYouBike();
+          searchYouBike(); // 這裡會通過 searchYouBike 來移動地圖
         }
       });
       
