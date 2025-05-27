@@ -1194,7 +1194,8 @@ body.dark-mode #closeCentralSettings:hover {
 
       let youbikeDataCache = null;
 
-      async function searchYouBike(showLoadingIndicator = true) {
+      // 修改 searchYouBike 函數，確保地圖移動邏輯正確
+      async function searchYouBike(showLoadingIndicator = true, shouldMoveMap = false) {
         if (showLoadingIndicator) showLoading();
         const keyword = keywordInput.value.trim().toLowerCase();
         try {
@@ -1401,7 +1402,7 @@ body.dark-mode #closeCentralSettings:hover {
 
           // 找到搜尋結果中最近的站點（已按距離排序）
           const stationCards = document.querySelectorAll('.station');
-          if (stationCards.length > 0) {
+          if (stationCards.length > 0 && shouldMoveMap) {  // 加入 shouldMoveMap 條件檢查
             const firstCard = stationCards[0];
             const lat = parseFloat(firstCard.dataset.lat);
             const lng = parseFloat(firstCard.dataset.lng);
@@ -1413,7 +1414,7 @@ body.dark-mode #closeCentralSettings:hover {
             }
           }
 
-          // 新增：更新地圖釘標
+          // 更新地圖釘標但不移動視圖
           updateMapMarkers();
 
           dataLoaded = true;
@@ -1829,12 +1830,12 @@ darkModeToggle.addEventListener('click', () => {
           getLocation();
         } else {
           userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-          searchYouBike();
+          searchYouBike(true, false);  // 首次載入不移動地圖
         }
       });
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
-          searchYouBike();
+          searchYouBike(true, true); // 移動地圖
         }
       });
 
@@ -1868,10 +1869,13 @@ darkModeToggle.addEventListener('click', () => {
     document.getElementById('heading').addEventListener('click', function() {
     keywordInput.value = '';
     countdownTimer.reset();
-    searchYouBike();
+    searchYouBike(true, true); // 秼動地圖
 });
 const searchIcon = document.getElementById('searchIcon');
-searchIcon.addEventListener('click', searchYouBike);
+searchIcon.addEventListener('click', () => {
+  searchYouBike(true, true); // 秮動地圖
+});
+// 修改倒數計時器物件
 let countdownTimer = {
     remaining: 60,
     updateButton: document.getElementById('updateCountdown'),
@@ -1882,25 +1886,34 @@ let countdownTimer = {
     },
     reset: function() {
         this.remaining = 60;
+        this.updateDisplay();
+    },
+    update: function() {
+        searchYouBike(true, false);  // 明確設定不移動地圖
+        this.reset();
     }
 };
-countdownTimer.updateDisplay();
+
+// 修改更新按鈕的事件監聽器
+countdownTimer.updateButton.addEventListener('click', () => {
+    countdownTimer.update();  // 使用更新的 update 方法
+});
+
+// 修改自動更新的計時器
 setInterval(() => {
     countdownTimer.remaining--;
     if (countdownTimer.remaining <= 0) {
-        searchYouBike();
-        countdownTimer.reset();
+        countdownTimer.update();  // 使用更新的 update 方法
     }
     countdownTimer.updateDisplay();
 }, 1000);
-countdownTimer.updateButton.addEventListener('click', () => {
-    searchYouBike();
-    countdownTimer.reset();
-    countdownTimer.updateDisplay();
-});
       // 修改全域變數
       let allStations = [];
         async function initMap() {
+        // 使用使用者位置或預設位置初始化地圖
+        const initialLat = userLocation ? userLocation.latitude : defaultLatitude;
+        const initialLng = userLocation ? userLocation.longitude : defaultLongitude;
+        
         leafletMap = L.map('map', {
           dragging: true,
           tap: true,
@@ -1908,8 +1921,7 @@ countdownTimer.updateButton.addEventListener('click', () => {
           doubleClickZoom: true,
           scrollWheelZoom: true,
           zoomControl: true
-        }).setView([userLocation ? userLocation.latitude : defaultLatitude, 
-                   userLocation ? userLocation.longitude : defaultLongitude], 16);
+        }).setView([initialLat, initialLng], 16);
         
         // 將 popupPane 的 z-index 設定為最高
         leafletMap.getPanes().popupPane.style.zIndex = "9999";
@@ -2020,7 +2032,7 @@ countdownTimer.updateButton.addEventListener('click', () => {
           getLocation();
         } else {
           userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-          searchYouBike(); // 這裡會通過 searchYouBike 來移動地圖
+          searchYouBike(true, false); // 這裡會通過 searchYouBike 來移動地圖
         }
       });
       
