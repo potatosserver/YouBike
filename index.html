@@ -1438,7 +1438,7 @@ body.dark-mode #closeCentralSettings:hover {
               const lat = parseFloat(nearestStation.dataset.lat);
               const lng = parseFloat(nearestStation.dataset.lng);
               if (!isNaN(lat) && !isNaN(lng) && leafletMap) {
-                leafletMap.setView([lat, lng], 16, {
+                leafletMap.setView([lat, lng], 18, { // 由16變更為18
                   animate: true,
                   duration: 1
                 });
@@ -1946,6 +1946,7 @@ setInterval(() => {
         const initialLat = userLocation ? userLocation.latitude : defaultLatitude;
         const initialLng = userLocation ? userLocation.longitude : defaultLongitude;
         
+        // 修改初始化地圖縮放倍率，從16改為18
         leafletMap = L.map('map', {
           dragging: true,
           tap: true,
@@ -1953,7 +1954,7 @@ setInterval(() => {
           doubleClickZoom: true,
           scrollWheelZoom: true,
           zoomControl: true
-        }).setView([initialLat, initialLng], 16);
+        }).setView([initialLat, initialLng], 18);
         
         // 將 popupPane 的 z-index 設定為最高
         leafletMap.getPanes().popupPane.style.zIndex = "9999";
@@ -1979,7 +1980,7 @@ setInterval(() => {
                 L.DomEvent.stopPropagation(e);
                 L.DomEvent.preventDefault(e);
                 if (userLocation) {
-                    leafletMap.setView([userLocation.latitude, userLocation.longitude], 16, { animate: true });
+                    leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
                 }
             });
             return btn;
