@@ -431,8 +431,8 @@ body.dark-mode #locationSwitchText {
         left: 0;
         right: 0;
         background: white;
-        height: 230px; /* 初始高度設定較小 */
-        min-height: 190px;
+        height: 40vh;
+        min-height: 200px;
         max-height: 85vh;
         z-index: 2;
         border-top-left-radius: 20px;
@@ -506,8 +506,6 @@ body.dark-mode #locationSwitchText {
           width: 100%;
           padding: 0; /* 移除上下 padding */
           max-width: none;
-          height: calc(230px + 30px); /* 增加30px的高度 */
-          min-height: calc(190px + 30px); /* 增加30px的最小高度 */
         }
         /* 移除 results 的左右 padding */
         #results {
@@ -2220,15 +2218,12 @@ setInterval(() => {
         const touch = e.touches ? e.touches[0] : e;
         const currentY = touch.clientY;
         const deltaY = startY - currentY;
-        const minHeight = calculateFirstCardHeight();
         const newHeight = Math.min(
-            Math.max(startHeight + deltaY, minHeight),
-            window.innerHeight * 0.8
+          Math.max(startHeight + deltaY, 200),
+          window.innerHeight * 0.85
         );
         
-        requestAnimationFrame(() => {
-            mainContent.style.height = `${newHeight}px`;
-        });
+        mainContent.style.height = `${newHeight}px`;
       }
 
       function onEnd() {
