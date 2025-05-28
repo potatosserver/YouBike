@@ -1605,75 +1605,100 @@ body.dark-mode #closeCentralSettings:hover {
           updateCardDistances();
         }
       }      function handleGeolocationError(error) {
-        console.error("Geolocation error:", error);
-        locationDenied = true;
-        let errorMessage = "";
-        let errorType = ""; // 新增錯誤類型判斷
-        
-        // 根據錯誤類型設定不同的提示訊息和錯誤類型
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage = currentLang === "en"
-              ? "Location permission denied. The app needs location permission to show nearby stations."
-              : "您尚未提供定位權限。需要定位權限才能顯示附近站點。";
-            errorType = "permission";
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage = currentLang === "en"
-              ? "Your device doesn't support or has disabled location services. Please check your device settings."
-              : "您的裝置不支援或已停用定位服務，請檢查裝置設定。";
-            errorType = "unavailable";
-            break;
-          case error.TIMEOUT:
-            errorMessage = currentLang === "en"
-              ? "Location request timed out. Please check your internet connection and try again."
-              : "定位請求逾時，請檢查網路連線後再試一次。";
-            errorType = "timeout";
-            break;
-          default:
-            errorMessage = currentLang === "en"
-              ? "Unable to get location. Please check your device settings."
-              : "無法取得位置資訊，請檢查裝置設定。";
-            errorType = "unknown";
+  console.error("Geolocation error:", error);
+  locationDenied = true;
+  let errorMessage = "";
+  let errorType = "";
+  let shouldDisableLocationToggle = false; // 新增變數控制是否要關閉開關
+  
+  switch (error.code) {
+    case error.PERMISSION_DENIED:
+      errorMessage = currentLang === "en"
+        ? "Location permission denied. The app needs location permission to show nearby stations."
+        : "您尚未提供定位權限。需要定位權限才能顯示附近站點。";
+      errorType = "permission";
+      shouldDisableLocationToggle = true; // 權限被拒絕時關閉開關
+      break;
+    case error.POSITION_UNAVAILABLE:
+      errorMessage = currentLang === "en"
+        ? "Your device doesn't support or has disabled location services. Please check your device settings."
+        : "您的裝置不支援或已停用定位服務，請檢查裝置設定。";
+      errorType = "unavailable";
+      shouldDisableLocationToggle = true; // 不支援定位時關閉開關
+      break;
+    case error.TIMEOUT:
+      errorMessage = currentLang === "en"
+        ? "Location request timed out. Please check your internet connection and try again."
+        : "定位請求逾時，請檢查網路連線後再試一次。";
+      errorType = "timeout";
+      shouldDisableLocationToggle = false; // 定位逾時時保持開關狀態
+      break;
+    default:
+      errorMessage = currentLang === "en"
+        ? "Unable to get location. Please check your device settings."
+        : "無法取得位置資訊，請檢查裝置設定。";
+      errorType = "unknown";
+      shouldDisableLocationToggle = true;
+  }
+
+  // 更新中央設定面板的定位開關
+  const centralLocationToggle = document.getElementById('centralLocationToggle');
+  if (shouldDisableLocationToggle && centralLocationToggle) {
+    centralLocationToggle.checked = false;
+    localStorage.setItem("useLocation", "false");
+  }
+
+  // 如果定位開關關閉，移除定位標記
+  if (!centralLocationToggle?.checked && locationMarker) {
+    locationMarker.remove();
+    locationMarker = null;
+  }
+
+  // 只在第一次顯示錯誤提示
+  if (!hasShownDefaultLocationMessage) {
+    const notification = document.getElementById('locationNotification');
+    
+    // 根據錯誤類型設定不同的背景顏色
+    switch (errorType) {
+      case "permission":
+        notification.style.backgroundColor = "rgba(244, 67, 54, 0.9)"; // 紅色
+        break;
+      case "unavailable":
+        notification.style.backgroundColor = "rgba(255, 152, 0, 0.9)"; // 橙色
+        break;
+      case "timeout":
+        notification.style.backgroundColor = "rgba(255, 193, 7, 0.9)"; // 黃色
+        break;
+      default:
+        notification.style.backgroundColor = "rgba(158, 158, 158, 0.9)"; // 灰色
+    }
+    
+    notification.textContent = errorMessage;
+    notification.classList.add('show');
+    
+    setTimeout(() => {
+      notification.classList.add('hide');
+      setTimeout(() => {
+        notification.classList.remove('show', 'hide');
+        // 重置通知顏色
+        notification.style.backgroundColor = "";
+      }, 300);
+    }, 5000); // 延長顯示時間到 5 秒
+
+    hasShownDefaultLocationMessage = true;
+  }
+
+  userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+  if (!shouldDisableLocationToggle) {
+    searchYouBike();
+  }
+}      function handleGeoUpdateSuccess(position) {
+        // 檢查定位開關是否開啟
+        const centralLocationToggle = document.getElementById('centralLocationToggle');
+        if (!centralLocationToggle?.checked) {
+          return; // 如果開關關閉，不處理定位更新
         }
         
-        // 只在第一次顯示錯誤提示
-        if (!hasShownDefaultLocationMessage) {
-          const notification = document.getElementById('locationNotification');
-          
-          // 根據錯誤類型設定不同的背景顏色
-          switch (errorType) {
-            case "permission":
-              notification.style.backgroundColor = "rgba(244, 67, 54, 0.9)"; // 紅色
-              break;
-            case "unavailable":
-              notification.style.backgroundColor = "rgba(255, 152, 0, 0.9)"; // 橙色
-              break;
-            case "timeout":
-              notification.style.backgroundColor = "rgba(255, 193, 7, 0.9)"; // 黃色
-              break;
-            default:
-              notification.style.backgroundColor = "rgba(158, 158, 158, 0.9)"; // 灰色
-          }
-          
-          notification.textContent = errorMessage;
-          notification.classList.add('show');
-          
-          setTimeout(() => {
-            notification.classList.add('hide');
-            setTimeout(() => {
-              notification.classList.remove('show', 'hide');
-              // 重置通知顏色
-              notification.style.backgroundColor = "";
-            }, 300);
-          }, 5000); // 延長顯示時間到 5 秒
-
-          hasShownDefaultLocationMessage = true;
-        }
-
-        userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-        searchYouBike();
-      }      function handleGeoUpdateSuccess(position) {
         const wasDefault = userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude;
         userLocation = {
           latitude: position.coords.latitude,
@@ -2316,18 +2341,29 @@ setInterval(() => {
 
         // 位置服務開關
         centralLocationToggle.addEventListener('change', function() {
-          // 移除對 toggleUseLocation 元素的引用，因為它不存在
-          if (this.checked) {
+          const isChecked = this.checked;
+          localStorage.setItem("useLocation", isChecked);
+          
+          if (isChecked) {
             getLocation();
           } else {
+            // 關閉定位時移除定位標記
+            if (locationMarker) {
+              locationMarker.remove();
+              locationMarker = null;
+            }
             userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
             searchYouBike();
           }
-          localStorage.setItem("useLocation", this.checked);
         });
 
-        // 初始化位置服務開關狀態
+        // 初始化位置服務開關狀態 - 預設為開啟
+        if (localStorage.getItem("useLocation") === null) {
+          localStorage.setItem("useLocation", "true");
+        }
         centralLocationToggle.checked = localStorage.getItem("useLocation") === "true";
+
+        // 初始化時檢查定位開關狀態
         if (centralLocationToggle.checked) {
           getLocation();
         } else {
