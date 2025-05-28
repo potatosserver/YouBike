@@ -2023,9 +2023,14 @@ setInterval(() => {
         let locateControl = L.control({ position: 'topleft' });
         locateControl.onAdd = function(map) {
             let btn = L.DomUtil.create('button', 'leaflet-bar leaflet-control leaflet-control-custom');
-            btn.innerHTML = '<i class="material-icons" style="font-size:18px;">my_location</i>';
+            btn.innerHTML = '<i class="material-icons" style="font-size:18px; line-height:30px;">my_location</i>';
             btn.style.width = '30px';
             btn.style.height = '30px';
+            btn.style.display = 'flex';  // 新增 flex 布局
+            btn.style.alignItems = 'center';  // 垂直置中
+            btn.style.justifyContent = 'center';  // 水平置中
+            btn.style.padding = '0';  // 移除內邊距
+            btn.style.cursor = 'pointer';  // 新增指針樣式
             btn.title = currentLang === "en" ? "Go to my location" : "定位到我目前位置";
             L.DomEvent.on(btn, 'click', function(e) {
                 L.DomEvent.stopPropagation(e);
