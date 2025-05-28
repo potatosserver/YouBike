@@ -1555,7 +1555,7 @@ body.dark-mode #closeCentralSettings:hover {
         return R * c;
       }      async function handleGeolocationSuccess(position) {
         const wasDefault = !userLocation || (userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude);
-        const isFirstLocation = !userLocation;  // 新增：檢查是否為第一次定位
+        const isFirstLocation = !locationMarker;  // 使用 locationMarker 來判斷是否為第一次定位
         
         userLocation = {
           latitude: position.coords.latitude,
@@ -1563,7 +1563,9 @@ body.dark-mode #closeCentralSettings:hover {
         };
 
         if (leafletMap) {
+          // 建立或更新定位標記
           if (!locationMarker) {
+            // 第一次定位時建立標記並添加脈衝效果
             locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
               radius: 10,
               fillColor: '#2196F3',
@@ -1572,16 +1574,27 @@ body.dark-mode #closeCentralSettings:hover {
               weight: 3,
               pane: 'markerPane'
             }).addTo(leafletMap);
-          } else {
-            locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
-          }
 
-          // 修改：只在第一次定位成功時移動地圖
-          if (isFirstLocation) {
+            // 添加脈衝動畫效果
+            const pulsingIcon = L.divIcon({
+              className: 'pulsing-icon',
+              html: '<div class="pulse"></div>',
+              iconSize: [20, 20]
+            });
+            
+            L.marker([userLocation.latitude, userLocation.longitude], {
+              icon: pulsingIcon,
+              pane: 'markerPane'
+            }).addTo(leafletMap);
+
+            // 第一次定位時移動地圖到使用者位置
             leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, {
               animate: true,
               duration: 1
             });
+          } else {
+            // 之後只更新標記位置
+            locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
           }
         }
         
