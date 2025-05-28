@@ -1412,17 +1412,37 @@ body.dark-mode #closeCentralSettings:hover {
           });          updateResultsOrder();
           await new Promise(resolve => setTimeout(resolve, 0));
 
-          // 找到搜尋結果中最近的站點（已按距離排序）
+          // 找到搜尋結果中距離最近的站點（已按距離排序）
           const stationCards = document.querySelectorAll('.station');
           if (stationCards.length > 0 && shouldMoveMap) {  // 加入 shouldMoveMap 條件檢查
-            const firstCard = stationCards[0];
-            const lat = parseFloat(firstCard.dataset.lat);
-            const lng = parseFloat(firstCard.dataset.lng);
-            if (!isNaN(lat) && !isNaN(lng) && leafletMap) {
-              leafletMap.setView([lat, lng], 16, {
-                animate: true,
-                duration: 1
-              });
+            let nearestStation = null;
+            let minDistance = Infinity;
+            
+            stationCards.forEach(card => {
+              const lat = parseFloat(card.dataset.lat);
+              const lng = parseFloat(card.dataset.lng);
+              const distance = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                lat,
+                lng
+              );
+              
+              if (distance < minDistance) {
+                minDistance = distance;
+                nearestStation = card;
+              }
+            });
+
+            if (nearestStation) {
+              const lat = parseFloat(nearestStation.dataset.lat);
+              const lng = parseFloat(nearestStation.dataset.lng);
+              if (!isNaN(lat) && !isNaN(lng) && leafletMap) {
+                leafletMap.setView([lat, lng], 16, {
+                  animate: true,
+                  duration: 1
+                });
+              }
             }
           }
 
