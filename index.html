@@ -1967,6 +1967,25 @@ setInterval(() => {
         markerClusterGroup = L.markerClusterGroup();
         leafletMap.addLayer(markerClusterGroup);
         
+        // 新增定位按鈕，顯示於地圖左上角縮放按鈕下方
+        let locateControl = L.control({ position: 'topleft' });
+        locateControl.onAdd = function(map) {
+            let btn = L.DomUtil.create('button', 'leaflet-bar leaflet-control leaflet-control-custom');
+            btn.innerHTML = '<i class="material-icons" style="font-size:18px;">my_location</i>';
+            btn.style.width = '30px';
+            btn.style.height = '30px';
+            btn.title = currentLang === "en" ? "Go to my location" : "定位到我目前位置";
+            L.DomEvent.on(btn, 'click', function(e) {
+                L.DomEvent.stopPropagation(e);
+                L.DomEvent.preventDefault(e);
+                if (userLocation) {
+                    leafletMap.setView([userLocation.latitude, userLocation.longitude], 16, { animate: true });
+                }
+            });
+            return btn;
+        };
+        locateControl.addTo(leafletMap);
+        
         try {
           // 取得全國站點資料
           const response = await fetch('https://apis.youbike.com.tw/json/station-min-yb2.json', {
