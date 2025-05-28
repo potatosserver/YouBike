@@ -1085,6 +1085,7 @@ body.dark-mode #closeCentralSettings:hover {
       // 新增全域變數
       let leafletMap, markerClusterGroup, tileLayer;
       let userLocation = null;
+      let locationMarker = null; // 新增位置標記變數
       let sortingLocked = false;
       let initialLoad = true;
       let locationDenied = false;
@@ -1555,9 +1556,30 @@ body.dark-mode #closeCentralSettings:hover {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude
         };
+
+        // 確保地圖已初始化
+        if (leafletMap) {
+          // 更新或創建位置標記
+          if (!locationMarker) {
+            locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
+              radius: 10,
+              fillColor: '#2196F3',
+              fillOpacity: 0.8,
+              color: '#ffffff',
+              weight: 3,
+              pane: 'markerPane'
+            }).addTo(leafletMap);
+          } else {
+            locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+          }
+
+          if (wasDefault) {
+            leafletMap.setView([userLocation.latitude, userLocation.longitude], 18);
+          }
+        }
         
         if (wasDefault) {
-          await searchYouBike(); // 這裡會通過 searchYouBike 來移動地圖
+          await searchYouBike();
           updateResultsOrder();
         } else {
           updateCardDistances();
@@ -1637,6 +1659,11 @@ body.dark-mode #closeCentralSettings:hover {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude
         };
+        
+        // 更新位置標記
+        if (locationMarker) {
+          locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+        }
         
         if (wasDefault) {
           searchYouBike().then(() => {
@@ -1955,6 +1982,30 @@ setInterval(() => {
           scrollWheelZoom: true,
           zoomControl: true
         }).setView([initialLat, initialLng], 18);
+
+        // 如果有用戶位置，立即創建位置標記
+        if (userLocation) {
+          locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
+            radius: 10,          // 增加半徑
+            fillColor: '#2196F3',// 使用更鮮艷的藍色
+            fillOpacity: 0.8,    // 增加不透明度
+            color: '#ffffff',    // 白色邊框
+            weight: 3,           // 增加邊框寬度
+            pane: 'markerPane'   // 確保在正確的圖層
+          }).addTo(leafletMap);
+          
+          // 添加脈衝動畫效果
+          const pulsingIcon = L.divIcon({
+            className: 'pulsing-icon',
+            html: '<div class="pulse"></div>',
+            iconSize: [20, 20]
+          });
+          
+          L.marker([userLocation.latitude, userLocation.longitude], {
+            icon: pulsingIcon,
+            pane: 'markerPane'
+          }).addTo(leafletMap);
+        }
         
         // 將 popupPane 的 z-index 設定為最高
         leafletMap.getPanes().popupPane.style.zIndex = "9999";
@@ -2097,7 +2148,7 @@ setInterval(() => {
       });
 
 
-      // 完全重寫拖曳功能
+      // 完全重寫拖曱功能
       const mainContent = document.getElementById('mainContent');
       const dragHandle = document.getElementById('dragHandle');
       let startY = 0;
