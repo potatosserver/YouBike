@@ -1552,14 +1552,14 @@ body.dark-mode #closeCentralSettings:hover {
         return R * c;
       }      async function handleGeolocationSuccess(position) {
         const wasDefault = !userLocation || (userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude);
+        const isFirstLocation = !userLocation;  // 新增：檢查是否為第一次定位
+        
         userLocation = {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude
         };
 
-        // 確保地圖已初始化
         if (leafletMap) {
-          // 更新或創建位置標記
           if (!locationMarker) {
             locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
               radius: 10,
@@ -1573,8 +1573,12 @@ body.dark-mode #closeCentralSettings:hover {
             locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
           }
 
-          if (wasDefault) {
-            leafletMap.setView([userLocation.latitude, userLocation.longitude], 18);
+          // 修改：只在第一次定位成功時移動地圖
+          if (isFirstLocation) {
+            leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, {
+              animate: true,
+              duration: 1
+            });
           }
         }
         
