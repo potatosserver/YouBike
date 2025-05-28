@@ -503,21 +503,19 @@ body.dark-mode #locationSwitchText {
 
       @media (max-width: 480px) {
         #mainContent {
-          width: 100%; /* 從 75% 改為 100% */
-          padding: 20px 0; /* 移除左右 padding */
-          max-width: none; /* 移除最大寬度限制 */
+          width: 100%;
+          padding: 0; /* 移除上下 padding */
+          max-width: none;
         }
         /* 移除 results 的左右 padding */
         #results {
-          padding-left: 0;
-          padding-right: 0;
+          padding: 0 16px; /* 改為固定的左右 padding */
         }
         /* 移除 station 卡片的左右邊距 */
         .station {
-          margin-left: 0;
-          margin-right: 0;
-          width: 100%;
-          border-radius: 0; /* 移除圓角 */
+          margin: 10px 0; /* 只保留上下邊距 */
+          width: calc(100% - 32px); /* 配合 results 的 padding */
+          border-radius: 10px; /* 保持圓角 */
         }
       }      /* Adjustments for narrow screens */
       @media (max-width: 768px) {
@@ -2031,12 +2029,12 @@ setInterval(() => {
         // 如果有用戶位置，立即創建位置標記
         if (userLocation) {
           locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
-            radius: 10,          // 增加半徑
-            fillColor: '#2196F3',// 使用更鮮艷的藍色
-            fillOpacity: 0.8,    // 增加不透明度
-            color: '#ffffff',    // 白色邊框
-            weight: 3,           // 增加邊框寬度
-            pane: 'markerPane'   // 確保在正確的圖層
+            radius: 10,
+            fillColor: '#2196F3',
+            fillOpacity: 0.8,
+            color: '#ffffff',
+            weight: 3,
+            pane: 'markerPane'
           }).addTo(leafletMap);
           
           // 添加脈衝動畫效果
