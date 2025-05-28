@@ -441,11 +441,13 @@ body.dark-mode #locationSwitchText {
         padding: 20px;
         padding-top: 0; /* 移除上方 padding */
         overflow-y: auto;
-        width: 90%; /* 新增：設定固定寬度 */
-        margin: 0 auto; /* 新增：水平置中 */
-        left: 50%; /* 新增：配合 transform 置中 */
-        transform: translateX(-50%); /* 新增：配合 left 置中 */
-        touch-action: none;
+        width: 85%; /* 從 94% 改為 85% */
+        max-width: 1000px; /* 從 1200px 改為 1000px */
+        margin: 0 auto;
+        left: 50%;
+        transform: translateX(-50%);
+        touch-action: pan-y; /* 修改：允許垂直捲動 */
+        -webkit-overflow-scrolling: touch; /* 增加：提供 iOS 的平滑捲動 */
       }
 
       #mainContent::before {
@@ -495,13 +497,13 @@ body.dark-mode #locationSwitchText {
 
       @media (max-width: 768px) {
         #mainContent {
-          width: 94%; /* 調整：在較小螢幕上稍微加寬 */
+          width: 80%; /* 從 92% 改為 80% */
         }
       }
 
       @media (max-width: 480px) {
         #mainContent {
-          width: 96%; /* 調整：在手機螢幕上使用更大的寬度 */
+          width: 75%; /* 從 90% 改為 75% */
         }
         /* 新增左右內邊距給 #results */
         #results {
@@ -1764,10 +1766,10 @@ darkModeToggle.addEventListener('click', () => {
           locationSwitchSpan.textContent = currentLang === "en" ? "Use Location" : "使用定位";
         }
         const heading = document.getElementById('heading');
-        if (heading) {
+               if (heading) {
             heading.textContent = currentLang === "en" ? "YouBike Station Search" : "YouBike  站點搜尋";
         }
-        const keywordInput = document.getElementById('keyword');
+               const keywordInput = document.getElementById('keyword');
         if (keywordInput) {
           keywordInput.placeholder = currentLang === "en" ? "Please enter station name or address" : "請輸入站點名稱、地址";
         }
