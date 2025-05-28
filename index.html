@@ -2066,17 +2066,23 @@ setInterval(() => {
         locateControl.addTo(leafletMap);
         
         try {
-          // 取得全國站點資料
-          const response = await fetch('https://apis.youbike.com.tw/json/station-min-yb2.json', {
-            headers: {
-              'accept': '*/*',
-              'accept-language': 'zh-TW,zh;q=0.9'
+          let stations;
+          if (navigator.onLine) {
+            const response = await fetch('https://apis.youbike.com.tw/json/station-min-yb2.json', {
+              headers: {
+                'accept': '*/*',
+                'accept-language': 'zh-TW,zh;q=0.9'
+              }
+            });
+            if (!response.ok) throw new Error('無法取得站點資料');
+            stations = await response.json();
+            localStorage.setItem('cachedAllStations', JSON.stringify(stations));
+          } else {
+            stations = JSON.parse(localStorage.getItem('cachedAllStations') || '[]');
+            if (stations.length === 0) {
+              throw new Error('離線狀態下無站點資料');
             }
-          });
-          
-          if (!response.ok) throw new Error('無法取得站點資料');
-          
-          const stations = await response.json();
+          }
           allStations = stations;
           
           // 新增所有站點的釘標
@@ -2357,5 +2363,19 @@ setInterval(() => {
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <!-- 加入 MarkerCluster 的 JS -->
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+    <script>
+      // 新增：註冊 Service Worker 以便離線時仍能進入網頁
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/YouBike/service-worker.js')
+            .then(registration => {
+              console.log("Service Worker 註冊成功:", registration);
+            })
+            .catch(error => {
+              console.error("Service Worker 註冊失敗:", error);
+            });
+        });
+      }
+    </script>
   </body>
 </html>
