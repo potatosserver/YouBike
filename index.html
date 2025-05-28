@@ -2026,37 +2026,16 @@ setInterval(() => {
           zoomControl: true
         }).setView([initialLat, initialLng], 18);
 
-        // 如果有用戶位置，立即創建位置標記
-        if (userLocation) {
-          locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
-            radius: 10,
-            fillColor: '#2196F3',
-            fillOpacity: 0.8,
-            color: '#ffffff',
-            weight: 3,
-            pane: 'markerPane'
+        // 離線模式處理：若在線則正常加入 tileLayer，否則設定容器背景
+        if (navigator.onLine) {
+          tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
           }).addTo(leafletMap);
-          
-          // 添加脈衝動畫效果
-          const pulsingIcon = L.divIcon({
-            className: 'pulsing-icon',
-            html: '<div class="pulse"></div>',
-            iconSize: [20, 20]
-          });
-          
-          L.marker([userLocation.latitude, userLocation.longitude], {
-            icon: pulsingIcon,
-            pane: 'markerPane'
-          }).addTo(leafletMap);
+        } else {
+          // 離線情況，避免 tileLayer 讀取失敗導致問題
+          leafletMap.getContainer().style.backgroundColor = '#f4f4f4';
         }
-        
-        // 將 popupPane 的 z-index 設定為最高
-        leafletMap.getPanes().popupPane.style.zIndex = "9999";
-        
-        tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-          attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        }).addTo(leafletMap);
         
         // 初始化 MarkerClusterGroup
         markerClusterGroup = L.markerClusterGroup();
