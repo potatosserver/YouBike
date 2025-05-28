@@ -12,15 +12,35 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-    event.respondWith(
-        caches.match(event.request).then((response) => {
-            if (response) return response;
-            return fetch(event.request).catch((error) => {
-                console.error('PWA fetch failed:', error);
-                throw error;
-            });
-        })
-    );
+    if (event.request.url.includes('tile.openstreetmap.org')) {
+        event.respondWith(
+            caches.open('map-tiles-cache').then(cache => {
+                return cache.match(event.request).then(response => {
+                    if (response) return response;
+                    return fetch(event.request).then(networkResponse => {
+                        // 將下載到的地圖加入緩存
+                        cache.put(event.request, networkResponse.clone());
+                        return networkResponse;
+                    }).catch((error) => {
+                        console.error('Tile fetch failed:', error);
+                        // 回傳一個透明 1x1 gif 以作為預設地圖圖片
+                        const transparentImg = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+                        return new Response(transparentImg, { headers: { 'Content-Type': 'image/gif' } });
+                    });
+                });
+            })
+        );
+    } else {
+        event.respondWith(
+            caches.match(event.request).then((response) => {
+                if (response) return response;
+                return fetch(event.request).catch((error) => {
+                    console.error('PWA fetch failed:', error);
+                    throw error;
+                });
+            })
+        );
+    }
 });
 
 self.addEventListener('activate', (event) => {
