@@ -14,7 +14,6 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="manifest" href="/YouBike/manifest.json" />
     <link rel="icon" type="image/x-icon" href="https://potatosserver.github.io/YouBike/icons/icon.ico" />
-    <!-- 加入 Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
@@ -941,6 +940,40 @@ body.dark-mode .settings-group h3 {
     font-size: 1.1em;
 }
 
+/* Styles for external links in central settings panel */
+#centralSettingsPanel .github-link {
+    color: #007BFF; /* Light blue for light mode */
+    text-decoration: none; /* Remove underline */
+    display: flex; /* Use flexbox for alignment */
+    align-items: center; /* Vertically align items */
+    width: 100%; /* Take full width of parent */
+}
+
+body.dark-mode #centralSettingsPanel .github-link {
+    color: #90CAF9; /* Light blue for dark mode */
+}
+
+#centralSettingsPanel .github-link:visited {
+    color: #007BFF; /* Keep same color after visited in light mode */
+}
+
+body.dark-mode #centralSettingsPanel .github-link:visited {
+    color: #90CAF9; /* Keep same color after visited in dark mode */
+}
+
+#centralSettingsPanel .github-link:hover {
+    color: #0056b3; /* Slightly darker blue on hover in light mode */
+}
+
+body.dark-mode #centralSettingsPanel .github-link:hover {
+    color: #BBDEFB; /* Slightly lighter blue on hover in dark mode */
+}
+
+#centralSettingsPanel .github-link span {
+    margin-left: 10px; /* Add some spacing between image and text */
+}
+
+
 #closeCentralSettings {
     position: absolute;
     top: 2vh;   /* 增加上間距 */
@@ -980,17 +1013,13 @@ body.dark-mode #closeCentralSettings:hover {
   </head>
   <body>
     <div id="map"></div>
-    <!-- 將搜尋框移到地圖外層，避免 input 蓋住 popup -->
     <div id="mapControls">
       <h1 id="heading" class="main-title"></h1>
       <div id="searchContainer">
         <input type="text" id="keyword" placeholder="請輸入站點名稱、地址" value="" />
         <span id="searchIcon" class="material-icons" title="搜尋">search</span>
       </div>
-      <!-- 移除了 locationSwitchContainer div -->
-    </div>
-    <!-- 地圖其他內容由 leaflet 控制 -->
-    <!-- 移除獨立的 #mapControls（若有的話） -->
+      </div>
     <div id="locationNotification"></div>
     <div id="loadingOverlay">
       <div id="loadingContent">
@@ -1034,7 +1063,6 @@ body.dark-mode #closeCentralSettings:hover {
         </div>
       </div>
     </div>
-    <!-- 新增浮動卡片，用於顯示釘標詳細資訊 -->
     <div id="floatingCard"></div>
     <button id="updateCountdown" style="display:none; position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; padding: 6px 12px; background-color: white; color: #007bff; border: 2px solid #007bff; border-radius: 25px; font-size: 0.8em; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: all 0.3s ease; width: 100px;">60秒後更新</button>
     <div id="centralSettingsPanel">
@@ -1727,7 +1755,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
         notification.style.backgroundColor = "rgba(255, 193, 7, 0.9)"; // 黃色
         break;
       default:
-        notification.style.backgroundColor = "rgba(158, 158, 158, 0.9)"; // 灰色
+        notification.style.backgroundColor = "rgba(158, 158, 158, 0.9)"; // 灰色 
     }
     
     notification.textContent = errorMessage;
@@ -2134,7 +2162,7 @@ setInterval(() => {
         try {
             tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(leafletMap);
         } catch(err) {
             console.error("Tile layer failed:", err);
@@ -2469,9 +2497,7 @@ setInterval(() => {
         }
       });
     </script>
-    <!-- 引入 Leaflet JS -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <!-- 加入 MarkerCluster 的 JS -->
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
   </body>
 </html>
