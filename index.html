@@ -1800,7 +1800,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
         
         setTimeout(() => {
           notification.classList.add('hide');
-                   setTimeout(() => {
+                             setTimeout(() => {
             notification.classList.remove('show', 'hide');
           }, 300);
         }, 3000);
@@ -2110,12 +2110,17 @@ setInterval(() => {
         // 將 popupPane 的 z-index 設定為最高
         leafletMap.getPanes().popupPane.style.zIndex = "9999";
         
-        tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-          maxZoom: 19,
-          attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        }).addTo(leafletMap);
-        
-        // 初始化 MarkerClusterGroup
+        try {
+            tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(leafletMap);
+        } catch(err) {
+            console.error("Tile layer failed:", err);
+            showNotification(currentLang === "en"
+                ? "Offline mode: Map tiles unavailable."
+                : "離線模式：地圖圖層無法載入。");
+        }
         markerClusterGroup = L.markerClusterGroup();
         leafletMap.addLayer(markerClusterGroup);
         
