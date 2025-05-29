@@ -2081,7 +2081,7 @@ setInterval(() => {
       // 修改全域變數
       let allStations = [];
         async function initMap() {
-        // 新增：離線模式通知邏輯
+        // 修改：離線模式通知邏輯，不再直接 return
         if (!navigator.onLine) {
           if (!window.offlineNotified) {
             showNotification(currentLang === "en" 
@@ -2089,10 +2089,9 @@ setInterval(() => {
               : "離線模式無法初始化地圖");
             window.offlineNotified = true;
           }
-          return;
+          // 不再 return，直接繼續使用預設位置初始化地圖
         }
         
-        // 使用使用者位置或預設位置初始化地圖
         const initialLat = userLocation ? userLocation.latitude : defaultLatitude;
         const initialLng = userLocation ? userLocation.longitude : defaultLongitude;
         
@@ -2233,7 +2232,7 @@ setInterval(() => {
       // 更新地圖釘標函數現在只需要處理搜尋結果的高亮顯示
       function updateMapMarkers() {
         // 檢查是否離線且地圖元件未初始化
-        if (!navigator.onLine || !markerClusterGroup) {
+        if (!markerClusterGroup) {
           console.log('Map features are limited in offline mode');
           return;
         }
