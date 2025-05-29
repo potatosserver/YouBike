@@ -1037,6 +1037,8 @@ body.dark-mode #closeCentralSettings:hover {
       <div id="searchContainer">
         <input type="text" id="keyword" placeholder="請輸入站點名稱、地址" value="" />
         <span id="searchIcon" class="material-icons" title="搜尋">search</span>
+        <!-- 新增：當輸入有文字時出現清除按鈕 -->
+        <span id="clearTextBtn" class="material-icons" title="清除" style="display:none; margin-left:10px; cursor:pointer;">close</span>
       </div>
       <div id="results"></div>
       <div id="loading">載入中，請稍候...</div>
@@ -1139,6 +1141,19 @@ body.dark-mode #closeCentralSettings:hover {
       const resultsDiv = document.getElementById('results');
       const loadingDiv = document.getElementById('loading');
       const keywordInput = document.getElementById('keyword');
+      // 新增 clearTextBtn 相關程式碼
+      const clearTextBtn = document.getElementById('clearTextBtn');
+      keywordInput.addEventListener('input', () => {
+          clearTextBtn.style.display = keywordInput.value.trim() ? 'inline-flex' : 'none';
+      });
+      clearTextBtn.addEventListener('click', () => {
+          keywordInput.value = '';
+          clearTextBtn.style.display = 'none';
+          // 移動地圖到使用者當前定位（使用 userLocation 與 leafletMap）
+          if (userLocation && leafletMap) {
+            leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
+          }
+      });
       const maxResults = 100;
       const defaultSearchArea = "";
       const pinnedStations = new Set(JSON.parse(localStorage.getItem('pinnedStations') || '[]').map(id => String(id)));
@@ -2074,12 +2089,7 @@ darkModeToggle.addEventListener('click', () => {
             }, 300);
         }
     });
-    document.getElementById('heading').addEventListener('click', function() {
-    keywordInput.value = '';
-    countdownTimer.reset();
-    searchYouBike(true, true); // 秼動地圖
-});
-const searchIcon = document.getElementById('searchIcon');
+    const searchIcon = document.getElementById('searchIcon');
 searchIcon.addEventListener('click', () => {
   searchYouBike(true, true); // 秮動地圖
 });
