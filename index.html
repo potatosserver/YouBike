@@ -1135,8 +1135,11 @@ body.dark-mode #closeCentralSettings:hover {
         updateResultsOrder();
       }
       let mainContentShown = false;
+      let renderComplete = false;
+      let locationComplete = false;
+
       function showMainContent() {
-        if (!mainContentShown) {
+        if (!mainContentShown && renderComplete && (locationComplete || !useLocation)) {
           const overlay = document.getElementById("loadingOverlay");
           const mainContent = document.getElementById("mainContent");
           const isOffline = !navigator.onLine;
@@ -1156,6 +1159,62 @@ body.dark-mode #closeCentralSettings:hover {
           
           mainContentShown = true;
         }
+      }
+
+      async function handleGeolocationSuccess(position) {
+        const wasDefault = !userLocation || (userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude);
+        const isFirstLocation = !locationMarker;
+        
+        userLocation = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        };
+
+        if (leafletMap) {
+          // 建立或更新定位標記
+          if (!locationMarker) {
+            // 第一次定位時建立標記並添加脈衝效果
+            locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
+              radius: 10,
+              fillColor: '#2196F3',
+              fillOpacity: 0.8,
+              color: '#ffffff',
+              weight: 3,
+              pane: 'markerPane'
+            }).addTo(leafletMap);
+
+            // 添加脈衝動畫效果
+            const pulsingIcon = L.divIcon({
+              className: 'pulsing-icon',
+              html: '<div class="pulse"></div>',
+              iconSize: [20, 20]
+            });
+            
+            L.marker([userLocation.latitude, userLocation.longitude], {
+              icon: pulsingIcon,
+              pane: 'markerPane'
+            }).addTo(leafletMap);
+
+            // 第一次定位時移動地圖到使用者位置
+            leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, {
+              animate: true,
+              duration: 1
+            });
+          } else {
+            // 之後只更新標記位置
+            locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+          }
+        }
+        
+        if (wasDefault) {
+          await searchYouBike();
+          updateResultsOrder();
+        } else {
+          updateCardDistances();
+        }
+
+        locationComplete = true;
+        showMainContent();
       }
       (function simulateLoadingPercentage() {
         const loadingText = document.getElementById("loadingText");
@@ -1507,6 +1566,7 @@ async function searchYouBike(showLoadingIndicator = true, shouldMoveMap = false)
     updateMapMarkers();
 
     dataLoaded = true;
+    renderComplete = true;
     if (showLoadingIndicator) {
       showMainContent();
     }
@@ -1612,7 +1672,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return R * c;
 }      async function handleGeolocationSuccess(position) {
         const wasDefault = !userLocation || (userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude);
-        const isFirstLocation = !locationMarker;  // 使用 locationMarker 來判斷是否為第一次定位
+        const isFirstLocation = !locationMarker;
         
         userLocation = {
           latitude: position.coords.latitude,
@@ -1661,6 +1721,9 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
         } else {
           updateCardDistances();
         }
+
+        locationComplete = true;
+        showMainContent();
       }      function handleGeolocationError(error) {
   console.error("Geolocation error:", error);
   locationDenied = true;
@@ -2009,15 +2072,22 @@ darkModeToggle.addEventListener('click', () => {
           if (centralLocationToggle?.checked) {
             getLocation();
           } else {
+            locationComplete = true; // 不使用定位時直接標記完成
             userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
             await searchYouBike(true, false);
           }
-          showMainContent();
+          
+          // 不在這裡調用 showMainContent，讓它在定位和渲染完成後自動調用
         } catch (error) {
           console.error('Initialization error:', error);
           showNotification(currentLang === "en"
             ? "Error initializing app. Some features may be limited."
             : "初始化應用程式時發生錯誤，部分功能可能受限。");
+            
+          // 發生錯誤時也要標記完成狀態
+          locationComplete = true;
+          renderComplete = true;
+          showMainContent();
         }
       });
 
