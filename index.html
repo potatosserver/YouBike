@@ -1208,350 +1208,415 @@ body.dark-mode #closeCentralSettings:hover {
 
       let youbikeDataCache = null;
 
-      // 修改 searchYouBike 函數，確保地圖移動邏輯正確
-      async function searchYouBike(showLoadingIndicator = true, shouldMoveMap = false) {
-        if (showLoadingIndicator) showLoading();
-        const keyword = keywordInput.value.trim().toLowerCase();
+      // IndexedDB 操作函數
+function openYoubikeDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('YouBikeDB', 1);
+    request.onupgradeneeded = function(event) {
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains('youbikeData')) {
+        db.createObjectStore('youbikeData', { keyPath: 'id' });
+      }
+    };
+    request.onsuccess = function(event) {
+      resolve(event.target.result);
+    };
+    request.onerror = function(event) {
+      reject(event.target.error);
+    };
+  });
+}
+
+function saveYoubikeDataToDB(dataArray) {
+  return openYoubikeDB().then(db => {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('youbikeData', 'readwrite');
+      const store = tx.objectStore('youbikeData');
+      store.clear();
+      dataArray.forEach((item, idx) => {
+        store.put({ id: idx, value: item });
+      });
+      tx.oncomplete = () => resolve();
+      tx.onerror = (e) => reject(e.target.error);
+    });
+  });
+}
+
+function getYoubikeDataFromDB() {
+  return openYoubikeDB().then(db => {
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('youbikeData', 'readonly');
+      const store = tx.objectStore('youbikeData');
+      const data = [];
+      const req = store.openCursor();
+      req.onsuccess = function(event) {
+        const cursor = event.target.result;
+        if (cursor) {
+          data.push(cursor.value.value);
+          cursor.continue();
+        } else {
+          resolve(data);
+        }
+      };
+      req.onerror = (e) => reject(e.target.error);
+    });
+  });
+}
+
+// 修改 searchYouBike 函數，確保地圖移動邏輯正確
+async function searchYouBike(showLoadingIndicator = true, shouldMoveMap = false) {
+  if (showLoadingIndicator) showLoading();
+  const keyword = keywordInput.value.trim().toLowerCase();
+  try {
+    if (navigator.onLine) {
+      if (!youbikeDataCache) {
+        const youbikeUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
+        const response = await fetch(youbikeUrl, {
+          headers : {
+            'accept': '*/*',
+            'accept-language': 'zh-TW,zh;q=0.9',
+          }
+        });
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const youbikeData = await response.json();
+        youbikeDataCache = Array.isArray(youbikeData)
+          ? youbikeData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
+          : [];
+        // 使用 IndexedDB 儲存
         try {
-          if (navigator.onLine) {
-            if (!youbikeDataCache) {
-              const youbikeUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
-              const response = await fetch(youbikeUrl, {
-                headers : {
-                  'accept': '*/*',
-                  'accept-language': 'zh-TW,zh;q=0.9',
-                }
-              });
-              if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-              const youbikeData = await response.json();
-              youbikeDataCache = Array.isArray(youbikeData)
-                ? youbikeData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
-                : [];
-              localStorage.setItem('cachedYoubikeData', JSON.stringify(youbikeDataCache));
-            }
+          await saveYoubikeDataToDB(youbikeDataCache);
+        } catch (e) {
+          console.warn('Failed to save to IndexedDB:', e);
+        }
+      }
+    } else {
+      if (!youbikeDataCache) {
+        try {
+          youbikeDataCache = await getYoubikeDataFromDB();
+        } catch (e) {
+          youbikeDataCache = [];
+        }
+        youbikeDataCache = youbikeDataCache.map(item => ({
+          ...item,
+          lat: parseFloat(item.lat),
+          lng: parseFloat(item.lng)
+        }));
+      }
+    }
+    let youbikeResults = youbikeDataCache;
+    if (keyword) {
+      youbikeResults = youbikeResults.filter(station => {
+        const stationNameTW = station.name_tw ? station.name_tw.toLowerCase() : '';
+        const stationAddressTW = station.address_tw ? station.address_tw.toLowerCase() : '';
+        const stationNameEN = station.name_en ? station.name_en.toLowerCase() : '';
+        const stationAddressEN = station.address_en ? station.address_en.toLowerCase() : '';
+        return stationNameTW.includes(keyword) || stationAddressTW.includes(keyword) ||
+               stationNameEN.includes(keyword) || stationAddressEN.includes(keyword);
+      });
+    }
+    youbikeResults = youbikeResults.sort((a, b) => {
+      const distA = calculateDistance(
+        userLocation ? userLocation.latitude : defaultLatitude,
+        userLocation ? userLocation.longitude : defaultLongitude,
+        a.lat, a.lng
+      );
+      const distB = calculateDistance(
+        userLocation ? userLocation.latitude : defaultLatitude,
+        userLocation ? userLocation.longitude : defaultLongitude,
+        b.lat, b.lng
+      );
+      return distA - distB;
+    });
+    let limit = keyword ? 50 : 20;
+    let usedStations;
+    if (!keyword) {
+      const pinnedFromLocal = youbikeResults.filter(station => pinnedStations.has(String(station.station_no)));
+      const unpinned = youbikeResults.filter(station => !pinnedStations.has(String(station.station_no)));
+      pinnedFromLocal.sort((a, b) => {
+        const distA = calculateDistance(
+          userLocation ? userLocation.latitude : defaultLatitude,
+          userLocation ? userLocation.longitude : defaultLongitude,
+          a.lat, a.lng
+        );
+        const distB = calculateDistance(
+          userLocation ? userLocation.latitude : defaultLatitude,
+          userLocation ? userLocation.longitude : defaultLongitude,
+          b.lat, b.lng
+        );
+        return distA - distB;
+      });
+      unpinned.sort((a, b) => {
+        const distA = calculateDistance(
+          userLocation ? userLocation.latitude : defaultLatitude,
+          userLocation ? userLocation.longitude : defaultLongitude,
+          a.lat, a.lng
+        );
+        const distB = calculateDistance(
+          userLocation ? userLocation.latitude : defaultLatitude,
+          userLocation ? userLocation.longitude : defaultLongitude,
+          b.lat, b.lng
+        );
+        return distA - distB;
+      });
+      usedStations = [...pinnedFromLocal, ...unpinned].slice(0, limit);
+    } else {
+      usedStations = youbikeResults.slice(0, limit);
+      const pinnedList = usedStations.filter(station => pinnedStations.has(String(station.station_no)));
+      const nonPinnedList = usedStations.filter(station => !pinnedStations.has(String(station.station_no)));
+      pinnedList.sort((a, b) => {
+        const distA = calculateDistance(
+          userLocation ? userLocation.latitude : defaultLatitude,
+          userLocation ? userLocation.longitude : defaultLongitude,
+          a.lat, a.lng
+        );
+        const distB = calculateDistance(
+          userLocation ? userLocation.latitude : defaultLatitude,
+          userLocation ? userLocation.longitude : defaultLongitude,
+          b.lat, b.lng
+        );
+        return distA - distB;
+      });
+      nonPinnedList.sort((a, b) => {
+        const distA = calculateDistance(
+          userLocation ? userLocation.latitude : defaultLatitude,
+          userLocation ? userLocation.longitude : defaultLongitude,
+          a.lat, a.lng
+        );
+        const distB = calculateDistance(
+          userLocation ? userLocation.latitude : defaultLatitude,
+          userLocation ? userLocation.longitude : defaultLongitude,
+          b.lat, b.lng
+        );
+        return distA - distB;
+      });
+      usedStations = [...pinnedList, ...nonPinnedList];
+    }
+    const isOnline = navigator.onLine;
+    let vehData = {};
+    const stationIds = usedStations.map(station => String(station.station_no));
+    if (isOnline) {
+      vehData = await queryVehicleData(stationIds);
+    }
+    const organizedOutput = usedStations.map(site => {
+      const info = {
+        id: String(site.station_no),
+        name: currentLang === "en" ? site.name_en : site.name_tw,
+        coords: [site.lat, site.lng],
+        district: currentLang === "en" ? site.district_en : site.district_tw,
+        address: currentLang === "en" ? site.address_en : site.address_tw
+      };
+      const vehicle = isOnline ? (Object.entries(vehData).find(([key]) => key === info.id)?.[1] || {}) : {};
+      return { station_info: info, vehicle_info: vehicle };
+    });
+    organizedOutput.forEach(item => {
+      const station = item.station_info;
+      const vehicle = item.vehicle_info;
+      let card = document.querySelector(`.station[data-id="${station.id}"]`);
+
+      const isPinned = pinnedStations.has(String(station.id));
+      const pinButtonHtml = `<span
+        class="pin-button ${isPinned ? 'pinned' : ''}"
+        data-id="${station.id}"
+        onclick="togglePinStation('${station.id}', event)"
+      >${isPinned ? '★' : '☆'}</span>`;
+      const distance = calculateDistance(
+        userLocation ? userLocation.latitude : defaultLatitude,
+        userLocation ? userLocation.longitude : defaultLongitude,
+        station.coords[0],
+        station.coords[1]
+      );
+      const displayDistance = distance < 1 ? Math.round(distance * 1000) + (currentLang === "en" ? " m" : " 公尺")
+                                           : distance.toFixed(2) + (currentLang === "en" ? " km" : " 公里");
+      const distanceLabel = currentLang === "en" ? "Distance:" : "距離:";
+      const addressLabel = currentLang === "en" ? "Address:" : "地址:";
+      const slotsLabel = currentLang === "en" ? "Available Slots:" : "可停空位數:";
+      const unknownStation = currentLang === "en" ? "Unknown Station" : "未知站點";
+      const unknownAddress = currentLang === "en" ? "Unknown Address" : "未知地址";
+      const unknownValue = currentLang === "en" ? "Unknown" : "未知";
+      const vehicleInfoHtml = isOnline ? `
+                    <p>YouBike 2.0: <span class="vehicle_yb2">${vehicle?.available_2_0 !== undefined ? vehicle.available_2_0 : unknownValue}</span></p>
+                    <p>YouBike 2.0E: <span class="vehicle_ybe">${vehicle?.available_e !== undefined ? vehicle.available_e : unknownValue}</span></p>
+                    <p>${slotsLabel} <span class="vehicle_empty">${vehicle?.empty_spaces !== undefined ? vehicle.empty_spaces : unknownValue}</span></p>
+                  ` : '';
+      const isDefaultLocation = userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude;
+      const distanceHTML = !isDefaultLocation ? `<p class="distance">${distanceLabel} ${displayDistance}</p>` : "";
+      const cardContent = `
+                    ${pinButtonHtml}
+                    <h3>${station.name || unknownStation}</h3>
+                    ${distanceHTML}
+                    <p>${addressLabel} ${station.address || unknownAddress}</p>
+                    ${vehicleInfoHtml}
+                `;
+      if (card) {
+        card.innerHTML = cardContent;
+        card.dataset.lat = station.coords[0];
+        card.dataset.lng = station.coords[1];
+        card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
+      } else {
+        card = document.createElement('div');
+        card.className = 'station';
+        card.dataset.id = station.id;
+        card.dataset.lat = station.coords[0];
+        card.dataset.lng = station.coords[1];
+        card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
+        card.innerHTML = cardContent;
+        card.addEventListener("click", () => {
+          const lat = parseFloat(station.coords[0]), lng = parseFloat(station.coords[1]);
+          if (!isNaN(lat) && !isNaN(lng)) {
+            window.open(`https://www.google.com/maps?q=${lat},${lng}`, "_blank");
           } else {
-            if (!youbikeDataCache) {
-              youbikeDataCache = JSON.parse(localStorage.getItem('cachedYoubikeData') || '[]').map(item => ({
-                ...item,
-                lat: parseFloat(item.lat),
-                lng: parseFloat(item.lng)
-              }));
-            }
+            showModal(currentLang === "en" ? "Invalid station coordinates, cannot open map." : "站點座標無效，無法開啟地圖。");
           }
-          let youbikeResults = youbikeDataCache;
-          if (keyword) {
-            youbikeResults = youbikeResults.filter(station => {
-              const stationNameTW = station.name_tw ? station.name_tw.toLowerCase() : '';
-              const stationAddressTW = station.address_tw ? station.address_tw.toLowerCase() : '';
-              const stationNameEN = station.name_en ? station.name_en.toLowerCase() : '';
-              const stationAddressEN = station.address_en ? station.address_en.toLowerCase() : '';
-              return stationNameTW.includes(keyword) || stationAddressTW.includes(keyword) ||
-                     stationNameEN.includes(keyword) || stationAddressEN.includes(keyword);
-            });
-          }
-          youbikeResults = youbikeResults.sort((a, b) => {
-            const distA = calculateDistance(
-              userLocation ? userLocation.latitude : defaultLatitude,
-              userLocation ? userLocation.longitude : defaultLongitude,
-              a.lat, a.lng
-            );
-            const distB = calculateDistance(
-              userLocation ? userLocation.latitude : defaultLatitude,
-              userLocation ? userLocation.longitude : defaultLongitude,
-              b.lat, b.lng
-            );
-            return distA - distB;
-          });
-          let limit = keyword ? 50 : 20;
-          let usedStations;
-          if (!keyword) {
-            const pinnedFromLocal = youbikeResults.filter(station => pinnedStations.has(String(station.station_no)));
-            const unpinned = youbikeResults.filter(station => !pinnedStations.has(String(station.station_no)));
-            pinnedFromLocal.sort((a, b) => {
-              const distA = calculateDistance(
-                userLocation ? userLocation.latitude : defaultLatitude,
-                userLocation ? userLocation.longitude : defaultLongitude,
-                a.lat, a.lng
-              );
-              const distB = calculateDistance(
-                userLocation ? userLocation.latitude : defaultLatitude,
-                userLocation ? userLocation.longitude : defaultLongitude,
-                b.lat, b.lng
-              );
-              return distA - distB;
-            });
-            unpinned.sort((a, b) => {
-              const distA = calculateDistance(
-                userLocation ? userLocation.latitude : defaultLatitude,
-                userLocation ? userLocation.longitude : defaultLongitude,
-                a.lat, a.lng
-              );
-              const distB = calculateDistance(
-                userLocation ? userLocation.latitude : defaultLatitude,
-                userLocation ? userLocation.longitude : defaultLongitude,
-                b.lat, b.lng
-              );
-              return distA - distB;
-            });
-            usedStations = [...pinnedFromLocal, ...unpinned].slice(0, limit);
-          } else {
-            usedStations = youbikeResults.slice(0, limit);
-            const pinnedList = usedStations.filter(station => pinnedStations.has(String(station.station_no)));
-            const nonPinnedList = usedStations.filter(station => !pinnedStations.has(String(station.station_no)));
-            pinnedList.sort((a, b) => {
-              const distA = calculateDistance(
-                userLocation ? userLocation.latitude : defaultLatitude,
-                userLocation ? userLocation.longitude : defaultLongitude,
-                a.lat, a.lng
-              );
-              const distB = calculateDistance(
-                userLocation ? userLocation.latitude : defaultLatitude,
-                userLocation ? userLocation.longitude : defaultLongitude,
-                b.lat, b.lng
-              );
-              return distA - distB;
-            });
-            nonPinnedList.sort((a, b) => {
-              const distA = calculateDistance(
-                userLocation ? userLocation.latitude : defaultLatitude,
-                userLocation ? userLocation.longitude : defaultLongitude,
-                a.lat, a.lng
-              );
-              const distB = calculateDistance(
-                userLocation ? userLocation.latitude : defaultLatitude,
-                userLocation ? userLocation.longitude : defaultLongitude,
-                b.lat, b.lng
-              );
-              return distA - distB;
-            });
-            usedStations = [...pinnedList, ...nonPinnedList];
-          }
-          const isOnline = navigator.onLine;
-          let vehData = {};
-          const stationIds = usedStations.map(station => String(station.station_no));
-          if (isOnline) {
-            vehData = await queryVehicleData(stationIds);
-          }
-          const organizedOutput = usedStations.map(site => {
-            const info = {
-              id: String(site.station_no),
-              name: currentLang === "en" ? site.name_en : site.name_tw,
-              coords: [site.lat, site.lng],
-              district: currentLang === "en" ? site.district_en : site.district_tw,
-              address: currentLang === "en" ? site.address_en : site.address_tw
-            };
-            const vehicle = isOnline ? (Object.entries(vehData).find(([key]) => key === info.id)?.[1] || {}) : {};
-            return { station_info: info, vehicle_info: vehicle };
-          });
-          organizedOutput.forEach(item => {
-            const station = item.station_info;
-            const vehicle = item.vehicle_info;
-            let card = document.querySelector(`.station[data-id="${station.id}"]`);
-
-            const isPinned = pinnedStations.has(String(station.id));
-            const pinButtonHtml = `<span
-              class="pin-button ${isPinned ? 'pinned' : ''}"
-              data-id="${station.id}"
-              onclick="togglePinStation('${station.id}', event)"
-            >${isPinned ? '★' : '☆'}</span>`;
-            const distance = calculateDistance(
-              userLocation ? userLocation.latitude : defaultLatitude,
-              userLocation ? userLocation.longitude : defaultLongitude,
-              station.coords[0],
-              station.coords[1]
-            );
-            const displayDistance = distance < 1 ? Math.round(distance * 1000) + (currentLang === "en" ? " m" : " 公尺")
-                                                 : distance.toFixed(2) + (currentLang === "en" ? " km" : " 公里");
-            const distanceLabel = currentLang === "en" ? "Distance:" : "距離:";
-            const addressLabel = currentLang === "en" ? "Address:" : "地址:";
-            const slotsLabel = currentLang === "en" ? "Available Slots:" : "可停空位數:";
-            const unknownStation = currentLang === "en" ? "Unknown Station" : "未知站點";
-            const unknownAddress = currentLang === "en" ? "Unknown Address" : "未知地址";
-            const unknownValue = currentLang === "en" ? "Unknown" : "未知";
-            const vehicleInfoHtml = isOnline ? `
-                          <p>YouBike 2.0: <span class="vehicle_yb2">${vehicle?.available_2_0 !== undefined ? vehicle.available_2_0 : unknownValue}</span></p>
-                          <p>YouBike 2.0E: <span class="vehicle_ybe">${vehicle?.available_e !== undefined ? vehicle.available_e : unknownValue}</span></p>
-                          <p>${slotsLabel} <span class="vehicle_empty">${vehicle?.empty_spaces !== undefined ? vehicle.empty_spaces : unknownValue}</span></p>
-                        ` : '';
-            const isDefaultLocation = userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude;
-            const distanceHTML = !isDefaultLocation ? `<p class="distance">${distanceLabel} ${displayDistance}</p>` : "";
-            const cardContent = `
-                          ${pinButtonHtml}
-                          <h3>${station.name || unknownStation}</h3>
-                          ${distanceHTML}
-                          <p>${addressLabel} ${station.address || unknownAddress}</p>
-                          ${vehicleInfoHtml}
-                      `;
-            if (card) {
-              card.innerHTML = cardContent;
-              card.dataset.lat = station.coords[0];
-              card.dataset.lng = station.coords[1];
-              card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
-            } else {
-              card = document.createElement('div');
-              card.className = 'station';
-              card.dataset.id = station.id;
-              card.dataset.lat = station.coords[0];
-              card.dataset.lng = station.coords[1];
-              card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
-              card.innerHTML = cardContent;
-              card.addEventListener("click", () => {
-                const lat = parseFloat(station.coords[0]), lng = parseFloat(station.coords[1]);
-                if (!isNaN(lat) && !isNaN(lng)) {
-                  window.open(`https://www.google.com/maps?q=${lat},${lng}`, "_blank");
-                } else {
-                  showModal(currentLang === "en" ? "Invalid station coordinates, cannot open map." : "站點座標無效，無法開啟地圖。");
-                }
-              });
-              resultsDiv.appendChild(card);
-            }
-          });
-          const validIds = organizedOutput.map(item => item.station_info.id);
-          Array.from(resultsDiv.children).forEach(card => {
-            if (!validIds.includes(card.dataset.id)) {
-              resultsDiv.removeChild(card);
-            }
-          });          updateResultsOrder();
-          await new Promise(resolve => setTimeout(resolve, 0));
-
-          // 找到搜尋結果中距離最近的站點（已按距離排序）
-          const stationCards = document.querySelectorAll('.station');
-          if (stationCards.length > 0 && shouldMoveMap) {  // 加入 shouldMoveMap 條件檢查
-            let nearestStation = null;
-            let minDistance = Infinity;
-            
-            stationCards.forEach(card => {
-              const lat = parseFloat(card.dataset.lat);
-              const lng = parseFloat(card.dataset.lng);
-              const distance = calculateDistance(
-                userLocation ? userLocation.latitude : defaultLatitude,
-                userLocation ? userLocation.longitude : defaultLongitude,
-                lat,
-                lng
-              );
-              
-              if (distance < minDistance) {
-                minDistance = distance;
-                nearestStation = card;
-              }
-            });
-
-            if (nearestStation) {
-              const lat = parseFloat(nearestStation.dataset.lat);
-              const lng = parseFloat(nearestStation.dataset.lng);
-              if (!isNaN(lat) && !isNaN(lng) && leafletMap) {
-                leafletMap.setView([lat, lng], 18, { // 由16變更為18
-                  animate: true,
-                  duration: 1
-                });
-              }
-            }
-          }
-
-          // 更新地圖釘標但不移動視圖
-          updateMapMarkers();
-
-          dataLoaded = true;
-          if (showLoadingIndicator) {
-            showMainContent();
-          }
-        } catch (error) {
-          console.error("Fetch error:", error);
-          resultsDiv.innerHTML = `發生錯誤: ${error.message}`;
-        } finally {
-          if (showLoadingIndicator) hideLoading();
-        }
-      }
-      async function queryVehicleData(stationIds) {
-        if (stationIds.length > 60) {
-          stationIds = stationIds.slice(0, 60);
-        }
-        const batchSize = 20;
-        const allVehicleData = {};
-        const headers = {
-          'Accept': '*/*',
-          'Content-Type': 'application/json',
-          'Origin': 'https://www.youbike.com.tw',
-          'Referer': 'https://www.youbike.com.tw/'
-        };
-        for (let i = 0; i < stationIds.length; i += batchSize) {
-          const stationIdBatch = stationIds.slice(i, i + batchSize);
-          const body = JSON.stringify({ station_no: stationIdBatch });
-          try {
-            const response = await fetch('https://apis.youbike.com.tw/tw2/parkingInfo', {
-              method: 'POST',
-              headers,
-              body
-            });
-            const result = await response.json();
-            if (result.retCode === 1 && result.retVal && result.retVal.data) {
-              const dataArray = result.retVal.data;
-              dataArray.forEach(item => {
-                allVehicleData[item.station_no] = {
-                  available_2_0: item.available_spaces_detail ? item.available_spaces_detail.yb2 : 0,
-                  available_e: item.available_spaces_detail ? item.available_spaces_detail.eyb : 0,
-                  empty_spaces: item.empty_spaces || 0
-                };
-              });
-            } else {
-              console.error("API 請求失敗:", result.retMsg);
-            }
-          } catch (e) {
-            console.error(e);
-          }
-        }
-        return allVehicleData;
-      }
-      function updateResultsOrder() {
-        const cards = Array.from(document.querySelectorAll(".station"));
-        cards.sort((a, b) => {
-          const aPinned = pinnedStations.has(a.dataset.id);
-          const bPinned = pinnedStations.has(b.dataset.id);
-          if (aPinned && !bPinned) return -1;
-          if (!aPinned && bPinned) return 1;
-          const distanceA = calculateDistance(
-            userLocation ? userLocation.latitude : defaultLatitude,
-            userLocation ? userLocation.longitude : defaultLongitude,
-            parseFloat(a.dataset.lat),
-            parseFloat(a.dataset.lng)
-          );
-          const distanceB = calculateDistance(
-            userLocation ? userLocation.latitude : defaultLatitude,
-            userLocation ? userLocation.longitude : defaultLongitude,
-            parseFloat(b.dataset.lat),
-            parseFloat(b.dataset.lng)
-          );
-          return distanceA - distanceB;
         });
-        cards.forEach(card => {
-          resultsDiv.appendChild(card);
+        resultsDiv.appendChild(card);
+      }
+    });
+    const validIds = organizedOutput.map(item => item.station_info.id);
+    Array.from(resultsDiv.children).forEach(card => {
+      if (!validIds.includes(card.dataset.id)) {
+        resultsDiv.removeChild(card);
+      }
+    });          updateResultsOrder();
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    // 找到搜尋結果中距離最近的站點（已按距離排序）
+    const stationCards = document.querySelectorAll('.station');
+    if (stationCards.length > 0 && shouldMoveMap) {  // 加入 shouldMoveMap 條件檢查
+      let nearestStation = null;
+      let minDistance = Infinity;
+      
+      stationCards.forEach(card => {
+        const lat = parseFloat(card.dataset.lat);
+        const lng = parseFloat(card.dataset.lng);
+        const distance = calculateDistance(
+          userLocation ? userLocation.latitude : defaultLatitude,
+          userLocation ? userLocation.longitude : defaultLongitude,
+          lat,
+          lng
+        );
+        
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestStation = card;
+        }
+      });
+
+      if (nearestStation) {
+        const lat = parseFloat(nearestStation.dataset.lat);
+        const lng = parseFloat(nearestStation.dataset.lng);
+        if (!isNaN(lat) && !isNaN(lng) && leafletMap) {
+          leafletMap.setView([lat, lng], 18, { // 由16變更為18
+            animate: true,
+            duration: 1
+          });
+        }
+      }
+    }
+
+    // 更新地圖釘標但不移動視圖
+    updateMapMarkers();
+
+    dataLoaded = true;
+    if (showLoadingIndicator) {
+      showMainContent();
+    }
+  } catch (error) {
+    console.error("Fetch error:", error);
+    resultsDiv.innerHTML = `發生錯誤: ${error.message}`;
+  } finally {
+    if (showLoadingIndicator) hideLoading();
+  }
+}
+async function queryVehicleData(stationIds) {
+  if (stationIds.length > 60) {
+    stationIds = stationIds.slice(0, 60);
+  }
+  const batchSize = 20;
+  const allVehicleData = {};
+  const headers = {
+    'Accept': '*/*',
+    'Content-Type': 'application/json',
+    'Origin': 'https://www.youbike.com.tw',
+    'Referer': 'https://www.youbike.com.tw/'
+  };
+  for (let i = 0; i < stationIds.length; i += batchSize) {
+    const stationIdBatch = stationIds.slice(i, i + batchSize);
+    const body = JSON.stringify({ station_no: stationIdBatch });
+    try {
+      const response = await fetch('https://apis.youbike.com.tw/tw2/parkingInfo', {
+        method: 'POST',
+        headers,
+        body
+      });
+      const result = await response.json();
+      if (result.retCode === 1 && result.retVal && result.retVal.data) {
+        const dataArray = result.retVal.data;
+        dataArray.forEach(item => {
+          allVehicleData[item.station_no] = {
+            available_2_0: item.available_spaces_detail ? item.available_spaces_detail.yb2 : 0,
+            available_e: item.available_spaces_detail ? item.available_spaces_detail.eyb : 0,
+            empty_spaces: item.empty_spaces || 0
+          };
         });
+      } else {
+        console.error("API 請求失敗:", result.retMsg);
       }
-      function showLoading() {
-        loadingDiv.classList.add('show');
-      }
-      function hideLoading() {
-        loadingDiv.classList.remove('show');
-      }
-      function showModal(message) {
-        modalText.textContent = message;
-        overlay.classList.add('show');
-        modal.classList.add('show');
-      }
-      function hideModal() {
-        overlay.classList.remove('show');
-        modal.classList.remove('show');
-      }
-      function calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371;
-        const dLat = (lat2 - lat1) * Math.PI / 180;
-        const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                  Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
-      }      async function handleGeolocationSuccess(position) {
+    } catch (e) {
+      console.error(e);
+    }
+  }
+  return allVehicleData;
+}
+function updateResultsOrder() {
+  const cards = Array.from(document.querySelectorAll(".station"));
+  cards.sort((a, b) => {
+    const aPinned = pinnedStations.has(a.dataset.id);
+    const bPinned = pinnedStations.has(b.dataset.id);
+    if (aPinned && !bPinned) return -1;
+    if (!aPinned && bPinned) return 1;
+    const distanceA = calculateDistance(
+      userLocation ? userLocation.latitude : defaultLatitude,
+      userLocation ? userLocation.longitude : defaultLongitude,
+      parseFloat(a.dataset.lat),
+      parseFloat(a.dataset.lng)
+    );
+    const distanceB = calculateDistance(
+      userLocation ? userLocation.latitude : defaultLatitude,
+      userLocation ? userLocation.longitude : defaultLongitude,
+      parseFloat(b.dataset.lat),
+      parseFloat(b.dataset.lng)
+    );
+    return distanceA - distanceB;
+  });
+  cards.forEach(card => {
+    resultsDiv.appendChild(card);
+  });
+}
+function showLoading() {
+  loadingDiv.classList.add('show');
+}
+function hideLoading() {
+  loadingDiv.classList.remove('show');
+}
+function showModal(message) {
+  modalText.textContent = message;
+  overlay.classList.add('show');
+  modal.classList.add('show');
+}
+function hideModal() {
+  overlay.classList.remove('show');
+  modal.classList.remove('show');
+}
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+            Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}      async function handleGeolocationSuccess(position) {
         const wasDefault = !userLocation || (userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude);
         const isFirstLocation = !locationMarker;  // 使用 locationMarker 來判斷是否為第一次定位
         
