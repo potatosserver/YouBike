@@ -627,6 +627,19 @@ body.dark-mode #locationSwitchText {
         transform: translateY(-20px);
       }
 
+      /* 新增離線通知樣式 */
+      #offlineNotification {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        width: 100%;
+        background: #f44336;
+        color: #fff;
+        text-align: center;
+        padding: 10px;
+        z-index: 10000;
+      }
+
       #loadingContent {
         display: flex;
         flex-direction: column;
@@ -992,6 +1005,10 @@ body.dark-mode #closeCentralSettings:hover {
     <!-- 地圖其他內容由 leaflet 控制 -->
     <!-- 移除獨立的 #mapControls（若有的話） -->
     <div id="locationNotification"></div>
+    <!-- 新增離線通知元素 -->
+    <div id="offlineNotification" style="display:none; position:fixed; bottom:0; width:100%; background:#f44336; color:#fff; text-align:center; padding:10px; z-index:10000;">
+      <!-- 預設內容由 script 依語系設定 -->
+    </div>
     <div id="loadingOverlay">
       <div id="loadingContent">
         <h2 id="loadingText">載入中</h2>
