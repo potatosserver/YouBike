@@ -2081,152 +2081,172 @@ setInterval(() => {
       // 修改全域變數
       let allStations = [];
         async function initMap() {
-        // 新增：離線模式通知邏輯
-        if (!navigator.onLine) {
-          if (!window.offlineNotified) {
-            showNotification(currentLang === "en" 
-              ? "Offline mode: Map cannot be initialized." 
-              : "離線模式無法初始化地圖");
-            window.offlineNotified = true;
-          }
-          return;
-        }
-        
-        // 使用使用者位置或預設位置初始化地圖
-        const initialLat = userLocation ? userLocation.latitude : defaultLatitude;
-        const initialLng = userLocation ? userLocation.longitude : defaultLongitude;
-        
-        leafletMap = L.map('map', {
-          dragging: true,
-          tap: true,
-          touchZoom: true,
-          doubleClickZoom: true,
-          scrollWheelZoom: true,
-          zoomControl: true
-        }).setView([initialLat, initialLng], 18);
-
-        // 如果有用戶位置，立即創建位置標記
-        if (userLocation) {
-          locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
-            radius: 10,
-            fillColor: '#2196F3',
-            fillOpacity: 0.8,
-            color: '#ffffff',
-            weight: 3,
-            pane: 'markerPane'
-          }).addTo(leafletMap);
-          
-          // 添加脈衝動畫效果
-          const pulsingIcon = L.divIcon({
-            className: 'pulsing-icon',
-            html: '<div class="pulse"></div>',
-            iconSize: [20, 20]
-          });
-          
-          L.marker([userLocation.latitude, userLocation.longitude], {
-            icon: pulsingIcon,
-            pane: 'markerPane'
-          }).addTo(leafletMap);
-        }
-        
-        // 將 popupPane 的 z-index 設定為最高
-        leafletMap.getPanes().popupPane.style.zIndex = "9999";
-        
         try {
-            tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+          // 使用使用者位置或預設位置初始化地圖
+          const initialLat = userLocation ? userLocation.latitude : defaultLatitude;
+          const initialLng = userLocation ? userLocation.longitude : defaultLongitude;
+          
+          leafletMap = L.map('map', {
+            dragging: true,
+            tap: true,
+            touchZoom: true,
+            doubleClickZoom: true,
+            scrollWheelZoom: true,
+            zoomControl: true
+          }).setView([initialLat, initialLng], 18);
+
+          // 如果有用戶位置，立即創建位置標記
+          if (userLocation) {
+            locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
+              radius: 10,
+              fillColor: '#2196F3',
+              fillOpacity: 0.8,
+              color: '#ffffff',
+              weight: 3,
+              pane: 'markerPane'
             }).addTo(leafletMap);
-        } catch(err) {
-            console.error("Tile layer failed:", err);
-            showNotification(currentLang === "en"
-                ? "Offline mode: Map tiles unavailable."
-                : "離線模式：地圖圖層無法載入。");
-        }
-        markerClusterGroup = L.markerClusterGroup();
-        if (leafletMap && markerClusterGroup) {
-          leafletMap.addLayer(markerClusterGroup);
-        }
-        
-        // 新增定位按鈕，顯示於地圖左上角縮放按鈕下方
-        let locateControl = L.control({ position: 'topleft' });
-        locateControl.onAdd = function(map) {
-            let btn = L.DomUtil.create('button', 'leaflet-bar leaflet-control leaflet-control-custom');
-            btn.innerHTML = '<i class="material-icons" style="font-size:18px; line-height:30px;">my_location</i>';
-            btn.style.width = '30px';
-            btn.style.height = '30px';
-            btn.style.display = 'flex';  // 新增 flex 布局
-            btn.style.alignItems = 'center';  // 垂直置中
-            btn.style.justifyContent = 'center';  // 水平置中
-            btn.style.padding = '0';  // 移除內邊距
-            btn.style.cursor = 'pointer';  // 新增指針樣式
-            btn.title = currentLang === "en" ? "Go to my location" : "定位到我目前位置";
-            L.DomEvent.on(btn, 'click', function(e) {
-                L.DomEvent.stopPropagation(e);
-                L.DomEvent.preventDefault(e);
-                if (userLocation) {
-                    leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
-                }
-            });
-            return btn;
-        };
-        locateControl.addTo(leafletMap);
-        
-        try {
-          // 取得全國站點資料
-          const response = await fetch('https://apis.youbike.com.tw/json/station-min-yb2.json', {
-            headers: {
-              'accept': '*/*',
-              'accept-language': 'zh-TW,zh;q=0.9'
-            }
-          });
-          
-          if (!response.ok) throw new Error('無法取得站點資料');
-          
-          const stations = await response.json();
-          allStations = stations;
-          
-          // 新增所有站點的釘標
-          stations.forEach(station => {
-            const lat = parseFloat(station.lat);
-            const lng = parseFloat(station.lng);
             
-            if (!isNaN(lat) && !isNaN(lng)) {
-              const marker = L.marker([lat, lng]);
-              
+            // 添加脈衝動畫效果
+            const pulsingIcon = L.divIcon({
+              className: 'pulsing-icon',
+              html: '<div class="pulse"></div>',
+              iconSize: [20, 20]
+            });
+            
+            L.marker([userLocation.latitude, userLocation.longitude], {
+              icon: pulsingIcon,
+              pane: 'markerPane'
+            }).addTo(leafletMap);
+          }
+          
+          // 將 popupPane 的 z-index 設定為最高
+          leafletMap.getPanes().popupPane.style.zIndex = "9999";
+          
+          // 嘗試從快取加載地圖圖層
+          try {
+            tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+              maxZoom: 19,
+              attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+              useCache: true,
+              crossOrigin: true
+            }).addTo(leafletMap);
+          } catch(err) {
+            console.warn("Tile layer load attempt:", err);
+            if (!navigator.onLine) {
+              showNotification(currentLang === "en" 
+                ? "Offline mode: Using cached map tiles if available"
+                : "離線模式：使用快取地圖圖層");
+            }
+          }
 
-              marker.on('click', async () => {
-                try {
-                  // 點擊時才取得即時資訊
-                  const vehicleData = await queryVehicleData([station.station_no]);
-                  const stationInfo = vehicleData[station.station_no] || {};
-                  
+          markerClusterGroup = L.markerClusterGroup();
+          if (leafletMap && markerClusterGroup) {
+            leafletMap.addLayer(markerClusterGroup);
+          }
+          
+          // 新增定位按鈕
+          let locateControl = L.control({ position: 'topleft' });
+          locateControl.onAdd = function(map) {
+              let btn = L.DomUtil.create('button', 'leaflet-bar leaflet-control leaflet-control-custom');
+              btn.innerHTML = '<i class="material-icons" style="font-size:18px; line-height:30px;">my_location</i>';
+              btn.style.width = '30px';
+              btn.style.height = '30px';
+              btn.style.display = 'flex';  // 新增 flex 布局
+              btn.style.alignItems = 'center';  // 垂直置中
+              btn.style.justifyContent = 'center';  // 水平置中
+              btn.style.padding = '0';  // 移除內邊距
+              btn.style.cursor = 'pointer';  // 新增指針樣式
+              btn.title = currentLang === "en" ? "Go to my location" : "定位到我目前位置";
+              L.DomEvent.on(btn, 'click', function(e) {
+                  L.DomEvent.stopPropagation(e);
+                  L.DomEvent.preventDefault(e);
+                  if (userLocation) {
+                      leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
+                  }
+              });
+              return btn;
+          };
+          locateControl.addTo(leafletMap);
+          
+          try {
+            // 優先從 IndexedDB 獲取站點資料
+            let stations = [];
+            if (!navigator.onLine) {
+              try {
+                const cachedData = await getYoubikeDataFromDB();
+                if (cachedData && cachedData.length > 0) {
+                  stations = cachedData;
+                  console.log('Using cached station data');
+                }
+              } catch (e) {
+                console.warn('Failed to get cached data:', e);
+              }
+            }
 
-                  const content = `
-                    <h4>${currentLang === "en" ? station.name_en : station.name_tw}</h4>
-                    <p>${currentLang === "en" ? "Address: " : "地址："} ${currentLang === "en" ? station.address_en : station.address_tw}</p>
-                    <p>YouBike 2.0: ${stationInfo.available_2_0 !== undefined ? stationInfo.available_2_0 : (currentLang === "en" ? 'Unknown' : '未知')}</p>
-                    <p>YouBike 2.0E: ${stationInfo.available_e !== undefined ? stationInfo.available_e : (currentLang === "en" ? 'Unknown' : '未知')}</p>
-                    <p>${currentLang === "en" ? "Available Slots: " : "可停空位數："} ${stationInfo.empty_spaces !== undefined ? stationInfo.empty_spaces : (currentLang === "en" ? 'Unknown' : '未知')}</p>
-                  `;
-                  
-
-                  // 使用地圖內建 Popup 顯示詳細資訊
-                  marker.bindPopup(content).openPopup();
-                } catch (error) {
-                  console.error('取得站點資訊失敗:', error);
-                  showNotification(currentLang === "en" ? "Failed to get station information." : "無法取得站點資訊。");
+            // 如果沒有快取資料且在線上，則從 API 獲取
+            if (stations.length === 0 && navigator.onLine) {
+              const response = await fetch('https://apis.youbike.com.tw/json/station-min-yb2.json', {
+                headers: {
+                  'Accept': '*/*',
+                  'Content-Type': 'application/json'
                 }
               });
               
-
-              markerClusterGroup.addLayer(marker);
+              if (!response.ok) throw new Error('無法取得站點資料');
+              stations = await response.json();
+              
+              // 儲存到 IndexedDB 作為快取
+              try {
+                await saveYoubikeDataToDB(stations);
+              } catch (e) {
+                console.warn('Failed to cache station data:', e);
+              }
             }
-          });
-          
+
+            // 確保我們有站點資料才繼續
+            if (stations && stations.length > 0) {
+              allStations = stations;
+              
+              // 新增所有站點的釘標
+              stations.forEach(station => {
+                const lat = parseFloat(station.lat);
+                const lng = parseFloat(station.lng);
+                
+                if (!isNaN(lat) && !isNaN(lng)) {
+                  const marker = L.marker([lat, lng], {
+                    icon: L.icon({
+                      iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+                      shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+                      iconSize: [25, 41],
+                      iconAnchor: [12, 41],
+                      popupAnchor: [1, -34],
+                      shadowSize: [41, 41]
+                    })
+                  });
+                  
+                  marker.bindPopup(`
+                    <strong>${station.name}</strong><br>
+                    ${station.address}
+                  `);
+                  
+                  markerClusterGroup.addLayer(marker);
+                }
+              });
+            } else {
+              throw new Error('No station data available');
+            }
+            
+          } catch (error) {
+            console.error('初始化地圖失敗:', error);
+            showNotification(currentLang === "en" 
+              ? "Using offline mode with limited functionality"
+              : "使用離線模式，部分功能可能受限");
+          }
         } catch (error) {
-          console.error('初始化地圖失敗:', error);
-          showNotification(currentLang === "en" ? "Failed to initialize map." : "初始化地圖失敗。");
+          console.error('Map initialization failed:', error);
+          showNotification(currentLang === "en"
+            ? "Map initialization failed, but station data is still available"
+            : "地圖初始化失敗，但站點資料仍可使用");
         }
       }
       
