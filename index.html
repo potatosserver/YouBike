@@ -627,19 +627,6 @@ body.dark-mode #locationSwitchText {
         transform: translateY(-20px);
       }
 
-      /* 新增離線通知樣式 */
-      #offlineNotification {
-        display: none;
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        background: #f44336;
-        color: #fff;
-        text-align: center;
-        padding: 10px;
-        z-index: 10000;
-      }
-
       #loadingContent {
         display: flex;
         flex-direction: column;
@@ -1005,10 +992,6 @@ body.dark-mode #closeCentralSettings:hover {
     <!-- 地圖其他內容由 leaflet 控制 -->
     <!-- 移除獨立的 #mapControls（若有的話） -->
     <div id="locationNotification"></div>
-    <!-- 新增離線通知元素 -->
-    <div id="offlineNotification" style="display:none; position:fixed; bottom:0; width:100%; background:#f44336; color:#fff; text-align:center; padding:10px; z-index:10000;">
-      <!-- 預設內容由 script 依語系設定 -->
-    </div>
     <div id="loadingOverlay">
       <div id="loadingContent">
         <h2 id="loadingText">載入中</h2>
@@ -1817,7 +1800,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
         
         setTimeout(() => {
           notification.classList.add('hide');
-                             setTimeout(() => {
+                                      setTimeout(() => {
             notification.classList.remove('show', 'hide');
           }, 300);
         }, 3000);
@@ -2086,11 +2069,21 @@ setInterval(() => {
       // 修改全域變數
       let allStations = [];
         async function initMap() {
+        // 新增：離線模式通知邏輯
+        if (!navigator.onLine) {
+          if (!window.offlineNotified) {
+            showNotification(currentLang === "en" 
+              ? "Offline mode: Map cannot be initialized." 
+              : "離線模式無法初始化地圖");
+            window.offlineNotified = true;
+          }
+          return;
+        }
+        
         // 使用使用者位置或預設位置初始化地圖
         const initialLat = userLocation ? userLocation.latitude : defaultLatitude;
         const initialLng = userLocation ? userLocation.longitude : defaultLongitude;
         
-        // 修改初始化地圖縮放倍率，從16改為18
         leafletMap = L.map('map', {
           dragging: true,
           tap: true,
