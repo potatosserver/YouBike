@@ -1139,10 +1139,23 @@ body.dark-mode #closeCentralSettings:hover {
         if (!mainContentShown) {
           const overlay = document.getElementById("loadingOverlay");
           const mainContent = document.getElementById("mainContent");
-          overlay.style.opacity = "0";
-          overlay.style.display = "none";
-          mainContent.style.display = "block";
-          document.getElementById('updateCountdown').style.display = "block";
+          if (navigator.onLine) {
+            overlay.style.opacity = "0";
+            setTimeout(() => {
+              overlay.style.display = "none";
+              mainContent.style.display = "block";
+              document.getElementById('updateCountdown').style.display = "block";
+            }, 500);
+          } else {
+            const lang = localStorage.getItem("lang") || "zh";
+            document.getElementById("loadingText").textContent = lang === "en" ? "Offline mode starting..." : "離線模式啟動中...";
+            overlay.style.opacity = "1";
+            setTimeout(() => {
+              overlay.style.display = "none";
+              mainContent.style.display = "block";
+              document.getElementById('updateCountdown').style.display = "block";
+            }, 3000);
+          }
           mainContentShown = true;
         }
       }
@@ -1808,7 +1821,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
               }
             },
             function (error) {
-                           if (!timeoutTriggered) {
+              if (!timeoutTriggered) {
                 clearTimeout(geoTimeout);
                 handleGeolocationError(error);
               }
@@ -1984,44 +1997,18 @@ darkModeToggle.addEventListener('click', () => {
       });
       // modalButton.addEventListener('click', hideModal);
       window.addEventListener('load', () => {
+        // 修正：無論有無網路都先初始化地圖
         initMap();
-        loadDataAndShowContent();
-      });
-
-      async function loadDataAndShowContent() {
-        try {
-          youbikeDataCache = await getYoubikeDataFromDB();
-          if (youbikeDataCache && youbikeDataCache.length > 0) {
-            youbikeDataCache = youbikeDataCache.map(item => ({
-              ...item,
-              lat: parseFloat(item.lat),
-              lng: parseFloat(item.lng)
-            }));
-            console.log('Data loaded from IndexedDB');
-            await searchYouBike(false, false);
-            showMainContent();
-            return;
-          }
-        } catch (e) {
-          console.warn('Failed to load from IndexedDB:', e);
-        }
-
-        if (navigator.onLine) {
-          if (useLocation) {
-            getLocation();
-          } else {
-            userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-            searchYouBike(true, false).then(() => {
-              showMainContent();
-            });
-          }
+        if (useLocation) {
+          getLocation();
         } else {
-          showNotification(currentLang === "en"
-            ? "Offline mode: No data available."
-            : "離線模式：無可用資料。");
-          showMainContent();
+          userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+          // 修正：離線時也要顯示主內容
+          searchYouBike(true, false).then(() => {
+            showMainContent();
+          });
         }
-      }
+      });
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
           searchYouBike(true, true); // 移動地圖
