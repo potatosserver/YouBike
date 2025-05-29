@@ -1798,7 +1798,7 @@ body.dark-mode #closeCentralSettings:hover {
               distanceEl.textContent = "";
             } else {
               const distanceLabel = currentLang === "en" ? "Distance:" : "距離:";
-                           const unit = newDistance < 1 ? (currentLang === "en" ? " m" : " 公尺") : (currentLang === "en" ? " km" : " 公里");
+              const unit = newDistance < 1 ? (currentLang === "en" ? " m" : " 公尺") : (currentLang === "en" ? " km" : " 公里");
               const displayDistance = newDistance < 1 ? Math.round(newDistance * 1000) : newDistance.toFixed(2);
               distanceEl.textContent = distanceLabel + " " + displayDistance + unit;
             }
@@ -2026,16 +2026,37 @@ setInterval(() => {
           zoomControl: true
         }).setView([initialLat, initialLng], 18);
 
-        // 離線模式處理：若在線則正常加入 tileLayer，否則設定容器背景
-        if (navigator.onLine) {
-          tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        // 如果有用戶位置，立即創建位置標記
+        if (userLocation) {
+          locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
+            radius: 10,
+            fillColor: '#2196F3',
+            fillOpacity: 0.8,
+            color: '#ffffff',
+            weight: 3,
+            pane: 'markerPane'
           }).addTo(leafletMap);
-        } else {
-          // 離線情況，避免 tileLayer 讀取失敗導致問題
-          leafletMap.getContainer().style.backgroundColor = '#f4f4f4';
+          
+          // 添加脈衝動畫效果
+          const pulsingIcon = L.divIcon({
+            className: 'pulsing-icon',
+            html: '<div class="pulse"></div>',
+            iconSize: [20, 20]
+          });
+          
+          L.marker([userLocation.latitude, userLocation.longitude], {
+            icon: pulsingIcon,
+            pane: 'markerPane'
+          }).addTo(leafletMap);
         }
+        
+        // 將 popupPane 的 z-index 設定為最高
+        leafletMap.getPanes().popupPane.style.zIndex = "9999";
+        
+        tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(leafletMap);
         
         // 初始化 MarkerClusterGroup
         markerClusterGroup = L.markerClusterGroup();
@@ -2353,9 +2374,9 @@ setInterval(() => {
         initializeMap();
       });
     </script>
-    <!-- 引入 Leaflet JS（改為本地路徑，請確保 libs/leaflet.js 已下載） -->
-    <script src="libs/leaflet.js"></script>
-    <!-- 加入 MarkerCluster 的 JS（改為本地路徑，請確保 libs/leaflet.markercluster.js 已下載） -->
-    <script src="libs/leaflet.markercluster.js"></script>
+    <!-- 引入 Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <!-- 加入 MarkerCluster 的 JS -->
+    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
   </body>
 </html>
