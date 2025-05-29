@@ -1139,23 +1139,21 @@ body.dark-mode #closeCentralSettings:hover {
         if (!mainContentShown) {
           const overlay = document.getElementById("loadingOverlay");
           const mainContent = document.getElementById("mainContent");
-          if (navigator.onLine) {
-            overlay.style.opacity = "0";
-            setTimeout(() => {
-              overlay.style.display = "none";
-              mainContent.style.display = "block";
-              document.getElementById('updateCountdown').style.display = "block";
-            }, 500);
-          } else {
-            const lang = localStorage.getItem("lang") || "zh";
-            document.getElementById("loadingText").textContent = lang === "en" ? "Offline mode starting..." : "離線模式啟動中...";
-            overlay.style.opacity = "1";
-            setTimeout(() => {
-              overlay.style.display = "none";
-              mainContent.style.display = "block";
-              document.getElementById('updateCountdown').style.display = "block";
-            }, 3000);
+          const isOffline = !navigator.onLine;
+          
+          if (isOffline) {
+            document.getElementById("loadingText").textContent = 
+              currentLang === "en" ? "Loading cached data..." : "載入快取資料中...";
           }
+          
+          overlay.style.opacity = "0";
+          setTimeout(() => {
+            overlay.style.display = "none";
+            mainContent.style.display = "block";
+            document.getElementById('updateCountdown').style.display = 
+              isOffline ? "none" : "block";
+          }, 500);
+          
           mainContentShown = true;
         }
       }
@@ -1263,44 +1261,36 @@ function getYoubikeDataFromDB() {
   });
 }
 
-// 修改 searchYouBike 函數，確保地圖移動邏輯正確
+// 修改 searchYouBike 函數開始部分
 async function searchYouBike(showLoadingIndicator = true, shouldMoveMap = false) {
   if (showLoadingIndicator) showLoading();
   const keyword = keywordInput.value.trim().toLowerCase();
   try {
-    if (navigator.onLine) {
-      if (!youbikeDataCache) {
-        const youbikeUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
-        const response = await fetch(youbikeUrl, {
-          headers : {
-            'accept': '*/*',
-            'accept-language': 'zh-TW,zh;q=0.9',
-          }
-        });
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const youbikeData = await response.json();
-        youbikeDataCache = Array.isArray(youbikeData)
-          ? youbikeData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
-          : [];
-        // 使用 IndexedDB 儲存
+    if (!youbikeDataCache) {
+      if (navigator.onLine) {
         try {
+          const youbikeUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
+          const response = await fetch(youbikeUrl, {
+            headers: {
+              'accept': '*/*',
+              'accept-language': 'zh-TW,zh;q=0.9',
+            }
+          });
+          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+          const youbikeData = await response.json();
+          youbikeDataCache = Array.isArray(youbikeData)
+            ? youbikeData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
+            : [];
           await saveYoubikeDataToDB(youbikeDataCache);
-        } catch (e) {
-          console.warn('Failed to save to IndexedDB:', e);
-        }
-      }
-    } else {
-      if (!youbikeDataCache) {
-        try {
+        } catch (error) {
+          console.warn('Failed to fetch online data, trying IndexedDB:', error);
           youbikeDataCache = await getYoubikeDataFromDB();
-        } catch (e) {
-          youbikeDataCache = [];
         }
-        youbikeDataCache = youbikeDataCache.map(item => ({
-          ...item,
-          lat: parseFloat(item.lat),
-          lng: parseFloat(item.lng)
-        }));
+      } else {
+        youbikeDataCache = await getYoubikeDataFromDB();
+        showNotification(currentLang === "en" 
+          ? "Offline mode: Using cached data" 
+          : "離線模式：使用快取資料");
       }
     }
     let youbikeResults = youbikeDataCache;
@@ -1996,22 +1986,44 @@ darkModeToggle.addEventListener('click', () => {
         event.stopPropagation();
       });
       // modalButton.addEventListener('click', hideModal);
-      window.addEventListener('load', () => {
-        // 修正：無論有無網路都先初始化地圖
-        initMap();
-        if (useLocation) {
-          getLocation();
-        } else {
-          userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-          // 修正：離線時也要顯示主內容
-          searchYouBike(true, false).then(() => {
-            showMainContent();
-          });
+      window.addEventListener('load', async () => {
+        try {
+          // 檢查是否有網路連線
+          if (navigator.onLine) {
+            await initMap();
+          } else {
+            showNotification(currentLang === "en"
+              ? "Offline mode: Map features are limited"
+              : "離線模式：地圖功能受限");
+          }
+
+          // 從 IndexedDB 預先載入資料
+          if (!navigator.onLine) {
+            try {
+              youbikeDataCache = await getYoubikeDataFromDB();
+            } catch (error) {
+              console.warn('Failed to load cached data:', error);
+            }
+          }
+
+          if (centralLocationToggle?.checked) {
+            getLocation();
+          } else {
+            userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+            await searchYouBike(true, false);
+          }
+          showMainContent();
+        } catch (error) {
+          console.error('Initialization error:', error);
+          showNotification(currentLang === "en"
+            ? "Error initializing app. Some features may be limited."
+            : "初始化應用程式時發生錯誤，部分功能可能受限。");
         }
       });
+
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
-          searchYouBike(true, true); // 移動地圖
+          searchYouBike(true, true); // 秼動地圖
         }
       });
 
