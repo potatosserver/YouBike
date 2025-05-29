@@ -1993,11 +1993,16 @@ darkModeToggle.addEventListener('click', () => {
       });
       modalButton.addEventListener('click', hideModal);
       window.addEventListener('load', () => {
+        // 修正：無論有無網路都先初始化地圖
+        initMap();
         if (useLocation) {
           getLocation();
         } else {
           userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-          searchYouBike(true, false);  // 首次載入不移動地圖
+          // 修正：離線時也要顯示主內容
+          searchYouBike(true, false).then(() => {
+            showMainContent();
+          });
         }
       });
       keywordInput.addEventListener('keypress', function (event) {
@@ -2006,25 +2011,8 @@ darkModeToggle.addEventListener('click', () => {
         }
       });
 
-      // Removed installButton related JavaScript
-      /*
-      function updateInstallButton() {
-          const installBtn =
-                      console.error('PWA button error:', errorMessage, { deferredPrompt, displayMode: window.matchMedia('(display-mode: standalone)').matches, userAgent: navigator.userAgent, manifestHref: document.querySelector('link[rel="manifest"]')?.href });
-                      alert(errorMessage);
-                  }
-                  updateInstallButton();
-              } catch (error) {
-                  console.error('安裝按鈕發生錯誤:', error);
-              }
-          });
-      });
-      window.addEventListener('appinstalled', () => {
-          console.log('App 已安裝');
-          deferredPrompt = null;
-          updateInstallButton();
-      });
-      */    window.addEventListener('scroll', () => {
+
+            window.addEventListener('scroll', () => {
         if (settingsPanel.classList.contains('show')) {
             settingsPanel.classList.add('hiding');
            
@@ -2248,7 +2236,9 @@ setInterval(() => {
           getLocation();
         } else {
           userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-          searchYouBike(true, false); // 這裡會通過 searchYouBike 來移動地圖
+          searchYouBike(true, false).then(() => {
+            showMainContent();
+          });
         }
       });
       
