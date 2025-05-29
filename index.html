@@ -912,8 +912,12 @@ body.dark-mode #centralSettingsPanel h2 {
 .settings-group {
     margin-bottom: 20px;
     padding: 15px;
-    background: rgba(255, 255, 255, 0.1);
+    background: transparent;
+    border: 1px solid #000; /* 明亮模式：黑色外框 */
     border-radius: 10px;
+}
+body.dark-mode .settings-group {
+    border-color: #fff; /* 黑暗模式：白色外框 */
 }
 
 .settings-group h3 {
@@ -932,8 +936,13 @@ body.dark-mode .settings-group h3 {
     justify-content: space-between;
     margin-bottom: 15px;
     padding: 10px;
-    background: rgba(255, 255, 255, 0.05);
+    background: #f0f0f0; /* 明亮模式使用灰色 */
     border-radius: 8px;
+}
+
+/* 暗色模式下細項顏色保持原設定 */
+body.dark-mode .setting-item {
+    background: #455a64;
 }
 
 .setting-item label {
