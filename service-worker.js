@@ -12,6 +12,15 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+    // 新增：對 navigation 請求（HTML 頁面）離線時回傳快取的 index.html
+    if (event.request.mode === 'navigate') {
+        event.respondWith(
+            fetch(event.request).catch(() => {
+                return caches.match('/YouBike/index.html');
+            })
+        );
+        return;
+    }
     if (event.request.url.includes('tile.openstreetmap.org')) {
         event.respondWith(
             caches.open('map-tiles-cache').then(cache => {
