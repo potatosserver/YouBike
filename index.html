@@ -1598,7 +1598,7 @@ function showLoading() {
 function hideLoading() {
   loadingDiv.classList.remove('show');
 }
-function showModal(message) {
+function showNotification(message) {
     // 將提示轉換成右上角顯示的通知
     const notification = document.getElementById('locationNotification');
     notification.textContent = message;
@@ -1995,7 +1995,7 @@ darkModeToggle.addEventListener('click', () => {
       settingsPanel.addEventListener('click', (event) => {
         event.stopPropagation();
       });
-      modalButton.addEventListener('click', hideModal);
+      // modalButton.addEventListener('click', hideModal);
       window.addEventListener('load', () => {
         // 修正：無論有無網路都先初始化地圖
         initMap();
@@ -2165,6 +2165,7 @@ setInterval(() => {
             if (!isNaN(lat) && !isNaN(lng)) {
               const marker = L.marker([lat, lng]);
               
+
               marker.on('click', async () => {
                 try {
                   // 點擊時才取得即時資訊
@@ -2185,7 +2186,7 @@ setInterval(() => {
                   marker.bindPopup(content).openPopup();
                 } catch (error) {
                   console.error('取得站點資訊失敗:', error);
-                  showModal(currentLang === "en" ? "Failed to get station information." : "無法取得站點資訊。");
+                  showNotification(currentLang === "en" ? "Failed to get station information." : "無法取得站點資訊。");
                 }
               });
               
@@ -2196,7 +2197,7 @@ setInterval(() => {
           
         } catch (error) {
           console.error('初始化地圖失敗:', error);
-          showModal(currentLang === "en" ? "Failed to initialize map." : "初始化地圖失敗。");
+          showNotification(currentLang === "en" ? "Failed to initialize map." : "初始化地圖失敗。");
         }
       }
       
