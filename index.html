@@ -1999,20 +1999,12 @@ darkModeToggle.addEventListener('click', () => {
 
           // 從 IndexedDB 預先載入資料
           if (!navigator.onLine) {
-        try {
-          youbikeDataCache = await getYoubikeDataFromDB();
-          if (!youbikeDataCache || youbikeDataCache.length === 0) {
-            showNotification(currentLang === "en"
-              ? "No local data available for offline mode."
-              : "離線模式下無本地資料可用");
+            try {
+              youbikeDataCache = await getYoubikeDataFromDB();
+            } catch (error) {
+              console.warn('Failed to load cached data:', error);
+            }
           }
-        } catch (error) {
-          console.warn('Failed to load cached data:', error);
-          showNotification(currentLang === "en"
-            ? "Failed to load local data for offline mode."
-            : "離線模式無法載入本地資料");
-        }
-      }
 
           if (centralLocationToggle?.checked) {
             getLocation();
