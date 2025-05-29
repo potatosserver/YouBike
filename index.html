@@ -2144,7 +2144,9 @@ setInterval(() => {
                 : "離線模式：地圖圖層無法載入。");
         }
         markerClusterGroup = L.markerClusterGroup();
-        leafletMap.addLayer(markerClusterGroup);
+        if (leafletMap && markerClusterGroup) {
+          leafletMap.addLayer(markerClusterGroup);
+        }
         
         // 新增定位按鈕，顯示於地圖左上角縮放按鈕下方
         let locateControl = L.control({ position: 'topleft' });
@@ -2230,34 +2232,45 @@ setInterval(() => {
       
       // 更新地圖釘標函數現在只需要處理搜尋結果的高亮顯示
       function updateMapMarkers() {
-        // 重置所有釘標的樣式
-        markerClusterGroup.eachLayer(marker => {
-          marker.setIcon(L.icon({
-            iconUrl: 'https://unpkg.com/leaflet/dist/images/marker-icon.png',
-            iconSize: [25, 41],
-            iconAnchor: [12, 41]
-          }));
-        });
-        
-       
-       
-        // 高亮顯示搜尋結果的釘標
-        const stationCards = document.querySelectorAll('.station');
-        stationCards.forEach(card => {
-          const lat = parseFloat(card.dataset.lat);
-          const lng = parseFloat(card.dataset.lng);
-          
+        // 檢查是否離線且地圖元件未初始化
+        if (!navigator.onLine || !markerClusterGroup) {
+          console.log('Map features are limited in offline mode');
+          return;
+        }
+
+        try {
+          // 重置所有釘標的樣式
           markerClusterGroup.eachLayer(marker => {
-            const markerLatLng = marker.getLatLng();
-            if ( markerLatLng.lat === lat && markerLatLng.lng === lng) {
-              marker.setIcon(L.icon({
-                iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-                iconSize: [25, 41],
-                               iconAnchor: [12, 41]
-              }));
+            marker.setIcon(L.icon({
+              iconUrl: 'https://unpkg.com/leaflet/dist/images/marker-icon.png',
+              iconSize: [25, 41],
+              iconAnchor: [12, 41]
+            }));
+          });
+          
+          // 高亮顯示搜尋結果的釘標
+          const stationCards = document.querySelectorAll('.station');
+          stationCards.forEach(card => {
+            const lat = parseFloat(card.dataset.lat);
+            const lng = parseFloat(card.dataset.lng);
+            
+            if (markerClusterGroup && typeof markerClusterGroup.eachLayer === 'function') {
+              markerClusterGroup.eachLayer(marker => {
+                const markerLatLng = marker.getLatLng();
+                if (markerLatLng.lat === lat && markerLatLng.lng === lng) {
+                  marker.setIcon(L.icon({
+                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41]
+                  }));
+                }
+              });
             }
- });
-        });        // 地圖縮放範圍的調整已經移到 searchYouBike 函數中處理
+          });
+        } catch (error) {
+          console.error('Error updating map markers:', error);
+          // 不中斷應用程式運行，僅記錄錯誤
+        }
       }
       
       // 初始化地圖於頁面載入時
