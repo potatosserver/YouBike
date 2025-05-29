@@ -1599,13 +1599,17 @@ function hideLoading() {
   loadingDiv.classList.remove('show');
 }
 function showModal(message) {
-  modalText.textContent = message;
-  overlay.classList.add('show');
-  modal.classList.add('show');
+    // 將提示轉換成右上角顯示的通知
+    const notification = document.getElementById('locationNotification');
+    notification.textContent = message;
+    notification.classList.add('show');
+    setTimeout(() => {
+       notification.classList.remove('show');
+    }, 5000);
 }
+
 function hideModal() {
-  overlay.classList.remove('show');
-  modal.classList.remove('show');
+    // 不再使用 modal 提示，保留空函式
 }
 function calculateDistance(lat1, lon1, lat2, lon2) {
   const R = 6371;
@@ -1796,7 +1800,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
         
         setTimeout(() => {
           notification.classList.add('hide');
-          setTimeout(() => {
+                   setTimeout(() => {
             notification.classList.remove('show', 'hide');
           }, 300);
         }, 3000);
