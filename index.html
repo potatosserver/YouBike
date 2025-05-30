@@ -1824,6 +1824,11 @@
           }, 3000);
       }
       async function getLocation() {
+        const centralLocationToggle = document.getElementById('centralLocationToggle');
+        if (!centralLocationToggle?.checked) {
+          return; // 定位開關關閉，不讀取定位
+        }
+        
         if (navigator.geolocation) {
           try {
             const positionPromise = new Promise((resolve, reject) => {
@@ -1834,19 +1839,17 @@
               });
             });
             const timeoutPromise = new Promise(resolve => {
-              setTimeout(() => resolve(null), 10000); // 等待最多10秒
+              setTimeout(() => resolve(null), 10000);
             });
             const position = await Promise.race([positionPromise, timeoutPromise]);
             if (position) {
               handleGeolocationSuccess(position);
             } else {
-              // 若10秒內未取得定位, 才以預設定位, 不會立即使用預設定位
               handleGeolocationError({ code: 3, message: "定位超時，開始使用預設定位" });
             }
           } catch (e) {
             handleGeolocationError(e);
           }
-          // 持續更新定位
           setInterval(() => {
             navigator.geolocation.getCurrentPosition(
               handleGeoUpdateSuccess,
@@ -2345,7 +2348,7 @@
       });
 
 
-      // 重寫拖曳功能
+      // 重寫拖曱功能
       const mainContent = document.getElementById('mainContent');
       const dragHandle = document.getElementById('dragHandle');
       let startY = 0;
@@ -2484,7 +2487,7 @@
           if (isChecked) {
             getLocation();
           } else {
-            // 關閉定位時移除定位標記
+            // 關閉定位時清除已存在的定位標記並強制使用預設座標
             if (locationMarker) {
               locationMarker.remove();
               locationMarker = null;
