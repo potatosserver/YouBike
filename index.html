@@ -1327,14 +1327,27 @@
       // IndexedDB 操作函數
       function openYoubikeDB() {
         return new Promise((resolve, reject) => {
-          const request = indexedDB.open('YouBikeDB', 2);  // 版本升級到 2
+          // 請求持久性儲存空間
+          if (navigator.storage && navigator.storage.persist) {
+            navigator.storage.persist().then(isPersisted => {
+              console.log(`持久性儲存權限: ${isPersisted ? '已授權' : '未授權'}`);
+            });
+          }
+
+          const request = indexedDB.open('YouBikeDB', 3); // 版本升級到 3
           
           request.onupgradeneeded = function(event) {
             const db = event.target.result;
             
+            // 新增資料庫版本更新的錯誤處理
+            db.onerror = function(event) {
+              console.error('資料庫更新失敗:', event.target.error);
+            };
+            
             // 站點資料存儲
             if (!db.objectStoreNames.contains('youbikeData')) {
-              db.createObjectStore('youbikeData', { keyPath: 'id' });
+              const youbikeStore = db.createObjectStore('youbikeData', { keyPath: 'id' });
+              youbikeStore.createIndex('timestamp', 'timestamp'); // 新增時間戳記索引
             }
             
             // 地圖圖磚存儲
@@ -1345,39 +1358,69 @@
             
             // 區域資料存儲
             if (!db.objectStoreNames.contains('regionData')) {
-              db.createObjectStore('regionData', { keyPath: 'region' });
+              const regionStore = db.createObjectStore('regionData', { keyPath: 'region' });
+              regionStore.createIndex('timestamp', 'timestamp'); // 新增時間戳記索引
             }
           };
-          
+
           request.onsuccess = function(event) {
-            resolve(event.target.result);
+            const db = event.target.result;
+            
+            // 新增自動錯誤處理
+            db.onerror = function(event) {
+              console.error('資料庫操作錯誤:', event.target.error);
+            };
+
+            // 定期檢查並備份資料
+            setInterval(() => {
+              backupData(db);
+            }, 24 * 60 * 60 * 1000); // 每24小時執行一次
+            
+            resolve(db);
           };
           
           request.onerror = function(event) {
+            console.error('無法開啟資料庫:', event.target.error);
             reject(event.target.error);
           };
         });
       }
 
-      // 新增清理過期地圖圖磚的函數
-      async function cleanupOldTiles() {
-        const db = await openYoubikeDB();
-        const tx = db.transaction('mapTiles', 'readwrite');
-        const store = tx.objectStore('mapTiles');
-        const index = store.index('timestamp');
-        
-        // 清理超過 30 天的圖磚
-        const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
-        const range = IDBKeyRange.upperBound(thirtyDaysAgo);
-        
+      // 新增資料備份功能
+      async function backupData(db) {
+        try {
+          const tx = db.transaction(['youbikeData', 'regionData'], 'readonly');
+          const youbikeStore = tx.objectStore('youbikeData');
+          const regionStore = tx.objectStore('regionData');
+
+          // 獲取所有資料
+          const youbikeData = await getAllData(youbikeStore);
+          const regionData = await getAllData(regionStore);
+
+          // 將資料存入 localStorage 作為備份
+          try {
+            localStorage.setItem('youbikeData_backup', JSON.stringify(youbikeData));
+            localStorage.setItem('regionData_backup', JSON.stringify(regionData));
+            localStorage.setItem('backup_timestamp', Date.now().toString());
+          } catch (e) {
+            console.warn('localStorage 備份失敗，可能是空間不足:', e);
+          }
+        } catch (error) {
+          console.error('資料備份失敗:', error);
+        }
+      }
+
+      // 輔助函數：從 store 獲取所有資料
+      function getAllData(store) {
         return new Promise((resolve, reject) => {
-          index.openCursor(range).onsuccess = function(event) {
+          const data = [];
+          store.openCursor().onsuccess = function(event) {
             const cursor = event.target.result;
             if (cursor) {
-              store.delete(cursor.primaryKey);
+              data.push(cursor.value);
               cursor.continue();
             } else {
-              resolve();
+              resolve(data);
             }
           };
         });
