@@ -1840,18 +1840,19 @@
               });
             });
             const timeoutPromise = new Promise(resolve => {
-              setTimeout(() => resolve(null), 10000);
+              setTimeout(() => resolve(null), 10000); // 等待最多10秒
             });
             const position = await Promise.race([positionPromise, timeoutPromise]);
             if (position) {
               handleGeolocationSuccess(position);
             } else {
-              handleGeolocationError({ code: 3, message: "首次定位超時" });
+              // 若10秒內未取得定位, 才以預設定位, 不會立即使用預設定位
+              handleGeolocationError({ code: 3, message: "定位超時，開始使用預設定位" });
             }
           } catch (e) {
             handleGeolocationError(e);
           }
-          // 10秒後持續更新定位
+          // 持續更新定位
           setInterval(() => {
             navigator.geolocation.getCurrentPosition(
               handleGeoUpdateSuccess,
