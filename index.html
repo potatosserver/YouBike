@@ -909,15 +909,19 @@
           background: transparent;
           border: 1px solid #000; /* 明亮模式：黑色外框 */
           border-radius: 10px;
+          color: #333; /* 新增：明確設定文字顏色 */
+          transition: border-color 0.3s; /* 只對邊框保留過渡效果 */
       }
       body.dark-mode .settings-group {
           border-color: #fff; /* 黑暗模式：白色外框 */
+          color: #fff; /* 新增：明確設定深色模式文字顏色 */
       }
 
       .settings-group h3 {
           margin-bottom: 15px;
           color: #333;
           font-size: 1.2em;
+          transition: none; /* 移除過渡效果 */
       }
 
       body.dark-mode .settings-group h3 {
@@ -930,17 +934,15 @@
           justify-content: space-between;
           margin-bottom: 15px;
           padding: 10px;
-          background: #f0f0f0; /* 明亮模式使用灰色 */
+          background: #f0f0f0;
           border-radius: 8px;
+          color: #333; /* 新增：明確設定文字顏色 */
+          transition: background-color 0.3s; /* 只對背景保留過渡效果 */
       }
 
-      /* 暗色模式下細項顏色保持原設定 */
       body.dark-mode .setting-item {
           background: #455a64;
-      }
-
-      .setting-item label {
-          font-size: 1.1em;
+          color: #fff; /* 新增：明確設定深色模式文字顏色 */
       }
 
       /* Styles for external links in central settings panel */
