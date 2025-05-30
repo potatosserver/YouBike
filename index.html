@@ -1074,29 +1074,47 @@
       <h2 id="settingsPanelTitle">系統設定</h2>
       
       <div class="settings-group">
-          <h3>基本設定</h3>
-          <div class="setting-item">
-              <label for="centralLocationToggle">位置服務</label>
-              <label class="switch">
-                  <input type="checkbox" id="centralLocationToggle">
-                  <span class="slider"></span>
-              </label>
+              <h3>基本設定</h3>
+              <div class="setting-item">
+                  <label for="centralRegionSelect" id="regionSelectLabel">地區選擇</label>
+                  <select id="centralRegionSelect" style="padding: 5px; border-radius: 5px;">
+                      <option value="taipei">台北市</option>
+                      <option value="newTaipei">新北市</option>
+                      <option value="taoyuan">桃園市</option>
+                      <option value="hsinchuCounty">新竹縣</option>
+                      <option value="hsinchuCity">新竹市</option>
+                      <option value="sciencePark">新竹科學園區</option>
+                      <option value="miaoli">苗栗縣</option>
+                      <option value="taichung">台中市</option>
+                      <option value="chiayi">嘉義市</option>
+                      <option value="tainan">臺南市</option>
+                      <option value="kaohsiung" selected>高雄市</option>
+                      <option value="pingtung">屏東縣</option>
+                      <option value="taitung">臺東縣</option>
+                  </select>
+              </div>
+              <div class="setting-item">
+                  <label for="centralLocationToggle">位置服務</label>
+                  <label class="switch">
+                      <input type="checkbox" id="centralLocationToggle">
+                      <span class="slider"></span>
+                  </label>
+              </div>
+              <div class="setting-item">
+                  <label for="centralDarkModeToggle">深色模式</label>
+                  <label class="switch">
+                      <input type="checkbox" id="centralDarkModeToggle">
+                      <span class="slider"></span>
+                  </label>
+              </div>
+              <div class="setting-item">
+                  <label for="centralLangToggle">中文/English</label>
+                  <label class="switch">
+                      <input type="checkbox" id="centralLangToggle">
+                      <span class="slider"></span>
+                  </label>
+              </div>
           </div>
-          <div class="setting-item">
-              <label for="centralDarkModeToggle">深色模式</label>
-              <label class="switch">
-                  <input type="checkbox" id="centralDarkModeToggle">
-                  <span class="slider"></span>
-              </label>
-          </div>
-          <div class="setting-item">
-              <label for="centralLangToggle">中文/English</label>
-              <label class="switch">
-                  <input type="checkbox" id="centralLangToggle">
-                  <span class="slider"></span>
-              </label>
-          </div>
-      </div>
 
       <div class="settings-group">
           <h3>外部連結</h3>
@@ -1125,8 +1143,24 @@
       let geolocationErrorMessage = null;
       let dataLoaded = false;
       let hasShownDefaultLocationMessage = false; // 添加新的標記
-      const defaultLatitude = 22.6315725;
-      const defaultLongitude = 120.3025079;
+      const regionCoordinates = {
+        taipei: { lat: 25.047924, lng: 121.517081 },
+        newTaipei: { lat: 25.0215339197085, lng: 121.4568090197085 },
+        taoyuan: { lat: 24.953671, lng: 121.225783 },
+        hsinchuCounty: { lat: 24.826917615712, lng: 121.01290295049 },
+        hsinchuCity: { lat: 24.801815, lng: 120.971459 },
+        sciencePark: { lat: 24.781830, lng: 121.005074 },
+        miaoli: { lat: 24.5648599, lng: 120.8185503 },
+        taichung: { lat: 24.154712, lng: 120.664265 },
+        chiayi: { lat: 23.4797837, lng: 120.4397206 },
+        tainan: { lat: 22.99230083082, lng: 120.18509419659 },
+        kaohsiung: { lat: 22.631442, lng: 120.301890 },
+        pingtung: { lat: 22.683036253664, lng: 120.48790854724 },
+        taitung: { lat: 22.755711056126138, lng: 121.15035332587574 }
+      };
+      let defaultRegion = localStorage.getItem('selectedRegion') || 'kaohsiung'; // 改用變數儲存預設區域
+      const defaultLatitude = regionCoordinates[defaultRegion].lat;
+      const defaultLongitude = regionCoordinates[defaultRegion].lng;
       const overlay = document.querySelector('.overlay');
       const modal = document.querySelector('.modal');
       const modalText = document.getElementById('modalText');
@@ -1702,13 +1736,12 @@
               ? "Location permission denied. The app needs location permission to show nearby stations."
               : "您尚未提供定位權限。需要定位權限才能顯示附近站點。";
             errorType = "permission";
-            shouldDisableLocationToggle = true; // 權限被拒絕時關閉開關
-            break;
+            shouldDisableLocationToggle = true; // 權限被拒絕時關閉開關            break;
           case error.POSITION_UNAVAILABLE:
             errorMessage = currentLang === "en"
               ? "Your device doesn't support or has disabled location services. Please check your device settings."
               : "您的裝置不支援或已停用定位服務，請檢查裝置設定。";
-            errorType = "unavailable";
+                       errorType = "unavailable";
             shouldDisableLocationToggle = true; // 不支援定位時關閉開關
             break;
           case error.TIMEOUT:
@@ -1986,6 +2019,36 @@
         if (langLabel) {
           langLabel.textContent = currentLang === "en" ? "Chinese/English" : "中文/English";
         }
+
+        // 新增區域選單文字更新
+        const regionNames = {
+            taipei: { en: "Taipei City", zh: "台北市" },
+            newTaipei: { en: "New Taipei City", zh: "新北市" },
+            taoyuan: { en: "Taoyuan City", zh: "桃園市" },
+            hsinchuCounty: { en: "Hsinchu County", zh: "新竹縣" },
+            hsinchuCity: { en: "Hsinchu City", zh: "新竹市" },
+            sciencePark: { en: "Hsinchu Science Park", zh: "新竹科學園區" },
+            miaoli: { en: "Miaoli County", zh: "苗栗縣" },
+            taichung: { en: "Taichung City", zh: "台中市" },
+            chiayi: { en: "Chiayi City", zh: "嘉義市" },
+            tainan: { en: "Tainan City", zh: "臺南市" },
+            kaohsiung: { en: "Kaohsiung City", zh: "高雄市" },
+            pingtung: { en: "Pingtung County", zh: "屏東縣" },
+            taitung: { en: "Taitung County", zh: "臺東縣" }
+        };
+        
+        const select = document.getElementById('centralRegionSelect');
+        const options = select.options;
+        
+        for (let i = 0; i < options.length; i++) {
+            const value = options[i].value;
+            options[i].text = regionNames[value][currentLang === "en" ? "en" : "zh"];
+        }
+
+        const regionSelectLabel = document.querySelector('label[for="centralRegionSelect"]');
+    if (regionSelectLabel) {
+        regionSelectLabel.textContent = currentLang === "en" ? "Region" : "地區選擇";
+    }
       }
       updateLanguageTexts();
 
@@ -2143,7 +2206,7 @@
     }, 1000);
       // 修改全域變數
       let allStations = [];
-        async function initMap() {
+      async function initMap() {
         // 修改：離線模式通知邏輯，不再直接 return
         if (!navigator.onLine) {
           if (!window.offlineNotified) {
@@ -2414,6 +2477,11 @@
         const centralDarkModeToggle = document.getElementById('centralDarkModeToggle');
         const centralLangToggle = document.getElementById('centralLangToggle');
         const centralLocationToggle = document.getElementById('centralLocationToggle');
+        const centralRegionSelect = document.getElementById('centralRegionSelect');
+
+        // 移除重複的預設值設定
+        const savedRegion = localStorage.getItem('selectedRegion');
+        centralRegionSelect.value = savedRegion || 'kaohsiung';
 
         // 初始化開關狀態
         centralDarkModeToggle.checked = document.body.classList.contains('dark-mode');
@@ -2481,7 +2549,64 @@
           userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
           searchYouBike();
         }
+
+        // 初始化地區選單
+        centralRegionSelect.addEventListener('change', function() {
+          const selectedRegion = this.value;
+          defaultRegion = selectedRegion; // 更新全域變數
+          localStorage.setItem('selectedRegion', selectedRegion);
+          
+          const coords = regionCoordinates[selectedRegion];
+          
+          // 只有在未使用定位服務時才更新預設座標
+          if (!centralLocationToggle.checked) {
+              userLocation = { latitude: coords.lat, longitude: coords.lng };
+              if (leafletMap) {
+                  leafletMap.setView([coords.lat, coords.lng], 18, { animate: true });
+              }
+              searchYouBike();
+          }
+        });
+
+        // 修改定位服務處理
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    if (!centralLocationToggle.checked) {
+                      // 只在未使用定位服務時根據距離設定預設區域
+                      let nearestRegion = findNearestRegion(position.coords.latitude, position.coords.longitude);
+                      defaultRegion = nearestRegion;
+                      localStorage.setItem('selectedRegion', nearestRegion);
+                      centralRegionSelect.value = nearestRegion;
+                    }
+                },
+                () => {
+                    // 定位失敗時保持使用者選擇的區域
+                    const savedRegion = localStorage.getItem('selectedRegion');
+                    if (savedRegion) {
+                      defaultRegion = savedRegion;
+                      centralRegionSelect.value = savedRegion;
+                    }
+                }
+            );
+        }
       });
+
+      // 新增尋找最近區域的輔助函數
+      function findNearestRegion(lat, lng) {
+          let nearestRegion = 'kaohsiung';
+          let minDistance = Infinity;
+          
+          for (const [region, coords] of Object.entries(regionCoordinates)) {
+              const distance = calculateDistance(lat, lng, coords.lat, coords.lng);
+              if (distance < minDistance) {
+                  minDistance = distance;
+                  nearestRegion = region;
+              }
+          }
+          
+          return nearestRegion;
+      }
     </script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
