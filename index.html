@@ -2612,14 +2612,41 @@
         // 初始化地區選單
         centralRegionSelect.addEventListener('change', function() {
           const selectedRegion = this.value;
-          defaultRegion = selectedRegion; // 更新全域變數
+          defaultRegion = selectedRegion;
           localStorage.setItem('selectedRegion', selectedRegion);
           
           const coords = regionCoordinates[selectedRegion];
           
-          // 只有在未使用定位服務時才更新預設座標
+          // 只有在未使用定位服務時才更新預設座標和位置標記
           if (!centralLocationToggle.checked) {
               userLocation = { latitude: coords.lat, longitude: coords.lng };
+              
+              // 更新或創建位置標記
+              if (locationMarker) {
+                  locationMarker.setLatLng([coords.lat, coords.lng]);
+              } else {
+                  locationMarker = L.circleMarker([coords.lat, coords.lng], {
+                      radius: 10,
+                      fillColor: '#2196F3',
+                      fillOpacity: 0.8,
+                      color: '#ffffff',
+                      weight: 3,
+                      pane: 'markerPane'
+                  }).addTo(leafletMap);
+
+                  // 添加脈衝動畫效果
+                  const pulsingIcon = L.divIcon({
+                      className: 'pulsing-icon',
+                      html: '<div class="pulse"></div>',
+                      iconSize: [20, 20]
+                  });
+                  
+                  L.marker([coords.lat, coords.lng], {
+                      icon: pulsingIcon,
+                      pane: 'markerPane'
+                  }).addTo(leafletMap);
+              }
+              
               if (leafletMap) {
                   leafletMap.setView([coords.lat, coords.lng], 18, { animate: true });
               }
