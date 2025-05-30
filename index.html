@@ -1729,7 +1729,7 @@
               ? "Unable to get location. Please check your device settings."
               : "無法取得位置資訊，請檢查裝置設定。";
             errorType = "unknown";
-            shouldDisableLocationToggle = true;
+            shouldDisableLocationToggle = false; // 其他錯誤保持開關開啟
         }
 
         // 更新中央設定面板的定位開關
