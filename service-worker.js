@@ -6,12 +6,40 @@ self.addEventListener('install', (event) => {
                 '/YouBike/index.html',
                 '/YouBike/main.js',
                 '/YouBike/manifest.json',
+                'https://unpkg.com/leaflet/dist/leaflet.css',
+                'https://unpkg.com/leaflet/dist/leaflet.js',
+                'https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js',
+                'https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css',
+                'https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css'
             ]);
-        }).then(() => self.skipWaiting()) // 加入立即跳過等待
+        }).then(() => self.skipWaiting())
     );
 });
 
 self.addEventListener('fetch', (event) => {
+    const url = new URL(event.request.url);
+    
+    // 特別處理 OpenStreetMap 圖磚請求
+    if (url.hostname === 'tile.openstreetmap.org') {
+        event.respondWith(
+            caches.open('map-tiles-cache').then((cache) => {
+                return cache.match(event.request).then((response) => {
+                    if (response) {
+                        return response;
+                    }
+                    return fetch(event.request).then((response) => {
+                        if (response.status === 200) {
+                            cache.put(event.request, response.clone());
+                        }
+                        return response;
+                    });
+                });
+            })
+        );
+        return;
+    }
+
+    // 處理其他請求
     event.respondWith(
         caches.match(event.request).then((response) => {
             if (response) return response;
@@ -34,6 +62,6 @@ self.addEventListener('activate', (event) => {
                     }
                 })
             );
-        }).then(() => self.clients.claim()) // 加入立即控制所有客戶端
+        }).then(() => self.clients.claim())
     );
 });

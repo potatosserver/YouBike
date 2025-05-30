@@ -1327,34 +1327,92 @@
       // IndexedDB 操作函數
       function openYoubikeDB() {
         return new Promise((resolve, reject) => {
-          const request = indexedDB.open('YouBikeDB', 1);
+          const request = indexedDB.open('YouBikeDB', 2);  // 版本升級到 2
+          
           request.onupgradeneeded = function(event) {
             const db = event.target.result;
+            
+            // 站點資料存儲
             if (!db.objectStoreNames.contains('youbikeData')) {
               db.createObjectStore('youbikeData', { keyPath: 'id' });
             }
+            
+            // 地圖圖磚存儲
+            if (!db.objectStoreNames.contains('mapTiles')) {
+              const tileStore = db.createObjectStore('mapTiles', { keyPath: 'url' });
+              tileStore.createIndex('timestamp', 'timestamp');
+            }
+            
+            // 區域資料存儲
+            if (!db.objectStoreNames.contains('regionData')) {
+              db.createObjectStore('regionData', { keyPath: 'region' });
+            }
           };
+          
           request.onsuccess = function(event) {
             resolve(event.target.result);
           };
+          
           request.onerror = function(event) {
             reject(event.target.error);
           };
         });
       }
 
-      function saveYoubikeDataToDB(dataArray) {
-        return openYoubikeDB().then(db => {
-          return new Promise((resolve, reject) => {
-            const tx = db.transaction('youbikeData', 'readwrite');
-            const store = tx.objectStore('youbikeData');
-            store.clear();
-            dataArray.forEach((item, idx) => {
-              store.put({ id: idx, value: item });
-            });
-            tx.oncomplete = () => resolve();
-            tx.onerror = (e) => reject(e.target.error);
+      // 新增清理過期地圖圖磚的函數
+      async function cleanupOldTiles() {
+        const db = await openYoubikeDB();
+        const tx = db.transaction('mapTiles', 'readwrite');
+        const store = tx.objectStore('mapTiles');
+        const index = store.index('timestamp');
+        
+        // 清理超過 30 天的圖磚
+        const thirtyDaysAgo = Date.now() - (30 * 24 * 60 * 60 * 1000);
+        const range = IDBKeyRange.upperBound(thirtyDaysAgo);
+        
+        return new Promise((resolve, reject) => {
+          index.openCursor(range).onsuccess = function(event) {
+            const cursor = event.target.result;
+            if (cursor) {
+              store.delete(cursor.primaryKey);
+              cursor.continue();
+            } else {
+              resolve();
+            }
+          };
+        });
+      }
+
+      // 修改站點資料儲存函數
+      async function saveYoubikeDataToDB(dataArray) {
+        const db = await openYoubikeDB();
+        const tx = db.transaction('youbikeData', 'readwrite');
+        const store = tx.objectStore('youbikeData');
+        
+        // 清除舊資料
+        await store.clear();
+        
+        // 儲存新資料
+        for (const [idx, item] of dataArray.entries()) {
+          await store.put({ 
+            id: idx,
+            value: item,
+            timestamp: Date.now()
           });
+        }
+        
+        // 儲存區域資料
+        const regionTx = db.transaction('regionData', 'readwrite');
+        const regionStore = regionTx.objectStore('regionData');
+        await regionStore.put({
+          region: defaultRegion,
+          coordinates: regionCoordinates[defaultRegion],
+          timestamp: Date.now()
+        });
+        
+        return new Promise((resolve, reject) => {
+          tx.oncomplete = resolve;
+          tx.onerror = reject;
         });
       }
 
