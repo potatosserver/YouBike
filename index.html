@@ -1334,7 +1334,8 @@
             });
           }
 
-          const request = indexedDB.open('YouBikeDB', 3); // 版本升級到 3
+          // 修改此處：將版本號從3改為1
+          const request = indexedDB.open('YouBikeDB', 1); // 版本改為 1
           
           request.onupgradeneeded = function(event) {
             const db = event.target.result;
@@ -2758,7 +2759,7 @@
                     L.marker([coords.lat, coords.lng], {
                         icon: pulsingIcon,
                         pane: 'markerPane'
-                    }).addTo(leafletMap);
+                      }).addTo(leafletMap);
                 }
                 
                 // 移動地圖到選擇的區域
