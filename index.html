@@ -1483,12 +1483,12 @@
               card.dataset.lng = station.coords[1];
               card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
               card.innerHTML = cardContent;
+              // Add click event listener to move map to station coordinates
               card.addEventListener("click", () => {
-                const lat = parseFloat(station.coords[0]), lng = parseFloat(station.coords[1]);
-                if (!isNaN(lat) && !isNaN(lng)) {
-                  window.open(`https://www.google.com/maps?q=${lat},${lng}`, "_blank");
-                } else {
-                  showModal(currentLang === "en" ? "Invalid station coordinates, cannot open map." : "站點座標無效，無法開啟地圖。");
+                const lat = parseFloat(station.coords[0]);
+                const lng = parseFloat(station.coords[1]);
+                if (!isNaN(lat) && !isNaN(lng) && leafletMap) {
+                  leafletMap.setView([lat, lng], 18, { animate: true, duration: 1 });
                 }
               });
               resultsDiv.appendChild(card);
@@ -1823,6 +1823,7 @@
             }, 300);
           }, 3000);
       }
+      let locationIntervalId; // Add this global variable
       async function getLocation() {
         const centralLocationToggle = document.getElementById('centralLocationToggle');
         if (!centralLocationToggle?.checked) {
@@ -2357,7 +2358,7 @@
       });
 
 
-      // 重寫拖曱功能
+      // 重寫拖曳功能
       const mainContent = document.getElementById('mainContent');
       const dragHandle = document.getElementById('dragHandle');
       let startY = 0;
@@ -2403,57 +2404,9 @@
       document.addEventListener('touchend', onEnd);
       document.addEventListener('touchcancel', onEnd);
 
-      const darkModeMapStyle = [
-        { elementType: 'geometry', stylers: [{ color: '#1d2c4d' }] },
-        { elementType: 'labels.text.stroke', stylers: [{ color: '#1a3646' }] },
-        { elementType: 'labels.text.fill', stylers: [{ color: '#8ec3b9' }] },
-        { featureType: 'administrative', elementType: 'geometry', stylers: [{ color: '#1a3646' }] },
-        { featureType: 'administrative.country', elementType: 'labels.text.fill', stylers: [{ color: '#4e6d70' }] },
-        { featureType: 'administrative.land_parcel', stylers: [{ visibility: 'off' }] },
-        { featureType: 'administrative.locality', elementType: 'labels.text.fill', stylers: [{ color: '#c4d4e0' }] },
-        { featureType: 'poi', elementType: 'geometry', stylers: [{ color: '#283d6a' }] },
-        { featureType: 'poi', elementType: 'labels.text.fill', stylers: [{ color: '#6f9ba5' }] },
-        { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: '#023e58' }] },
-        { featureType: 'poi.park', elementType: 'labels.text.fill', stylers: [{ color: '#3C7680' }] },
-        { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#304a7d' }] },
-        { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#98a5be' }] },
-        { featureType: 'road', elementType: 'labels.text.stroke', stylers: [{ color: '#1d2c4d' }] },
-        { featureType: 'road.highway', elementType: 'geometry', stylers: [{ color: '#2c6675' }] },
-        { featureType: 'road.highway', elementType: 'geometry.stroke', stylers: [{ color: '#255763' }] },
-        { featureType: 'road.highway', elementType: 'labels.text.fill', stylers: [{ color: '#b0d5ce' }] },
-        { featureType: 'road.highway', elementType: 'labels.text.stroke', stylers: [{ color: '#023e58' }] },
-        { featureType: 'transit', elementType: 'labels.text.fill', stylers: [{ color: '#98a5be' }] },
-        { featureType: 'transit', elementType: 'labels.text.stroke', stylers: [{ color: '#1d2c4d' }] },
-        { featureType: 'transit.line', elementType: 'geometry.fill', stylers: [{ color: '#283d6a' }] },
-        { featureType: 'transit.station', elementType: 'geometry', stylers: [{ color: '#3a4762' }] },
-        { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#0e1626' }] },
-        { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#4e6d70' }] }
-      ];
-
-      function initializeMap() {
-        const mapOptions = {
-          center: { lat: defaultLatitude, lng: defaultLongitude },
-          zoom: 14,
-          styles: document.body.classList.contains('dark-mode') ? darkModeMapStyle : null,
-        };
-
-        const map = new google.maps.Map(document.getElementById('map'), mapOptions);
-
-        // 確保地圖容器有正確的高度和寬度
-        const mapContainer = document.getElementById('map');
-        if (mapContainer) {
-          mapContainer.style.height = '100vh';
-          mapContainer.style.width = '100%';
-        }
-
-        // Add a listener to toggle styles when dark mode changes
-        const observer = new MutationObserver(() => {
-          const isDarkMode = document.body.classList.contains('dark-mode');
-          map.setOptions({ styles: isDarkMode ? darkModeMapStyle : null });
-        });
-
-        observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
-      }
+      // 徹底移除 darkModeMapStyle 和 initializeMap 函數
+      // const darkModeMapStyle = [ ... ]; // 已移除
+      // function initializeMap() { ... } // 已移除
 
       // 初始化中央設定面板
       document.addEventListener('DOMContentLoaded', () => {
