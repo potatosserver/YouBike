@@ -20,11 +20,11 @@
     <style>
       body {
         font-family: 'Noto Sans TC', Arial, sans-serif;
-        margin: 0; /* Remove default body margin */
-        background: #f4f4f4; /* Default light mode background */
-        color: #333; /* Default light mode text color */
+        margin: 0; /* 移除預設 body 邊距 */
+        background: #f4f4f4; /* 預設亮色模式背景 */
+        color: #333; /* 預設亮色模式文字顏色 */
         transition: background 0.5s ease, color 0.5s ease;
-        padding-top: 20px; /* Add padding to the top */
+        padding-top: 20px; /* 增加頂部填充 */
       }
       
       /* 定位通知樣式 */
@@ -148,33 +148,33 @@
       }
 
       #locationSwitchContainer {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: rgba(255, 255, 255, 0.9);
-    padding: 8px 15px;
-    border-radius: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    backdrop-filter: blur(5px);
-    transition: all 0.3s ease;
-}
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 8px 15px;
+        border-radius: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+      }
 
-body.dark-mode #locationSwitchContainer {
-    background-color: rgba(30, 30, 30, 0.9);
-    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
-}
+      body.dark-mode #locationSwitchContainer {
+          background-color: rgba(30, 30, 30, 0.9);
+          box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+      }
 
-#locationSwitchText {
-    color: #007BFF;
-    font-weight: 500;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
-    margin-left: 10px;
-}
+      #locationSwitchText {
+          color: #007BFF;
+          font-weight: 500;
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+          margin-left: 10px;
+      }
 
-body.dark-mode #locationSwitchText {
-    color: #90CAF9;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-}
+      body.dark-mode #locationSwitchText {
+          color: #90CAF9;
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+      }
 
       #results {
         margin-top: 20px;
@@ -309,24 +309,24 @@ body.dark-mode #locationSwitchText {
         color: #90CAF9; /* 與暗色模式站點名稱一致 */
       }
       body.dark-mode #keyword {
-        /* In dark mode, keyword background should be transparent to show searchContainer background */
+        /* 在暗色模式下，關鍵字背景應透明以顯示搜尋容器背景 */
         background-color: transparent;
         color: #ffffff;
-        border-color: #90caf9; /* This border-color won't show because border: none */
+        border-color: #90caf9; /* 此邊框顏色不會顯示，因為 border: none */
       }
       body.dark-mode #keyword::placeholder {
-         color: #888; /* Adjust placeholder color for dark mode */
+         color: #888; /* 調整暗色模式下佔位符顏色 */
       }
 
        body.dark-mode #searchContainer {
-          background-color: #1e1e1e; /* Dark mode container background */
-          box-shadow: 0 2px 4px rgba(255,255,255,0.1); /* Dark mode subtle elevation */
+          background-color: #1e1e1e; /* 暗色模式容器背景 */
+          box-shadow: 0 2px 4px rgba(255,255,255,0.1); /* 暗色模式細微陰影 */
       }
        body.dark-mode #searchIcon {
-          color: #ccc; /* Dark mode icon color */
+          color: #ccc; /* 暗色模式圖標顏色 */
       }
       body.dark-mode #searchIcon:hover {
-        color: #ffffff; /* White icon on hover in dark mode */
+        color: #ffffff; /* 暗色模式下懸停時為白色圖標 */
       }
       body.dark-mode button {
         background-color: #90caf9;
@@ -450,14 +450,14 @@ body.dark-mode #locationSwitchText {
       }
 
       #mainContent::before {
-    content: '';
-    display: block;
-    height: 24px; /* 設定頂部空間高度 */
-    background: inherit; /* 繼承父元素背景色 */
-    position: sticky;
-    top: 0;
-    z-index: 99;
-}
+        content: '';
+        display: block;
+        height: 24px; /* 設定頂部空間高度 */
+        background: inherit; /* 繼承父元素背景色 */
+        position: sticky;
+        top: 0;
+        z-index: 99;
+      }
 
       #mainContent::-webkit-scrollbar {
         display: none;  /* Chrome, Safari and Opera */
@@ -676,13 +676,7 @@ body.dark-mode #locationSwitchText {
       input:checked + .slider:before {
         transform: translateX(26px);
       }
-      #githubButton img {
-        display: block;
-        margin: 0;
-        width: 45px;
-        height: 45px;
-        object-fit: contain;
-      }      /* Removed installButton styles */
+      /* Removed installButton styles */
       /* #installButton { ... } */
       /* #installButton img { ... } */      @keyframes popUp {
           0% { transform: translateX(100%) scale(0.5); opacity: 0; }
@@ -876,148 +870,148 @@ body.dark-mode #locationSwitchText {
       }
 
       /* 新增中央設定面板樣式 */
-#centralSettingsPanel {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 80%;
-    max-width: 320px;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 20px;
-    padding: 25px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    z-index: 10000;
-    backdrop-filter: blur(10px);
-    animation: fadeIn 0.3s ease;
-}
+      #centralSettingsPanel {
+          display: none;
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 80%;
+          max-width: 320px;
+          background: rgba(255, 255, 255, 0.95);
+          border-radius: 20px;
+          padding: 25px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+          z-index: 10000;
+          backdrop-filter: blur(10px);
+          animation: fadeIn 0.3s ease;
+      }
 
-body.dark-mode #centralSettingsPanel {
-    background: rgba(30, 30, 30, 0.95);
-    color: #fff;
-}
+      body.dark-mode #centralSettingsPanel {
+          background: rgba(30, 30, 30, 0.95);
+          color: #fff;
+      }
 
-#centralSettingsPanel h2 {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #007BFF;
-    font-size: 1.5em;
-}
+      #centralSettingsPanel h2 {
+          text-align: center;
+          margin-bottom: 20px;
+          color: #007BFF;
+          font-size: 1.5em;
+      }
 
-body.dark-mode #centralSettingsPanel h2 {
-    color: #90CAF9;
-}
+      body.dark-mode #centralSettingsPanel h2 {
+          color: #90CAF9;
+      }
 
-.settings-group {
-    margin-bottom: 20px;
-    padding: 15px;
-    background: transparent;
-    border: 1px solid #000; /* 明亮模式：黑色外框 */
-    border-radius: 10px;
-}
-body.dark-mode .settings-group {
-    border-color: #fff; /* 黑暗模式：白色外框 */
-}
+      .settings-group {
+          margin-bottom: 20px;
+          padding: 15px;
+          background: transparent;
+          border: 1px solid #000; /* 明亮模式：黑色外框 */
+          border-radius: 10px;
+      }
+      body.dark-mode .settings-group {
+          border-color: #fff; /* 黑暗模式：白色外框 */
+      }
 
-.settings-group h3 {
-    margin-bottom: 15px;
-    color: #333;
-    font-size: 1.2em;
-}
+      .settings-group h3 {
+          margin-bottom: 15px;
+          color: #333;
+          font-size: 1.2em;
+      }
 
-body.dark-mode .settings-group h3 {
-    color: #fff;
-}
+      body.dark-mode .settings-group h3 {
+          color: #fff;
+      }
 
-.setting-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 15px;
-    padding: 10px;
-    background: #f0f0f0; /* 明亮模式使用灰色 */
-    border-radius: 8px;
-}
+      .setting-item {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 15px;
+          padding: 10px;
+          background: #f0f0f0; /* 明亮模式使用灰色 */
+          border-radius: 8px;
+      }
 
-/* 暗色模式下細項顏色保持原設定 */
-body.dark-mode .setting-item {
-    background: #455a64;
-}
+      /* 暗色模式下細項顏色保持原設定 */
+      body.dark-mode .setting-item {
+          background: #455a64;
+      }
 
-.setting-item label {
-    font-size: 1.1em;
-}
+      .setting-item label {
+          font-size: 1.1em;
+      }
 
-/* Styles for external links in central settings panel */
-#centralSettingsPanel .github-link {
-    color: #007BFF; /* Light blue for light mode */
-    text-decoration: none; /* Remove underline */
-    display: flex; /* Use flexbox for alignment */
-    align-items: center; /* Vertically align items */
-    width: 100%; /* Take full width of parent */
-}
+      /* Styles for external links in central settings panel */
+      #centralSettingsPanel .github-link {
+          color: #007BFF; /* Light blue for light mode */
+          text-decoration: none; /* Remove underline */
+          display: flex; /* Use flexbox for alignment */
+          align-items: center; /* Vertically align items */
+          width: 100%; /* Take full width of parent */
+      }
 
-body.dark-mode #centralSettingsPanel .github-link {
-    color: #90CAF9; /* Light blue for dark mode */
-}
+      body.dark-mode #centralSettingsPanel .github-link {
+          color: #90CAF9; /* Light blue for dark mode */
+      }
 
-#centralSettingsPanel .github-link:visited {
-    color: #007BFF; /* Keep same color after visited in light mode */
-}
+      #centralSettingsPanel .github-link:visited {
+          color: #007BFF; /* Keep same color after visited in light mode */
+      }
 
-body.dark-mode #centralSettingsPanel .github-link:visited {
-    color: #90CAF9; /* Keep same color after visited in dark mode */
-}
+      body.dark-mode #centralSettingsPanel .github-link:visited {
+          color: #90CAF9; /* Keep same color after visited in dark mode */
+      }
 
-#centralSettingsPanel .github-link:hover {
-    color: #0056b3; /* Slightly darker blue on hover in light mode */
-}
+      #centralSettingsPanel .github-link:hover {
+          color: #0056b3; /* Slightly darker blue on hover in light mode */
+      }
 
-body.dark-mode #centralSettingsPanel .github-link:hover {
-    color: #BBDEFB; /* Slightly lighter blue on hover in dark mode */
-}
+      body.dark-mode #centralSettingsPanel .github-link:hover {
+          color: #BBDEFB; /* Slightly lighter blue on hover in dark mode */
+      }
 
-#centralSettingsPanel .github-link span {
-    margin-left: 10px; /* Add some spacing between image and text */
-}
+      #centralSettingsPanel .github-link span {
+          margin-left: 10px; /* Add some spacing between image and text */
+      }
 
 
-#closeCentralSettings {
-    position: absolute;
-    top: 2vh;   /* 增加上間距 */
-    right: 2vh; /* 增加右間距 */
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: #666;
-    padding: 8px;  /* 增加內間距 */
-    border-radius: 50%;  /* 新增圓形邊框 */
-    width: 40px;   /* 固定寬度 */
-    height: 40px;  /* 固定高度 */
-    display: flex;  /* 使用 flex 置中 */
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.3s;  /* 新增過渡效果 */
-}
+      #closeCentralSettings {
+          position: absolute;
+          top: 2vh;   /* 增加上間距 */
+          right: 2vh; /* 增加右間距 */
+          background: none;
+          border: none;
+          font-size: 24px;
+          cursor: pointer;
+          color: #666;
+          padding: 8px;  /* 增加內間距 */
+          border-radius: 50%;  /* 新增圓形邊框 */
+          width: 40px;   /* 固定寬度 */
+          height: 40px;  /* 固定高度 */
+          display: flex;  /* 使用 flex 置中 */
+          align-items: center;
+          justify-content: center;
+          transition: background-color 0.3s;  /* 新增過渡效果 */
+      }
 
-#closeCentralSettings:hover {
-    background-color: rgba(0, 0, 0, 0.1);  /* 新增懸停效果 */
-}
+      #closeCentralSettings:hover {
+          background-color: rgba(0, 0, 0, 0.1);  /* 新增懸停效果 */
+      }
 
-body.dark-mode #closeCentralSettings {
-    color: #fff;
-}
+      body.dark-mode #closeCentralSettings {
+          color: #fff;
+      }
 
-body.dark-mode #closeCentralSettings:hover {
-    background-color: rgba(255, 255, 255, 0.1);  /* 暗色模式懸停效果 */
-}
+      body.dark-mode #closeCentralSettings:hover {
+          background-color: rgba(255, 255, 255, 0.1);  /* 暗色模式懸停效果 */
+      }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translate(-50%, -48%); }
-    to { opacity: 1; transform: translate(-50%, -50%); }
-}
+      @keyframes fadeIn {
+          from { opacity: 0; transform: translate(-50%, -48%); }
+          to { opacity: 1; transform: translate(-50%, -50%); }
+      }
     </style>
   </head>
   <body>
@@ -1037,7 +1031,6 @@ body.dark-mode #closeCentralSettings:hover {
       <div id="searchContainer">
         <input type="text" id="keyword" placeholder="請輸入站點名稱、地址" value="" />
         <span id="searchIcon" class="material-icons" title="搜尋">search</span>
-        <!-- 新增：當輸入有文字時出現清除按鈕 -->
         <span id="clearTextBtn" class="material-icons" title="清除" style="display:none; margin-left:10px; cursor:pointer;">close</span>
       </div>
       <div id="results"></div>
@@ -1077,50 +1070,50 @@ body.dark-mode #closeCentralSettings:hover {
     <div id="floatingCard"></div>
     <button id="updateCountdown" style="display:none; position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; padding: 6px 12px; background-color: white; color: #007bff; border: 2px solid #007bff; border-radius: 25px; font-size: 0.8em; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: all 0.3s ease; width: 100px;">60秒後更新</button>
     <div id="centralSettingsPanel">
-    <button id="closeCentralSettings">×</button>
-    <h2 id="settingsPanelTitle">系統設定</h2>
-    
-    <div class="settings-group">
-        <h3>基本設定</h3>
-        <div class="setting-item">
-            <label for="centralLocationToggle">位置服務</label>
-            <label class="switch">
-                <input type="checkbox" id="centralLocationToggle">
-                <span class="slider"></span>
-            </label>
-        </div>
-        <div class="setting-item">
-            <label for="centralDarkModeToggle">深色模式</label>
-            <label class="switch">
-                <input type="checkbox" id="centralDarkModeToggle">
-                <span class="slider"></span>
-            </label>
-        </div>
-        <div class="setting-item">
-            <label for="centralLangToggle">中文/English</label>
-            <label class="switch">
-                <input type="checkbox" id="centralLangToggle">
-                <span class="slider"></span>
-            </label>
-        </div>
-    </div>
+      <button id="closeCentralSettings">×</button>
+      <h2 id="settingsPanelTitle">系統設定</h2>
+      
+      <div class="settings-group">
+          <h3>基本設定</h3>
+          <div class="setting-item">
+              <label for="centralLocationToggle">位置服務</label>
+              <label class="switch">
+                  <input type="checkbox" id="centralLocationToggle">
+                  <span class="slider"></span>
+              </label>
+          </div>
+          <div class="setting-item">
+              <label for="centralDarkModeToggle">深色模式</label>
+              <label class="switch">
+                  <input type="checkbox" id="centralDarkModeToggle">
+                  <span class="slider"></span>
+              </label>
+          </div>
+          <div class="setting-item">
+              <label for="centralLangToggle">中文/English</label>
+              <label class="switch">
+                  <input type="checkbox" id="centralLangToggle">
+                  <span class="slider"></span>
+              </label>
+          </div>
+      </div>
 
-    <div class="settings-group">
-        <h3>外部連結</h3>
-        <div class="setting-item">
-            <a href="https://github.com/potatosserver/YouBike" target="_blank" class="github-link">
-                <img src="https://potatosserver.github.io/YouBike/icons/html.webp" alt="HTML Repo" style="width:30px; height:30px;">
-                <span>YouBike HTML</span>
-            </a>
-        </div>
-        <div class="setting-item">
-            <a href="https://github.com/potatosserver/YouBike_Python" target="_blank" class="github-link">
-                <img src="https://potatosserver.github.io/YouBike/icons/python.webp" alt="Python Repo" style="width:30px; height:30px;">
-                <span>YouBike Python</span>
-            </a>
-        </div>
+      <div class="settings-group">
+          <h3>外部連結</h3>
+          <div class="setting-item">
+              <a href="https://github.com/potatosserver/YouBike" target="_blank" class="github-link">
+                  <img src="https://potatosserver.github.io/YouBike/icons/html.webp" alt="HTML Repo" style="width:30px; height:30px;">
+                  <span>YouBike HTML</span>
+              </a>
+          </div>
+          <div class="setting-item">
+              <a href="https://github.com/potatosserver/YouBike_Python" target="_blank" class="github-link">
+                  <img src="https://potatosserver.github.io/YouBike/icons/python.webp" alt="Python Repo" style="width:30px; height:30px;">
+                  <span>YouBike Python</span>
+              </a>
+          </div>
+      </div>
     </div>
-</div>
     <script>
       // 新增全域變數
       let leafletMap, markerClusterGroup, tileLayer;
@@ -1157,7 +1150,6 @@ body.dark-mode #closeCentralSettings:hover {
       const maxResults = 100;
       const defaultSearchArea = "";
       const pinnedStations = new Set(JSON.parse(localStorage.getItem('pinnedStations') || '[]').map(id => String(id)));
-      // 移除 useLocationSetting 相關代碼
       const useLocation = true; // 直接設定為 true
       
       function togglePinStation(stationId, event) {
@@ -1259,593 +1251,593 @@ body.dark-mode #closeCentralSettings:hover {
       let youbikeDataCache = null;
 
       // IndexedDB 操作函數
-function openYoubikeDB() {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('YouBikeDB', 1);
-    request.onupgradeneeded = function(event) {
-      const db = event.target.result;
-      if (!db.objectStoreNames.contains('youbikeData')) {
-        db.createObjectStore('youbikeData', { keyPath: 'id' });
-      }
-    };
-    request.onsuccess = function(event) {
-      resolve(event.target.result);
-    };
-    request.onerror = function(event) {
-      reject(event.target.error);
-    };
-  });
-}
-
-function saveYoubikeDataToDB(dataArray) {
-  return openYoubikeDB().then(db => {
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction('youbikeData', 'readwrite');
-      const store = tx.objectStore('youbikeData');
-      store.clear();
-      dataArray.forEach((item, idx) => {
-        store.put({ id: idx, value: item });
-      });
-      tx.oncomplete = () => resolve();
-      tx.onerror = (e) => reject(e.target.error);
-    });
-  });
-}
-
-function getYoubikeDataFromDB() {
-  return openYoubikeDB().then(db => {
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction('youbikeData', 'readonly');
-      const store = tx.objectStore('youbikeData');
-      const data = [];
-      const req = store.openCursor();
-      req.onsuccess = function(event) {
-        const cursor = event.target.result;
-        if (cursor) {
-          data.push(cursor.value.value);
-          cursor.continue();
-        } else {
-          resolve(data);
-        }
-      };
-      req.onerror = (e) => reject(e.target.error);
-    });
-  });
-}
-
-// 修改 searchYouBike 函數開始部分
-async function searchYouBike(showLoadingIndicator = true, shouldMoveMap = false) {
-  if (showLoadingIndicator) showLoading();
-  const keyword = keywordInput.value.trim().toLowerCase();
-  try {
-    if (!youbikeDataCache) {
-      if (navigator.onLine) {
-        try {
-          const youbikeUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
-          const response = await fetch(youbikeUrl, {
-            headers: {
-              'accept': '*/*',
-              'accept-language': 'zh-TW,zh;q=0.9',
+      function openYoubikeDB() {
+        return new Promise((resolve, reject) => {
+          const request = indexedDB.open('YouBikeDB', 1);
+          request.onupgradeneeded = function(event) {
+            const db = event.target.result;
+            if (!db.objectStoreNames.contains('youbikeData')) {
+              db.createObjectStore('youbikeData', { keyPath: 'id' });
             }
-          });
-          if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-          const youbikeData = await response.json();
-          youbikeDataCache = Array.isArray(youbikeData)
-            ? youbikeData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
-            : [];
-          await saveYoubikeDataToDB(youbikeDataCache);
-        } catch (error) {
-          console.warn('Failed to fetch online data, trying IndexedDB:', error);
-          youbikeDataCache = await getYoubikeDataFromDB();
-        }
-      } else {
-        youbikeDataCache = await getYoubikeDataFromDB();
-        showNotification(currentLang === "en" 
-          ? "Offline mode: Using cached data" 
-          : "離線模式：使用快取資料");
-      }
-    }
-    let youbikeResults = youbikeDataCache;
-    if (keyword) {
-      youbikeResults = youbikeResults.filter(station => {
-        const stationNameTW = station.name_tw ? station.name_tw.toLowerCase() : '';
-        const stationAddressTW = station.address_tw ? station.address_tw.toLowerCase() : '';
-        const stationNameEN = station.name_en ? station.name_en.toLowerCase() : '';
-        const stationAddressEN = station.address_en ? station.address_en.toLowerCase() : '';
-        return stationNameTW.includes(keyword) || stationAddressTW.includes(keyword) ||
-               stationNameEN.includes(keyword) || stationAddressEN.includes(keyword);
-      });
-    }
-    youbikeResults = youbikeResults.sort((a, b) => {
-      const distA = calculateDistance(
-        userLocation ? userLocation.latitude : defaultLatitude,
-        userLocation ? userLocation.longitude : defaultLongitude,
-        a.lat, a.lng
-      );
-      const distB = calculateDistance(
-        userLocation ? userLocation.latitude : defaultLatitude,
-        userLocation ? userLocation.longitude : defaultLongitude,
-        b.lat, b.lng
-      );
-      return distA - distB;
-    });
-    let limit = keyword ? 50 : 20;
-    let usedStations;
-    if (!keyword) {
-      const pinnedFromLocal = youbikeResults.filter(station => pinnedStations.has(String(station.station_no)));
-      const unpinned = youbikeResults.filter(station => !pinnedStations.has(String(station.station_no)));
-      pinnedFromLocal.sort((a, b) => {
-        const distA = calculateDistance(
-          userLocation ? userLocation.latitude : defaultLatitude,
-          userLocation ? userLocation.longitude : defaultLongitude,
-          a.lat, a.lng
-        );
-        const distB = calculateDistance(
-          userLocation ? userLocation.latitude : defaultLatitude,
-          userLocation ? userLocation.longitude : defaultLongitude,
-          b.lat, b.lng
-        );
-        return distA - distB;
-      });
-      unpinned.sort((a, b) => {
-        const distA = calculateDistance(
-          userLocation ? userLocation.latitude : defaultLatitude,
-          userLocation ? userLocation.longitude : defaultLongitude,
-          a.lat, a.lng
-        );
-        const distB = calculateDistance(
-          userLocation ? userLocation.latitude : defaultLatitude,
-          userLocation ? userLocation.longitude : defaultLongitude,
-          b.lat, b.lng
-        );
-        return distA - distB;
-      });
-      usedStations = [...pinnedFromLocal, ...unpinned].slice(0, limit);
-    } else {
-      usedStations = youbikeResults.slice(0, limit);
-      const pinnedList = usedStations.filter(station => pinnedStations.has(String(station.station_no)));
-      const nonPinnedList = usedStations.filter(station => !pinnedStations.has(String(station.station_no)));
-      pinnedList.sort((a, b) => {
-        const distA = calculateDistance(
-          userLocation ? userLocation.latitude : defaultLatitude,
-          userLocation ? userLocation.longitude : defaultLongitude,
-          a.lat, a.lng
-        );
-        const distB = calculateDistance(
-          userLocation ? userLocation.latitude : defaultLatitude,
-          userLocation ? userLocation.longitude : defaultLongitude,
-          b.lat, b.lng
-        );
-        return distA - distB;
-      });
-      nonPinnedList.sort((a, b) => {
-        const distA = calculateDistance(
-          userLocation ? userLocation.latitude : defaultLatitude,
-          userLocation ? userLocation.longitude : defaultLongitude,
-          a.lat, a.lng
-        );
-        const distB = calculateDistance(
-          userLocation ? userLocation.latitude : defaultLatitude,
-          userLocation ? userLocation.longitude : defaultLongitude,
-          b.lat, b.lng
-        );
-        return distA - distB;
-      });
-      usedStations = [...pinnedList, ...nonPinnedList];
-    }
-    const isOnline = navigator.onLine;
-    let vehData = {};
-    const stationIds = usedStations.map(station => String(station.station_no));
-    if (isOnline) {
-      vehData = await queryVehicleData(stationIds);
-    }
-    const organizedOutput = usedStations.map(site => {
-      const info = {
-        id: String(site.station_no),
-        name: currentLang === "en" ? site.name_en : site.name_tw,
-        coords: [site.lat, site.lng],
-        district: currentLang === "en" ? site.district_en : site.district_tw,
-        address: currentLang === "en" ? site.address_en : site.address_tw
-      };
-      const vehicle = isOnline ? (Object.entries(vehData).find(([key]) => key === info.id)?.[1] || {}) : {};
-      return { station_info: info, vehicle_info: vehicle };
-    });
-    organizedOutput.forEach(item => {
-      const station = item.station_info;
-      const vehicle = item.vehicle_info;
-      let card = document.querySelector(`.station[data-id="${station.id}"]`);
-
-      const isPinned = pinnedStations.has(String(station.id));
-      const pinButtonHtml = `<span
-        class="pin-button ${isPinned ? 'pinned' : ''}"
-        data-id="${station.id}"
-        onclick="togglePinStation('${station.id}', event)"
-      >${isPinned ? '★' : '☆'}</span>`;
-      const distance = calculateDistance(
-        userLocation ? userLocation.latitude : defaultLatitude,
-        userLocation ? userLocation.longitude : defaultLongitude,
-        station.coords[0],
-        station.coords[1]
-      );
-      const displayDistance = distance < 1 ? Math.round(distance * 1000) + (currentLang === "en" ? " m" : " 公尺")
-                                           : distance.toFixed(2) + (currentLang === "en" ? " km" : " 公里");
-      const distanceLabel = currentLang === "en" ? "Distance:" : "距離:";
-      const addressLabel = currentLang === "en" ? "Address:" : "地址:";
-      const slotsLabel = currentLang === "en" ? "Available Slots:" : "可停空位數:";
-      const unknownStation = currentLang === "en" ? "Unknown Station" : "未知站點";
-      const unknownAddress = currentLang === "en" ? "Unknown Address" : "未知地址";
-      const unknownValue = currentLang === "en" ? "Unknown" : "未知";
-      const vehicleInfoHtml = isOnline ? `
-                    <p>YouBike 2.0: <span class="vehicle_yb2">${vehicle?.available_2_0 !== undefined ? vehicle.available_2_0 : unknownValue}</span></p>
-                    <p>YouBike 2.0E: <span class="vehicle_ybe">${vehicle?.available_e !== undefined ? vehicle.available_e : unknownValue}</span></p>
-                    <p>${slotsLabel} <span class="vehicle_empty">${vehicle?.empty_spaces !== undefined ? vehicle.empty_spaces : unknownValue}</span></p>
-                  ` : '';
-      const isDefaultLocation = userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude;
-      const distanceHTML = !isDefaultLocation ? `<p class="distance">${distanceLabel} ${displayDistance}</p>` : "";
-      const cardContent = `
-                    ${pinButtonHtml}
-                    <h3>${station.name || unknownStation}</h3>
-                    ${distanceHTML}
-                    <p>${addressLabel} ${station.address || unknownAddress}</p>
-                    ${vehicleInfoHtml}
-                `;
-      if (card) {
-        card.innerHTML = cardContent;
-        card.dataset.lat = station.coords[0];
-        card.dataset.lng = station.coords[1];
-        card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
-      } else {
-        card = document.createElement('div');
-        card.className = 'station';
-        card.dataset.id = station.id;
-        card.dataset.lat = station.coords[0];
-        card.dataset.lng = station.coords[1];
-        card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
-        card.innerHTML = cardContent;
-        card.addEventListener("click", () => {
-          const lat = parseFloat(station.coords[0]), lng = parseFloat(station.coords[1]);
-          if (!isNaN(lat) && !isNaN(lng)) {
-            window.open(`https://www.google.com/maps?q=${lat},${lng}`, "_blank");
-          } else {
-            showModal(currentLang === "en" ? "Invalid station coordinates, cannot open map." : "站點座標無效，無法開啟地圖。");
-          }
-        });
-        resultsDiv.appendChild(card);
-      }
-    });
-    const validIds = organizedOutput.map(item => item.station_info.id);
-    Array.from(resultsDiv.children).forEach(card => {
-      if (!validIds.includes(card.dataset.id)) {
-        resultsDiv.removeChild(card);
-      }
-    });          updateResultsOrder();
-    await new Promise(resolve => setTimeout(resolve, 0));
-
-    // 找到搜尋結果中距離最近的站點（已按距離排序）
-    const stationCards = document.querySelectorAll('.station');
-    if (stationCards.length > 0 && shouldMoveMap) {  // 加入 shouldMoveMap 條件檢查
-      let nearestStation = null;
-      let minDistance = Infinity;
-      
-      stationCards.forEach(card => {
-        const lat = parseFloat(card.dataset.lat);
-        const lng = parseFloat(card.dataset.lng);
-        const distance = calculateDistance(
-          userLocation ? userLocation.latitude : defaultLatitude,
-          userLocation ? userLocation.longitude : defaultLongitude,
-          lat,
-          lng
-        );
-        
-        if (distance < minDistance) {
-          minDistance = distance;
-          nearestStation = card;
-        }
-      });
-
-      if (nearestStation) {
-        const lat = parseFloat(nearestStation.dataset.lat);
-        const lng = parseFloat(nearestStation.dataset.lng);
-        if (!isNaN(lat) && !isNaN(lng) && leafletMap) {
-          leafletMap.setView([lat, lng], 18, { // 由16變更為18
-            animate: true,
-            duration: 1
-          });
-        }
-      }
-    }
-
-    // 更新地圖釘標但不移動視圖
-    updateMapMarkers();
-
-    dataLoaded = true;
-    if (showLoadingIndicator) {
-      showMainContent();
-    }
-  } catch (error) {
-    console.error("Fetch error:", error);
-    resultsDiv.innerHTML = `發生錯誤: ${error.message}`;
-  } finally {
-    if (showLoadingIndicator) hideLoading();
-  }
-}
-async function queryVehicleData(stationIds) {
-  if (stationIds.length > 60) {
-    stationIds = stationIds.slice(0, 60);
-  }
-  const batchSize = 20;
-  const allVehicleData = {};
-  const headers = {
-    'Accept': '*/*',
-    'Content-Type': 'application/json',
-    'Origin': 'https://www.youbike.com.tw',
-    'Referer': 'https://www.youbike.com.tw/'
-  };
-  for (let i = 0; i < stationIds.length; i += batchSize) {
-    const stationIdBatch = stationIds.slice(i, i + batchSize);
-    const body = JSON.stringify({ station_no: stationIdBatch });
-    try {
-      const response = await fetch('https://apis.youbike.com.tw/tw2/parkingInfo', {
-        method: 'POST',
-        headers,
-        body
-      });
-      const result = await response.json();
-      if (result.retCode === 1 && result.retVal && result.retVal.data) {
-        const dataArray = result.retVal.data;
-        dataArray.forEach(item => {
-          allVehicleData[item.station_no] = {
-            available_2_0: item.available_spaces_detail ? item.available_spaces_detail.yb2 : 0,
-            available_e: item.available_spaces_detail ? item.available_spaces_detail.eyb : 0,
-            empty_spaces: item.empty_spaces || 0
+          };
+          request.onsuccess = function(event) {
+            resolve(event.target.result);
+          };
+          request.onerror = function(event) {
+            reject(event.target.error);
           };
         });
-      } else {
-        console.error("API 請求失敗:", result.retMsg);
       }
-    } catch (e) {
-      console.error(e);
-    }
-  }
-  return allVehicleData;
-}
-function updateResultsOrder() {
-  const cards = Array.from(document.querySelectorAll(".station"));
-  cards.sort((a, b) => {
-    const aPinned = pinnedStations.has(a.dataset.id);
-    const bPinned = pinnedStations.has(b.dataset.id);
-    if (aPinned && !bPinned) return -1;
-    if (!aPinned && bPinned) return 1;
-    const distanceA = calculateDistance(
-      userLocation ? userLocation.latitude : defaultLatitude,
-      userLocation ? userLocation.longitude : defaultLongitude,
-      parseFloat(a.dataset.lat),
-      parseFloat(a.dataset.lng)
-    );
-    const distanceB = calculateDistance(
-      userLocation ? userLocation.latitude : defaultLatitude,
-      userLocation ? userLocation.longitude : defaultLongitude,
-      parseFloat(b.dataset.lat),
-      parseFloat(b.dataset.lng)
-    );
-    return distanceA - distanceB;
-  });
-  cards.forEach(card => {
-    resultsDiv.appendChild(card);
-  });
-}
-function showLoading() {
-  loadingDiv.classList.add('show');
-}
-function hideLoading() {
-  loadingDiv.classList.remove('show');
-}
-function showNotification(message) {
-    // 將提示轉換成右上角顯示的通知
-    const notification = document.getElementById('locationNotification');
-    notification.textContent = message;
-    notification.classList.add('show');
-    setTimeout(() => {
-       notification.classList.remove('show');
-    }, 5000);
-}
 
-function hideModal() {
-    // 不再使用 modal 提示，保留空函式
-}
-function calculateDistance(lat1, lon1, lat2, lon2) {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  return R * c;
-}      async function handleGeolocationSuccess(position) {
-        const wasDefault = !userLocation || (userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude);
-        const isFirstLocation = !locationMarker;  // 使用 locationMarker 來判斷是否為第一次定位
-        
-        userLocation = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        };
-
-        if (leafletMap) {
-          // 建立或更新定位標記
-          if (!locationMarker) {
-            // 第一次定位時建立標記並添加脈衝效果
-            locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
-              radius: 10,
-              fillColor: '#2196F3',
-              fillOpacity: 0.8,
-              color: '#ffffff',
-              weight: 3,
-              pane: 'markerPane'
-            }).addTo(leafletMap);
-
-            // 添加脈衝動畫效果
-            const pulsingIcon = L.divIcon({
-              className: 'pulsing-icon',
-              html: '<div class="pulse"></div>',
-              iconSize: [20, 20]
+      function saveYoubikeDataToDB(dataArray) {
+        return openYoubikeDB().then(db => {
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction('youbikeData', 'readwrite');
+            const store = tx.objectStore('youbikeData');
+            store.clear();
+            dataArray.forEach((item, idx) => {
+              store.put({ id: idx, value: item });
             });
-            
-            L.marker([userLocation.latitude, userLocation.longitude], {
-              icon: pulsingIcon,
-              pane: 'markerPane'
-            }).addTo(leafletMap);
+            tx.oncomplete = () => resolve();
+            tx.onerror = (e) => reject(e.target.error);
+          });
+        });
+      }
 
-            // 第一次定位時移動地圖到使用者位置
-            leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, {
-              animate: true,
-              duration: 1
+      function getYoubikeDataFromDB() {
+        return openYoubikeDB().then(db => {
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction('youbikeData', 'readonly');
+            const store = tx.objectStore('youbikeData');
+            const data = [];
+            const req = store.openCursor();
+            req.onsuccess = function(event) {
+              const cursor = event.target.result;
+              if (cursor) {
+                data.push(cursor.value.value);
+                cursor.continue();
+              } else {
+                resolve(data);
+              }
+            };
+            req.onerror = (e) => reject(e.target.error);
+          });
+        });
+      }
+
+      // 修改 searchYouBike 函數開始部分
+      async function searchYouBike(showLoadingIndicator = true, shouldMoveMap = false) {
+        if (showLoadingIndicator) showLoading();
+        const keyword = keywordInput.value.trim().toLowerCase();
+        try {
+          if (!youbikeDataCache) {
+            if (navigator.onLine) {
+              try {
+                const youbikeUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
+                const response = await fetch(youbikeUrl, {
+                  headers: {
+                    'accept': '*/*',
+                    'accept-language': 'zh-TW,zh;q=0.9',
+                  }
+                });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const youbikeData = await response.json();
+                youbikeDataCache = Array.isArray(youbikeData)
+                  ? youbikeData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
+                  : [];
+                await saveYoubikeDataToDB(youbikeDataCache);
+              } catch (error) {
+                console.warn('Failed to fetch online data, trying IndexedDB:', error);
+                youbikeDataCache = await getYoubikeDataFromDB();
+              }
+            } else {
+              youbikeDataCache = await getYoubikeDataFromDB();
+              showNotification(currentLang === "en" 
+                ? "Offline mode: Using cached data" 
+                : "離線模式：使用快取資料");
+            }
+          }
+          let youbikeResults = youbikeDataCache;
+          if (keyword) {
+            youbikeResults = youbikeResults.filter(station => {
+              const stationNameTW = station.name_tw ? station.name_tw.toLowerCase() : '';
+              const stationAddressTW = station.address_tw ? station.address_tw.toLowerCase() : '';
+              const stationNameEN = station.name_en ? station.name_en.toLowerCase() : '';
+              const stationAddressEN = station.address_en ? station.address_en.toLowerCase() : '';
+              return stationNameTW.includes(keyword) || stationAddressTW.includes(keyword) ||
+                     stationNameEN.includes(keyword) || stationAddressEN.includes(keyword);
             });
+          }
+          youbikeResults = youbikeResults.sort((a, b) => {
+            const distA = calculateDistance(
+              userLocation ? userLocation.latitude : defaultLatitude,
+              userLocation ? userLocation.longitude : defaultLongitude,
+              a.lat, a.lng
+            );
+            const distB = calculateDistance(
+              userLocation ? userLocation.latitude : defaultLatitude,
+              userLocation ? userLocation.longitude : defaultLongitude,
+              b.lat, b.lng
+            );
+            return distA - distB;
+          });
+          let limit = keyword ? 50 : 20;
+          let usedStations;
+          if (!keyword) {
+            const pinnedFromLocal = youbikeResults.filter(station => pinnedStations.has(String(station.station_no)));
+            const unpinned = youbikeResults.filter(station => !pinnedStations.has(String(station.station_no)));
+            pinnedFromLocal.sort((a, b) => {
+              const distA = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                a.lat, a.lng
+              );
+              const distB = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                b.lat, b.lng
+              );
+              return distA - distB;
+            });
+            unpinned.sort((a, b) => {
+              const distA = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                a.lat, a.lng
+              );
+              const distB = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                b.lat, b.lng
+              );
+              return distA - distB;
+            });
+            usedStations = [...pinnedFromLocal, ...unpinned].slice(0, limit);
           } else {
-            // 之後只更新標記位置
-            locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+            usedStations = youbikeResults.slice(0, limit);
+            const pinnedList = usedStations.filter(station => pinnedStations.has(String(station.station_no)));
+            const nonPinnedList = usedStations.filter(station => !pinnedStations.has(String(station.station_no)));
+            pinnedList.sort((a, b) => {
+              const distA = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                a.lat, a.lng
+              );
+              const distB = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                b.lat, b.lng
+              );
+              return distA - distB;
+            });
+            nonPinnedList.sort((a, b) => {
+              const distA = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                a.lat, a.lng
+              );
+              const distB = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                b.lat, b.lng
+              );
+              return distA - distB;
+            });
+            usedStations = [...pinnedList, ...nonPinnedList];
+          }
+          const isOnline = navigator.onLine;
+          let vehData = {};
+          const stationIds = usedStations.map(station => String(station.station_no));
+          if (isOnline) {
+            vehData = await queryVehicleData(stationIds);
+          }
+          const organizedOutput = usedStations.map(site => {
+            const info = {
+              id: String(site.station_no),
+              name: currentLang === "en" ? site.name_en : site.name_tw,
+              coords: [site.lat, site.lng],
+              district: currentLang === "en" ? site.district_en : site.district_tw,
+              address: currentLang === "en" ? site.address_en : site.address_tw
+            };
+            const vehicle = isOnline ? (Object.entries(vehData).find(([key]) => key === info.id)?.[1] || {}) : {};
+            return { station_info: info, vehicle_info: vehicle };
+          });
+          organizedOutput.forEach(item => {
+            const station = item.station_info;
+            const vehicle = item.vehicle_info;
+            let card = document.querySelector(`.station[data-id="${station.id}"]`);
+
+            const isPinned = pinnedStations.has(String(station.id));
+            const pinButtonHtml = `<span
+              class="pin-button ${isPinned ? 'pinned' : ''}"
+              data-id="${station.id}"
+              onclick="togglePinStation('${station.id}', event)"
+            >${isPinned ? '★' : '☆'}</span>`;
+            const distance = calculateDistance(
+              userLocation ? userLocation.latitude : defaultLatitude,
+              userLocation ? userLocation.longitude : defaultLongitude,
+              station.coords[0],
+              station.coords[1]
+            );
+            const displayDistance = distance < 1 ? Math.round(distance * 1000) + (currentLang === "en" ? " m" : " 公尺")
+                                             : distance.toFixed(2) + (currentLang === "en" ? " km" : " 公里");
+            const distanceLabel = currentLang === "en" ? "Distance:" : "距離:";
+            const addressLabel = currentLang === "en" ? "Address:" : "地址:";
+            const slotsLabel = currentLang === "en" ? "Available Slots:" : "可停空位數:";
+            const unknownStation = currentLang === "en" ? "Unknown Station" : "未知站點";
+            const unknownAddress = currentLang === "en" ? "Unknown Address" : "未知地址";
+            const unknownValue = currentLang === "en" ? "Unknown" : "未知";
+            const vehicleInfoHtml = isOnline ? `
+                      <p>YouBike 2.0: <span class="vehicle_yb2">${vehicle?.available_2_0 !== undefined ? vehicle.available_2_0 : unknownValue}</span></p>
+                      <p>YouBike 2.0E: <span class="vehicle_ybe">${vehicle?.available_e !== undefined ? vehicle.available_e : unknownValue}</span></p>
+                      <p>${slotsLabel} <span class="vehicle_empty">${vehicle?.empty_spaces !== undefined ? vehicle.empty_spaces : unknownValue}</span></p>
+                    ` : '';
+            const isDefaultLocation = userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude;
+            const distanceHTML = !isDefaultLocation ? `<p class="distance">${distanceLabel} ${displayDistance}</p>` : "";
+            const cardContent = `
+                      ${pinButtonHtml}
+                      <h3>${station.name || unknownStation}</h3>
+                      ${distanceHTML}
+                      <p>${addressLabel} ${station.address || unknownAddress}</p>
+                      ${vehicleInfoHtml}
+                  `;
+            if (card) {
+              card.innerHTML = cardContent;
+              card.dataset.lat = station.coords[0];
+              card.dataset.lng = station.coords[1];
+              card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
+            } else {
+              card = document.createElement('div');
+              card.className = 'station';
+              card.dataset.id = station.id;
+              card.dataset.lat = station.coords[0];
+              card.dataset.lng = station.coords[1];
+              card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
+              card.innerHTML = cardContent;
+              card.addEventListener("click", () => {
+                const lat = parseFloat(station.coords[0]), lng = parseFloat(station.coords[1]);
+                if (!isNaN(lat) && !isNaN(lng)) {
+                  window.open(`https://www.google.com/maps?q=${lat},${lng}`, "_blank");
+                } else {
+                  showModal(currentLang === "en" ? "Invalid station coordinates, cannot open map." : "站點座標無效，無法開啟地圖。");
+                }
+              });
+              resultsDiv.appendChild(card);
+            }
+          });
+          const validIds = organizedOutput.map(item => item.station_info.id);
+          Array.from(resultsDiv.children).forEach(card => {
+            if (!validIds.includes(card.dataset.id)) {
+              resultsDiv.removeChild(card);
+            }
+          });          updateResultsOrder();
+          await new Promise(resolve => setTimeout(resolve, 0));
+
+          // 找到搜尋結果中距離最近的站點（已按距離排序）
+          const stationCards = document.querySelectorAll('.station');
+          if (stationCards.length > 0 && shouldMoveMap) {  // 加入 shouldMoveMap 條件檢查
+            let nearestStation = null;
+            let minDistance = Infinity;
+            
+            stationCards.forEach(card => {
+              const lat = parseFloat(card.dataset.lat);
+              const lng = parseFloat(card.dataset.lng);
+              const distance = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                lat,
+                lng
+              );
+              
+              if (distance < minDistance) {
+                minDistance = distance;
+                nearestStation = card;
+              }
+            });
+
+            if (nearestStation) {
+              const lat = parseFloat(nearestStation.dataset.lat);
+              const lng = parseFloat(nearestStation.dataset.lng);
+              if (!isNaN(lat) && !isNaN(lng) && leafletMap) {
+                leafletMap.setView([lat, lng], 18, { // 由16變更為18
+                  animate: true,
+                  duration: 1
+                });
+              }
+            }
+          }
+
+          // 更新地圖釘標但不移動視圖
+          updateMapMarkers();
+
+          dataLoaded = true;
+          if (showLoadingIndicator) {
+            showMainContent();
+          }
+        } catch (error) {
+          console.error("Fetch error:", error);
+          resultsDiv.innerHTML = `發生錯誤: ${error.message}`;
+        } finally {
+          if (showLoadingIndicator) hideLoading();
+        }
+      }
+      async function queryVehicleData(stationIds) {
+        if (stationIds.length > 60) {
+          stationIds = stationIds.slice(0, 60);
+        }
+        const batchSize = 20;
+        const allVehicleData = {};
+        const headers = {
+          'Accept': '*/*',
+          'Content-Type': 'application/json',
+          'Origin': 'https://www.youbike.com.tw',
+          'Referer': 'https://www.youbike.com.tw/'
+        };
+        for (let i = 0; i < stationIds.length; i += batchSize) {
+          const stationIdBatch = stationIds.slice(i, i + batchSize);
+          const body = JSON.stringify({ station_no: stationIdBatch });
+          try {
+            const response = await fetch('https://apis.youbike.com.tw/tw2/parkingInfo', {
+              method: 'POST',
+              headers,
+              body
+            });
+            const result = await response.json();
+            if (result.retCode === 1 && result.retVal && result.retVal.data) {
+              const dataArray = result.retVal.data;
+              dataArray.forEach(item => {
+                allVehicleData[item.station_no] = {
+                  available_2_0: item.available_spaces_detail ? item.available_spaces_detail.yb2 : 0,
+                  available_e: item.available_spaces_detail ? item.available_spaces_detail.eyb : 0,
+                  empty_spaces: item.empty_spaces || 0
+                };
+              });
+            } else {
+              console.error("API 請求失敗:", result.retMsg);
+            }
+          } catch (e) {
+            console.error(e);
           }
         }
-        
-        if (wasDefault) {
-          await searchYouBike();
-          updateResultsOrder();
-        } else {
-          updateCardDistances();
-        }
-      }      function handleGeolocationError(error) {
-  console.error("Geolocation error:", error);
-  locationDenied = true;
-  let errorMessage = "";
-  let errorType = "";
-  let shouldDisableLocationToggle = false; // 新增變數控制是否要關閉開關
-  
-  switch (error.code) {
-    case error.PERMISSION_DENIED:
-      errorMessage = currentLang === "en"
-        ? "Location permission denied. The app needs location permission to show nearby stations."
-        : "您尚未提供定位權限。需要定位權限才能顯示附近站點。";
-      errorType = "permission";
-      shouldDisableLocationToggle = true; // 權限被拒絕時關閉開關
-      break;
-    case error.POSITION_UNAVAILABLE:
-      errorMessage = currentLang === "en"
-        ? "Your device doesn't support or has disabled location services. Please check your device settings."
-        : "您的裝置不支援或已停用定位服務，請檢查裝置設定。";
-      errorType = "unavailable";
-      shouldDisableLocationToggle = true; // 不支援定位時關閉開關
-      break;
-    case error.TIMEOUT:
-      errorMessage = currentLang === "en"
-        ? "Location request timed out. Please check your internet connection and try again."
-        : "定位請求逾時，請檢查網路連線後再試一次。";
-      errorType = "timeout";
-      shouldDisableLocationToggle = false; // 定位逾時時保持開關狀態
-      break;
-    default:
-      errorMessage = currentLang === "en"
-        ? "Unable to get location. Please check your device settings."
-        : "無法取得位置資訊，請檢查裝置設定。";
-      errorType = "unknown";
-      shouldDisableLocationToggle = true;
-  }
+        return allVehicleData;
+      }
+      function updateResultsOrder() {
+        const cards = Array.from(document.querySelectorAll(".station"));
+        cards.sort((a, b) => {
+          const aPinned = pinnedStations.has(a.dataset.id);
+          const bPinned = pinnedStations.has(b.dataset.id);
+          if (aPinned && !bPinned) return -1;
+          if (!aPinned && bPinned) return 1;
+          const distanceA = calculateDistance(
+            userLocation ? userLocation.latitude : defaultLatitude,
+            userLocation ? userLocation.longitude : defaultLongitude,
+            parseFloat(a.dataset.lat),
+            parseFloat(a.dataset.lng)
+          );
+          const distanceB = calculateDistance(
+            userLocation ? userLocation.latitude : defaultLatitude,
+            userLocation ? userLocation.longitude : defaultLongitude,
+            parseFloat(b.dataset.lat),
+            parseFloat(b.dataset.lng)
+          );
+          return distanceA - distanceB;
+        });
+        cards.forEach(card => {
+          resultsDiv.appendChild(card);
+        });
+      }
+      function showLoading() {
+        loadingDiv.classList.add('show');
+      }
+      function hideLoading() {
+        loadingDiv.classList.remove('show');
+      }
+      function showNotification(message) {
+          // 將提示轉換成右上角顯示的通知
+          const notification = document.getElementById('locationNotification');
+          notification.textContent = message;
+          notification.classList.add('show');
+          setTimeout(() => {
+            notification.classList.remove('show');
+          }, 5000);
+      }
 
-  // 更新中央設定面板的定位開關
-  const centralLocationToggle = document.getElementById('centralLocationToggle');
-  if (shouldDisableLocationToggle && centralLocationToggle) {
-    centralLocationToggle.checked = false;
-    localStorage.setItem("useLocation", "false");
-  }
+      function hideModal() {
+          // 不再使用 modal 提示，保留空函式
+      }
+      function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+      }      async function handleGeolocationSuccess(position) {
+          const wasDefault = !userLocation || (userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude);
+          const isFirstLocation = !locationMarker;  // 使用 locationMarker 來判斷是否為第一次定位
+          
+          userLocation = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          };
 
-  // 如果定位開關關閉，移除定位標記
-  if (!centralLocationToggle?.checked && locationMarker) {
-    locationMarker.remove();
-    locationMarker = null;
-  }
+          if (leafletMap) {
+            // 建立或更新定位標記
+            if (!locationMarker) {
+              // 第一次定位時建立標記並添加脈衝效果
+              locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
+                radius: 10,
+                fillColor: '#2196F3',
+                fillOpacity: 0.8,
+                color: '#ffffff',
+                weight: 3,
+                pane: 'markerPane'
+              }).addTo(leafletMap);
 
-  // 只在第一次顯示錯誤提示
-  if (!hasShownDefaultLocationMessage) {
-    const notification = document.getElementById('locationNotification');
-    
-    // 根據錯誤類型設定不同的背景顏色
-    switch (errorType) {
-      case "permission":
-        notification.style.backgroundColor = "rgba(244, 67, 54, 0.9)"; // 紅色
-        break;
-      case "unavailable":
-        notification.style.backgroundColor = "rgba(255, 152, 0, 0.9)"; // 橙色
-        break;
-      case "timeout":
-        notification.style.backgroundColor = "rgba(255, 193, 7, 0.9)"; // 黃色
-        break;
-      default:
-        notification.style.backgroundColor = "rgba(158, 158, 158, 0.9)"; // 灰色 
-    }
-    
-    notification.textContent = errorMessage;
-    notification.classList.add('show');
-    
-    setTimeout(() => {
-      notification.classList.add('hide');
-      setTimeout(() => {
-        notification.classList.remove('show', 'hide');
-        // 重置通知顏色
-        notification.style.backgroundColor = "";
-      }, 300);
-    }, 5000); // 延長顯示時間到 5 秒
+              // 添加脈衝動畫效果
+              const pulsingIcon = L.divIcon({
+                className: 'pulsing-icon',
+                html: '<div class="pulse"></div>',
+                iconSize: [20, 20]
+              });
+              
+              L.marker([userLocation.latitude, userLocation.longitude], {
+                icon: pulsingIcon,
+                pane: 'markerPane'
+              }).addTo(leafletMap);
 
-    hasShownDefaultLocationMessage = true;
-  }
-
-  userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-  if (!shouldDisableLocationToggle) {
-    searchYouBike();
-  }
-}      function handleGeoUpdateSuccess(position) {
-        // 檢查定位開關是否開啟
-        const centralLocationToggle = document.getElementById('centralLocationToggle');
-        if (!centralLocationToggle?.checked) {
-          return; // 如果開關關閉，不處理定位更新
-        }
-        
-        const wasDefault = userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude;
-        userLocation = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        };
-        
-        // 更新位置標記
-        if (locationMarker) {
-          locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
-        }
-        
-        if (wasDefault) {
-          searchYouBike().then(() => {
+              // 第一次定位時移動地圖到使用者位置
+              leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, {
+                animate: true,
+                duration: 1
+              });
+            } else {
+              // 之後只更新標記位置
+              locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+            }
+          }
+          
+          if (wasDefault) {
+            await searchYouBike();
             updateResultsOrder();
-          });
-        } else {
-          updateCardDistances();
+          } else {
+            updateCardDistances();
+          }
+      }      function handleGeolocationError(error) {
+        console.error("Geolocation error:", error);
+        locationDenied = true;
+        let errorMessage = "";
+        let errorType = "";
+        let shouldDisableLocationToggle = false; // 新增變數控制是否要關閉開關
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = currentLang === "en"
+              ? "Location permission denied. The app needs location permission to show nearby stations."
+              : "您尚未提供定位權限。需要定位權限才能顯示附近站點。";
+            errorType = "permission";
+            shouldDisableLocationToggle = true; // 權限被拒絕時關閉開關
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = currentLang === "en"
+              ? "Your device doesn't support or has disabled location services. Please check your device settings."
+              : "您的裝置不支援或已停用定位服務，請檢查裝置設定。";
+            errorType = "unavailable";
+            shouldDisableLocationToggle = true; // 不支援定位時關閉開關
+            break;
+          case error.TIMEOUT:
+            errorMessage = currentLang === "en"
+              ? "Location request timed out. Please check your internet connection and try again."
+              : "定位請求逾時，請檢查網路連線後再試一次。";
+            errorType = "timeout";
+            shouldDisableLocationToggle = false; // 定位逾時時保持開關狀態
+            break;
+          default:
+            errorMessage = currentLang === "en"
+              ? "Unable to get location. Please check your device settings."
+              : "無法取得位置資訊，請檢查裝置設定。";
+            errorType = "unknown";
+            shouldDisableLocationToggle = true;
         }
+
+        // 更新中央設定面板的定位開關
+        const centralLocationToggle = document.getElementById('centralLocationToggle');
+        if (shouldDisableLocationToggle && centralLocationToggle) {
+          centralLocationToggle.checked = false;
+          localStorage.setItem("useLocation", "false");
+        }
+
+        // 如果定位開關關閉，移除定位標記
+        if (!centralLocationToggle?.checked && locationMarker) {
+          locationMarker.remove();
+          locationMarker = null;
+        }
+
+        // 只在第一次顯示錯誤提示
+        if (!hasShownDefaultLocationMessage) {
+          const notification = document.getElementById('locationNotification');
+          
+          // 根據錯誤類型設定不同的背景顏色
+          switch (errorType) {
+            case "permission":
+              notification.style.backgroundColor = "rgba(244, 67, 54, 0.9)"; // 紅色
+              break;
+            case "unavailable":
+              notification.style.backgroundColor = "rgba(255, 152, 0, 0.9)"; // 橙色
+              break;
+            case "timeout":
+              notification.style.backgroundColor = "rgba(255, 193, 7, 0.9)"; // 黃色
+              break;
+            default:
+              notification.style.backgroundColor = "rgba(158, 158, 158, 0.9)"; // 灰色 
+          }
+          
+          notification.textContent = errorMessage;
+          notification.classList.add('show');
+          
+          setTimeout(() => {
+            notification.classList.add('hide');
+            setTimeout(() => {
+              notification.classList.remove('show', 'hide');
+              // 重置通知顏色
+              notification.style.backgroundColor = "";
+            }, 300);
+          }, 5000); // 延長顯示時間到 5 秒
+
+          hasShownDefaultLocationMessage = true;
+        }
+
+        userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+        if (!shouldDisableLocationToggle) {
+          searchYouBike();
+        }
+      }      function handleGeoUpdateSuccess(position) {
+          // 檢查定位開關是否開啟
+          const centralLocationToggle = document.getElementById('centralLocationToggle');
+          if (!centralLocationToggle?.checked) {
+            return; // 如果開關關閉，不處理定位更新
+          }
+          
+          const wasDefault = userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude;
+          userLocation = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          };
+          
+          // 更新位置標記
+          if (locationMarker) {
+            locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+          }
+          
+          if (wasDefault) {
+            searchYouBike().then(() => {
+              updateResultsOrder();
+            });
+          } else {
+            updateCardDistances();
+          }
       }      function handleGeoUpdateError(error) {
-        console.error("Geolocation update error:", error);
-        // 新增：如果使用預設座標定位，則不顯示使用先前座標定位提示
-        if (userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude) {
-          return;
-        }
-        let errorMessage = currentLang === "en" 
-          ? "Unable to update location, continuing with last known position"
-          : "無法更新位置，將繼續使用上次的定位";
-        
-        const notification = document.getElementById('locationNotification');
-        notification.textContent = errorMessage;
-        notification.classList.add('show');
-        
-        setTimeout(() => {
-          notification.classList.add('hide');
-                                      setTimeout(() => {
-            notification.classList.remove('show', 'hide');
-          }, 300);
-        }, 3000);
+          console.error("Geolocation update error:", error);
+          // 新增：如果使用預設座標定位，則不顯示使用先前座標定位提示
+          if (userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude) {
+            return;
+          }
+          let errorMessage = currentLang === "en" 
+            ? "Unable to update location, continuing with last known position"
+            : "無法更新位置，將繼續使用上次的定位";
+          
+          const notification = document.getElementById('locationNotification');
+          notification.textContent = errorMessage;
+          notification.classList.add('show');
+          
+          setTimeout(() => {
+            notification.classList.add('hide');
+                                        setTimeout(() => {
+              notification.classList.remove('show', 'hide');
+            }, 300);
+          }, 3000);
       }
       function getLocation() {
         // 移除 toggleUseLocation 檢查
@@ -1875,7 +1867,6 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
             }
           );
           setInterval(() => {
-            // 移除 toggleUseLocation 檢查
             navigator.geolocation.getCurrentPosition(
               handleGeoUpdateSuccess,
               handleGeoUpdateError,
@@ -1940,19 +1931,19 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
           });
       }
       const darkModeToggle = document.getElementById('darkModeToggle');
-darkModeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    const isDark = document.body.classList.contains("dark-mode");
-    localStorage.setItem("dark_mode", isDark);
-    darkModeToggle.innerHTML = isDark ? '<span style="color:#ffd700; font-size:32px;">☀️</span>' : '🌙';
-    // 重載地圖：移除現有地圖並呼叫 initMap() 重新初始化
-    if (leafletMap) {
-        leafletMap.remove();
-    }
-    initMap();
-    // 切換模式後重新調整地圖位置與縮放
-    updateMapMarkers();
-});
+      darkModeToggle.addEventListener('click', () => {
+          document.body.classList.toggle('dark-mode');
+          const isDark = document.body.classList.contains("dark-mode");
+          localStorage.setItem("dark_mode", isDark);
+          darkModeToggle.innerHTML = isDark ? '<span style="color:#ffd700; font-size:32px;">☀️</span>' : '🌙';
+          // 重載地圖：移除現有地圖並呼叫 initMap() 重新初始化
+          if (leafletMap) {
+              leafletMap.remove();
+          }
+          initMap();
+          // 切換模式後重新調整地圖位置與縮放
+          updateMapMarkers();
+      });
       if (localStorage.getItem("dark_mode") === "true") {
         document.body.classList.add("dark-mode");
         darkModeToggle.innerHTML = '<span style="color:#ffd700; font-size:32px;">☀️</span>';
@@ -2001,7 +1992,11 @@ darkModeToggle.addEventListener('click', () => {
         if (darkModeLabel) {
           darkModeLabel.textContent = currentLang === "en" ? "Dark Mode" : "深色模式";
         }
-    }
+        const langLabel = document.querySelector('#centralSettingsPanel .setting-item label[for="centralLangToggle"]');
+        if (langLabel) {
+          langLabel.textContent = currentLang === "en" ? "Chinese/English" : "中文/English";
+        }
+      }
       updateLanguageTexts();
 
       const langToggle = document.getElementById('langToggle');
@@ -2015,29 +2010,57 @@ darkModeToggle.addEventListener('click', () => {
 
       // Initialize settings panel and button
       const settingsButton = document.getElementById('settingsButton');
-      const settingsPanel = document.getElementById('settingsPanel');
+      const centralSettingsPanel = document.getElementById('centralSettingsPanel');
+      const closeCentralSettings = document.getElementById('closeCentralSettings');
       
       // Settings button click handler
       settingsButton.addEventListener('click', (event) => {
         event.stopPropagation();
-        document.getElementById('centralSettingsPanel').style.display = 'block';
-        settingsPanel.classList.remove('show');
+        centralSettingsPanel.style.display = 'block';
+        // Push a new state to history when settings panel opens
+        history.pushState({ panelOpen: true }, 'Settings', '#settings');
       });
       
+      // Close settings panel button click handler
+      closeCentralSettings.addEventListener('click', () => {
+        centralSettingsPanel.style.display = 'none';
+        // If the current history state is for the settings panel, go back
+        if (history.state && history.state.panelOpen) {
+          history.back();
+        }
+      });
+
+      // Handle browser back button (Android back gesture)
+      window.addEventListener('popstate', (event) => {
+        if (event.state && event.state.panelOpen) {
+          // If we're going back to a state where the panel was open, close it
+          centralSettingsPanel.style.display = 'block'; // Ensure it's visible before hiding
+          centralSettingsPanel.style.display = 'none';
+        } else if (!centralSettingsPanel.style.display || centralSettingsPanel.style.display === 'none') {
+            // If the panel is already closed and we're popping a state, it means we're going back to the main page or further.
+            // Do nothing, let the browser handle the navigation.
+        } else {
+            // If we are on the settings panel and popstate is not related to it, close the panel
+            centralSettingsPanel.style.display = 'none';
+        }
+      });
+
       // Close settings panel when clicking outside
       document.addEventListener('click', (event) => {
-        const panel = document.getElementById('centralSettingsPanel');
-        const settingsButton = document.getElementById('settingsButton');
-        if (!panel.contains(event.target) && event.target !== settingsButton) {
-            panel.style.display = 'none';
+        if (!centralSettingsPanel.contains(event.target) && event.target !== settingsButton) {
+            centralSettingsPanel.style.display = 'none';
+            // If the panel was open, and we clicked outside, remove the history state for the panel
+            if (history.state && history.state.panelOpen) {
+                history.back(); // This will trigger popstate, which will then hide the panel.
+            }
         }
       });
       
       // Prevent settings panel from closing when clicking inside it
-      settingsPanel.addEventListener('click', (event) => {
+      centralSettingsPanel.addEventListener('click', (event) => {
         event.stopPropagation();
       });
-      // modalButton.addEventListener('click', hideModal);
+
       window.addEventListener('load', async () => {
         try {
           // 檢查是否有網路連線
@@ -2075,7 +2098,7 @@ darkModeToggle.addEventListener('click', () => {
 
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
-          searchYouBike(true, true); // 秼動地圖
+          searchYouBike(true, true); // 移動地圖
         }
       });
 
@@ -2090,41 +2113,41 @@ darkModeToggle.addEventListener('click', () => {
         }
     });
     const searchIcon = document.getElementById('searchIcon');
-searchIcon.addEventListener('click', () => {
-  searchYouBike(true, true); // 秮動地圖
-});
-// 修改倒數計時器物件
-let countdownTimer = {
-    remaining: 60,
-    updateButton: document.getElementById('updateCountdown'),
-    updateDisplay: function() {
-        this.updateButton.textContent = currentLang === "en"
-            ? `${this.remaining} sec update `
-            : `${this.remaining}秒後更新`;
-    },
-    reset: function() {
-        this.remaining = 60;
-        this.updateDisplay();
-    },
-    update: function() {
-        searchYouBike(true, false);  // 明確設定不移動地圖
-        this.reset();
-    }
-};
+    searchIcon.addEventListener('click', () => {
+      searchYouBike(true, true); // 移動地圖
+    });
+    // 修改倒數計時器物件
+    let countdownTimer = {
+        remaining: 60,
+        updateButton: document.getElementById('updateCountdown'),
+        updateDisplay: function() {
+            this.updateButton.textContent = currentLang === "en"
+                ? `${this.remaining} sec update `
+                : `${this.remaining}秒後更新`;
+        },
+        reset: function() {
+            this.remaining = 60;
+            this.updateDisplay();
+        },
+        update: function() {
+            searchYouBike(true, false);  // 明確設定不移動地圖
+            this.reset();
+        }
+    };
 
-// 修改更新按鈕的事件監聽器
-countdownTimer.updateButton.addEventListener('click', () => {
-    countdownTimer.update();  // 使用更新的 update 方法
-});
-
-// 修改自動更新的計時器
-setInterval(() => {
-    countdownTimer.remaining--;
-    if (countdownTimer.remaining <= 0) {
+    // 修改更新按鈕的事件監聽器
+    countdownTimer.updateButton.addEventListener('click', () => {
         countdownTimer.update();  // 使用更新的 update 方法
-    }
-    countdownTimer.updateDisplay();
-}, 1000);
+    });
+
+    // 修改自動更新的計時器
+    setInterval(() => {
+        countdownTimer.remaining--;
+        if (countdownTimer.remaining <= 0) {
+            countdownTimer.update();  // 使用更新的 update 方法
+        }
+        countdownTimer.updateDisplay();
+    }, 1000);
       // 修改全域變數
       let allStations = [];
         async function initMap() {
@@ -2265,7 +2288,6 @@ setInterval(() => {
                 }
               });
               
-
               markerClusterGroup.addLayer(marker);
             }
           });
@@ -2342,7 +2364,7 @@ setInterval(() => {
       });
 
 
-      // 完全重寫拖曱功能
+      // 重寫拖曳功能
       const mainContent = document.getElementById('mainContent');
       const dragHandle = document.getElementById('dragHandle');
       let startY = 0;
@@ -2443,7 +2465,6 @@ setInterval(() => {
       // 初始化中央設定面板
       document.addEventListener('DOMContentLoaded', () => {
         const centralSettingsPanel = document.getElementById('centralSettingsPanel');
-        const closeCentralSettings = document.getElementById('closeCentralSettings');
         const centralDarkModeToggle = document.getElementById('centralDarkModeToggle');
         const centralLangToggle = document.getElementById('centralLangToggle');
         const centralLocationToggle = document.getElementById('centralLocationToggle');
@@ -2452,11 +2473,6 @@ setInterval(() => {
         centralDarkModeToggle.checked = document.body.classList.contains('dark-mode');
         centralLangToggle.checked = currentLang === "en";
         centralLocationToggle.checked = localStorage.getItem("useLocation") === "true";
-
-        // 關閉按鈕事件
-        closeCentralSettings.addEventListener('click', () => {
-          centralSettingsPanel.style.display = 'none';
-        });
 
         // 深色模式開關
         centralDarkModeToggle.addEventListener('change', () => {
@@ -2477,10 +2493,6 @@ setInterval(() => {
           localStorage.setItem("lang", currentLang);
           updateLanguageTexts();
           searchYouBike(false);
-          
-          // 更新設定面板標題
-          document.getElementById('settingsPanelTitle').textContent = 
-            currentLang === "en" ? "System Settings" : "系統設定";
         });
 
         // 位置服務開關
