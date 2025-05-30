@@ -2571,6 +2571,7 @@
                   clearInterval(locationIntervalId);
                   locationIntervalId = null;
                 }
+                
                 // 獲取目前選擇的區域
                 const selectedRegion = document.getElementById('centralRegionSelect').value;
                 const coords = regionCoordinates[selectedRegion];
@@ -2578,10 +2579,16 @@
                 // 更新使用者位置到選擇的區域座標
                 userLocation = { latitude: coords.lat, longitude: coords.lng };
                 
+                // 更新藍點位置到預設區域
+                if (locationMarker) {
+                    locationMarker.setLatLng([coords.lat, coords.lng]);
+                }
+                
                 // 移動地圖到選擇的區域
                 if (leafletMap) {
                   leafletMap.setView([coords.lat, coords.lng], 18, { animate: true });
                 }
+                
                 searchYouBike();
             }
         });
