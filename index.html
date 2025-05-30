@@ -1183,21 +1183,10 @@
         if (!mainContentShown) {
           const overlay = document.getElementById("loadingOverlay");
           const mainContent = document.getElementById("mainContent");
-          const isOffline = !navigator.onLine;
-          
-          if (isOffline) {
-            document.getElementById("loadingText").textContent = 
-              currentLang === "en" ? "Loading cached data..." : "載入快取資料中...";
-          }
-          
-          overlay.style.opacity = "0";
-          setTimeout(() => {
-            overlay.style.display = "none";
-            mainContent.style.display = "block";
-            document.getElementById('updateCountdown').style.display = 
-              isOffline ? "none" : "block";
-          }, 500);
-          
+          // 移除延遲，直接隱藏 loadingOverlay 並顯示主內容
+          overlay.style.display = "none";
+          mainContent.style.display = "block";
+          document.getElementById('updateCountdown').style.display = navigator.onLine ? "block" : "none";
           mainContentShown = true;
         }
       }
