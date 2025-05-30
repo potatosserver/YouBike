@@ -1012,6 +1012,18 @@
           from { opacity: 0; transform: translate(-50%, -48%); }
           to { opacity: 1; transform: translate(-50%, -50%); }
       }
+
+      /* 新增地區選擇下拉選單的深色模式樣式 */
+      body.dark-mode #centralRegionSelect {
+          background-color: #555; /* 深色背景 */
+          color: #fff; /* 白色文字 */
+          border: 1px solid #777; /* 深色邊框 */
+      }
+
+      body.dark-mode #centralRegionSelect option {
+          background-color: #555; /* 深色背景 */
+          color: #fff; /* 白色文字 */
+      }
     </style>
   </head>
   <body>
@@ -1159,8 +1171,8 @@
         taitung: { lat: 22.755711056126138, lng: 121.15035332587574 }
       };
       let defaultRegion = localStorage.getItem('selectedRegion') || 'kaohsiung'; // 改用變數儲存預設區域
-      const defaultLatitude = regionCoordinates[defaultRegion].lat;
-      const defaultLongitude = regionCoordinates[defaultRegion].lng;
+      let defaultLatitude = regionCoordinates[defaultRegion].lat;
+      let defaultLongitude = regionCoordinates[defaultRegion].lng;
       const overlay = document.querySelector('.overlay');
       const modal = document.querySelector('.modal');
       const modalText = document.getElementById('modalText');
@@ -2004,7 +2016,7 @@
         const settingGroups = document.querySelectorAll('#centralSettingsPanel .settings-group h3');
         if (settingGroups.length >= 2) {
           settingGroups[0].textContent = currentLang === "en" ? "Basic Settings" : "基本設定";
-          settingGroups[1].textContent = currentLang === "en" ? "GitHub Repositories" : "GitHub 儲存庫";
+          settingGroups[1].textContent = currentLang === "en" ? "External Links" : "外部連結";
         }
         // 更新基本設定中各選項標籤
         const locationLabel = document.querySelector('#centralSettingsPanel .setting-item label[for="centralLocationToggle"]');
@@ -2421,7 +2433,7 @@
       });
 
 
-      // 重寫拖曱功能
+      // 重寫拖曳功能
       const mainContent = document.getElementById('mainContent');
       const dragHandle = document.getElementById('dragHandle');
       let startY = 0;
@@ -2466,10 +2478,6 @@
       document.addEventListener('touchmove', onMove, { passive: true });
       document.addEventListener('touchend', onEnd);
       document.addEventListener('touchcancel', onEnd);
-
-      // 徹底移除 darkModeMapStyle 和 initializeMap 函數
-      // const darkModeMapStyle = [ ... ]; // 已移除
-      // function initializeMap() { ... } // 已移除
 
       // 初始化中央設定面板
       document.addEventListener('DOMContentLoaded', () => {
