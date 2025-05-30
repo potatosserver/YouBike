@@ -1327,7 +1327,7 @@
       // IndexedDB 操作函數
       function openYoubikeDB() {
         return new Promise((resolve, reject) => {
-          const request = indexedDB.open('YouBikeDB', 2);  // 版本升級到 2
+          const request = indexedDB.open('YouBikeDB', 3); // 版本升級到 3
           
           request.onupgradeneeded = function(event) {
             const db = event.target.result;
@@ -1335,6 +1335,11 @@
             // 站點資料存儲
             if (!db.objectStoreNames.contains('youbikeData')) {
               db.createObjectStore('youbikeData', { keyPath: 'id' });
+            }
+            
+            // 釘標資料存儲
+            if (!db.objectStoreNames.contains('markerData')) {
+              db.createObjectStore('markerData', { keyPath: 'id' });
             }
             
             // 地圖圖磚存儲
@@ -1386,29 +1391,36 @@
       // 修改站點資料儲存函數
       async function saveYoubikeDataToDB(dataArray) {
         const db = await openYoubikeDB();
-        const tx = db.transaction('youbikeData', 'readwrite');
+        const tx = db.transaction(['youbikeData', 'markerData'], 'readwrite');
         const store = tx.objectStore('youbikeData');
+        const markerStore = tx.objectStore('markerData');
         
         // 清除舊資料
         await store.clear();
+        await markerStore.clear();
         
-        // 儲存新資料
+        // 儲存站點和釘標資料
         for (const [idx, item] of dataArray.entries()) {
           await store.put({ 
             id: idx,
             value: item,
             timestamp: Date.now()
           });
+          
+          // 儲存釘標資料
+          if (!isNaN(parseFloat(item.lat)) && !isNaN(parseFloat(item.lng))) {
+            await markerStore.put({
+              id: item.station_no,
+              lat: parseFloat(item.lat),
+              lng: parseFloat(item.lng),
+              name_tw: item.name_tw,
+              name_en: item.name_en,
+              address_tw: item.address_tw,
+              address_en: item.address_en,
+              timestamp: Date.now()
+            });
+          }
         }
-        
-        // 儲存區域資料
-        const regionTx = db.transaction('regionData', 'readwrite');
-        const regionStore = regionTx.objectStore('regionData');
-        await regionStore.put({
-          region: defaultRegion,
-          coordinates: regionCoordinates[defaultRegion],
-          timestamp: Date.now()
-        });
         
         return new Promise((resolve, reject) => {
           tx.oncomplete = resolve;
@@ -2411,7 +2423,7 @@
           const response = await fetch('https://apis.youbike.com.tw/json/station-min-yb2.json', {
             headers: {
               'accept': '*/*',
-              'accept-language': 'zh-TW,zh;q=0.9'
+              'accept-language': 'zh-TW,zh;q=0.9',
             }
           });
           
