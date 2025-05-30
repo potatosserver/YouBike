@@ -1041,11 +1041,11 @@
         <button id="modalButton">確定</button>
       </div>
       <div id="extraButtons">
-          <a href="https://github.com/potatosserver/YouBike" target="_blank">
-              <img loading="lazy" src="https://potatosserver.github.io/YouBike/icons/html.webp" alt="YouBike Repo" style="width:30px; height:30px;" />
+          <a href="https://github.com/KEVIN970712/YouBike" target="_blank">
+              <img loading="lazy" src="https://potatosserver.github.io/YouBike/icons/html.webp" alt="GitHub Repository" style="width:30px; height:30px;" />
           </a>
-          <a href="https://github.com/potatosserver/YouBike_Python" target="_blank">
-                <img loading="lazy" src="https://potatosserver.github.io/YouBike/icons/python.webp" alt="YouBike Python" style="width:30px; height:30px;" />
+          <a href="https://github.com/KEVIN970712/YouBike_Python" target="_blank">
+                <img loading="lazy" src="https://potatosserver.github.io/YouBike/icons/python.webp" alt="GitHub Repository" style="width:30px; height:30px;" />
           </a>
       </div>
       </div>      <button id="settingsButton" title="設定" style="position: fixed; bottom: 60px; right: 20px; z-index: 1200; width: 50px; height: 50px; background: white; color: black; border: 2px solid black; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: transform 0.2s ease;">⚙️</button>
@@ -1055,14 +1055,14 @@
           <img loading="lazy" src="https://potatosserver.github.io/YouBike/icons/translate.webp" alt="Translate" style="width:35px; height:35px;" />
         </button>
         <a id="githubLink" href="https://github.com/KEVIN970712/YouBike" target="_blank" style="width:50px; height:50px; border-radius:50%; margin:0 5px; display:flex; align-items:center; justify-content:center; background:white; text-decoration:none;">
-          <img loading="lazy" src="https://potatosserver.github.io/YouBike/icons/github.webp" alt="GitHub" style="width:35px; height:35px;" />
+          <img loading="lazy" src="https://potatosserver.github.io/YouBike/icons/github.webp" alt="GitHub Repository" style="width:35px; height:35px;" />
         </a>
         <div id="extraButtons">
-          <a href="https://github.com/potatosserver/YouBike" target="_blank">
-              <img loading="lazy" src="https://potatosserver.github.io/YouBike/icons/html.webp" alt="YouBike Repo" style="width:30px; height:30px;" />
+          <a href="https://github.com/KEVIN970712/YouBike" target="_blank">
+              <img loading="lazy" src="https://potatosserver.github.io/YouBike/icons/html.webp" alt="GitHub Repository" style="width:30px; height:30px;" />
           </a>
-          <a href="https://github.com/potatosserver/YouBike_Python" target="_blank">
-                <img loading="lazy" src="https://potatosserver.github.io/YouBike/icons/python.webp" alt="YouBike Python" style="width:30px; height:30px;" />
+          <a href="https://github.com/KEVIN970712/YouBike_Python" target="_blank">
+                <img loading="lazy" src="https://potatosserver.github.io/YouBike/icons/python.webp" alt="GitHub Repository" style="width:30px; height:30px;" />
           </a>
         </div>
       </div>
@@ -1101,15 +1101,15 @@
       <div class="settings-group">
           <h3>外部連結</h3>
           <div class="setting-item">
-              <a href="https://github.com/potatosserver/YouBike" target="_blank" class="github-link">
-                  <img src="https://potatosserver.github.io/YouBike/icons/html.webp" alt="HTML Repo" style="width:30px; height:30px;">
-                  <span>YouBike HTML</span>
+              <a href="https://github.com/KEVIN970712/YouBike" target="_blank" class="github-link">
+                  <img src="https://potatosserver.github.io/YouBike/icons/html.webp" alt="GitHub Repository" style="width:30px; height:30px;">
+                  <span>YouBike Repository</span>
               </a>
           </div>
           <div class="setting-item">
-              <a href="https://github.com/potatosserver/YouBike_Python" target="_blank" class="github-link">
-                  <img src="https://potatosserver.github.io/YouBike/icons/python.webp" alt="Python Repo" style="width:30px; height:30px;">
-                  <span>YouBike Python</span>
+              <a href="https://github.com/KEVIN970712/YouBike_Python" target="_blank" class="github-link">
+                  <img src="https://potatosserver.github.io/YouBike/icons/python.webp" alt="GitHub Repository" style="width:30px; height:30px;">
+                  <span>YouBike Python Repository</span>
               </a>
           </div>
       </div>
@@ -1971,7 +1971,7 @@
         const settingGroups = document.querySelectorAll('#centralSettingsPanel .settings-group h3');
         if (settingGroups.length >= 2) {
           settingGroups[0].textContent = currentLang === "en" ? "Basic Settings" : "基本設定";
-          settingGroups[1].textContent = currentLang === "en" ? "External Links" : "外部連結";
+          settingGroups[1].textContent = currentLang === "en" ? "GitHub Repositories" : "GitHub 儲存庫";
         }
         // 更新基本設定中各選項標籤
         const locationLabel = document.querySelector('#centralSettingsPanel .setting-item label[for="centralLocationToggle"]');
@@ -2358,7 +2358,7 @@
       });
 
 
-      // 重寫拖曳功能
+      // 重寫拖曱功能
       const mainContent = document.getElementById('mainContent');
       const dragHandle = document.getElementById('dragHandle');
       let startY = 0;
@@ -2443,24 +2443,29 @@
 
         // 位置服務開關
         centralLocationToggle.addEventListener('change', function() {
-          const isChecked = this.checked;
-          localStorage.setItem("useLocation", isChecked);
-          
-          if (isChecked) {
-            getLocation();
-          } else {
-            if (locationIntervalId) {
-              clearInterval(locationIntervalId);
-              locationIntervalId = null;
+            const isChecked = this.checked;
+            localStorage.setItem("useLocation", isChecked);
+            
+            if (isChecked) {
+                // 開啟定位後，獲取定位並移動地圖到定位點
+                getLocation().then(() => {
+                    if (leafletMap && userLocation) {
+                        leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
+                    }
+                });
+            } else {
+                if (locationIntervalId) {
+                  clearInterval(locationIntervalId);
+                  locationIntervalId = null;
+                }
+                // 不移除藍點 (locationMarker)，保持其顯示
+                // 立即將地圖拉回預設位置
+                if (leafletMap) {
+                  leafletMap.setView([defaultLatitude, defaultLongitude], 18, { animate: true });
+                }
+                userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+                searchYouBike();
             }
-            // 不移除藍點 (locationMarker) ，保持其顯示
-            // 立即將地圖拉回預設位置
-            if (leafletMap) {
-              leafletMap.setView([defaultLatitude, defaultLongitude], 18, { animate: true });
-            }
-            userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-            searchYouBike();
-          }
         });
 
         // 初始化位置服務開關狀態 - 預設為開啟
