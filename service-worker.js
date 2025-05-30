@@ -10,7 +10,14 @@ self.addEventListener('install', (event) => {
                 'https://unpkg.com/leaflet/dist/leaflet.js',
                 'https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js',
                 'https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css',
-                'https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css'
+                'https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css',
+                // 新增 Leaflet 預設圖示
+                'https://unpkg.com/leaflet/dist/images/marker-icon.png',
+                'https://unpkg.com/leaflet/dist/images/marker-icon-2x.png',
+                'https://unpkg.com/leaflet/dist/images/marker-shadow.png',
+                // 新增紅色標記圖示
+                'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png'
             ]);
         }).then(() => self.skipWaiting())
     );
