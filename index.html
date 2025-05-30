@@ -1826,6 +1826,10 @@
       async function getLocation() {
         const centralLocationToggle = document.getElementById('centralLocationToggle');
         if (!centralLocationToggle?.checked) {
+          if (locationIntervalId) {
+            clearInterval(locationIntervalId);
+            locationIntervalId = null;
+          }
           return; // 定位開關關閉，不讀取定位
         }
         
@@ -1850,12 +1854,17 @@
           } catch (e) {
             handleGeolocationError(e);
           }
-          setInterval(() => {
-            navigator.geolocation.getCurrentPosition(
-              handleGeoUpdateSuccess,
-              handleGeoUpdateError,
-              { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-            );
+          locationIntervalId = setInterval(() => {
+            if (centralLocationToggle?.checked) {
+              navigator.geolocation.getCurrentPosition(
+                handleGeoUpdateSuccess,
+                handleGeoUpdateError,
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+              );
+            } else if (locationIntervalId) {
+              clearInterval(locationIntervalId);
+              locationIntervalId = null;
+            }
           }, 10000);
         } else {
           showModal("您的瀏覽器不支援地理位置功能。站點將以將使用預設座標進行定位。");
@@ -2487,7 +2496,11 @@
           if (isChecked) {
             getLocation();
           } else {
-            // 關閉定位時清除已存在的定位標記並強制使用預設座標
+            if (locationIntervalId) {
+              clearInterval(locationIntervalId);
+              locationIntervalId = null;
+            }
+            // 關閉定位時清除定位標記並強制使用預設座標
             if (locationMarker) {
               locationMarker.remove();
               locationMarker = null;
