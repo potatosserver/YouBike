@@ -2534,12 +2534,17 @@
                   clearInterval(locationIntervalId);
                   locationIntervalId = null;
                 }
-                // 不移除藍點 (locationMarker)，保持其顯示
-                // 立即將地圖拉回預設位置
+                // 獲取目前選擇的區域
+                const selectedRegion = document.getElementById('centralRegionSelect').value;
+                const coords = regionCoordinates[selectedRegion];
+                
+                // 更新使用者位置到選擇的區域座標
+                userLocation = { latitude: coords.lat, longitude: coords.lng };
+                
+                // 移動地圖到選擇的區域
                 if (leafletMap) {
-                  leafletMap.setView([defaultLatitude, defaultLongitude], 18, { animate: true });
+                  leafletMap.setView([coords.lat, coords.lng], 18, { animate: true });
                 }
-                userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
                 searchYouBike();
             }
         });
