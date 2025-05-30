@@ -2453,11 +2453,7 @@
               clearInterval(locationIntervalId);
               locationIntervalId = null;
             }
-            // 清除定位標記
-            if (locationMarker) {
-              locationMarker.remove();
-              locationMarker = null;
-            }
+            // 不移除藍點 (locationMarker) ，保持其顯示
             // 立即將地圖拉回預設位置
             if (leafletMap) {
               leafletMap.setView([defaultLatitude, defaultLongitude], 18, { animate: true });
