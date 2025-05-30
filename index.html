@@ -2064,14 +2064,15 @@
             }
           }
 
-          // 修改：先等待定位設定完成，再進行搜尋與卡片排序後才顯示主畫面
+          // 修改：等待定位作業完成後，再等待卡片搜尋與排序完成，然後再顯示主畫面
           if (centralLocationToggle?.checked) {
             await getLocation();
+            await searchYouBike(true, false); // 等待卡片渲染與排序完成
           } else {
             userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-            await searchYouBike(true, false);
+            await searchYouBike(true, false); // 等待卡片渲染與排序完成
           }
-          // 卡片搜尋與排序完成後，顯示主內容
+          // 卡片搜尋與排序完成後再進入畫面
           showMainContent();
         } catch (error) {
           console.error('Initialization error:', error);
@@ -2273,6 +2274,7 @@
                 }
               });
               
+
               markerClusterGroup.addLayer(marker);
             }
           });
