@@ -1192,9 +1192,9 @@
         pingtung: { lat: 22.683036253664, lng: 120.48790854724 },
         taitung: { lat: 22.755711056126138, lng: 121.15035332587574 }
       };
-      let defaultRegion = localStorage.getItem('selectedRegion') || 'kaohsiung'; // 改用變數儲存預設區域
-      let defaultLatitude = regionCoordinates[defaultRegion].lat;
-      let defaultLongitude = regionCoordinates[defaultRegion].lng;
+      let defaultRegion = 'kaohsiung';  // 暫時設定高雄市作為後備預設值
+      let defaultLatitude = regionCoordinates.kaohsiung.lat;
+      let defaultLongitude = regionCoordinates.kaohsiung.lng;
       const overlay = document.querySelector('.overlay');
       const modal = document.querySelector('.modal');
       const modalText = document.getElementById('modalText');
@@ -2654,25 +2654,46 @@
           }
         });
 
-        // 修改定位服務處理
+        // 修改定位服務初始化處理
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 position => {
-                    if (!centralLocationToggle.checked) {
-                      // 只在未使用定位服務時根據距離設定預設區域
-                      let nearestRegion = findNearestRegion(position.coords.latitude, position.coords.longitude);
-                      defaultRegion = nearestRegion;
-                      localStorage.setItem('selectedRegion', nearestRegion);
+                    // 找到最近的區域並設為預設值
+                    const nearestRegion = findNearestRegion(position.coords.latitude, position.coords.longitude);
+                    defaultRegion = nearestRegion;
+                    defaultLatitude = regionCoordinates[nearestRegion].lat;
+                    defaultLongitude = regionCoordinates[nearestRegion].lng;
+                    
+                    // 更新本地儲存和選單值
+                    localStorage.setItem('selectedRegion', nearestRegion);
+                    const centralRegionSelect = document.getElementById('centralRegionSelect');
+                    if (centralRegionSelect) {
                       centralRegionSelect.value = nearestRegion;
                     }
-                },
-                () => {
-                    // 定位失敗時保持使用者選擇的區域
-                    const savedRegion = localStorage.getItem('selectedRegion');
-                    if (savedRegion) {
-                      defaultRegion = savedRegion;
-                      centralRegionSelect.value = savedRegion;
+
+                    // 如果沒有使用定位服務,則移動到最近區域
+                    if (!centralLocationToggle.checked) {
+                      userLocation = { 
+                        latitude: regionCoordinates[nearestRegion].lat, 
+                        longitude: regionCoordinates[nearestRegion].lng 
+                      };
+                      if (leafletMap) {
+                        leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
+                      }
+                      searchYouBike();
                     }
+                },
+                error => {
+                  // 定位失敗時使用儲存的區域,如果沒有則使用高雄市
+                  console.warn('Geolocation failed:', error);
+                  const savedRegion = localStorage.getItem('selectedRegion') || 'kaohsiung';
+                  defaultRegion = savedRegion;
+                  defaultLatitude = regionCoordinates[savedRegion].lat;
+                  defaultLongitude = regionCoordinates[savedRegion].lng;
+                  const centralRegionSelect = document.getElementById('centralRegionSelect');
+                  if (centralRegionSelect) {
+                    centralRegionSelect.value = savedRegion;
+                  }
                 }
             );
         }
