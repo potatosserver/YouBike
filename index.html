@@ -1332,6 +1332,10 @@
           request.onupgradeneeded = function(event) {
             const db = event.target.result;
             
+            // 新增站點標記存儲
+            if (!db.objectStoreNames.contains('stationMarkers')) {
+              db.createObjectStore('stationMarkers', { keyPath: 'id' });
+            }
             // 站點資料存儲
             if (!db.objectStoreNames.contains('youbikeData')) {
               db.createObjectStore('youbikeData', { keyPath: 'id' });
@@ -2407,20 +2411,56 @@
         locateControl.addTo(leafletMap);
         
         try {
-          // 取得全國站點資料
-          const response = await fetch('https://apis.youbike.com.tw/json/station-min-yb2.json', {
-            headers: {
-              'accept': '*/*',
-              'accept-language': 'zh-TW,zh;q=0.9'
+          // 嘗試從線上取得資料，如果離線則從 IndexedDB 取得
+          let stations;
+          if (navigator.onLine) {
+            const response = await fetch('https://apis.youbike.com.tw/json/station-min-yb2.json', {
+              headers: {
+                'accept': '*/*',
+                'accept-language': 'zh-TW,zh;q=0.9'
+              }
+            });
+            
+            if (!response.ok) throw new Error('無法取得站點資料');
+            stations = await response.json();
+            
+            // 儲存站點資料到 IndexedDB
+            try {
+              const db = await openYoubikeDB();
+              const tx = db.transaction('stationMarkers', 'readwrite');
+              const store = tx.objectStore('stationMarkers');
+              await store.clear();
+              await store.put({ 
+                id: 'allStations',
+                data: stations,
+                timestamp: Date.now() 
+              });
+            } catch (err) {
+              console.error('Failed to save stations to IndexedDB:', err);
             }
-          });
+          } else {
+            // 離線模式：從 IndexedDB 讀取站點資料
+            try {
+              const db = await openYoubikeDB();
+              const tx = db.transaction('stationMarkers', 'readonly');
+              const store = tx.objectStore('stationMarkers');
+              const result = await store.get('allStations');
+              stations = result ? result.data : [];
+              
+              if (stations.length === 0) {
+                showNotification(currentLang === "en" 
+                  ? "No offline station data available"
+                  : "無可用的離線站點資料");
+              }
+            } catch (err) {
+              console.error('Failed to load stations from IndexedDB:', err);
+              stations = [];
+            }
+          }
           
-          if (!response.ok) throw new Error('無法取得站點資料');
-          
-          const stations = await response.json();
           allStations = stations;
           
-          // 新增所有站點的釘標
+          // 建立站點標記
           stations.forEach(station => {
             const lat = parseFloat(station.lat);
             const lng = parseFloat(station.lng);
@@ -2431,10 +2471,12 @@
 
               marker.on('click', async () => {
                 try {
-                  // 點擊時才取得即時資訊
-                  const vehicleData = await queryVehicleData([station.station_no]);
-                  const stationInfo = vehicleData[station.station_no] || {};
-                  
+                  let stationInfo = {};
+                  if (navigator.onLine) {
+                    const vehicleData = await queryVehicleData([station.station_no]);
+                    stationInfo = vehicleData[station.station_no] || {};
+                  }
+
 
                   const content = `
                     <h4>${currentLang === "en" ? station.name_en : station.name_tw}</h4>
