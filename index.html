@@ -1024,6 +1024,26 @@
           background-color: #555; /* 深色背景 */
           color: #fff; /* 白色文字 */
       }
+
+      /* 添加淡入動畫樣式 */
+      #mainContent {
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+      }
+
+      #mainContent.fade-in {
+        opacity: 1;
+      }
+
+      #loadingOverlay {
+        opacity: 1;
+        transition: opacity 0.5s ease-in-out;
+      }
+
+      #loadingOverlay.fade-out {
+        opacity: 0;
+        pointer-events: none;
+      }
     </style>
   </head>
   <body>
@@ -1229,10 +1249,27 @@
         if (!mainContentShown) {
           const overlay = document.getElementById("loadingOverlay");
           const mainContent = document.getElementById("mainContent");
-          // 移除延遲，直接隱藏 loadingOverlay 並顯示主內容
-          overlay.style.display = "none";
+
+          // 添加淡出效果到 loading overlay
+          overlay.classList.add('fade-out');
+
+          // 顯示主內容
           mainContent.style.display = "block";
+          
+          // 強制重繪以觸發動畫
+          mainContent.offsetHeight;
+          
+          // 添加淡入效果到主內容
+          mainContent.classList.add('fade-in');
+
+          // 更新倒數計時器顯示
           document.getElementById('updateCountdown').style.display = navigator.onLine ? "block" : "none";
+          
+          // 在動畫完成後完全移除 overlay
+          setTimeout(() => {
+            overlay.style.display = "none";
+          }, 500);
+
           mainContentShown = true;
         }
       }
