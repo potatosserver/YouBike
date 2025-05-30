@@ -1672,6 +1672,7 @@
                 iconSize: [20, 20]
               });
               
+
               L.marker([userLocation.latitude, userLocation.longitude], {
                 icon: pulsingIcon,
                 pane: 'markerPane'
@@ -1828,42 +1829,34 @@
             }, 300);
           }, 3000);
       }
-      function getLocation() {
-        // 移除 toggleUseLocation 檢查
+      async function getLocation() {
         if (navigator.geolocation) {
-          let timeoutTriggered = false;
-          const geoTimeout = setTimeout(() => {
-            timeoutTriggered = true;
-            handleGeolocationError({ code: 3, message: "首次定位超時" });
-          }, 9998);
-          navigator.geolocation.getCurrentPosition(
-            function (position) {
-              if (!timeoutTriggered) {
-                clearTimeout(geoTimeout);
-                handleGeolocationSuccess(position);
-              }
-            },
-            function (error) {
-              if (!timeoutTriggered) {
-                clearTimeout(geoTimeout);
-                handleGeolocationError(error);
-              }
-            },
-            {
-              enableHighAccuracy: true,
-              timeout: 10000,
-              maximumAge: 0
+          try {
+            const positionPromise = new Promise((resolve, reject) => {
+              navigator.geolocation.getCurrentPosition(resolve, reject, {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+              });
+            });
+            const timeoutPromise = new Promise(resolve => {
+              setTimeout(() => resolve(null), 10000);
+            });
+            const position = await Promise.race([positionPromise, timeoutPromise]);
+            if (position) {
+              handleGeolocationSuccess(position);
+            } else {
+              handleGeolocationError({ code: 3, message: "首次定位超時" });
             }
-          );
+          } catch (e) {
+            handleGeolocationError(e);
+          }
+          // 10秒後持續更新定位
           setInterval(() => {
             navigator.geolocation.getCurrentPosition(
               handleGeoUpdateSuccess,
               handleGeoUpdateError,
-              {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
-              }
+              { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
             );
           }, 10000);
         } else {
