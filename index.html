@@ -2016,9 +2016,33 @@
             clearInterval(locationIntervalId);
             locationIntervalId = null;
           }
-          return; // 定位開關關閉，不讀取定位
+          return;
         }
         
+        // 先使用預設位置創建藍點
+        if (!locationMarker && leafletMap) {
+          locationMarker = L.circleMarker([defaultLatitude, defaultLongitude], {
+            radius: 10,
+            fillColor: '#2196F3',
+            fillOpacity: 0.8,
+            color: '#ffffff',
+            weight: 3,
+            pane: 'markerPane'
+          }).addTo(leafletMap);
+
+          // 添加脈衝動畫
+          const pulsingIcon = L.divIcon({
+            className: 'pulsing-icon',
+            html: '<div class="pulse"></div>',
+            iconSize: [20, 20]
+          });
+          
+          L.marker([defaultLatitude, defaultLongitude], {
+            icon: pulsingIcon,
+            pane: 'markerPane'
+          }).addTo(leafletMap);
+        }
+
         if (navigator.geolocation) {
           try {
             const positionPromise = new Promise((resolve, reject) => {
@@ -2028,18 +2052,24 @@
                 maximumAge: 0
               });
             });
-            const timeoutPromise = new Promise(resolve => {
-              setTimeout(() => resolve(null), 10000);
+            const timeoutPromise = new Promise((_, reject) => {
+              setTimeout(() => reject(new Error("TIMEOUT")), 10000);
             });
             const position = await Promise.race([positionPromise, timeoutPromise]);
-            if (position) {
-              handleGeolocationSuccess(position);
-            } else {
-              handleGeolocationError({ code: 3, message: "定位超時，開始使用預設定位" });
-            }
+            handleGeolocationSuccess(position);
           } catch (e) {
-            handleGeolocationError(e);
+            if (e.message === "TIMEOUT") {
+              handleGeolocationError({ 
+                code: 3, 
+                message: currentLang === "en" ? 
+                  "Location timeout, using default location" : 
+                  "定位超時，使用預設定位"
+              });
+            } else {
+              handleGeolocationError(e);
+            }
           }
+          
           locationIntervalId = setInterval(() => {
             if (centralLocationToggle?.checked) {
               navigator.geolocation.getCurrentPosition(
@@ -2053,7 +2083,10 @@
             }
           }, 10000);
         } else {
-          showModal("您的瀏覽器不支援地理位置功能。站點將以將使用預設座標進行定位。");
+          showModal(currentLang === "en" ? 
+            "Your browser doesn't support geolocation. Using default location." : 
+            "您的瀏覽器不支援地理位置功能。將使用預設座標進行定位。"
+          );
           userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
           searchYouBike();
           hideLoading();
@@ -2705,6 +2738,27 @@
                 // 更新藍點位置到預設區域
                 if (locationMarker) {
                     locationMarker.setLatLng([coords.lat, coords.lng]);
+                } else {
+                    locationMarker = L.circleMarker([coords.lat, coords.lng], {
+                        radius: 10,
+                        fillColor: '#2196F3',
+                        fillOpacity: 0.8,
+                        color: '#ffffff',
+                        weight: 3,
+                        pane: 'markerPane'
+                    }).addTo(leafletMap);
+
+                    // 添加脈衝動畫效果
+                    const pulsingIcon = L.divIcon({
+                        className: 'pulsing-icon',
+                        html: '<div class="pulse"></div>',
+                        iconSize: [20, 20]
+                    });
+                    
+                    L.marker([coords.lat, coords.lng], {
+                        icon: pulsingIcon,
+                        pane: 'markerPane'
+                    }).addTo(leafletMap);
                 }
                 
                 // 移動地圖到選擇的區域
