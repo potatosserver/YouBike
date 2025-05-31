@@ -1523,6 +1523,7 @@
             return distA - distB;
           });
           let limit = keyword ? 50 : 20;
+          // 進行資料篩選及排序後的使用站點陣列
           let usedStations;
           if (!keyword) {
             const pinnedFromLocal = youbikeResults.filter(station => pinnedStations.has(String(station.station_no)));
@@ -1590,7 +1591,11 @@
           let vehData = {};
           const stationIds = usedStations.map(station => String(station.station_no));
           if (isOnline) {
-            vehData = await queryVehicleData(stationIds);
+            // 若全域變數 cachedParkingInfoData 尚未查詢過，則呼叫 parkingInfo API
+            if (!window.cachedParkingInfoData) {
+              window.cachedParkingInfoData = await queryVehicleData(stationIds);
+            }
+            vehData = window.cachedParkingInfoData;
           }
           const organizedOutput = usedStations.map(site => {
             const info = {
