@@ -885,6 +885,9 @@
           z-index: 10000;
           backdrop-filter: blur(10px);
           animation: fadeIn 0.3s ease;
+          max-height: calc(100vh - 80px); /* 增加與上下邊界間距 */
+          overflow-y: scroll; /* 允許內容捲動 */
+          scrollbar-width: none; /* Firefox 隱藏捲軸 */
       }
 
       body.dark-mode #centralSettingsPanel {
@@ -2522,6 +2525,7 @@
             if (!isNaN(lat) && !isNaN(lng)) {
               const marker = L.marker([lat, lng]);
               
+
               marker.on('click', async () => {
                 try {
                   let stationInfo = {};
@@ -2754,9 +2758,9 @@
                         className: 'pulsing-icon',
                         html: '<div class="pulse"></div>',
                         iconSize: [20, 20]
-                    });
-                    
-                    L.marker([coords.lat, coords.lng], {
+                      });
+                      
+                      L.marker([coords.lat, coords.lng], {
                         icon: pulsingIcon,
                         pane: 'markerPane'
                       }).addTo(leafletMap);
