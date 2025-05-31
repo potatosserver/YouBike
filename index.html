@@ -1213,7 +1213,9 @@
       clearTextBtn.addEventListener('click', () => {
           keywordInput.value = '';
           clearTextBtn.style.display = 'none';
-          // 移動地圖到使用者當前定位（使用 userLocation 與 leafletMap）
+          // 清除後立即執行一次搜尋，不移動地圖視圖
+          searchYouBike(true, false);
+          // 移動地圖到使用者當前定位
           if (userLocation && leafletMap) {
             leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
           }
@@ -1489,34 +1491,14 @@
         if (showLoadingIndicator) showLoading();
         const keyword = keywordInput.value.trim().toLowerCase();
         try {
-          if (!youbikeDataCache) {
-            if (navigator.onLine) {
-              try {
-                const youbikeUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
-                const response = await fetch(youbikeUrl, {
-                  headers: {
-                    'accept': '*/*',
-                    'accept-language': 'zh-TW,zh;q=0.9',
-                  }
-                });
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const youbikeData = await response.json();
-                youbikeDataCache = Array.isArray(youbikeData)
-                  ? youbikeData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
-                  : [];
-                await saveYoubikeDataToDB(youbikeDataCache);
-              } catch (error) {
-                console.warn('Failed to fetch online data, trying IndexedDB:', error);
-                youbikeDataCache = await getYoubikeDataFromDB();
-              }
-            } else {
-              youbikeDataCache = await getYoubikeDataFromDB();
-              showNotification(currentLang === "en" 
-                ? "Offline mode: Using cached data" 
-                : "離線模式：使用快取資料");
-            }
-          }
+          // 使用 youbikeDataCache，不再重複呼叫 API
           let youbikeResults = youbikeDataCache;
+          if (!youbikeResults) {
+            // 如果快取不存在，則從 IndexedDB 讀取
+            youbikeResults = await getYoubikeDataFromDB();
+            youbikeDataCache = youbikeResults;
+          }
+          
           if (keyword) {
             youbikeResults = youbikeResults.filter(station => {
               const stationNameTW = station.name_tw ? station.name_tw.toLowerCase() : '';
@@ -2303,9 +2285,102 @@
         event.stopPropagation();
       });
 
+      // 移除重複的預設值設定
+      const savedRegion = localStorage.getItem('selectedRegion');
+      document.getElementById('centralRegionSelect').value = savedRegion || 'kaohsiung';
+
+      // 初始化開關狀態
+      document.getElementById('centralDarkModeToggle').checked = document.body.classList.contains('dark-mode');
+      document.getElementById('centralLangToggle').checked = currentLang === "en";
+      document.getElementById('centralLocationToggle').checked = localStorage.getItem("useLocation") === "true";
+
+      // 深色模式開關
+      document.getElementById('centralDarkModeToggle').addEventListener('change', () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains("dark-mode");
+        localStorage.setItem("dark_mode", isDark);
+        document.getElementById('darkModeToggle').innerHTML = isDark ? '<span style="color:#ffd700; font-size:32px;">☀️</span>' : '🌙';
+        if (leafletMap) {
+          leafletMap.remove();
+        }
+        initMap();
+        updateMapMarkers();
+      });
+
+      // 語言切換開關
+      document.getElementById('centralLangToggle').addEventListener('change', () => {
+        currentLang = currentLang === "en" ? "zh" : "en";
+        localStorage.setItem("lang", currentLang);
+        updateLanguageTexts();
+        searchYouBike(false);
+      });
+
+      // 位置服務開關
+      document.getElementById('centralLocationToggle').addEventListener('change', function() {
+          const isChecked = this.checked;
+          localStorage.setItem("useLocation", isChecked);
+          
+          if (isChecked) {
+              // 開啟定位後，獲取定位並移動地圖到定位點
+              getLocation().then(() => {
+                  if (leafletMap && userLocation) {
+                      leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
+                  }
+              });
+          } else {
+              if (locationIntervalId) {
+                clearInterval(locationIntervalId);
+                locationIntervalId = null;
+              }
+              
+              // 獲取目前選擇的區域
+              const selectedRegion = document.getElementById('centralRegionSelect').value;
+              const coords = regionCoordinates[selectedRegion];
+              
+              // 更新使用者位置到選擇的區域座標
+              userLocation = { latitude: coords.lat, longitude: coords.lng };
+              
+              // 更新藍點位置到預設區域
+              if (locationMarker) {
+                  locationMarker.setLatLng([coords.lat, coords.lng]);
+              } else {
+                  locationMarker = L.circleMarker([coords.lat, coords.lng], {
+                      radius: 10,
+                      fillColor: '#2196F3',
+                      fillOpacity: 0.8,
+                      color: '#ffffff',
+                      weight: 3,
+                      pane: 'markerPane'
+                  }).addTo(leafletMap);
+
+                  // 添加脈衝動畫效果
+                  const pulsingIcon = L.divIcon({
+                      className: 'pulsing-icon',
+                      html: '<div class="pulse"></div>',
+                      iconSize: [20, 20]
+                  });
+                  
+                  L.marker([coords.lat, coords.lng], {
+                    icon: pulsingIcon,
+                    pane: 'markerPane'
+                  }).addTo(leafletMap);
+              }
+              
+              // 移動地圖到選擇的區域
+              if (leafletMap) {
+                leafletMap.setView([coords.lat, coords.lng], 18, { animate: true });
+              }
+              
+              searchYouBike();
+          }
+      });
+
+      // 初始化時檢查定位開關狀態
+      document.getElementById('centralLocationToggle').checked = localStorage.getItem("useLocation") === "true";
+
+      // 初始化時獲取地圖
       window.addEventListener('load', async () => {
         try {
-          // 檢查是否有網路連線
           if (navigator.onLine) {
             await initMap();
           } else {
@@ -2314,7 +2389,6 @@
               : "離線模式：地圖功能受限");
           }
 
-          // 從 IndexedDB 預先載入資料
           if (!navigator.onLine) {
             try {
               youbikeDataCache = await getYoubikeDataFromDB();
@@ -2323,16 +2397,9 @@
             }
           }
 
-          // 修改：等待定位作業完成後，再等待卡片搜尋與排序完成，然後再顯示主畫面
-          if (centralLocationToggle?.checked) {
-            await getLocation();
-            await searchYouBike(true, false); // 等待卡片渲染與排序完成
-          } else {
-            userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-            await searchYouBike(true, false); // 等待卡片渲染與排序完成
-          }
-          // 卡片搜尋與排序完成後再進入畫面
-          showMainContent();
+          // 統一在這裡處理初始化搜尋
+          await initializeSearch();
+          
         } catch (error) {
           console.error('Initialization error:', error);
           showNotification(currentLang === "en"
@@ -2340,6 +2407,22 @@
             : "初始化應用程式時發生錯誤，部分功能可能受限。");
         }
       });
+
+      // 新增統一的初始化搜尋函數
+      async function initializeSearch() {
+        const centralLocationToggle = document.getElementById('centralLocationToggle');
+        const useLocationService = centralLocationToggle?.checked;
+
+        if (useLocationService) {
+          await getLocation();
+        } else {
+          userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+        }
+
+        // 只執行一次搜尋，並設定不移動地圖
+        await searchYouBike(true, false);
+        showMainContent();
+      }
 
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
@@ -2486,55 +2569,63 @@
         locateControl.addTo(leafletMap);
         
         try {
-          let stations;
-          if (navigator.onLine) {
-            try {
-              const response = await fetch('https://apis.youbike.com.tw/json/station-min-yb2.json', {
-                headers: {
-                  'accept': '*/*',
-                  'accept-language': 'zh-TW,zh;q=0.9'
-                }
-              });
-              
-              if (!response.ok) throw new Error('無法取得站點資料');
-              stations = await response.json();
-              
-              // 儲存到 IndexedDB
-              await saveYoubikeDataToDB(stations);
-            } catch (error) {
-              console.warn('Failed to fetch online data:', error);
-              stations = await getYoubikeDataFromDB();
-            }
-          } else {
-            // 離線模式：從 IndexedDB 讀取資料
-            stations = await getYoubikeDataFromDB();
-          }
-
-          allStations = stations;
-          
-          // 清除現有標記
-          if (markerClusterGroup) {
-            markerClusterGroup.clearLayers();
-          }
-
-          // 建立新標記
-          stations.forEach(station => {
-            const lat = parseFloat(station.lat);
-            const lng = parseFloat(station.lng);
-            
-            if (!isNaN(lat) && !isNaN(lng)) {
-              const marker = L.marker([lat, lng]);
-              
-
-              marker.on('click', async () => {
+            let stations;
+            if (!youbikeDataCache) { // 只在 cache 不存在時才嘗試獲取資料
+              if (navigator.onLine) {
                 try {
-                  let stationInfo = {};
-                  if (navigator.onLine) {
-                    const vehicleData = await queryVehicleData([station.station_no]);
-                    stationInfo = vehicleData[station.station_no] || {};
-                  }
+                  const response = await fetch('https://apis.youbike.com.tw/json/station-min-yb2.json', {
+                    headers: {
+                      'accept': '*/*',
+                      'accept-language': 'zh-TW,zh;q=0.9'
+                    }
+                  });
+                  
+                  if (!response.ok) throw new Error('無法取得站點資料');
+                  stations = await response.json();
+                  youbikeDataCache = stations; // 儲存到全域快取
+                  
+                  // 儲存到 IndexedDB
+                  await saveYoubikeDataToDB(stations);
+                } catch (error) {
+                  console.warn('Failed to fetch online data:', error);
+                  stations = await getYoubikeDataFromDB();
+                  youbikeDataCache = stations;
+                }
+              } else {
+                // 離線模式：從 IndexedDB 讀取資料
+                stations = await getYoubikeDataFromDB();
+                youbikeDataCache = stations;
+              }
+            } else {
+              stations = youbikeDataCache; // 使用已存在的快取資料
+            }
 
-                  const content = `
+            allStations = stations;
+            
+            // 清除現有標記
+            if (markerClusterGroup) {
+              markerClusterGroup.clearLayers();
+            }
+
+            // 建立新標記
+            stations.forEach(station => {
+              const lat = parseFloat(station.lat);
+              const lng = parseFloat(station.lng);
+              
+              if (!isNaN(lat) && !isNaN(lng)) {
+                const marker = L.marker([lat, lng]);
+                
+
+
+                marker.on('click', async () => {
+                  try {
+                    let stationInfo = {};
+                    if (navigator.onLine) {
+                      const vehicleData = await queryVehicleData([station.station_no]);
+                      stationInfo = vehicleData[station.station_no] || {};
+                    }
+
+                    const content = `
                     <h4>${currentLang === "en" ? station.name_en : station.name_tw}</h4>
                     <p>${currentLang === "en" ? "Address: " : "地址："} ${currentLang === "en" ? station.address_en : station.address_tw}</p>
                     ${navigator.onLine ? `
@@ -2616,9 +2707,7 @@
           getLocation();
         } else {
           userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-          searchYouBike(true, false).then(() => {
-            showMainContent();
-          });
+          // 移除此處的 searchYouBike 呼叫
         }
       });
       
@@ -2699,7 +2788,7 @@
           document.body.classList.toggle('dark-mode');
           const isDark = document.body.classList.contains("dark-mode");
           localStorage.setItem("dark_mode", isDark);
-          darkModeToggle.innerHTML = isDark ? '<span style="color:#ffd700; font-size:32px;">☀️</span>' : '🌙';
+          document.getElementById('darkModeToggle').innerHTML = isDark ? '<span style="color:#ffd700; font-size:32px;">☀️</span>' : '🌙';
           if (leafletMap) {
             leafletMap.remove();
           }
@@ -2758,12 +2847,12 @@
                         className: 'pulsing-icon',
                         html: '<div class="pulse"></div>',
                         iconSize: [20, 20]
-                      });
-                      
-                      L.marker([coords.lat, coords.lng], {
-                        icon: pulsingIcon,
-                        pane: 'markerPane'
-                      }).addTo(leafletMap);
+                    });
+                    
+                    L.marker([coords.lat, coords.lng], {
+                      icon: pulsingIcon,
+                      pane: 'markerPane'
+                    }).addTo(leafletMap);
                 }
                 
                 // 移動地圖到選擇的區域
@@ -2786,7 +2875,7 @@
           getLocation();
         } else {
           userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-          searchYouBike();
+          // 移除此處的 searchYouBike 呼叫
         }
 
         // 初始化地區選單
@@ -2797,85 +2886,47 @@
           
           const coords = regionCoordinates[selectedRegion];
           
-          // 只有在未使用定位服務時才更新預設座標和位置標記
           if (!centralLocationToggle.checked) {
-              userLocation = { latitude: coords.lat, longitude: coords.lng };
-              
-              // 更新或創建位置標記
-              if (locationMarker) {
-                  locationMarker.setLatLng([coords.lat, coords.lng]);
-              } else {
-                  locationMarker = L.circleMarker([coords.lat, coords.lng], {
-                      radius: 10,
-                      fillColor: '#2196F3',
-                      fillOpacity: 0.8,
-                      color: '#ffffff',
-                      weight: 3,
-                      pane: 'markerPane'
-                  }).addTo(leafletMap);
+            userLocation = { latitude: coords.lat, longitude: coords.lng };
+            
+            if (locationMarker) {
+              locationMarker.setLatLng([coords.lat, coords.lng]);
+            } else {
+              locationMarker = L.circleMarker([coords.lat, coords.lng], {
+                  radius: 10,
+                  fillColor: '#2196F3',
+                  fillOpacity: 0.8,
+                  color: '#ffffff',
+                  weight: 3,
+                  pane: 'markerPane'
+              }).addTo(leafletMap);
 
-                  // 添加脈衝動畫效果
-                  const pulsingIcon = L.divIcon({
-                      className: 'pulsing-icon',
-                      html: '<div class="pulse"></div>',
-                      iconSize: [20, 20]
-                  });
-                  
-                  L.marker([coords.lat, coords.lng], {
-                      icon: pulsingIcon,
-                      pane: 'markerPane'
-                  }).addTo(leafletMap);
-              }
+              // 添加脈衝動畫效果
+              const pulsingIcon = L.divIcon({
+                  className: 'pulsing-icon',
+                  html: '<div class="pulse"></div>',
+                  iconSize: [20, 20]
+              });
               
-              if (leafletMap) {
-                  leafletMap.setView([coords.lat, coords.lng], 18, { animate: true });
-              }
-              searchYouBike();
+              L.marker([coords.lat, coords.lng], {
+                  icon: pulsingIcon,
+                  pane: 'markerPane'
+              }).addTo(leafletMap);
+            }
+            
+            if (leafletMap) {
+              leafletMap.setView([coords.lat, coords.lng], 18, { animate: true });
+            }
+            searchYouBike(); // 這裡的搜尋是必要的，因為使用者主動切換地區
           }
         });
 
-        // 修改定位服務初始化處理
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                position => {
-                    // 找到最近的區域並設為預設值
-                    const nearestRegion = findNearestRegion(position.coords.latitude, position.coords.longitude);
-                    defaultRegion = nearestRegion;
-                    defaultLatitude = regionCoordinates[nearestRegion].lat;
-                    defaultLongitude = regionCoordinates[nearestRegion].lng;
-                    
-                    // 更新本地儲存和選單值
-                    localStorage.setItem('selectedRegion', nearestRegion);
-                    const centralRegionSelect = document.getElementById('centralRegionSelect');
-                    if (centralRegionSelect) {
-                      centralRegionSelect.value = nearestRegion;
-                    }
-
-                    // 如果沒有使用定位服務,則移動到最近區域
-                    if (!centralLocationToggle.checked) {
-                      userLocation = { 
-                        latitude: regionCoordinates[nearestRegion].lat, 
-                        longitude: regionCoordinates[nearestRegion].lng 
-                      };
-                      if (leafletMap) {
-                        leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
-                      }
-                      searchYouBike();
-                    }
-                },
-                error => {
-                  // 定位失敗時使用儲存的區域,如果沒有則使用高雄市
-                  console.warn('Geolocation failed:', error);
-                  const savedRegion = localStorage.getItem('selectedRegion') || 'kaohsiung';
-                  defaultRegion = savedRegion;
-                  defaultLatitude = regionCoordinates[savedRegion].lat;
-                  defaultLongitude = regionCoordinates[savedRegion].lng;
-                  const centralRegionSelect = document.getElementById('centralRegionSelect');
-                  if (centralRegionSelect) {
-                    centralRegionSelect.value = savedRegion;
-                  }
-                }
-            );
+        // 修改定位服務初始化處理部分
+        if (centralLocationToggle.checked) {
+          getLocation();
+        } else {
+          userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+          // 移除此處的 searchYouBike 呼叫
         }
       });
 
