@@ -1326,6 +1326,7 @@
       })();
 
       let youbikeDataCache = null;
+      let initializeSearch = null; // 新增全域變數，用於儲存parkingInfo資料
 
       // IndexedDB 操作函數
       function openYoubikeDB() {
@@ -1608,7 +1609,12 @@
           let vehData = {};
           const stationIds = usedStations.map(station => String(station.station_no));
           if (isOnline) {
-            vehData = await queryVehicleData(stationIds);
+            if (initializeSearch) {
+              vehData = initializeSearch;
+            } else {
+              vehData = await queryVehicleData(stationIds);
+              initializeSearch = vehData; // 儲存首次呼叫結果，後續直接利用
+            }
           }
           const organizedOutput = usedStations.map(site => {
             const info = {
@@ -2486,32 +2492,13 @@
         locateControl.addTo(leafletMap);
         
         try {
-          let stations;
-          if (navigator.onLine) {
-            try {
-              const response = await fetch('https://apis.youbike.com.tw/json/station-min-yb2.json', {
-                headers: {
-                  'accept': '*/*',
-                  'accept-language': 'zh-TW,zh;q=0.9'
-                }
-              });
-              
-              if (!response.ok) throw new Error('無法取得站點資料');
-              stations = await response.json();
-              
-              // 儲存到 IndexedDB
-              await saveYoubikeDataToDB(stations);
-            } catch (error) {
-              console.warn('Failed to fetch online data:', error);
-              stations = await getYoubikeDataFromDB();
-            }
-          } else {
-            // 離線模式：從 IndexedDB 讀取資料
+          // 改成直接使用共用的站點資料，避免重複呼叫 station-min-yb2 API
+          let stations = allStations;
+          if (!stations || stations.length === 0) {
             stations = await getYoubikeDataFromDB();
           }
-
           allStations = stations;
-          
+
           // 清除現有標記
           if (markerClusterGroup) {
             markerClusterGroup.clearLayers();
@@ -2556,7 +2543,6 @@
               markerClusterGroup.addLayer(marker);
             }
           });
-          
           leafletMap.addLayer(markerClusterGroup);
           
         } catch (error) {
