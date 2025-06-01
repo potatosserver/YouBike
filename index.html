@@ -26,8 +26,7 @@
         transition: background 0.5s ease, color 0.5s ease;
         padding-top: 20px; /* 增加頂部填充 */
       }
-      
-      /* 定位通知樣式 */
+
       #locationNotification {
         position: fixed;
         top: 20px;
@@ -758,18 +757,7 @@
       }
       
       #darkModeToggle {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 50px;
-          height: 50px;
-          background: linear-gradient(135deg, #007BFF, #0056b3);
-          border: none;
-          color: white;
-          border-radius: 50%;
-          cursor: pointer;
-          font-size: 24px;
-          transition: all 0.3s ease;
+          display: none; /* 隱藏這個按鈕 */
       }
       
       #settingsPanel a,
@@ -1077,31 +1065,11 @@
         <p id="modalText"></p>
         <button id="modalButton">確定</button>
       </div>
-      <div id="extraButtons">
-          <a href="https://github.com/KEVIN970712/YouBike" target="_blank">
-              <img loading="lazy" src="https://potatosserver.github.io/YouBike/icons/html.webp" alt="GitHub Repository" style="width:30px; height:30px;" />
-          </a>
-          <a href="https://github.com/potatosserver/YouBike_Python" target="_blank">
-                <img loading="lazy" src="https://potatosserver.github.io/YouBike/icons/python.webp" alt="GitHub Repository" style="width:30px; height:30px;" />
-          </a>
-      </div>
       </div>      <button id="settingsButton" title="設定" style="position: fixed; bottom: 60px; right: 20px; z-index: 1200; width: 50px; height: 50px; background: white; color: black; border: 2px solid black; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: transform 0.2s ease;">⚙️</button>
       <div id="settingsPanel">
-        <button id="darkModeToggle" title="切換暗色模式">🌙</button>
         <button id="langToggle" title="Switch Language" style="width:50px; height:50px; border-radius:50%; margin:0 5px; display:flex; align-items:center; justify-content:center;">
           <img loading="lazy" src="https://potatosserver.github.io/YouBike/icons/translate.webp" alt="Translate" style="width:35px; height:35px;" />
         </button>
-        <a id="githubLink" href="https://github.com/potatosserver/YouBike" target="_blank" style="width:50px; height:50px; border-radius:50%; margin:0 5px; display:flex; align-items:center; justify-content:center; background:white; text-decoration:none;">
-          <img loading="lazy" src="https://potatosserver.github.io/YouBike/icons/github.webp" alt="GitHub Repository" style="width:35px; height:35px;" />
-        </a>
-        <div id="extraButtons">
-          <a href="https://github.com/potatosserver/YouBike" target="_blank">
-              <img loading="lazy" src="https://potatosserver.github.io/YouBike/icons/html.webp" alt="GitHub Repository" style="width:30px; height:30px;" />
-          </a>
-          <a href="https://github.com/potatosserver/YouBike_Python" target="_blank">
-                <img loading="lazy" src="https://potatosserver.github.io/YouBike/icons/python.webp" alt="GitHub Repository" style="width:30px; height:30px;" />
-          </a>
-        </div>
       </div>
     </div>
     <div id="floatingCard"></div>
@@ -2147,24 +2115,6 @@
           .catch(error => {
             console.error("Vehicle data update failed:", error);
           });
-      }
-      const darkModeToggle = document.getElementById('darkModeToggle');
-      darkModeToggle.addEventListener('click', () => {
-          document.body.classList.toggle('dark-mode');
-          const isDark = document.body.classList.contains("dark-mode");
-          localStorage.setItem("dark_mode", isDark);
-          darkModeToggle.innerHTML = isDark ? '<span style="color:#ffd700; font-size:32px;">☀️</span>' : '🌙';
-          // 重載地圖：移除現有地圖並呼叫 initMap() 重新初始化
-          if (leafletMap) {
-              leafletMap.remove();
-          }
-          initMap();
-          // 切換模式後重新調整地圖位置與縮放
-          updateMapMarkers();
-      });
-      if (localStorage.getItem("dark_mode") === "true") {
-        document.body.classList.add("dark-mode");
-        darkModeToggle.innerHTML = '<span style="color:#ffd700; font-size:32px;">☀️</span>';
       }
 
       let currentLang = localStorage.getItem("lang") || "zh";
