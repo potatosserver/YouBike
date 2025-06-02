@@ -872,26 +872,15 @@
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
           z-index: 10000;
           backdrop-filter: blur(10px);
-          animation: fadeIn 0.3s ease;
+          animation: fadeIn 0.2s ease;
           max-height: calc(100vh - 80px); /* 增加與上下邊界間距 */
           overflow-y: scroll; /* 允許內容捲動 */
           scrollbar-width: none; /* Firefox 隱藏捲軸 */
+          transition: background-color 0.2s ease;
       }
 
       body.dark-mode #centralSettingsPanel {
           background: rgba(30, 30, 30, 0.95);
-          color: #fff;
-      }
-
-      #centralSettingsPanel h2 {
-          text-align: center;
-          margin-bottom: 20px;
-          color: #007BFF;
-          font-size: 1.5em;
-      }
-
-      body.dark-mode #centralSettingsPanel h2 {
-          color: #90CAF9;
       }
 
       .settings-group {
@@ -901,7 +890,7 @@
           border: 1px solid #000;
           border-radius: 10px;
           color: #333;
-          transition: border-color 0.3s;
+          transition: border-color 0.2s ease, color 0.2s ease;
       }
       
       body.dark-mode .settings-group {
@@ -918,19 +907,17 @@
           background: #f0f0f0;
           border-radius: 8px;
           color: inherit;
-          /* 移除背景和文字顏色的過渡效果，保持同步切換 */
-          transition: none;
+          transition: background-color 0.2s ease;
       }
 
       body.dark-mode .setting-item {
           background: #455a64;
-          color: inherit;
       }
 
-      /* 將顏色過渡效果移到父元素上 */
-      #centralSettingsPanel, #centralSettingsPanel * {
+      /* 移除這個通用的過渡效果，改用更精確的控制 */
+      /* #centralSettingsPanel, #centralSettingsPanel * {
           transition: background-color 0.3s ease, color 0.3s ease;
-      }
+      } */
 
       /* 設定面板關閉按鈕樣式 */
       #closeCentralSettings {
@@ -1807,6 +1794,7 @@
               }).addTo(leafletMap);
 
               const pulsingIcon = L.divIcon({
+
                 className: 'pulsing-icon',
                 html: '<div class="pulse"></div>',
                 iconSize: [20, 20]
@@ -2626,6 +2614,7 @@
                   leafletMap = null;
                   locationMarker = null;
                   
+
                   // 第三階段：重新初始化地圖
                   requestAnimationFrame(() => {
                     initMap().then(() => {
@@ -2735,6 +2724,7 @@
           if (!centralLocationToggle.checked) {
               userLocation = { latitude: coords.lat, longitude: coords.lng };
               
+
               // 更新或創建位置標記
               if (locationMarker) {
                   locationMarker.setLatLng([coords.lat, coords.lng]);
