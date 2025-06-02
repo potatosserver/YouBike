@@ -2621,9 +2621,12 @@
         const centralLocationToggle = document.getElementById('centralLocationToggle');
         const centralRegionSelect = document.getElementById('centralRegionSelect');
 
-        // 移除重複的預設值設定
-        const savedRegion = localStorage.getItem('selectedRegion');
-        centralRegionSelect.value = savedRegion || 'kaohsiung';
+        // 從本地儲存讀取深色模式設定
+        const isDarkMode = localStorage.getItem("dark_mode") === "true";
+        if (isDarkMode) {
+          document.body.classList.add('dark-mode');
+        }
+        centralDarkModeToggle.checked = isDarkMode;
 
         // 初始化開關狀態
         centralDarkModeToggle.checked = document.body.classList.contains('dark-mode');
@@ -2632,10 +2635,9 @@
 
         // 深色模式開關
         centralDarkModeToggle.addEventListener('change', () => {
-          document.body.classList.toggle('dark-mode');
-          const isDark = document.body.classList.contains("dark-mode");
-          localStorage.setItem("dark_mode", isDark);
-          darkModeToggle.innerHTML = isDark ? '<span style="color:#ffd700; font-size:32px;">☀️</span>' : '🌙';
+          const isDark = centralDarkModeToggle.checked;
+          document.body.classList.toggle('dark-mode', isDark);
+          localStorage.setItem("dark_mode", isDark.toString());
           if (leafletMap) {
             leafletMap.remove();
           }
