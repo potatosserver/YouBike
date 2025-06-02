@@ -872,11 +872,9 @@
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
           z-index: 10000;
           backdrop-filter: blur(10px);
-          animation: fadeIn 0.2s ease;
           max-height: calc(100vh - 80px); /* 增加與上下邊界間距 */
           overflow-y: scroll; /* 允許內容捲動 */
           scrollbar-width: none; /* Firefox 隱藏捲軸 */
-          transition: background-color 0.2s ease;
       }
 
       body.dark-mode #centralSettingsPanel {
@@ -890,7 +888,6 @@
           border: 1px solid #000;
           border-radius: 10px;
           color: #333;
-          transition: border-color 0.2s ease, color 0.2s ease;
       }
       
       body.dark-mode .settings-group {
@@ -907,7 +904,6 @@
           background: #f0f0f0;
           border-radius: 8px;
           color: inherit;
-          transition: background-color 0.2s ease;
       }
 
       body.dark-mode .setting-item {
