@@ -898,24 +898,14 @@
           margin-bottom: 20px;
           padding: 15px;
           background: transparent;
-          border: 1px solid #000; /* 明亮模式：黑色外框 */
+          border: 1px solid #000;
           border-radius: 10px;
-          color: #333; /* 新增：明確設定文字顏色 */
-          transition: border-color 0.3s; /* 只對邊框保留過渡效果 */
-      }
-      body.dark-mode .settings-group {
-          border-color: #fff; /* 黑暗模式：白色外框 */
-          color: #fff; /* 新增：明確設定深色模式文字顏色 */
-      }
-
-      .settings-group h3 {
-          margin-bottom: 15px;
           color: #333;
-          font-size: 1.2em;
-          transition: none; /* 移除過渡效果 */
+          transition: border-color 0.3s;
       }
-
-      body.dark-mode .settings-group h3 {
+      
+      body.dark-mode .settings-group {
+          border-color: #fff;
           color: #fff;
       }
 
@@ -927,49 +917,22 @@
           padding: 10px;
           background: #f0f0f0;
           border-radius: 8px;
-          color: #333; /* 新增：明確設定文字顏色 */
-          transition: background-color 0.3s; /* 只對背景保留過渡效果 */
+          color: inherit;
+          /* 移除背景和文字顏色的過渡效果，保持同步切換 */
+          transition: none;
       }
 
       body.dark-mode .setting-item {
           background: #455a64;
-          color: #fff; /* 新增：明確設定深色模式文字顏色 */
+          color: inherit;
       }
 
-      /* Styles for external links in central settings panel */
-      #centralSettingsPanel .github-link {
-          color: #007BFF; /* Light blue for light mode */
-          text-decoration: none; /* Remove underline */
-          display: flex; /* Use flexbox for alignment */
-          align-items: center; /* Vertically align items */
-          width: 100%; /* Take full width of parent */
+      /* 將顏色過渡效果移到父元素上 */
+      #centralSettingsPanel, #centralSettingsPanel * {
+          transition: background-color 0.3s ease, color 0.3s ease;
       }
 
-      body.dark-mode #centralSettingsPanel .github-link {
-          color: #90CAF9; /* Light blue for dark mode */
-      }
-
-      #centralSettingsPanel .github-link:visited {
-          color: #007BFF; /* Keep same color after visited in light mode */
-      }
-
-      body.dark-mode #centralSettingsPanel .github-link:visited {
-          color: #90CAF9; /* Keep same color after visited in dark mode */
-      }
-
-      #centralSettingsPanel .github-link:hover {
-          color: #0056b3; /* Slightly darker blue on hover in light mode */
-      }
-
-      body.dark-mode #centralSettingsPanel .github-link:hover {
-          color: #BBDEFB; /* Slightly lighter blue on hover in dark mode */
-      }
-
-      #centralSettingsPanel .github-link span {
-          margin-left: 10px; /* Add some spacing between image and text */
-      }
-
-
+      /* 設定面板關閉按鈕樣式 */
       #closeCentralSettings {
           position: absolute;
           top: 2vh;   /* 增加上間距 */
@@ -1036,6 +999,23 @@
       #loadingOverlay.fade-out {
         opacity: 0;
         pointer-events: none;
+      }
+
+      /* 新增 GitHub 連結樣式 */
+      .github-link {
+        text-decoration: none;
+        color: #007BFF;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      body.dark-mode .github-link {
+        color: #90CAF9;
+      }
+
+      .github-link span {
+        flex: 1;
       }
     </style>
   </head>
@@ -2300,7 +2280,7 @@
     });
     const searchIcon = document.getElementById('searchIcon');
     searchIcon.addEventListener('click', () => {
-      searchYouBike(true, true); // 移動地圖
+      searchYouBike(true, true); // 秺動地圖
     });
     // 修改倒數計時器物件
     let countdownTimer = {
