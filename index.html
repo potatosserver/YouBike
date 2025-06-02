@@ -25,6 +25,8 @@
         color: #333; /* 預設亮色模式文字顏色 */
         transition: background 0.5s ease, color 0.5s ease;
         padding-top: 20px; /* 增加頂部填充 */
+        --map-filter: none;
+        --map-transition: filter 0.3s ease;
       }
 
       #locationNotification {
@@ -841,32 +843,6 @@
         filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
       }
 
-      /* 新增 CSS 變數 */
-:root {
-    --map-filter: none;
-}
-
-body.dark-mode {
-    --map-filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
-}
-
-/* 修改：使用 CSS 變數應用濾鏡效果 */
-.leaflet-layer,
-.leaflet-control-zoom-in,
-.leaflet-control-zoom-out,
-.leaflet-control-attribution {
-    filter: var(--map-filter);
-    transition: filter 0.3s ease;
-}
-
-/* 移除舊的深色模式濾鏡規則 */
-body.dark-mode .leaflet-layer,
-body.dark-mode .leaflet-control-zoom-in,
-body.dark-mode .leaflet-control-zoom-out,
-body.dark-mode .leaflet-control-attribution {
-    filter: var(--map-filter);
-}
-
       /* 強制 popup 在所有搜尋框內容之上 */
       .leaflet-popup-pane {
         z-index: 12000 !important;
@@ -1133,9 +1109,7 @@ body.dark-mode .leaflet-control-attribution {
       // 新增全域變數
       let leafletMap, markerClusterGroup, tileLayer;
       let userLocation = null;
-      let locationMarker = null;
-      let autoCenter = false; // 新增: 追蹤定位狀態
-      let autoCenterInterval = null; // 新增: 追蹤定位計時器
+      let locationMarker = null; // 新增位置標記變數
       let sortingLocked = false;
       let initialLoad = true;
       let locationDenied = false;
@@ -1448,14 +1422,6 @@ body.dark-mode .leaflet-control-attribution {
 
       // 修改 searchYouBike 函數開始部分
       async function searchYouBike(showLoadingIndicator = true, shouldMoveMap = false) {
-        // 停止自動追蹤
-        if (autoCenter) {
-            autoCenter = false;
-            if (autoCenterInterval) {
-                clearInterval(autoCenterInterval);
-                autoCenterInterval = null;
-            }
-        }
         if (showLoadingIndicator) showLoading();
         const keyword = keywordInput.value.trim().toLowerCase();
         try {
@@ -1653,14 +1619,6 @@ body.dark-mode .leaflet-control-attribution {
                 const lat = parseFloat(station.coords[0]);
                 const lng = parseFloat(station.coords[1]);
                 if (!isNaN(lat) && !isNaN(lng) && leafletMap) {
-                  // 停止自動追蹤
-                  if (autoCenter) {
-                    autoCenter = false;
-                    if (autoCenterInterval) {
-                      clearInterval(autoCenterInterval);
-                      autoCenterInterval = null;
-                    }
-                  }
                   leafletMap.setView([lat, lng], 18, { animate: true, duration: 1 });
                 }
               });
@@ -1672,8 +1630,7 @@ body.dark-mode .leaflet-control-attribution {
             if (!validIds.includes(card.dataset.id)) {
               resultsDiv.removeChild(card);
             }
-          });
-          updateResultsOrder();
+          });          updateResultsOrder();
           await new Promise(resolve => setTimeout(resolve, 0));
 
           // 找到搜尋結果中距離最近的站點（已按距離排序）
@@ -1809,11 +1766,11 @@ body.dark-mode .leaflet-control-attribution {
           // 不再使用 modal 提示，保留空函式
       }
       function calculateDistance(lat1, lon1, lat2, lon2) {
-        const R =  6371;
+        const R = 6371;
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
         const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * 180) *
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
                   Math.sin(dLon / 2) * Math.sin(dLon / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
@@ -1825,7 +1782,6 @@ body.dark-mode .leaflet-control-attribution {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude
           };
-
 
           if (leafletMap) {
             // 移動地圖至使用者定位（第一次或從預設更新時）
@@ -2302,7 +2258,7 @@ body.dark-mode .leaflet-control-attribution {
 
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
-          searchYouBike(true, true); // 秼動地圖
+          searchYouBike(true, true); // 移動地圖
         }
       });
 
@@ -2382,17 +2338,6 @@ body.dark-mode .leaflet-control-attribution {
           zoomControl: true
         }).setView([initialLat, initialLng], 18);
 
-        // 新增地圖拖動事件監聽器
-        leafletMap.on('dragstart', () => {
-          if (autoCenter) {
-            autoCenter = false;
-            if (autoCenterInterval) {
-              clearInterval(autoCenterInterval);
-              autoCenterInterval = null;
-            }
-          }
-        });
-
         // 如果有用戶位置，立即創建位置標記
         if (userLocation) {
           locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
@@ -2443,33 +2388,17 @@ body.dark-mode .leaflet-control-attribution {
             btn.innerHTML = '<i class="material-icons" style="font-size:18px; line-height:30px;">my_location</i>';
             btn.style.width = '30px';
             btn.style.height = '30px';
-            btn.style.display = 'flex';
-            btn.style.alignItems = 'center';
-            btn.style.justifyContent = 'center';
-            btn.style.padding = '0';
-            btn.style.cursor = 'pointer';
+            btn.style.display = 'flex';  // 新增 flex 布局
+            btn.style.alignItems = 'center';  // 垂直置中
+            btn.style.justifyContent = 'center';  // 水平置中
+            btn.style.padding = '0';  // 移除內邊距
+            btn.style.cursor = 'pointer';  // 新增指針樣式
             btn.title = currentLang === "en" ? "Go to my location" : "定位到我目前位置";
-            
             L.DomEvent.on(btn, 'click', function(e) {
                 L.DomEvent.stopPropagation(e);
                 L.DomEvent.preventDefault(e);
-                
                 if (userLocation) {
                     leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
-                    autoCenter = true;
-                    
-                    if (autoCenterInterval) {
-                        clearInterval(autoCenterInterval);
-                    }
-                    autoCenterInterval = setInterval(() => {
-                        if (userLocation && autoCenter) {
-                            leafletMap.setView([userLocation.latitude, userLocation.longitude], 
-                                leafletMap.getZoom(), { animate: true });
-                        } else if (!autoCenter) {
-                            clearInterval(autoCenterInterval);
-                            autoCenterInterval = null;
-                        }
-                    }, 1000);
                 }
             });
             return btn;
@@ -2477,7 +2406,7 @@ body.dark-mode .leaflet-control-attribution {
         locateControl.addTo(leafletMap);
         
         try {
-          // 修改成直接使用共用的站點資料，避免重複呼叫 station-min-yb2 API
+          // 改成直接使用共用的站點資料，避免重複呼叫 station-min-yb2 API
           let stations = allStations;
           if (!stations || stations.length === 0) {
             stations = await getYoubikeDataFromDB();
@@ -2495,17 +2424,7 @@ body.dark-mode .leaflet-control-attribution {
             const lng = parseFloat(station.lng);
             
             if (!isNaN(lat) && !isNaN(lng)) {
-              const marker = L.marker([lat, lng], {
-                icon: L.icon({
-                  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-                  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
-                  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
-                  iconSize: [25, 41],
-                  iconAnchor: [12, 41],
-                  popupAnchor: [1, -34],
-                  shadowSize: [41, 41]
-                })
-              });
+              const marker = L.marker([lat, lng]);
               
 
               marker.on('click', async () => {
@@ -2558,13 +2477,9 @@ body.dark-mode .leaflet-control-attribution {
           // 重置所有釘標的樣式
           markerClusterGroup.eachLayer(marker => {
             marker.setIcon(L.icon({
-              iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
-              iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
-              shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+              iconUrl: 'https://unpkg.com/leaflet/dist/images/marker-icon.png',
               iconSize: [25, 41],
-              iconAnchor: [12, 41],
-              popupAnchor: [1, -34],
-              shadowSize: [41, 41]
+              iconAnchor: [12, 41]
             }));
           });
           
@@ -2580,12 +2495,8 @@ body.dark-mode .leaflet-control-attribution {
                 if (markerLatLng.lat === lat && markerLatLng.lng === lng) {
                   marker.setIcon(L.icon({
                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-                    iconRetinaUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-                    shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
                     iconSize: [25, 41],
-                    iconAnchor: [12, 41],
-                    popupAnchor: [1, -34],
-                    shadowSize: [41, 41]
+                    iconAnchor: [12, 41]
                   }));
                 }
               });
@@ -2690,13 +2601,16 @@ body.dark-mode .leaflet-control-attribution {
         centralDarkModeToggle.addEventListener('change', () => {
           const isDark = centralDarkModeToggle.checked;
           
-          document.body.classList.toggle('dark-mode', isDark);
-          localStorage.setItem("dark_mode", isDark.toString());
-          
-          // 不再重新初始化地圖，只更新標記
-          if (markerClusterGroup) {
+          // 先執行 DOM 操作
+          requestAnimationFrame(() => {
+            document.body.classList.toggle('dark-mode', isDark);
+            localStorage.setItem("dark_mode", isDark.toString());
+            
+            // 不再需要重新初始化地圖，移除舊的重置邏輯
+            if (leafletMap) {
               updateMapMarkers();
-          }
+            }
+          });
         });
 
         // 語言切換開關
