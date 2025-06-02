@@ -1133,7 +1133,9 @@ body.dark-mode .leaflet-control-attribution {
       // 新增全域變數
       let leafletMap, markerClusterGroup, tileLayer;
       let userLocation = null;
-      let locationMarker = null; // 新增位置標記變數
+      let locationMarker = null;
+      let autoCenter = false; // 新增: 追蹤定位狀態
+      let autoCenterInterval = null; // 新增: 追蹤定位計時器
       let sortingLocked = false;
       let initialLoad = true;
       let locationDenied = false;
@@ -2413,17 +2415,44 @@ body.dark-mode .leaflet-control-attribution {
             btn.innerHTML = '<i class="material-icons" style="font-size:18px; line-height:30px;">my_location</i>';
             btn.style.width = '30px';
             btn.style.height = '30px';
-            btn.style.display = 'flex';  // 新增 flex 布局
-            btn.style.alignItems = 'center';  // 垂直置中
-            btn.style.justifyContent = 'center';  // 水平置中
-            btn.style.padding = '0';  // 移除內邊距
-            btn.style.cursor = 'pointer';  // 新增指針樣式
+            btn.style.display = 'flex';
+            btn.style.alignItems = 'center';
+            btn.style.justifyContent = 'center';
+            btn.style.padding = '0';
+            btn.style.cursor = 'pointer';
             btn.title = currentLang === "en" ? "Go to my location" : "定位到我目前位置";
+            
             L.DomEvent.on(btn, 'click', function(e) {
                 L.DomEvent.stopPropagation(e);
                 L.DomEvent.preventDefault(e);
+                
                 if (userLocation) {
                     leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
+                    
+                    // 切換自動追蹤狀態
+                    autoCenter = !autoCenter;
+                    
+                    // 如果開啟自動追蹤
+                    if (autoCenter) {
+                        btn.style.backgroundColor = '#007BFF';
+                        btn.style.color = 'white';
+                        
+                        // 設定定期檢查
+                        autoCenterInterval = setInterval(() => {
+                            if (userLocation) {
+                                leafletMap.setView([userLocation.latitude, userLocation.longitude], 
+                                    leafletMap.getZoom(), { animate: true });
+                            }
+                        }, 1000);
+                    } else {
+                        // 關閉自動追蹤
+                        btn.style.backgroundColor = '';
+                        btn.style.color = '';
+                        if (autoCenterInterval) {
+                            clearInterval(autoCenterInterval);
+                            autoCenterInterval = null;
+                        }
+                    }
                 }
             });
             return btn;
