@@ -1448,6 +1448,20 @@ body.dark-mode .leaflet-control-attribution {
 
       // 修改 searchYouBike 函數開始部分
       async function searchYouBike(showLoadingIndicator = true, shouldMoveMap = false) {
+        // 停止自動追蹤
+        if (autoCenter) {
+            autoCenter = false;
+            if (autoCenterInterval) {
+                clearInterval(autoCenterInterval);
+                autoCenterInterval = null;
+            }
+            // 重置定位按鈕樣式
+            const locateBtn = document.querySelector('.leaflet-control-custom');
+            if (locateBtn) {
+                locateBtn.style.backgroundColor = '';
+                locateBtn.style.color = '';
+            }
+        }
         if (showLoadingIndicator) showLoading();
         const keyword = keywordInput.value.trim().toLowerCase();
         try {
@@ -1645,6 +1659,20 @@ body.dark-mode .leaflet-control-attribution {
                 const lat = parseFloat(station.coords[0]);
                 const lng = parseFloat(station.coords[1]);
                 if (!isNaN(lat) && !isNaN(lng) && leafletMap) {
+                  // 停止自動追蹤
+                  if (autoCenter) {
+                    autoCenter = false;
+                    if (autoCenterInterval) {
+                      clearInterval(autoCenterInterval);
+                      autoCenterInterval = null;
+                    }
+                    // 重置定位按鈕樣式
+                    const locateBtn = document.querySelector('.leaflet-control-custom');
+                    if (locateBtn) {
+                      locateBtn.style.backgroundColor = '';
+                      locateBtn.style.color = '';
+                    }
+                  }
                   leafletMap.setView([lat, lng], 18, { animate: true, duration: 1 });
                 }
               });
@@ -1656,7 +1684,8 @@ body.dark-mode .leaflet-control-attribution {
             if (!validIds.includes(card.dataset.id)) {
               resultsDiv.removeChild(card);
             }
-          });          updateResultsOrder();
+          });
+          updateResultsOrder();
           await new Promise(resolve => setTimeout(resolve, 0));
 
           // 找到搜尋結果中距離最近的站點（已按距離排序）
@@ -1792,7 +1821,7 @@ body.dark-mode .leaflet-control-attribution {
           // 不再使用 modal 提示，保留空函式
       }
       function calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371;
+        const R =  6371;
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
         const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
@@ -2428,31 +2457,19 @@ body.dark-mode .leaflet-control-attribution {
                 
                 if (userLocation) {
                     leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
+                    autoCenter = true;
+                    btn.style.backgroundColor = '#007BFF';
+                    btn.style.color = 'white';
                     
-                    // 切換自動追蹤狀態
-                    autoCenter = !autoCenter;
-                    
-                    // 如果開啟自動追蹤
-                    if (autoCenter) {
-                        btn.style.backgroundColor = '#007BFF';
-                        btn.style.color = 'white';
-                        
-                        // 設定定期檢查
-                        autoCenterInterval = setInterval(() => {
-                            if (userLocation) {
-                                leafletMap.setView([userLocation.latitude, userLocation.longitude], 
-                                    leafletMap.getZoom(), { animate: true });
-                            }
-                        }, 1000);
-                    } else {
-                        // 關閉自動追蹤
-                        btn.style.backgroundColor = '';
-                        btn.style.color = '';
-                        if (autoCenterInterval) {
-                            clearInterval(autoCenterInterval);
-                            autoCenterInterval = null;
-                        }
+                    if (autoCenterInterval) {
+                        clearInterval(autoCenterInterval);
                     }
+                    autoCenterInterval = setInterval(() => {
+                        if (userLocation && autoCenter) {
+                            leafletMap.setView([userLocation.latitude, userLocation.longitude], 
+                                leafletMap.getZoom(), { animate: true });
+                        }
+                    }, 1000);
                 }
             });
             return btn;
@@ -2460,7 +2477,7 @@ body.dark-mode .leaflet-control-attribution {
         locateControl.addTo(leafletMap);
         
         try {
-          // 改成直接使用共用的站點資料，避免重複呼叫 station-min-yb2 API
+          // 修改成直接使用共用的站點資料，避免重複呼叫 station-min-yb2 API
           let stations = allStations;
           if (!stations || stations.length === 0) {
             stations = await getYoubikeDataFromDB();
@@ -2478,7 +2495,17 @@ body.dark-mode .leaflet-control-attribution {
             const lng = parseFloat(station.lng);
             
             if (!isNaN(lat) && !isNaN(lng)) {
-              const marker = L.marker([lat, lng]);
+              const marker = L.marker([lat, lng], {
+                icon: L.icon({
+                  iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+                  iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
+                  shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
+                  iconSize: [25, 41],
+                  iconAnchor: [12, 41],
+                  popupAnchor: [1, -34],
+                  shadowSize: [41, 41]
+                })
+              });
               
 
               marker.on('click', async () => {
@@ -2531,9 +2558,13 @@ body.dark-mode .leaflet-control-attribution {
           // 重置所有釘標的樣式
           markerClusterGroup.eachLayer(marker => {
             marker.setIcon(L.icon({
-              iconUrl: 'https://unpkg.com/leaflet/dist/images/marker-icon.png',
+              iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
+              iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
+              shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
               iconSize: [25, 41],
-              iconAnchor: [12, 41]
+              iconAnchor: [12, 41],
+              popupAnchor: [1, -34],
+              shadowSize: [41, 41]
             }));
           });
           
@@ -2549,8 +2580,12 @@ body.dark-mode .leaflet-control-attribution {
                 if (markerLatLng.lat === lat && markerLatLng.lng === lng) {
                   marker.setIcon(L.icon({
                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                    iconRetinaUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                    shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png',
                     iconSize: [25, 41],
-                    iconAnchor: [12, 41]
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                    shadowSize: [41, 41]
                   }));
                 }
               });
