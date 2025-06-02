@@ -27,6 +27,29 @@
         padding-top: 20px; /* 增加頂部填充 */
         --map-filter: none;
         --map-transition: filter 0.3s ease;
+        /* 新增全域顏色過渡 */
+        --color-transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+      }
+
+      /* 為所有元素添加顏色過渡效果 */
+      *, *::before, *::after {
+        transition: var(--color-transition);
+      }
+
+      /* 確保特定元素有正確的過渡效果 */
+      .station, 
+      .station h3, 
+      .station p,
+      #searchContainer,
+      #keyword,
+      #mainContent,
+      .modal,
+      #toggleDarkMode,
+      #locationSwitchContainer,
+      #settingsPanel,
+      .settings-group,
+      .setting-item {
+        transition: var(--color-transition), transform 0.2s ease, box-shadow 0.2s ease;
       }
 
       #locationNotification {
@@ -733,7 +756,7 @@
           z-index: 1200;
           transform: translateX(100%) scale(0.5);
           opacity: 0;
-          transition: all 0.3s ease;
+          transition: all 0.2s ease; /* 從 0.3s 改為 0.2s */
           background: rgba(255, 255, 255, 0.9);
           padding: 10px;
           border-radius: 30px;
@@ -743,19 +766,11 @@
       }
       
       #settingsPanel.show {
-          transform: translateX(0) scale(1);
-          opacity: 1;
-          pointer-events: auto;
+          animation: popUpSettings 0.2s forwards; /* 從 0.3s 改為 0.2s */
       }
-      
-      body.dark-mode #settingsPanel {
-          background: rgba(30, 30, 30, 0.9);
-      }
-      
-      #settingsPanel.show {
-          transform: translateX(0) scale(1);
-          opacity: 1;
-          animation: popUpSettings 0.3s forwards;
+
+      #settingsPanel.hiding {
+          animation: popDownSettings 0.2s forwards; /* 從 0.3s 改為 0.2s */
       }
       
       #darkModeToggle {
@@ -797,9 +812,14 @@
           }
       }
 
-      #settingsPanel.hiding {
-          animation: popDownSettings 0.3s forwards;
+      #settingsPanel.show {
+          animation: popUpSettings 0.2s forwards; /* 從 0.3s 改為 0.2s */
       }
+
+      #settingsPanel.hiding {
+          animation: popDownSettings 0.2s forwards; /* 從 0.3s 改為 0.2s */
+      }
+
       #updateCountdown {
         white-space: nowrap;
       }
@@ -874,13 +894,15 @@
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
           z-index: 10000;
           backdrop-filter: blur(10px);
-          max-height: calc(100vh - 80px); /* 增加與上下邊界間距 */
-          overflow-y: scroll; /* 允許內容捲動 */
-          scrollbar-width: none; /* Firefox 隱藏捲軸 */
+          max-height: calc(100vh - 80px);
+          overflow-y: scroll;
+          scrollbar-width: none;
+          transition: background-color 0.1s ease; /* 加快背景色過渡 */
       }
 
       body.dark-mode #centralSettingsPanel {
           background: rgba(30, 30, 30, 0.95);
+          transition: background-color 0.1s ease; /* 加快深色模式過渡 */
       }
 
       .settings-group {
@@ -890,6 +912,7 @@
           border: 1px solid #000;
           border-radius: 10px;
           color: #333;
+          transition: border-color 0.1s ease, color 0.2s ease; /* 加快邊框和文字顏色過渡 */
       }
       
       body.dark-mode .settings-group {
@@ -906,6 +929,7 @@
           background: #f0f0f0;
           border-radius: 8px;
           color: inherit;
+          transition: background-color 0.2s ease, color 0.2s ease; /* 加快設定項目過渡 */
       }
 
       body.dark-mode .setting-item {
