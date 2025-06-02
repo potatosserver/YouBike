@@ -1455,12 +1455,6 @@ body.dark-mode .leaflet-control-attribution {
                 clearInterval(autoCenterInterval);
                 autoCenterInterval = null;
             }
-            // 重置定位按鈕樣式
-            const locateBtn = document.querySelector('.leaflet-control-custom');
-            if (locateBtn) {
-                locateBtn.style.backgroundColor = '';
-                locateBtn.style.color = '';
-            }
         }
         if (showLoadingIndicator) showLoading();
         const keyword = keywordInput.value.trim().toLowerCase();
@@ -1666,12 +1660,6 @@ body.dark-mode .leaflet-control-attribution {
                       clearInterval(autoCenterInterval);
                       autoCenterInterval = null;
                     }
-                    // 重置定位按鈕樣式
-                    const locateBtn = document.querySelector('.leaflet-control-custom');
-                    if (locateBtn) {
-                      locateBtn.style.backgroundColor = '';
-                      locateBtn.style.color = '';
-                    }
                   }
                   leafletMap.setView([lat, lng], 18, { animate: true, duration: 1 });
                 }
@@ -1825,7 +1813,7 @@ body.dark-mode .leaflet-control-attribution {
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
         const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * 180) *
                   Math.sin(dLon / 2) * Math.sin(dLon / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
@@ -2314,7 +2302,7 @@ body.dark-mode .leaflet-control-attribution {
 
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
-          searchYouBike(true, true); // 移動地圖
+          searchYouBike(true, true); // 秼動地圖
         }
       });
 
@@ -2394,6 +2382,17 @@ body.dark-mode .leaflet-control-attribution {
           zoomControl: true
         }).setView([initialLat, initialLng], 18);
 
+        // 新增地圖拖動事件監聽器
+        leafletMap.on('dragstart', () => {
+          if (autoCenter) {
+            autoCenter = false;
+            if (autoCenterInterval) {
+              clearInterval(autoCenterInterval);
+              autoCenterInterval = null;
+            }
+          }
+        });
+
         // 如果有用戶位置，立即創建位置標記
         if (userLocation) {
           locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
@@ -2458,8 +2457,6 @@ body.dark-mode .leaflet-control-attribution {
                 if (userLocation) {
                     leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
                     autoCenter = true;
-                    btn.style.backgroundColor = '#007BFF';
-                    btn.style.color = 'white';
                     
                     if (autoCenterInterval) {
                         clearInterval(autoCenterInterval);
@@ -2468,6 +2465,9 @@ body.dark-mode .leaflet-control-attribution {
                         if (userLocation && autoCenter) {
                             leafletMap.setView([userLocation.latitude, userLocation.longitude], 
                                 leafletMap.getZoom(), { animate: true });
+                        } else if (!autoCenter) {
+                            clearInterval(autoCenterInterval);
+                            autoCenterInterval = null;
                         }
                     }, 1000);
                 }
