@@ -841,6 +841,32 @@
         filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
       }
 
+      /* 新增 CSS 變數 */
+:root {
+    --map-filter: none;
+}
+
+body.dark-mode {
+    --map-filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
+/* 修改：使用 CSS 變數應用濾鏡效果 */
+.leaflet-layer,
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out,
+.leaflet-control-attribution {
+    filter: var(--map-filter);
+    transition: filter 0.3s ease;
+}
+
+/* 移除舊的深色模式濾鏡規則 */
+body.dark-mode .leaflet-layer,
+body.dark-mode .leaflet-control-zoom-in,
+body.dark-mode .leaflet-control-zoom-out,
+body.dark-mode .leaflet-control-attribution {
+    filter: var(--map-filter);
+}
+
       /* 強制 popup 在所有搜尋框內容之上 */
       .leaflet-popup-pane {
         z-index: 12000 !important;
@@ -1781,6 +1807,7 @@
             longitude: position.coords.longitude
           };
 
+
           if (leafletMap) {
             // 移動地圖至使用者定位（第一次或從預設更新時）
             if (isFirstLocation || wasDefault) {
@@ -2599,39 +2626,13 @@
         centralDarkModeToggle.addEventListener('change', () => {
           const isDark = centralDarkModeToggle.checked;
           
-          // 先執行 DOM 操作
-          requestAnimationFrame(() => {
-            document.body.classList.toggle('dark-mode', isDark);
-            localStorage.setItem("dark_mode", isDark.toString());
-            
-            // 分階段處理地圖重新初始化
-            if (leafletMap) {
-              // 第一階段：移除標記群組
-              requestAnimationFrame(() => {
-                if (markerClusterGroup) {
-                  markerClusterGroup.clearLayers();
-                }
-                
-                // 第二階段：移除地圖和重置變數
-                requestAnimationFrame(() => {
-                  leafletMap.remove();
-                  leafletMap = null;
-                  locationMarker = null;
-                  
-
-                  // 第三階段：重新初始化地圖
-                  requestAnimationFrame(() => {
-                    initMap().then(() => {
-                      // 第四階段：更新標記
-                      requestAnimationFrame(() => {
-                        updateMapMarkers();
-                      });
-                    });
-                  });
-                });
-              });
-            }
-          });
+          document.body.classList.toggle('dark-mode', isDark);
+          localStorage.setItem("dark_mode", isDark.toString());
+          
+          // 不再重新初始化地圖，只更新標記
+          if (markerClusterGroup) {
+              updateMapMarkers();
+          }
         });
 
         // 語言切換開關
