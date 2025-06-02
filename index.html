@@ -2264,16 +2264,16 @@
             }
           }
 
-          // 修改：等待定位作業完成後，再等待卡片搜尋與排序完成，然後再顯示主畫面
-          if (centralLocationToggle?.checked) {
-            await getLocation();
-            await searchYouBike(true, false); // 等待卡片渲染與排序完成
-          } else {
-            userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-            await searchYouBike(true, false); // 等待卡片渲染與排序完成
-          }
-          // 卡片搜尋與排序完成後再進入畫面
-          showMainContent();
+          // 延遲執行定位請求，確保它在使用者互動後發生
+          setTimeout(async () => {
+            if (centralLocationToggle?.checked) {
+              await getLocation();
+              await searchYouBike(true, false);
+            } else {
+              userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+              await searchYouBike(true, false);
+            }
+          }, 100);
         } catch (error) {
           console.error('Initialization error:', error);
           showNotification(currentLang === "en"
