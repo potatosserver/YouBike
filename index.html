@@ -1059,22 +1059,19 @@
       }
 
       /* 旋轉動畫樣式 */
-.rotate-right {
-  transform: rotate(360deg);
-  transition: transform 0.8s ease !important;  /* 由 1s 改為 0.8s */
-  transform-origin: center center;  
-  display: inline-block;  /* 新增：確保元素作為 inline-block 以正確旋轉 */
-  backface-visibility: hidden;  /* 加快硬體加速 */
-  will-change: transform;       /* 提醒瀏覽器進行預渲染 */
-}
-.rotate-left {
-  transform: rotate(-360deg);
-  transition: transform 0.8s ease !important;  /* 由 1s 改為 0.8s */
-  transform-origin: center center;  
-  display: inline-block;  /* 新增：確保元素作為 inline-block 以正確旋轉 */
-  backface-visibility: hidden;  /* 加快硬體加速 */
-  will-change: transform;       /* 提醒瀏覽器進行預渲染 */
-}
+      /* 已修正：移除重複的 transform-origin 和 display，並統一過渡時間 */
+      .rotate-right {
+        transform: rotate(360deg);
+        transition: transform 0.8s ease; /* 移除 !important */
+        backface-visibility: hidden;
+        will-change: transform;
+      }
+      .rotate-left {
+        transform: rotate(-360deg);
+        transition: transform 0.8s ease; /* 移除 !important */
+        backface-visibility: hidden;
+        will-change: transform;
+      }
     </style>
   </head>
   <body>
@@ -1103,7 +1100,7 @@
         <p id="modalText"></p>
         <button id="modalButton">確定</button>
       </div>
-      </div>      <button id="settingsButton" title="設定" style="position: fixed; bottom: 60px; right: 20px; z-index: 1200; width: 50px; height: 50px; background: white; color: black; border: 2px solid black; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: transform 0.2s ease;">⚙️</button>
+      </div>      <button id="settingsButton" title="設定" style="position: fixed; bottom: 60px; right: 20px; z-index: 10001; width: 50px; height: 50px; background: white; color: black; border: 2px solid black; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; transition: transform 0.8s ease; transform-origin: center center;">⚙️</button>
     </div>
     <div id="floatingCard"></div>
     <button id="updateCountdown" style="display:none; position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; padding: 6px 12px; background-color: white; color: #007bff; border: 2px solid #007bff; border-radius: 25px; font-size: 0.8em; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: all 0.3s ease; width: 100px;">60秒後更新</button>
@@ -2369,7 +2366,7 @@
       });
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
-          searchYouBike(true, true); // 移動地圖
+          searchYouBike(true, true); // 秺動地圖
           updateVehicleData(); // 確保即時資料更新
         }
       });
