@@ -1180,6 +1180,7 @@
       let geolocationErrorMessage = null;
       let dataLoaded = false;
       let hasShownDefaultLocationMessage = false; // 添加新的標記
+      let isFollowingUser = false; // 新增變數，控制地圖是否跟隨使用者位置
       const regionCoordinates = {
         taipei: { lat: 25.047924, lng: 121.517081 },
         newTaipei: { lat: 25.0215339197085, lng: 121.4568090197085 },
@@ -1818,7 +1819,8 @@
                   Math.sin(dLon / 2) * Math.sin(dLon / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
-      }      async function handleGeolocationSuccess(position) {
+      }      
+      async function handleGeolocationSuccess(position) {
           const wasDefault = !userLocation || (userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude);
           const isFirstLocation = !locationMarker;  // 使用 locationMarker 判斷是否為第一次定位
           
@@ -1828,10 +1830,14 @@
           };
 
           if (leafletMap) {
-            // 移動地圖至使用者定位（第一次或從預設更新時）
+            // 第一次定位或從預設位置更新時，設定 isFollowingUser 為 true
             if (isFirstLocation || wasDefault) {
+              isFollowingUser = true;
               leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true, duration: 1 });
+            } else if (isFollowingUser) { // 如果正在跟隨，則持續移動地圖
+              leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 });
             }
+
             if (!locationMarker) {
               // 第一次定位時建立定位標記與脈衝動畫
               locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
@@ -1844,7 +1850,6 @@
               }).addTo(leafletMap);
 
               const pulsingIcon = L.divIcon({
-
                 className: 'pulsing-icon',
                 html: '<div class="pulse"></div>',
                 iconSize: [20, 20]
@@ -1867,13 +1872,17 @@
             updateCardDistances();
             await updateVehicleData(); // 確保即時資料更新
           }
-      }      function handleGeolocationError(error) {
+      }      
+      function handleGeolocationError(error) {
         console.error("Geolocation error:", error);
         locationDenied = true;
         let errorMessage = "";
         let errorType = "";
         let shouldDisableLocationToggle = false; // 新增變數控制是否要關閉開關
         
+        // 停止跟隨使用者位置
+        isFollowingUser = false;
+
         switch (error.code) {
           case error.PERMISSION_DENIED:
             errorMessage = currentLang === "en"
@@ -1955,7 +1964,8 @@
           searchYouBike();
           updateVehicleData(); // 確保即時資料更新
         }
-      }      function handleGeoUpdateSuccess(position) {
+      }      
+      function handleGeoUpdateSuccess(position) {
           // 檢查定位開關是否開啟
           const centralLocationToggle = document.getElementById('centralLocationToggle');
           if (!centralLocationToggle?.checked) {
@@ -1973,6 +1983,11 @@
             locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
           }
           
+          // 如果 isFollowingUser 為 true，則移動地圖視圖
+          if (isFollowingUser && leafletMap) {
+            leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 });
+          }
+
           if (wasDefault) {
             searchYouBike().then(() => {
               updateResultsOrder();
@@ -1982,8 +1997,11 @@
             updateCardDistances();
             updateVehicleData(); // 確保即時資料更新
           }
-      }      function handleGeoUpdateError(error) {
+      }      
+      function handleGeoUpdateError(error) {
           console.error("Geolocation update error:", error);
+          // 停止跟隨使用者位置
+          isFollowingUser = false;
           // 新增：如果使用預設座標定位，則不顯示使用先前座標定位提示
           if (userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude) {
             return;
@@ -2510,6 +2528,7 @@
                 L.DomEvent.stopPropagation(e);
                 L.DomEvent.preventDefault(e);
                 if (userLocation) {
+                    isFollowingUser = true; // 點擊定位按鈕後開始跟隨
                     leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
                     searchYouBike(); // 新增：重新搜尋站點
                 }
@@ -2517,6 +2536,11 @@
             return btn;
         };
         locateControl.addTo(leafletMap);
+
+        // 監聽地圖移動事件，如果地圖被手動移動，則停止跟隨
+        leafletMap.on('movestart', () => {
+          isFollowingUser = false;
+        });
         
         try {
           // 確保 stations 參數是有效的陣列
@@ -2740,6 +2764,7 @@
             
             if (isChecked) {
                 // 開啟定位後，等待定位成功，再移動地圖並重新搜尋站點
+                isFollowingUser = true; // 開啟定位時開始跟隨
                 getLocation().then(() => {
                     if (leafletMap && userLocation) {
                         leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
@@ -2747,6 +2772,7 @@
                     }
                 });
             } else {
+                isFollowingUser = false; // 關閉定位時停止跟隨
                 if (locationIntervalId) {
                   clearInterval(locationIntervalId);
                   locationIntervalId = null;
@@ -2759,7 +2785,6 @@
                 // 更新使用者位置到選擇的區域座標
                 userLocation = { latitude: coords.lat, longitude: coords.lng };
                 
-
 
                 // 更新藍點位置到預設區域
                 if (locationMarker) {
