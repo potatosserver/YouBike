@@ -2281,8 +2281,6 @@
            }
         }
       });
-
-
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
           searchYouBike(true, true); // 移動地圖
@@ -2417,17 +2415,18 @@
             btn.innerHTML = '<i class="material-icons" style="font-size:18px; line-height:30px;">my_location</i>';
             btn.style.width = '30px';
             btn.style.height = '30px';
-            btn.style.display = 'flex';  // 新增 flex 布局
-            btn.style.alignItems = 'center';  // 垂直置中
-            btn.style.justifyContent = 'center';  // 水平置中
-            btn.style.padding = '0';  // 移除內邊距
-            btn.style.cursor = 'pointer';  // 新增指針樣式
+            btn.style.display = 'flex';
+            btn.style.alignItems = 'center';
+            btn.style.justifyContent = 'center';
+            btn.style.padding = '0';
+            btn.style.cursor = 'pointer';
             btn.title = currentLang === "en" ? "Go to my location" : "定位到我目前位置";
             L.DomEvent.on(btn, 'click', function(e) {
                 L.DomEvent.stopPropagation(e);
                 L.DomEvent.preventDefault(e);
                 if (userLocation) {
                     leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
+                    searchYouBike(); // 新增：重新搜尋站點
                 }
             });
             return btn;
