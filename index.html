@@ -936,6 +936,11 @@
           background: #455a64;
       }
 
+      /* 移除這個通用的過渡效果，改用更精確的控制 */
+      /* #centralSettingsPanel, #centralSettingsPanel * {
+          transition: background-color 0.3s ease, color 0.3s ease;
+      } */
+
       /* 設定面板關閉按鈕樣式 */
       #closeCentralSettings {
           position: absolute;
@@ -967,39 +972,11 @@
       body.dark-mode #closeCentralSettings:hover {
           background-color: rgba(255, 255, 255, 0.1);  /* 暗色模式懸停效果 */
       }
-      
-      /* Opening Animation for Central Settings Panel */
-      @keyframes centralPanelOpen {
-        from {
-          opacity: 0;
-          transform: translate(-50%, -50%) scale(0.95);
-        }
-        to {
-          opacity: 1;
-          transform: translate(-50%, -50%) scale(1);
-        }
-      }
 
-      /* Closing Animation for Central Settings Panel */
-      @keyframes centralPanelClose {
-        from {
-          opacity: 1;
-          transform: translate(-50%, -50%) scale(1);
-        }
-        to {
-          opacity: 0;
-          transform: translate(-50%, -50%) scale(0.95);
-        }
+      @keyframes fadeIn {
+          from { opacity: 0; transform: translate(-50%, -48%); }
+          to { opacity: 1; transform: translate(-50%, -50%); }
       }
-
-      #centralSettingsPanel.is-opening {
-        animation: centralPanelOpen 0.3s ease-out forwards;
-      }
-
-      #centralSettingsPanel.is-closing {
-        animation: centralPanelClose 0.3s ease-in forwards;
-      }
-
 
       /* 新增地區選擇下拉選單的深色模式樣式 */
       body.dark-mode #centralRegionSelect {
@@ -1196,9 +1173,6 @@
       clearTextBtn.addEventListener('click', () => {
           keywordInput.value = '';
           clearTextBtn.style.display = 'none';
-          // 清除搜尋關鍵字後，重新執行搜尋以更新地圖標記和列表
-          searchYouBike(true, true); // true to show loading, true to move map (optional, could be false)
-
           // 移動地圖到使用者當前定位（使用 userLocation 與 leafletMap）
           if (userLocation && leafletMap) {
             leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
@@ -1270,7 +1244,7 @@
         let prefix = lang === "en" ? "Loading:" : "載入中：";
         let progress = 0;
         let lockedProgress = null;
-        let loadingTextInterval = setInterval(() => { // Declare loadingTextInterval with let
+        loadingTextInterval = setInterval(() => {
           if (!mainContentShown) {
             if (progress < 85) {
               progress++;
@@ -1313,7 +1287,7 @@
 
       let youbikeDataCache = null;
       let initializeSearch = null; // 新增全域變數，用於儲存parkingInfo資料
-      let allStations = []; // 新增全域變數，用於儲存所有站點資料以供地圖使用
+      let allStations = []; // 全域變數，用於儲存所有站點資料以供地圖使用
 
       // IndexedDB 操作函數
       function openYoubikeDB() {
@@ -1408,13 +1382,12 @@
           store.openCursor().onsuccess = function(event) {
             const cursor = event.target.result;
             if (cursor) {
-              data.push(cursor.value.value); // 確保取出的是原始資料
+              data.push(cursor.value);
               cursor.continue();
             } else {
               resolve(data);
             }
           };
-          store.onerror = (e) => reject(e.target.error);
         });
       }
 
@@ -1430,7 +1403,7 @@
         // 儲存新資料
         for (const [idx, item] of dataArray.entries()) {
           await store.put({ 
-            id: idx,
+            id: idx, // 使用索引作為 keyPath
             value: item,
             timestamp: Date.now()
           });
@@ -1461,7 +1434,7 @@
             req.onsuccess = function(event) {
               const cursor = event.target.result;
               if (cursor) {
-                data.push(cursor.value.value);
+                data.push(cursor.value.value); // 只取 value 部分
                 cursor.continue();
               } else {
                 resolve(data);
@@ -1472,12 +1445,12 @@
         });
       }
 
-      // 修改 searchYouBike 函數開始部分
+      // 修改 searchYouBike 函數
       async function searchYouBike(showLoadingIndicator = true, shouldMoveMap = false) {
         if (showLoadingIndicator) showLoading();
         const keyword = keywordInput.value.trim().toLowerCase();
         try {
-          if (!youbikeDataCache) {
+          if (!youbikeDataCache || youbikeDataCache.length === 0) { // 確保快取存在且有資料
             if (navigator.onLine) {
               try {
                 const youbikeUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
@@ -1488,9 +1461,9 @@
                   }
                 });
                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const youbikeData = await response.json();
-                youbikeDataCache = Array.isArray(youbikeData)
-                  ? youbikeData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
+                const fetchedData = await response.json();
+                youbikeDataCache = Array.isArray(fetchedData)
+                  ? fetchedData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
                   : [];
                 await saveYoubikeDataToDB(youbikeDataCache);
               } catch (error) {
@@ -1504,10 +1477,11 @@
                 : "離線模式：使用快取資料");
             }
           }
-          // 將用來建立圖標的站點資料指派給全域變數 allStations
-          allStations = youbikeDataCache;
 
-          let youbikeResults = youbikeDataCache;
+          // *** 將站點資料指派給全域變數 allStations ***
+          allStations = [...youbikeDataCache]; // 複製一份以避免直接修改快取
+
+          let youbikeResults = [...youbikeDataCache]; // 使用複製的資料進行篩選和排序
           if (keyword) {
             youbikeResults = youbikeResults.filter(station => {
               const stationNameTW = station.name_tw ? station.name_tw.toLowerCase() : '';
@@ -1871,13 +1845,11 @@
           }
           
           if (wasDefault) {
-            await searchYouBike(); // This will call updateMapMarkers
-            updateResultsOrder(); // updateResultsOrder might be redundant if searchYouBike handles it
+            await searchYouBike();
+            updateResultsOrder();
           } else {
-            updateCardDistances(); // This also calls updateResultsOrder and potentially updateMapMarkers indirectly if search is re-triggered
+            updateCardDistances();
           }
-          // Explicitly call updateMapMarkers after location changes and data might be re-sorted or re-fetched
-          updateMapMarkers();
       }      function handleGeolocationError(error) {
         console.error("Geolocation error:", error);
         locationDenied = true;
@@ -1956,17 +1928,15 @@
               // 重置通知顏色
               notification.style.backgroundColor = "";
             }, 300);
-          }, 5000);
+          }, 5000); // 延長顯示時間到 5 秒
 
           hasShownDefaultLocationMessage = true;
         }
 
         userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
         if (!shouldDisableLocationToggle) {
-          searchYouBike(); // This will call updateMapMarkers
+          searchYouBike();
         }
-        // Explicitly call updateMapMarkers after setting default location due to error
-        updateMapMarkers();
       }      function handleGeoUpdateSuccess(position) {
           // 檢查定位開關是否開啟
           const centralLocationToggle = document.getElementById('centralLocationToggle');
@@ -1986,14 +1956,12 @@
           }
           
           if (wasDefault) {
-            searchYouBike().then(() => { // searchYouBike calls updateMapMarkers
+            searchYouBike().then(() => {
               updateResultsOrder();
             });
           } else {
-            updateCardDistances(); // updateCardDistances calls updateResultsOrder
+            updateCardDistances();
           }
-          // Explicitly call updateMapMarkers after location update
-          updateMapMarkers();
       }      function handleGeoUpdateError(error) {
           console.error("Geolocation update error:", error);
           // 新增：如果使用預設座標定位，則不顯示使用先前座標定位提示
@@ -2014,8 +1982,6 @@
               notification.classList.remove('show', 'hide');
             }, 300);
           }, 3000);
-          // Even on update error, refresh markers based on current (last known) location
-          updateMapMarkers();
       }
       let locationIntervalId; // Add this global variable
       async function getLocation() {
@@ -2025,8 +1991,6 @@
             clearInterval(locationIntervalId);
             locationIntervalId = null;
           }
-          // If location services are off, update markers based on default/selected region
-          updateMapMarkers();
           return;
         }
         
@@ -2067,7 +2031,7 @@
               setTimeout(() => reject(new Error("TIMEOUT")), 10000);
             });
             const position = await Promise.race([positionPromise, timeoutPromise]);
-            await handleGeolocationSuccess(position); // await to ensure markers are updated
+            handleGeolocationSuccess(position);
           } catch (e) {
             if (e.message === "TIMEOUT") {
               handleGeolocationError({ 
@@ -2091,8 +2055,6 @@
             } else if (locationIntervalId) {
               clearInterval(locationIntervalId);
               locationIntervalId = null;
-              // If toggle is turned off during interval, update markers based on default/selected region
-              updateMapMarkers();
             }
           }, 10000);
         } else {
@@ -2101,7 +2063,7 @@
             "您的瀏覽器不支援地理位置功能。將使用預設座標進行定位。"
           );
           userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-          searchYouBike(); // Calls updateMapMarkers
+          searchYouBike();
           hideLoading();
         }
       }
@@ -2128,7 +2090,6 @@
           }
         });
         updateResultsOrder();
-        updateMapMarkers(); // Update markers after distances change, as this might affect "closest"
       }
       function updateVehicleData() {
         const stationElements = document.querySelectorAll('.station');
@@ -2147,8 +2108,6 @@
               if (emptyEl) emptyEl.textContent = (data.empty_spaces !== undefined ? data.empty_spaces : '未知');
             });
             updateResultsOrder();
-            // No direct need to call updateMapMarkers here unless vehicle data influences which markers are "searched"
-            // or "closest", which it currently doesn't.
           })
           .catch(error => {
             console.error("Vehicle data update failed:", error);
@@ -2243,62 +2202,43 @@
       // Settings button click handler
       settingsButton.addEventListener('click', (event) => {
         event.stopPropagation();
-        if (centralSettingsPanel.style.display === 'block' && !centralSettingsPanel.classList.contains('is-closing')) {
-            return;
-        }
-        centralSettingsPanel.classList.remove('is-closing');
         centralSettingsPanel.style.display = 'block';
-        centralSettingsPanel.classList.add('is-opening');
+        // Push a new state to history when settings panel opens
         history.pushState({ panelOpen: true }, 'Settings', '#settings');
       });
       
       // Close settings panel button click handler
       closeCentralSettings.addEventListener('click', () => {
-        if (!centralSettingsPanel.classList.contains('is-closing') && centralSettingsPanel.style.display === 'block') {
-            centralSettingsPanel.classList.remove('is-opening');
-            centralSettingsPanel.classList.add('is-closing');
-            setTimeout(() => {
-                centralSettingsPanel.style.display = 'none';
-                centralSettingsPanel.classList.remove('is-closing'); 
-                if (history.state && history.state.panelOpen) {
-                    history.back();
-                }
-            }, 300); // Animation duration
+        centralSettingsPanel.style.display = 'none';
+        // If the current history state is for the settings panel, go back
+        if (history.state && history.state.panelOpen) {
+          history.back();
         }
       });
 
       // Handle browser back button (Android back gesture)
       window.addEventListener('popstate', (event) => {
-        const panelIsCurrentlyVisible = centralSettingsPanel.style.display === 'block' && !centralSettingsPanel.classList.contains('is-closing');
-        const panelShouldBeOpen = event.state && event.state.panelOpen;
-
-        if (!panelShouldBeOpen && panelIsCurrentlyVisible) {
-            centralSettingsPanel.classList.remove('is-opening');
-            centralSettingsPanel.classList.add('is-closing');
-            setTimeout(() => {
-                centralSettingsPanel.style.display = 'none';
-                centralSettingsPanel.classList.remove('is-closing');
-            }, 300);
-        } else if (panelShouldBeOpen && !panelIsCurrentlyVisible) {
-            centralSettingsPanel.classList.remove('is-closing');
-            centralSettingsPanel.style.display = 'block';
-            centralSettingsPanel.classList.add('is-opening');
+        if (event.state && event.state.panelOpen) {
+          // If we're going back to a state where the panel was open, close it
+          centralSettingsPanel.style.display = 'block'; // Ensure it's visible before hiding
+          centralSettingsPanel.style.display = 'none';
+        } else if (!centralSettingsPanel.style.display || centralSettingsPanel.style.display === 'none') {
+            // If the panel is already closed and we're popping a state, it means we're going back to the main page or further.
+            // Do nothing, let the browser handle the navigation.
+        } else {
+            // If we are on the settings panel and popstate is not related to it, close the panel
+            centralSettingsPanel.style.display = 'none';
         }
       });
 
       // Close settings panel when clicking outside
       document.addEventListener('click', (event) => {
-        const panelIsCurrentlyVisible = centralSettingsPanel.style.display === 'block' && !centralSettingsPanel.classList.contains('is-closing');
-        if (!centralSettingsPanel.contains(event.target) && event.target !== settingsButton && panelIsCurrentlyVisible) {
-            centralSettingsPanel.classList.remove('is-opening');
-            centralSettingsPanel.classList.add('is-closing');
-            setTimeout(() => {
-                centralSettingsPanel.style.display = 'none';
-                centralSettingsPanel.classList.remove('is-closing');
-                if (history.state && history.state.panelOpen) {
-                    history.back(); 
-                }
-            }, 300);
+        if (!centralSettingsPanel.contains(event.target) && event.target !== settingsButton) {
+            centralSettingsPanel.style.display = 'none';
+            // If the panel was open, and we clicked outside, remove the history state for the panel
+            if (history.state && history.state.panelOpen) {
+                history.back(); // This will trigger popstate, which will then hide the panel.
+            }
         }
       });
       
@@ -2307,9 +2247,67 @@
         event.stopPropagation();
       });
 
+      // *** 修改 window load 事件 ***
+      window.addEventListener('load', async () => {
+        try {
+          // 先呼叫 searchYouBike 取得站點資料，但不顯示載入指示器，也不移動地圖
+          await searchYouBike(false, false); 
+
+          // 檢查是否有網路連線
+          if (navigator.onLine) {
+            // 將 allStations 傳入 initMap
+            await initMap(allStations); 
+          } else {
+            showNotification(currentLang === "en"
+              ? "Offline mode: Map features are limited"
+              : "離線模式：地圖功能受限");
+          }
+
+          // 從 IndexedDB 預先載入資料 (如果 searchYouBike 失敗或離線)
+          if (!youbikeDataCache || youbikeDataCache.length === 0) {
+             if (!navigator.onLine) {
+                try {
+                  youbikeDataCache = await getYoubikeDataFromDB();
+                  allStations = [...youbikeDataCache]; // 更新 allStations
+                } catch (error) {
+                  console.warn('Failed to load cached data:', error);
+                }
+             }
+          }
+
+
+          // 延遲執行定位請求，確保它在使用者互動後發生
+          // 並在定位成功後再次呼叫 searchYouBike 以更新列表和地圖標記
+          setTimeout(async () => {
+            const centralLocationToggleChecked = document.getElementById('centralLocationToggle')?.checked;
+            if (centralLocationToggleChecked) {
+              await getLocation(); // getLocation 內部會呼叫 searchYouBike
+            } else {
+              userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+              // 確保即使沒有定位，列表和地圖標記也基於初始載入的 allStations 更新
+              await searchYouBike(true, false); 
+            }
+            // 確保在所有資料載入和處理後顯示主內容
+            if (!mainContentShown) {
+                 showMainContent();
+            }
+          }, 100);
+
+        } catch (error) {
+          console.error('Initialization error:', error);
+          showNotification(currentLang === "en"
+            ? "Error initializing app. Some features may be limited."
+            : "初始化應用程式時發生錯誤，部分功能可能受限。");
+           if (!mainContentShown) { // 即使出錯也要嘗試顯示主內容
+                showMainContent();
+           }
+        }
+      });
+
+
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
-          searchYouBike(true, true); // 移動地圖, calls updateMapMarkers
+          searchYouBike(true, true); // 移動地圖
         }
       });
 
@@ -2325,7 +2323,7 @@
     });
     const searchIcon = document.getElementById('searchIcon');
     searchIcon.addEventListener('click', () => {
-      searchYouBike(true, true); // 秺動地圖, calls updateMapMarkers
+      searchYouBike(true, true); // 秺動地圖
     });
     // 修改倒數計時器物件
     let countdownTimer = {
@@ -2341,7 +2339,7 @@
             this.updateDisplay();
         },
         update: function() {
-            searchYouBike(true, false);  // 明確設定不移動地圖, calls updateMapMarkers
+            searchYouBike(true, false);  // 明確設定不移動地圖
             this.reset();
         }
     };
@@ -2359,9 +2357,9 @@
         }
         countdownTimer.updateDisplay();
     }, 1000);
-      
-      // 修改 initMap 函式：調整函式參數為 stations，移除內部重抓站點資料的邏輯，改以傳入的資料建立所有圖標。
-      async function initMap(stationsToDisplay) {
+
+      // *** 修改 initMap 函式 ***
+      async function initMap(stations) { // 接受 stations 參數
         // 檢查地圖是否已經初始化
         if (leafletMap) {
           return;  // 如果已初始化就直接返回
@@ -2457,23 +2455,31 @@
         locateControl.addTo(leafletMap);
         
         try {
-          // 使用傳入的 stationsToDisplay 資料建立所有圖標
-          stationsToDisplay.forEach(station => {
+          // *** 改用傳入的 stations 資料建立圖標 ***
+          // let currentStations = stations; // 使用傳入的參數
+          // if (!currentStations || currentStations.length === 0) {
+          //   // 如果傳入的 stations 為空或未定義，嘗試從 IndexedDB 獲取
+          //   console.warn("initMap received empty stations, trying to fetch from DB.");
+          //   currentStations = await getYoubikeDataFromDB();
+          //   allStations = currentStations; // 同步更新全域變數
+          // }
+
+          // 確保 stations 參數是有效的陣列
+          const currentStations = Array.isArray(stations) ? stations : [];
+
+
+          // 清除現有標記
+          if (markerClusterGroup) {
+            markerClusterGroup.clearLayers();
+          }
+
+          // 建立新標記
+          currentStations.forEach(station => {
             const lat = parseFloat(station.lat);
             const lng = parseFloat(station.lng);
             
             if (!isNaN(lat) && !isNaN(lng)) {
-              // Initially use default icon. updateMapMarkers will handle coloring.
-              const marker = L.marker([lat, lng], {
-                icon: L.icon({
-                    iconUrl: 'https://unpkg.com/leaflet/dist/images/marker-icon.png',
-                    iconSize: [25, 41],
-                    iconAnchor: [12, 41],
-                    popupAnchor: [1, -34],
-                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-                    shadowSize: [41, 41]
-                })
-              });
+              const marker = L.marker([lat, lng]);
               
 
               marker.on('click', async () => {
@@ -2506,7 +2512,9 @@
               markerClusterGroup.addLayer(marker);
             }
           });
-          leafletMap.addLayer(markerClusterGroup);
+          if (leafletMap && markerClusterGroup) { // 再次檢查 leafletMap 是否存在
+             leafletMap.addLayer(markerClusterGroup);
+          }
           
         } catch (error) {
           console.error('初始化地圖失敗:', error);
@@ -2514,169 +2522,66 @@
         }
       }
       
-      // *** MODIFIED FUNCTION ***
-      // 更新地圖釘標函數，根據搜尋結果或最近距離高亮顯示特定圖標為紅色
+      // 更新地圖釘標函數現在只需要處理搜尋結果的高亮顯示
       function updateMapMarkers() {
-        // 檢查 markerClusterGroup 是否已初始化且具有 eachLayer 方法
-        if (!markerClusterGroup || typeof markerClusterGroup.eachLayer !== 'function') {
-            console.log('Map features are limited or not initialized, cannot update markers.');
-            return;
+        // 檢查是否離線且地圖元件未初始化
+        if (!markerClusterGroup) {
+          console.log('Map features are limited in offline mode or map not initialized');
+          return;
         }
 
         try {
-            const keyword = keywordInput.value.trim().toLowerCase();
+          // 重置所有釘標的樣式
+          markerClusterGroup.eachLayer(marker => {
+            marker.setIcon(L.icon({
+              iconUrl: 'https://unpkg.com/leaflet/dist/images/marker-icon.png',
+              iconSize: [25, 41],
+              iconAnchor: [12, 41]
+            }));
+          });
+          
+          // 高亮顯示搜尋結果的釘標
+          const stationCards = document.querySelectorAll('.station');
+          stationCards.forEach(card => {
+            const lat = parseFloat(card.dataset.lat);
+            const lng = parseFloat(card.dataset.lng);
             
-            // 獲取當前結果列表中的站點卡片，這些是已搜尋/篩選的站點
-            const stationCards = document.querySelectorAll('.station'); 
-
-            // 創建一個 Set 來快速查找已搜尋/篩選站點的座標
-            const searchedOrFilteredStationCoords = new Set();
-            if (keyword) { // 只有在有關鍵字搜尋時才填充此 Set
-                stationCards.forEach(card => {
-                    const lat = parseFloat(card.dataset.lat);
-                    const lng = parseFloat(card.dataset.lng);
-                    if (!isNaN(lat) && !isNaN(lng)) {
-                        searchedOrFilteredStationCoords.add(`${lat},${lng}`);
-                    }
-                });
-            }
-
-            // 創建一個 Set 來儲存最近10個站點的座標 (僅在無關鍵字搜尋時計算)
-            let closestStationsCoords = new Set();
-            if (!keyword && userLocation && allStations && allStations.length > 0) {
-                const stationsWithDistances = allStations.map(station => {
-                    const dist = calculateDistance(
-                        userLocation.latitude,
-                        userLocation.longitude,
-                        parseFloat(station.lat), // 確保 station.lat 和 station.lng 是數字
-                        parseFloat(station.lng)
-                    );
-                    return { ...station, dist };
-                });
-
-                stationsWithDistances.sort((a, b) => a.dist - b.dist);
-                const top10Closest = stationsWithDistances.slice(0, 10);
-
-                top10Closest.forEach(station => {
-                    closestStationsCoords.add(`${parseFloat(station.lat)},${parseFloat(station.lng)}`);
-                });
-            }
-            
-            // 遍歷 markerClusterGroup 中的每個圖層 (marker)
-            markerClusterGroup.eachLayer(marker => {
+            if (markerClusterGroup && typeof markerClusterGroup.eachLayer === 'function') {
+              markerClusterGroup.eachLayer(marker => {
                 const markerLatLng = marker.getLatLng();
-                const markerCoordString = `${markerLatLng.lat},${markerLatLng.lng}`;
-                let isRed = false;
-
-                if (keyword) { 
-                    // 如果有搜尋關鍵字，則優先根據搜尋結果來決定是否標紅
-                    if (searchedOrFilteredStationCoords.has(markerCoordString)) {
-                        isRed = true;
-                    }
-                } else { 
-                    // 如果沒有搜尋關鍵字，則根據最近10個站點來決定是否標紅
-                    if (closestStationsCoords.has(markerCoordString)) {
-                        isRed = true;
-                    }
+                if (markerLatLng.lat === lat && markerLatLng.lng === lng) {
+                  marker.setIcon(L.icon({
+                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41]
+                  }));
                 }
-
-                // 根據 isRed 的值設定圖標
-                if (isRed) {
-                    marker.setIcon(L.icon({
-                        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
-                        iconSize: [25, 41],
-                        iconAnchor: [12, 41],
-                        popupAnchor: [1, -34], // 確保彈出視窗位置正確
-                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png', // 添加陰影以保持一致性
-                        shadowSize: [41, 41]    // 陰影大小
-                    }));
-                } else {
-                    marker.setIcon(L.icon({
-                        iconUrl: 'https://unpkg.com/leaflet/dist/images/marker-icon.png', // 預設藍色圖標
-                        iconSize: [25, 41],
-                        iconAnchor: [12, 41],
-                        popupAnchor: [1, -34],
-                        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-                        shadowSize: [41, 41]
-                    }));
-                }
-            });
+              });
+            }
+          });
         } catch (error) {
-            console.error('Error updating map markers:', error);
-            // 即使發生錯誤，也盡量不中斷應用程式運行，僅在控制台記錄錯誤
+          console.error('Error updating map markers:', error);
+          // 不中斷應用程式運行，僅記錄錯誤
         }
       }
       
-      // 修改 window load 事件：先呼叫 searchYouBike 取得站點資料，再把 allStations 傳入 initMap，即可確保地圖初始化時就有圖標資料。
-      window.addEventListener('load', async () => {
-        try {
-          const centralLocationToggle = document.getElementById('centralLocationToggle');
-          
-          // 1. 嘗試獲取使用者初始位置或使用預設位置
-          if (centralLocationToggle.checked) {
-              try {
-                  const positionPromise = new Promise((resolve, reject) => {
-                      navigator.geolocation.getCurrentPosition(resolve, reject, {
-                          enableHighAccuracy: true,
-                          timeout: 10000,
-                          maximumAge: 0
-                      });
-                  });
-                  const timeoutPromise = new Promise((_, reject) => {
-                      setTimeout(() => reject(new Error("TIMEOUT")), 10000);
-                  });
-                  const position = await Promise.race([positionPromise, timeoutPromise]);
-                  userLocation = {
-                      latitude: position.coords.latitude,
-                      longitude: position.coords.longitude
-                  };
-              } catch (e) {
-                  console.warn("Initial geolocation failed, using default:", e);
-                  userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-                  handleGeolocationError(e); // 仍顯示錯誤提示, calls updateMapMarkers
-              }
-          } else {
-              userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-          }
-
-          // 2. 呼叫 searchYouBike 取得站點資料並填充 allStations
-          await searchYouBike(false, false); // 不顯示載入指示器，不移動地圖, calls updateMapMarkers
-
-          // 3. 將 allStations 傳入 initMap，確保地圖初始化時就有圖標資料
-          await initMap(allStations); // initMap itself does not call updateMapMarkers, but searchYouBike does.
-                                      // And markers are added here.
-
-          // 4. 根據定位開關狀態，啟動持續定位或直接顯示內容
-          if (centralLocationToggle.checked) {
-              await getLocation(); // 啟動持續定位並處理地圖更新和站點卡片排序, calls updateMapMarkers
-          } else {
-              showMainContent(); // 如果定位關閉，直接顯示主內容
-              updateMapMarkers(); // Ensure markers are updated based on default location if toggle is off
-          }
-
-          // 自動更新計時器 (此部分已存在，保持不變)
-          setInterval(() => {
-            countdownTimer.remaining--;
-            if (countdownTimer.remaining <= 0) {
-                countdownTimer.update();
-            }
-            countdownTimer.updateDisplay();
-          }, 1000);
-
-        } catch (error) {
-          console.error('Initialization error:', error);
-          showNotification(currentLang === "en"
-            ? "Error initializing app. Some features may be limited."
-            : "初始化應用程式時發生錯誤，部分功能可能受限。");
-          showMainContent(); // 即使出錯也要顯示內容
-          updateMapMarkers(); // Fallback update
-        }
-      });
+      // 初始化地圖於頁面載入時 (此處的 initMap 呼叫已在上面的 window load 事件中處理)
+      // window.addEventListener('load', () => {
+      //   initMap(); // 這裡的 initMap 將使用全域的 allStations (如果已填充)
+      //   if (useLocation) {
+      //     getLocation();
+      //   } else {
+      //     userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+      //     searchYouBike(true, false).then(() => {
+      //       showMainContent();
+      //     });
+      //   }
+      // });
       
       // 點擊頁面其他區域時，隱藏浮動卡片
       document.addEventListener('click', (e) => {
         const floatingCard = document.getElementById('floatingCard');
-        if (!e.target.closest('#floatingCard') && floatingCard.style.display === 'block') {
+        if (floatingCard && !e.target.closest('#floatingCard') && floatingCard.style.display === 'block') {
           floatingCard.style.display = 'none';
         }
       });
@@ -2759,7 +2664,7 @@
             
             // 不再需要重新初始化地圖，移除舊的重置邏輯
             if (leafletMap) {
-              updateMapMarkers(); // Update markers on theme change
+              updateMapMarkers();
             }
           });
         });
@@ -2769,7 +2674,7 @@
           currentLang = currentLang === "en" ? "zh" : "en";
           localStorage.setItem("lang", currentLang);
           updateLanguageTexts();
-          searchYouBike(false); // calls updateMapMarkers
+          searchYouBike(false);
         });
 
         // 位置服務開關
@@ -2779,7 +2684,7 @@
             
             if (isChecked) {
                 // 開啟定位後，獲取定位並移動地圖到定位點
-                getLocation().then(() => { // getLocation calls updateMapMarkers
+                getLocation().then(() => {
                     if (leafletMap && userLocation) {
                         leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
                     }
@@ -2797,10 +2702,11 @@
                 // 更新使用者位置到選擇的區域座標
                 userLocation = { latitude: coords.lat, longitude: coords.lng };
                 
+
                 // 更新藍點位置到預設區域
                 if (locationMarker) {
                     locationMarker.setLatLng([coords.lat, coords.lng]);
-                } else {
+                } else if (leafletMap) { // 確保 leafletMap 已初始化
                     locationMarker = L.circleMarker([coords.lat, coords.lng], {
                         radius: 10,
                         fillColor: '#2196F3',
@@ -2828,7 +2734,7 @@
                   leafletMap.setView([coords.lat, coords.lng], 18, { animate: true });
                 }
                 
-                searchYouBike(); // calls updateMapMarkers
+                searchYouBike();
             }
         });
 
@@ -2838,10 +2744,13 @@
         }
         centralLocationToggle.checked = localStorage.getItem("useLocation") === "true";
 
-        // 初始化時檢查定位開關狀態
-        // Note: The actual getLocation and searchYouBike calls are now handled in window.onload
-        // to ensure proper sequence with map initialization.
-        // This block primarily sets up the toggle's initial state and event listener.
+        // 初始化時檢查定位開關狀態 (這部分邏輯已移至 window load 事件)
+        // if (centralLocationToggle.checked) {
+        //   getLocation();
+        // } else {
+        //   userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+        //   searchYouBike();
+        // }
 
         // 初始化地區選單
         centralRegionSelect.addEventListener('change', function() {
@@ -2858,8 +2767,8 @@
 
               // 更新或創建位置標記
               if (locationMarker) {
-                  locationMarker.setLatLng([coords.lat, coords.lat]); // Corrected to use coords.lat for both
-              } else {
+                  locationMarker.setLatLng([coords.lat, coords.lng]);
+              } else if (leafletMap) { // 確保 leafletMap 已初始化
                   locationMarker = L.circleMarker([coords.lat, coords.lng], {
                       radius: 10,
                       fillColor: '#2196F3',
@@ -2885,7 +2794,7 @@
               if (leafletMap) {
                   leafletMap.setView([coords.lat, coords.lng], 18, { animate: true });
               }
-              searchYouBike(); // calls updateMapMarkers
+              searchYouBike();
           }
         });
 
@@ -2915,7 +2824,7 @@
                       if (leafletMap) {
                         leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
                       }
-                      // searchYouBike(); // This call is now handled by window.onload
+                      searchYouBike();
                     }
                 },
                 error => {
