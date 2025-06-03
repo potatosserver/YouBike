@@ -1825,9 +1825,6 @@
             updateCardDistances();
             await updateVehicleData(); // 確保即時資料更新
           }
-          // 新增：每次定位成功後切換圖標顏色並更新
-          markerColorToggle = !markerColorToggle;
-          updateMapMarkers();
       }      function handleGeolocationError(error) {
         console.error("Geolocation error:", error);
         locationDenied = true;
@@ -1943,9 +1940,6 @@
             updateCardDistances();
             updateVehicleData(); // 確保即時資料更新
           }
-          // 新增：每次更新定位後切換圖標顏色並更新地圖釘標
-          markerColorToggle = !markerColorToggle;
-          updateMapMarkers();
       }      function handleGeoUpdateError(error) {
           console.error("Geolocation update error:", error);
           // 新增：如果使用預設座標定位，則不顯示使用先前座標定位提示
@@ -2075,6 +2069,7 @@
           }
         });
         updateResultsOrder();
+        updateMapMarkers(); // 新增：根據定位距離與搜尋狀態更新站點圖標的顏色
       }
       
       // 修改 updateVehicleData 函數，使其更健壯
@@ -2306,7 +2301,7 @@
     });
     const searchIcon = document.getElementById('searchIcon');
     searchIcon.addEventListener('click', () => {
-      searchYouBike(true, true); // 秺動地圖
+      searchYouBike(true, true); // 移動地圖
       updateVehicleData(); // 確保即時資料更新
     });
     // 修改倒數計時器物件
@@ -2515,19 +2510,7 @@
             }));
           });
           
-          // 使用 markerColorToggle 決定預設圖標顏色
-          const defaultIconUrl = markerColorToggle 
-            ? 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png'
-            : 'https://unpkg.com/leaflet/dist/images/marker-icon.png';
-          markerClusterGroup.eachLayer(marker => {
-            marker.setIcon(L.icon({
-              iconUrl: defaultIconUrl,
-              iconSize: [25, 41],
-              iconAnchor: [12, 41]
-            }));
-          });
-          
-          // 高亮顯示搜尋結果的釘標 (保留原本紅色邏輯)
+          // 高亮顯示搜尋結果的釘標
           const stationCards = document.querySelectorAll('.station');
           stationCards.forEach(card => {
             const lat = parseFloat(card.dataset.lat);
