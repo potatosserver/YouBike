@@ -898,6 +898,9 @@
           overflow-y: scroll;
           scrollbar-width: none;
           transition: background-color 0.1s ease; /* 加快背景色過渡 */
+          animation-duration: 0.3s;
+          animation-fill-mode: forwards;
+          opacity: 0;
       }
 
       body.dark-mode #centralSettingsPanel {
@@ -978,6 +981,26 @@
           to { opacity: 1; transform: translate(-50%, -50%); }
       }
 
+      @keyframes slideIn {
+        from { transform: translate(-50%, -60%) scale(0.8); opacity: 0; }
+        to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      }
+      @keyframes slideOut {
+        from { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        to { transform: translate(-50%, -60%) scale(0.8); opacity: 0; }
+      }
+      #centralSettingsPanel {
+        /* ...existing code... */
+        animation-duration: 0.3s;
+        animation-fill-mode: forwards;
+        opacity: 0;
+      }
+      #centralSettingsPanel.panel-open {
+        animation-name: slideIn;
+      }
+      #centralSettingsPanel.panel-close {
+        animation-name: slideOut;
+      }
       /* 新增地區選擇下拉選單的深色模式樣式 */
       body.dark-mode #centralRegionSelect {
           background-color: #555; /* 深色背景 */
@@ -1034,6 +1057,24 @@
       body.dark-mode #settingsPanelTitle {
           color: #fff;
       }
+
+      /* 旋轉動畫樣式 */
+.rotate-right {
+  transform: rotate(360deg);
+  transition: transform 0.8s ease !important;  /* 由 1s 改為 0.8s */
+  transform-origin: center center;  
+  display: inline-block;  /* 新增：確保元素作為 inline-block 以正確旋轉 */
+  backface-visibility: hidden;  /* 加快硬體加速 */
+  will-change: transform;       /* 提醒瀏覽器進行預渲染 */
+}
+.rotate-left {
+  transform: rotate(-360deg);
+  transition: transform 0.8s ease !important;  /* 由 1s 改為 0.8s */
+  transform-origin: center center;  
+  display: inline-block;  /* 新增：確保元素作為 inline-block 以正確旋轉 */
+  backface-visibility: hidden;  /* 加快硬體加速 */
+  will-change: transform;       /* 提醒瀏覽器進行預渲染 */
+}
     </style>
   </head>
   <body>
@@ -1756,6 +1797,7 @@
         loadingDiv.classList.remove('show');
       }
       function showNotification(message) {
+         
           // 將提示轉換成右上角顯示的通知
           const notification = document.getElementById('locationNotification');
           notification.textContent = message;
@@ -2195,45 +2237,89 @@
       // Settings button click handler
       settingsButton.addEventListener('click', (event) => {
         event.stopPropagation();
-        centralSettingsPanel.style.display = 'block';
-        // Push a new state to history when settings panel opens
-        history.pushState({ panelOpen: true }, 'Settings', '#settings');
+        // 移除現有旋轉類別
+        settingsButton.classList.remove('rotate-right', 'rotate-left');
+        if (centralSettingsPanel.style.display === 'block') {
+            // 關閉面板時
+            centralSettingsPanel.classList.remove('panel-open');
+            centralSettingsPanel.classList.add('panel-close');
+            centralSettingsPanel.addEventListener('animationend', function handler() {
+              centralSettingsPanel.style.display = 'none';
+              centralSettingsPanel.classList.remove('panel-close');
+              centralSettingsPanel.removeEventListener('animationend', handler);
+            });
+            // 加入反向旋轉類別
+            settingsButton.classList.add('rotate-left');
+            if (history.state && history.state.panelOpen) {
+              history.back();
+            }
+        } else {
+            // 開啟面板時
+            centralSettingsPanel.style.display = 'block';
+            centralSettingsPanel.classList.remove('panel-close');
+            centralSettingsPanel.classList.add('panel-open');
+            history.pushState({ panelOpen: true }, 'Settings', '#settings');
+            // 加入正向旋轉類別
+            settingsButton.classList.add('rotate-right');
+          }
       });
       
       // Close settings panel button click handler
       closeCentralSettings.addEventListener('click', () => {
-        centralSettingsPanel.style.display = 'none';
-        // If the current history state is for the settings panel, go back
+        centralSettingsPanel.classList.remove('panel-open');
+        centralSettingsPanel.classList.add('panel-close');
+        centralSettingsPanel.addEventListener('animationend', function handler() {
+          centralSettingsPanel.style.display = 'none';
+          centralSettingsPanel.classList.remove('panel-close');
+          centralSettingsPanel.removeEventListener('animationend', handler);
+        });
+
+        // 新增：設定按鈕旋轉動畫
+        settingsButton.classList.add('rotate-left');
+        setTimeout(() => {
+          settingsButton.classList.remove('rotate-left');
+        }, 1000);
+
         if (history.state && history.state.panelOpen) {
           history.back();
         }
       });
 
-      // Handle browser back button (Android back gesture)
+      // 當使用者透過瀏覽器返回按鈕也要執行相同關閉動畫
       window.addEventListener('popstate', (event) => {
-        if (event.state && event.state.panelOpen) {
-          // If we're going back to a state where the panel was open, close it
-          centralSettingsPanel.style.display = 'block'; // Ensure it's visible before hiding
-          centralSettingsPanel.style.display = 'none';
-        } else if (!centralSettingsPanel.style.display || centralSettingsPanel.style.display === 'none') {
-            // If the panel is already closed and we're popping a state, it means we're going back to the main page or further.
-            // Do nothing, let the browser handle the navigation.
-        } else {
-            // If we are on the settings panel and popstate is not related to it, close the panel
+        if (centralSettingsPanel.style.display === 'block') {
+          centralSettingsPanel.classList.remove('panel-open');
+          centralSettingsPanel.classList.add('panel-close');
+          centralSettingsPanel.addEventListener('animationend', function handler() {
             centralSettingsPanel.style.display = 'none';
+            centralSettingsPanel.classList.remove('panel-close');
+            centralSettingsPanel.removeEventListener('animationend', handler);
+          });
         }
       });
 
-      // Close settings panel when clicking outside
+      // 修改：點擊頁面其他區域時以動畫關閉中央設定面板，並讓設定按鈕向左旋轉
       document.addEventListener('click', (event) => {
-        if (!centralSettingsPanel.contains(event.target) && event.target !== settingsButton) {
-            centralSettingsPanel.style.display = 'none';
-            // If the panel was open, and we clicked outside, remove the history state for the panel
-            if (history.state && history.state.panelOpen) {
-                history.back(); // This will trigger popstate, which will then hide the panel.
-            }
-        }
-      });
+	if (!centralSettingsPanel.contains(event.target) && event.target !== settingsButton) {
+		if (centralSettingsPanel.style.display === 'block') {
+			centralSettingsPanel.classList.remove('panel-open');
+			centralSettingsPanel.classList.add('panel-close');
+			// 新增：設定按鈕向左旋轉
+			settingsButton.classList.add('rotate-left');
+			setTimeout(() => {
+				settingsButton.classList.remove('rotate-left');
+			}, 1000);
+			centralSettingsPanel.addEventListener('animationend', function handler() {
+				centralSettingsPanel.style.display = 'none';
+				centralSettingsPanel.classList.remove('panel-close');
+				centralSettingsPanel.removeEventListener('animationend', handler);
+			});
+			if (history.state && history.state.panelOpen) {
+				history.back();
+			}
+		}
+	}
+});
       
       // Prevent settings panel from closing when clicking inside it
       centralSettingsPanel.addEventListener('click', (event) => {
@@ -2300,7 +2386,7 @@
     });
     const searchIcon = document.getElementById('searchIcon');
     searchIcon.addEventListener('click', () => {
-      searchYouBike(true, true); // 移動地圖
+      searchYouBike(true, true); // 秺動地圖
       updateVehicleData(); // 確保即時資料更新
     });
     // 修改倒數計時器物件
