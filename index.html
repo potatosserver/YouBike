@@ -2759,8 +2759,8 @@
                   });
                   
                   L.marker([coords.lat, coords.lng], {
-                      icon: pulsingIcon,
-                      pane: 'markerPane'
+                    icon: pulsingIcon,
+                    pane: 'markerPane'
                   }).addTo(leafletMap);
               }
               
@@ -2833,6 +2833,16 @@
           
           return nearestRegion;
       }
+    </script>
+    <script>
+      // 監聽頁面可見性變化
+      document.addEventListener('visibilitychange', () => {
+        // 當頁面從背景切回前景時
+        if (document.visibilityState === 'visible') {
+          // 直接執行更新
+          countdownTimer.update();
+        }
+      });
     </script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
