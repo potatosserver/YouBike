@@ -1286,7 +1286,6 @@
       })();
 
       let youbikeDataCache = null;
-      let initializeSearch = null; // 新增全域變數，用於儲存parkingInfo資料
       let allStations = []; // 全域變數，用於儲存所有站點資料以供地圖使用
 
       // IndexedDB 操作函數
@@ -1569,18 +1568,17 @@
             });
             usedStations = [...pinnedList, ...nonPinnedList];
           }
-          const isOnline = navigator.onLine;
-          let vehData = {};
-          const stationIds = usedStations.map(station => String(station.station_no));
-          if (isOnline) {
-            if (initializeSearch) {
-              vehData = initializeSearch;
-            } else {
-              vehData = await queryVehicleData(stationIds);
-              initializeSearch = vehData; // 儲存首次呼叫結果，後續直接利用
-            }
-          }
-          const organizedOutput = usedStations.map(site => {
+
+          // 清空舊的搜尋結果並渲染站點基本資訊
+          resultsDiv.innerHTML = ''; 
+          const unknownValue = currentLang === "en" ? "Unknown" : "未知";
+          const addressLabel = currentLang === "en" ? "Address:" : "地址:";
+          const slotsLabel = currentLang === "en" ? "Available Slots:" : "可停空位數:";
+          const unknownStation = currentLang === "en" ? "Unknown Station" : "未知站點";
+          const unknownAddress = currentLang === "en" ? "Unknown Address" : "未知地址";
+          const distanceLabel = currentLang === "en" ? "Distance:" : "距離:";
+
+          usedStations.forEach(site => {
             const info = {
               id: String(site.station_no),
               name: currentLang === "en" ? site.name_en : site.name_tw,
@@ -1588,79 +1586,53 @@
               district: currentLang === "en" ? site.district_en : site.district_tw,
               address: currentLang === "en" ? site.address_en : site.address_tw
             };
-            const vehicle = isOnline ? (Object.entries(vehData).find(([key]) => key === info.id)?.[1] || {}) : {};
-            return { station_info: info, vehicle_info: vehicle };
-          });
-          organizedOutput.forEach(item => {
-            const station = item.station_info;
-            const vehicle = item.vehicle_info;
-            let card = document.querySelector(`.station[data-id="${station.id}"]`);
 
-            const isPinned = pinnedStations.has(String(station.id));
+            const isPinned = pinnedStations.has(String(info.id));
             const pinButtonHtml = `<span
               class="pin-button ${isPinned ? 'pinned' : ''}"
-              data-id="${station.id}"
-              onclick="togglePinStation('${station.id}', event)"
+              data-id="${info.id}"
+              onclick="togglePinStation('${info.id}', event)"
             >${isPinned ? '★' : '☆'}</span>`;
+
             const distance = calculateDistance(
               userLocation ? userLocation.latitude : defaultLatitude,
               userLocation ? userLocation.longitude : defaultLongitude,
-              station.coords[0],
-              station.coords[1]
+              info.coords[0],
+              info.coords[1]
             );
             const displayDistance = distance < 1 ? Math.round(distance * 1000) + (currentLang === "en" ? " m" : " 公尺")
                                              : distance.toFixed(2) + (currentLang === "en" ? " km" : " 公里");
-            const distanceLabel = currentLang === "en" ? "Distance:" : "距離:";
-            const addressLabel = currentLang === "en" ? "Address:" : "地址:";
-            const slotsLabel = currentLang === "en" ? "Available Slots:" : "可停空位數:";
-            const unknownStation = currentLang === "en" ? "Unknown Station" : "未知站點";
-            const unknownAddress = currentLang === "en" ? "Unknown Address" : "未知地址";
-            const unknownValue = currentLang === "en" ? "Unknown" : "未知";
-            const vehicleInfoHtml = isOnline ? `
-                      <p>YouBike 2.0: <span class="vehicle_yb2">${vehicle?.available_2_0 !== undefined ? vehicle.available_2_0 : unknownValue}</span></p>
-                      <p>YouBike 2.0E: <span class="vehicle_ybe">${vehicle?.available_e !== undefined ? vehicle.available_e : unknownValue}</span></p>
-                      <p>${slotsLabel} <span class="vehicle_empty">${vehicle?.empty_spaces !== undefined ? vehicle.empty_spaces : unknownValue}</span></p>
-                    ` : '';
             const isDefaultLocation = userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude;
             const distanceHTML = !isDefaultLocation ? `<p class="distance">${distanceLabel} ${displayDistance}</p>` : "";
+
             const cardContent = `
                       ${pinButtonHtml}
-                      <h3>${station.name || unknownStation}</h3>
+                      <h3>${info.name || unknownStation}</h3>
                       ${distanceHTML}
-                      <p>${addressLabel} ${station.address || unknownAddress}</p>
-                      ${vehicleInfoHtml}
+                      <p>${addressLabel} ${info.address || unknownAddress}</p>
+                      <p>YouBike 2.0: <span class="vehicle_yb2">${unknownValue}</span></p>
+                      <p>YouBike 2.0E: <span class="vehicle_ybe">${unknownValue}</span></p>
+                      <p>${slotsLabel} <span class="vehicle_empty">${unknownValue}</span></p>
                   `;
-            if (card) {
-              card.innerHTML = cardContent;
-              card.dataset.lat = station.coords[0];
-              card.dataset.lng = station.coords[1];
-              card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
-            } else {
-              card = document.createElement('div');
-              card.className = 'station';
-              card.dataset.id = station.id;
-              card.dataset.lat = station.coords[0];
-              card.dataset.lng = station.coords[1];
-              card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
-              card.innerHTML = cardContent;
-              // Add click event listener to move map to station coordinates
-              card.addEventListener("click", () => {
-                const lat = parseFloat(station.coords[0]);
-                const lng = parseFloat(station.coords[1]);
-                if (!isNaN(lat) && !isNaN(lng) && leafletMap) {
-                  leafletMap.setView([lat, lng], 18, { animate: true, duration: 1 });
-                }
-              });
-              resultsDiv.appendChild(card);
-            }
+            
+            let card = document.createElement('div');
+            card.className = 'station';
+            card.dataset.id = info.id;
+            card.dataset.lat = info.coords[0];
+            card.dataset.lng = info.coords[1];
+            card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
+            card.innerHTML = cardContent;
+            card.addEventListener("click", () => {
+              const lat = parseFloat(info.coords[0]);
+              const lng = parseFloat(info.coords[1]);
+              if (!isNaN(lat) && !isNaN(lng) && leafletMap) {
+                leafletMap.setView([lat, lng], 18, { animate: true, duration: 1 });
+              }
+            });
+            resultsDiv.appendChild(card);
           });
-          const validIds = organizedOutput.map(item => item.station_info.id);
-          Array.from(resultsDiv.children).forEach(card => {
-            if (!validIds.includes(card.dataset.id)) {
-              resultsDiv.removeChild(card);
-            }
-          });          updateResultsOrder();
-          await new Promise(resolve => setTimeout(resolve, 0));
+
+          updateResultsOrder(); // 重新排序卡片，確保釘選和距離正確
 
           // 找到搜尋結果中距離最近的站點（已按距離排序）
           const stationCards = document.querySelectorAll('.station');
@@ -1733,6 +1705,7 @@
             });
             const result = await response.json();
             if (result.retCode === 1 && result.retVal && result.retVal.data) {
+              console.log("queryVehicleData: API response data:", result.retVal.data); // 添加日誌
               const dataArray = result.retVal.data;
               dataArray.forEach(item => {
                 allVehicleData[item.station_no] = {
@@ -1742,7 +1715,7 @@
                 };
               });
             } else {
-              console.error("API 請求失敗:", result.retMsg);
+              console.error("API 請求失敗或無資料:", result.retMsg, "Response:", result); // 改進錯誤日誌
             }
           } catch (e) {
             console.error(e);
@@ -1845,10 +1818,12 @@
           }
           
           if (wasDefault) {
-            await searchYouBike();
+            await searchYouBike(); // 重新觸發搜尋和卡片渲染
+            await updateVehicleData(); // 確保即時資料更新
             updateResultsOrder();
           } else {
             updateCardDistances();
+            await updateVehicleData(); // 確保即時資料更新
           }
       }      function handleGeolocationError(error) {
         console.error("Geolocation error:", error);
@@ -1936,6 +1911,7 @@
         userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
         if (!shouldDisableLocationToggle) {
           searchYouBike();
+          updateVehicleData(); // 確保即時資料更新
         }
       }      function handleGeoUpdateSuccess(position) {
           // 檢查定位開關是否開啟
@@ -1958,9 +1934,11 @@
           if (wasDefault) {
             searchYouBike().then(() => {
               updateResultsOrder();
+              updateVehicleData(); // 確保即時資料更新
             });
           } else {
             updateCardDistances();
+            updateVehicleData(); // 確保即時資料更新
           }
       }      function handleGeoUpdateError(error) {
           console.error("Geolocation update error:", error);
@@ -2064,6 +2042,7 @@
           );
           userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
           searchYouBike();
+          updateVehicleData(); // 確保即時資料更新
           hideLoading();
         }
       }
@@ -2091,26 +2070,38 @@
         });
         updateResultsOrder();
       }
+      
+      // 修改 updateVehicleData 函數，使其更健壯
       function updateVehicleData() {
         const stationElements = document.querySelectorAll('.station');
         if (!stationElements.length) return;
         const stationIds = Array.from(stationElements).map(el => el.dataset.id);
+        
         queryVehicleData(stationIds)
           .then(vehicleData => {
             stationElements.forEach(card => {
               const id = card.dataset.id;
-              const data = vehicleData[id] || {};
+              const newVehicleData = vehicleData[id]; // 獲取該站點的新資料
+              
               const yb2El = card.querySelector('.vehicle_yb2');
               const ybeEl = card.querySelector('.vehicle_ybe');
               const emptyEl = card.querySelector('.vehicle_empty');
-              if (yb2El) yb2El.textContent = (data.available_2_0 !== undefined ? data.available_2_0 : '未知');
-              if (ybeEl) ybeEl.textContent = (data.available_e !== undefined ? data.available_e : '未知');
-              if (emptyEl) emptyEl.textContent = (data.empty_spaces !== undefined ? data.empty_spaces : '未知');
+              const unknownValue = currentLang === "en" ? "Unknown" : "未知";
+
+              // 只有當有新資料時才更新卡片上的值
+              if (newVehicleData) {
+                if (yb2El) yb2El.textContent = (newVehicleData.available_2_0 !== undefined ? newVehicleData.available_2_0 : unknownValue);
+                if (ybeEl) ybeEl.textContent = (newVehicleData.available_e !== undefined ? newVehicleData.available_e : unknownValue);
+                if (emptyEl) emptyEl.textContent = (newVehicleData.empty_spaces !== undefined ? newVehicleData.empty_spaces : unknownValue);
+              } 
+              // 如果沒有新資料，則保持現有值不變，避免將已顯示的資料重置為「未知」
+              // 如果初始就是「未知」，則保持「未知」
             });
             updateResultsOrder();
           })
           .catch(error => {
             console.error("Vehicle data update failed:", error);
+            showNotification(currentLang === "en" ? "Failed to update real-time data." : "即時資料更新失敗。");
           });
       }
 
@@ -2250,12 +2241,11 @@
       // *** 修改 window load 事件 ***
       window.addEventListener('load', async () => {
         try {
-          // 先呼叫 searchYouBike 取得站點資料，但不顯示載入指示器，也不移動地圖
+          // 1. 先載入站點基本資料 (youbikeDataCache) 並渲染卡片，車輛資料會先顯示「未知」
           await searchYouBike(false, false); 
 
-          // 檢查是否有網路連線
+          // 2. 初始化地圖並載入所有站點標記
           if (navigator.onLine) {
-            // 將 allStations 傳入 initMap
             await initMap(allStations); 
           } else {
             showNotification(currentLang === "en"
@@ -2263,29 +2253,15 @@
               : "離線模式：地圖功能受限");
           }
 
-          // 從 IndexedDB 預先載入資料 (如果 searchYouBike 失敗或離線)
-          if (!youbikeDataCache || youbikeDataCache.length === 0) {
-             if (!navigator.onLine) {
-                try {
-                  youbikeDataCache = await getYoubikeDataFromDB();
-                  allStations = [...youbikeDataCache]; // 更新 allStations
-                } catch (error) {
-                  console.warn('Failed to load cached data:', error);
-                }
-             }
-          }
-
-
-          // 延遲執行定位請求，確保它在使用者互動後發生
-          // 並在定位成功後再次呼叫 searchYouBike 以更新列表和地圖標記
+          // 3. 延遲執行定位請求，並在定位成功後更新即時車輛資料
           setTimeout(async () => {
             const centralLocationToggleChecked = document.getElementById('centralLocationToggle')?.checked;
             if (centralLocationToggleChecked) {
-              await getLocation(); // getLocation 內部會呼叫 searchYouBike
+              await getLocation(); // getLocation 內部會呼叫 searchYouBike 和 updateVehicleData
             } else {
               userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-              // 確保即使沒有定位，列表和地圖標記也基於初始載入的 allStations 更新
-              await searchYouBike(true, false); 
+              // 如果定位服務關閉，則直接更新即時車輛資料
+              await updateVehicleData(); 
             }
             // 確保在所有資料載入和處理後顯示主內容
             if (!mainContentShown) {
@@ -2308,6 +2284,7 @@
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
           searchYouBike(true, true); // 移動地圖
+          updateVehicleData(); // 確保即時資料更新
         }
       });
 
@@ -2323,7 +2300,8 @@
     });
     const searchIcon = document.getElementById('searchIcon');
     searchIcon.addEventListener('click', () => {
-      searchYouBike(true, true); // 秺動地圖
+      searchYouBike(true, true); // 移動地圖
+      updateVehicleData(); // 確保即時資料更新
     });
     // 修改倒數計時器物件
     let countdownTimer = {
@@ -2339,7 +2317,7 @@
             this.updateDisplay();
         },
         update: function() {
-            searchYouBike(true, false);  // 明確設定不移動地圖
+            updateVehicleData(); // 只更新車輛資料
             this.reset();
         }
     };
@@ -2455,15 +2433,6 @@
         locateControl.addTo(leafletMap);
         
         try {
-          // *** 改用傳入的 stations 資料建立圖標 ***
-          // let currentStations = stations; // 使用傳入的參數
-          // if (!currentStations || currentStations.length === 0) {
-          //   // 如果傳入的 stations 為空或未定義，嘗試從 IndexedDB 獲取
-          //   console.warn("initMap received empty stations, trying to fetch from DB.");
-          //   currentStations = await getYoubikeDataFromDB();
-          //   allStations = currentStations; // 同步更新全域變數
-          // }
-
           // 確保 stations 參數是有效的陣列
           const currentStations = Array.isArray(stations) ? stations : [];
 
@@ -2675,6 +2644,7 @@
           localStorage.setItem("lang", currentLang);
           updateLanguageTexts();
           searchYouBike(false);
+          updateVehicleData(); // 確保即時資料更新
         });
 
         // 位置服務開關
@@ -2735,6 +2705,7 @@
                 }
                 
                 searchYouBike();
+                updateVehicleData(); // 確保即時資料更新
             }
         });
 
@@ -2795,6 +2766,7 @@
                   leafletMap.setView([coords.lat, coords.lng], 18, { animate: true });
               }
               searchYouBike();
+              updateVehicleData(); // 確保即時資料更新
           }
         });
 
@@ -2825,6 +2797,7 @@
                         leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
                       }
                       searchYouBike();
+                      updateVehicleData(); // 確保即時資料更新
                     }
                 },
                 error => {
