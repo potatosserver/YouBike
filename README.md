@@ -17,24 +17,25 @@
 
 **其他功能**
 * Openstreet Map地圖顯示
-* PWA 應用程式安裝
 * 定位開關
 * 明亮/黑暗 雙色模式
 * 中/英 雙語模式
+* PWA 應用程式安裝(BETA)
 * 離線模式(BETA)
 
 **離線模式提供定位功能，但需要在PWA或實體應用程式中開啟。離線模式僅提供附近站點，不會顯示車子數量**
 
 **使用VPN或是清除應用資料可能導致離線模式無法正確啟動，使用時請確保符合條件**
 
+**BETA版的功能可能存在部分嚴重錯誤，請斟酌使用**
+
 ## 使用方式
 
 1. 請前往 [potatosserver.github.io/YouBike](https://potatosserver.github.io/YouBike/) 或是從[Releases](https://github.com/potatosserver/YouBike/releases)下載APK安裝至Android手機即可使用本服務。
 2. 在搜尋框輸入關鍵字查詢
 3. 可開啟定位啟用最近站點與距離計算。
-4. 點擊卡片可開啟站點的Google地圖。
-5. 可使用卡片右上角的星星釘選車站
-6. 點擊右下角的按鈕，切換色彩模式及安裝PWA應用程式
+4. 可使用卡片右上角的星星釘選車站
+6. 點擊右下角的設定按鈕，開啟設定面板
 
 ## 螢幕截圖
 
