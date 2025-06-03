@@ -1140,8 +1140,6 @@
       let geolocationErrorMessage = null;
       let dataLoaded = false;
       let hasShownDefaultLocationMessage = false; // 添加新的標記
-      // 新增切換圖標顏色的旗標
-      let locationMarkerToggle = false;
       const regionCoordinates = {
         taipei: { lat: 25.047924, lng: 121.517081 },
         newTaipei: { lat: 25.0215339197085, lng: 121.4568090197085 },
@@ -1789,14 +1787,14 @@
 
           if (leafletMap) {
             // 移動地圖至使用者定位（第一次或從預設更新時）
-            if ( !locationMarker || (userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude) ) {
+            if (isFirstLocation || wasDefault) {
               leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true, duration: 1 });
             }
             if (!locationMarker) {
               // 第一次定位時建立定位標記與脈衝動畫
               locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
                 radius: 10,
-                fillColor: '#2196F3', // 初始顏色
+                fillColor: '#2196F3',
                 fillOpacity: 0.8,
                 color: '#ffffff',
                 weight: 3,
@@ -1817,12 +1815,6 @@
               // 後續只更新定位標記位置
               locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
             }
-            // 每次定位後更新圖標顏色
-            if(locationMarker) {
-                let newColor = locationMarkerToggle ? '#FF5722' : '#2196F3';
-                locationMarker.setStyle({ fillColor: newColor });
-                locationMarkerToggle = !locationMarkerToggle;
-            }
           }
           
           if (wasDefault) {
@@ -1833,6 +1825,9 @@
             updateCardDistances();
             await updateVehicleData(); // 確保即時資料更新
           }
+          // 新增：每次定位成功後切換圖標顏色並更新
+          markerColorToggle = !markerColorToggle;
+          updateMapMarkers();
       }      function handleGeolocationError(error) {
         console.error("Geolocation error:", error);
         locationDenied = true;
@@ -1937,10 +1932,6 @@
           // 更新位置標記
           if (locationMarker) {
             locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
-            // 每次更新定位後更新圖標顏色
-            let newColor = locationMarkerToggle ? '#FF5722' : '#2196F3';
-            locationMarker.setStyle({ fillColor: newColor });
-            locationMarkerToggle = !locationMarkerToggle;
           }
           
           if (wasDefault) {
@@ -1952,6 +1943,9 @@
             updateCardDistances();
             updateVehicleData(); // 確保即時資料更新
           }
+          // 新增：每次更新定位後切換圖標顏色並更新地圖釘標
+          markerColorToggle = !markerColorToggle;
+          updateMapMarkers();
       }      function handleGeoUpdateError(error) {
           console.error("Geolocation update error:", error);
           // 新增：如果使用預設座標定位，則不顯示使用先前座標定位提示
@@ -2312,7 +2306,7 @@
     });
     const searchIcon = document.getElementById('searchIcon');
     searchIcon.addEventListener('click', () => {
-      searchYouBike(true, true); // 移動地圖
+      searchYouBike(true, true); // 秺動地圖
       updateVehicleData(); // 確保即時資料更新
     });
     // 修改倒數計時器物件
@@ -2521,7 +2515,19 @@
             }));
           });
           
-          // 高亮顯示搜尋結果的釘標
+          // 使用 markerColorToggle 決定預設圖標顏色
+          const defaultIconUrl = markerColorToggle 
+            ? 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-green.png'
+            : 'https://unpkg.com/leaflet/dist/images/marker-icon.png';
+          markerClusterGroup.eachLayer(marker => {
+            marker.setIcon(L.icon({
+              iconUrl: defaultIconUrl,
+              iconSize: [25, 41],
+              iconAnchor: [12, 41]
+            }));
+          });
+          
+          // 高亮顯示搜尋結果的釘標 (保留原本紅色邏輯)
           const stationCards = document.querySelectorAll('.station');
           stationCards.forEach(card => {
             const lat = parseFloat(card.dataset.lat);
