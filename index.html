@@ -1174,6 +1174,7 @@
       let leafletMap, markerClusterGroup, tileLayer;
       let userLocation = null;
       let locationMarker = null; // 新增位置標記變數
+      let pulsingMarker = null; // 新增脈衝動畫標記變數
       let sortingLocked = false;
       let initialLoad = true;
       let locationDenied = false;
@@ -1822,7 +1823,6 @@
       }      
       async function handleGeolocationSuccess(position) {
           const wasDefault = !userLocation || (userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude);
-          const isFirstLocation = !locationMarker;  // 使用 locationMarker 判斷是否為第一次定位
           
           userLocation = {
             latitude: position.coords.latitude,
@@ -1831,15 +1831,15 @@
 
           if (leafletMap) {
             // 第一次定位或從預設位置更新時，設定 isFollowingUser 為 true
-            if (isFirstLocation || wasDefault) {
-              isFollowingUser = true;
+            if (wasDefault) {
+              isFollowingUser = true; // 第一次定位成功後開始跟隨
               leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true, duration: 1 });
             } else if (isFollowingUser) { // 如果正在跟隨，則持續移動地圖
               leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 });
             }
 
+            // 更新或創建定位標記
             if (!locationMarker) {
-              // 第一次定位時建立定位標記與脈衝動畫
               locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
                 radius: 10,
                 fillColor: '#2196F3',
@@ -1854,13 +1854,15 @@
                 html: '<div class="pulse"></div>',
                 iconSize: [20, 20]
               });
-              L.marker([userLocation.latitude, userLocation.longitude], {
+              pulsingMarker = L.marker([userLocation.latitude, userLocation.longitude], { // 將脈衝標記存儲到 pulsingMarker
                 icon: pulsingIcon,
                 pane: 'markerPane'
               }).addTo(leafletMap);
             } else {
-              // 後續只更新定位標記位置
               locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+              if (pulsingMarker) { // 更新脈衝標記的位置
+                pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+              }
             }
           }
           
@@ -1923,6 +1925,10 @@
         if (!centralLocationToggle?.checked && locationMarker) {
           locationMarker.remove();
           locationMarker = null;
+          if (pulsingMarker) { // 移除脈衝標記
+            pulsingMarker.remove();
+            pulsingMarker = null;
+          }
         }
 
         // 只在第一次顯示錯誤提示
@@ -1972,7 +1978,6 @@
             return; // 如果開關關閉，不處理定位更新
           }
           
-          const wasDefault = userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude;
           userLocation = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude
@@ -1982,21 +1987,17 @@
           if (locationMarker) {
             locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
           }
+          if (pulsingMarker) { // 更新脈衝標記的位置
+            pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+          }
           
           // 如果 isFollowingUser 為 true，則移動地圖視圖
           if (isFollowingUser && leafletMap) {
             leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 });
           }
 
-          if (wasDefault) {
-            searchYouBike().then(() => {
-              updateResultsOrder();
-              updateVehicleData(); // 確保即時資料更新
-            });
-          } else {
-            updateCardDistances();
-            updateVehicleData(); // 確保即時資料更新
-          }
+          updateCardDistances();
+          updateVehicleData(); // 確保即時資料更新
       }      
       function handleGeoUpdateError(error) {
           console.error("Geolocation update error:", error);
@@ -2050,7 +2051,7 @@
             iconSize: [20, 20]
           });
           
-          L.marker([defaultLatitude, defaultLongitude], {
+          pulsingMarker = L.marker([defaultLatitude, defaultLongitude], { // 將脈衝標記存儲到 pulsingMarker
             icon: pulsingIcon,
             pane: 'markerPane'
           }).addTo(leafletMap);
@@ -2450,8 +2451,8 @@
         if (!navigator.onLine) {
           if (!window.offlineNotified) {
             showNotification(currentLang === "en" 
-              ? "Offline mode: Using cached map data" 
-              : "離線模式：使用快取地圖資料");
+              ? "Offline mode: Map features are limited" 
+              : "離線模式：地圖功能受限");
             window.offlineNotified = true;
           }
         }
@@ -2486,7 +2487,7 @@
             iconSize: [20, 20]
           });
           
-          L.marker([userLocation.latitude, userLocation.longitude], {
+          pulsingMarker = L.marker([userLocation.latitude, userLocation.longitude], { // 將脈衝標記存儲到 pulsingMarker
             icon: pulsingIcon,
             pane: 'markerPane'
           }).addTo(leafletMap);
@@ -2806,7 +2807,7 @@
                         iconSize: [20, 20]
                       });
                       
-                      L.marker([coords.lat, coords.lng], {
+                      pulsingMarker = L.marker([coords.lat, coords.lng], { // 將脈衝標記存儲到 pulsingMarker
                         icon: pulsingIcon,
                         pane: 'markerPane'
                       }).addTo(leafletMap);
@@ -2869,7 +2870,7 @@
                       iconSize: [20, 20]
                   });
                   
-                  L.marker([coords.lat, coords.lng], {
+                  pulsingMarker = L.marker([coords.lat, coords.lng], { // 將脈衝標記存儲到 pulsingMarker
                     icon: pulsingIcon,
                     pane: 'markerPane'
                   }).addTo(leafletMap);
