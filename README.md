@@ -62,14 +62,15 @@
 
 ## 已知錯誤
 
-* 暫無
+* 第一次載入時站點圖標會消失(重新載入即可顯示)
+* 載入卡頓
 ## 貢獻
 
 歡迎對本專案感興趣的開發者一起參與貢獻！您可以透過 GitHub 提交 Pull Request 來改善程式碼、新增功能或修復錯誤.
 
 ## 貢獻者
 
-* [AndrewCho0531](https://github.com/AndrewCho0531):邏輯編寫、UI設計
+* [AndrewCho0531](https://github.com/AndrewCho0531):邏輯編寫、UI設計、錯誤修正
 * [KEVIN970712](https://github.com/KEVIN970712):題材發想、錯誤修正、APK封裝
 
 ## 補充
