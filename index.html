@@ -1177,6 +1177,7 @@
           if (userLocation && leafletMap) {
             leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
           }
+          searchYouBike(); // 新增：按下清除後立即用空關鍵字搜尋
       });
       const maxResults = 100;
       const defaultSearchArea = "";
