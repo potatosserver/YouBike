@@ -1881,6 +1881,7 @@
             updateCardDistances();
             await updateVehicleData(); // 確保即時資料更新
           }
+          countdownTimer.update(); // 定位成功後觸發更新按鈕
       }      
       function handleGeolocationError(error) {
         console.error("Geolocation error:", error);
@@ -1977,6 +1978,7 @@
           searchYouBike();
           updateVehicleData(); // 確保即時資料更新
         }
+        countdownTimer.update(); // 定位失敗後觸發更新按鈕
       }      
       function handleGeoUpdateSuccess(position) {
           // 檢查定位開關是否開啟
@@ -2824,19 +2826,18 @@
         });
 
         // 位置服務開關
-        centralLocationToggle.addEventListener('change', function() {
+        centralLocationToggle.addEventListener('change', async function() { // 將事件處理器改為 async
             const isChecked = this.checked;
             localStorage.setItem("useLocation", isChecked);
             
             if (isChecked) {
                 // 開啟定位後，等待定位成功，再移動地圖並重新搜尋站點
                 isFollowingUser = true; // 開啟定位時開始跟隨
-                getLocation().then(() => {
-                    if (leafletMap && userLocation) {
-                        leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
-                        searchYouBike(); // 新增：定位成功後重新搜尋站點
-                    }
-                });
+                await getLocation(); // 等待 getLocation 完成
+                if (leafletMap && userLocation) {
+                    leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
+                    searchYouBike(); // 新增：定位成功後重新搜尋站點
+                }
             } else {
                 isFollowingUser = false; // 關閉定位時停止跟隨
                 if (locationIntervalId) {
@@ -2886,6 +2887,7 @@
                 searchYouBike();
                 updateVehicleData(); // 確保即時資料更新
             }
+            countdownTimer.update(); // 切換定位開關後觸發更新按鈕
         });
 
         // 初始化位置服務開關狀態 - 預設為開啟
