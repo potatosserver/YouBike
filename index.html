@@ -1242,7 +1242,8 @@
             leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
           }
           searchYouBike(); // 新增：按下清除後立即用空關鍵字搜尋
-          stopTracking(); // 停止追蹤功能
+          // 移除定位按鈕關閉定位追蹤的功能，所以這裡不再呼叫 stopTracking
+          // stopTracking(); // 停止追蹤功能
           updateLocateButtonTitle(); // 更新按鈕標題
       });
       const maxResults = 100;
@@ -1695,7 +1696,8 @@
               if (!isNaN(lat) && !isNaN(lng) && leafletMap) {
                 leafletMap.setView([lat, lng], 18, { animate: true, duration: 1 });
               }
-              stopTracking(); // 點擊卡片時停止追蹤
+              // 點擊卡片時停止跟隨，但不停止追蹤
+              isFollowingUser = false;
               updateLocateButtonTitle(); // 更新按鈕標題
             });
             resultsDiv.appendChild(card);
@@ -1729,10 +1731,12 @@
               const lat = parseFloat(nearestStation.dataset.lat);
               const lng = parseFloat(nearestStation.dataset.lng);
               if (!isNaN(lat) && !isNaN(lng) && leafletMap) {
+                isMapMovingDueToTracking = true; // Set flag before moving map
                 leafletMap.setView([lat, lng], 18, { // 由16變更為18
                   animate: true,
                   duration: 1
                 });
+                setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Clear flag after a short delay
               }
             }
           }
@@ -1918,7 +1922,8 @@
         
         // 停止跟隨使用者位置
         isFollowingUser = false;
-        stopTracking(); // Ensure tracking is stopped on error
+        // 移除定位按鈕關閉定位追蹤的功能，所以這裡不再呼叫 stopTracking
+        // stopTracking(); // Ensure tracking is stopped on error
 
         switch (error.code) {
           case error.PERMISSION_DENIED:
@@ -2053,7 +2058,8 @@
           console.error("Geolocation update error:", error);
           // 停止跟隨使用者位置
           isFollowingUser = false;
-          stopTracking(); // Stop tracking on update error
+          // 移除定位按鈕關閉定位追蹤的功能，所以這裡不再呼叫 stopTracking
+          // stopTracking(); // Stop tracking on update error
           // 新增：如果使用預設座標定位，則不顯示使用先前座標定位提示
           if (userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude) {
             return;
@@ -2178,7 +2184,9 @@
                           pane: 'markerPane'
                       }).addTo(leafletMap);
                   }
+                  isMapMovingDueToTracking = true; // Set flag before moving map
                   leafletMap.setView([coords.lat, coords.lng], 18, { animate: true });
+                  setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Clear flag after a short delay
               }
               searchYouBike();
               updateVehicleData();
@@ -2462,7 +2470,8 @@
         if (event.key === 'Enter') {
           searchYouBike(true, true); // 移動地圖
           updateVehicleData(); // 確保即時資料更新
-          stopTracking(); // 搜尋時停止追蹤
+          // 移除定位按鈕關閉定位追蹤的功能，所以這裡不再呼叫 stopTracking
+          // stopTracking(); // 搜尋時停止追蹤
           updateLocateButtonTitle(); // 更新按鈕標題
         }
       });
@@ -2481,7 +2490,8 @@
     searchIcon.addEventListener('click', () => {
       searchYouBike(true, true); // 移動地圖
       updateVehicleData(); // 確保即時資料更新
-      stopTracking(); // 搜尋時停止追蹤
+      // 移除定位按鈕關閉定位追蹤的功能，所以這裡不再呼叫 stopTracking
+      // stopTracking(); // 搜尋時停止追蹤
       updateLocateButtonTitle(); // 更新按鈕標題
     });
     // 修改倒數計時器物件
@@ -2591,10 +2601,10 @@
 
         // 監聽地圖移動事件，如果地圖被手動移動，則停止跟隨
         leafletMap.on('movestart', () => {
-          // 只有當追蹤功能開啟且移動不是由追蹤引起時，才停止追蹤
+          // 只有當追蹤功能開啟且移動不是由追蹤引起時，才停止跟隨地圖
           if (isTrackingActive && !isMapMovingDueToTracking) {
-            stopTracking();
-            showNotification(currentLang === "en" ? "Map manually moved, tracking stopped." : "地圖被手動移動，追蹤功能已關閉。");
+            isFollowingUser = false; // 停止跟隨地圖
+            showNotification(currentLang === "en" ? "Map manually moved, auto-following stopped." : "地圖被手動移動，已停止自動跟隨。");
             updateLocateButtonTitle(); // 更新按鈕標題
           }
         });
@@ -2638,7 +2648,8 @@
 
                   // 使用地圖內建 Popup 顯示詳細資訊
                   marker.bindPopup(content).openPopup();
-                  stopTracking(); // 點擊地圖上的站點標記時停止追蹤
+                  // 點擊地圖上的站點標記時停止跟隨，但不停止追蹤
+                  isFollowingUser = false;
                   updateLocateButtonTitle(); // 更新按鈕標題
                 } catch (error) {
                   console.error('取得站點資訊失敗:', error);
@@ -2764,24 +2775,9 @@
           if (isTrackingActive) {
               // 如果目前正在追蹤，則停止追蹤
               stopTracking();
-              // 停止追蹤後，將地圖移動到選定的預設區域
-              const selectedRegion = document.getElementById('centralRegionSelect').value;
-              const coords = regionCoordinates[selectedRegion];
-              userLocation = { latitude: coords.lat, longitude: coords.lng }; // 更新 userLocation 為預設區域
-              if (leafletMap) {
-                  isMapMovingDueToTracking = true; // Set flag before moving map
-                  leafletMap.setView([coords.lat, coords.lng], 18, { animate: true, duration: 1 });
-                  setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Clear flag after a short delay
-              }
-              // 更新藍點位置到預設區域
-              if (locationMarker) {
-                  locationMarker.setLatLng([coords.lat, coords.lng]);
-              }
-              if (pulsingMarker) {
-                  pulsingMarker.setLatLng([coords.lat, coords.lng]);
-              }
-              updateCardDistances();
-              updateVehicleData();
+              // 停止追蹤後，將 isFollowingUser 設為 false，但不移動地圖到預設區域
+              isFollowingUser = false;
+              showNotification(currentLang === "en" ? "Tracking disabled, map auto-following stopped." : "追蹤功能已關閉，地圖自動跟隨已停止。");
           } else {
               // 如果目前沒有追蹤，則嘗試開啟追蹤
               if (!centralLocationToggle.checked) {
@@ -2824,6 +2820,7 @@
               } else {
                   // 如果定位服務開關是開啟的，則啟動追蹤並立即移動地圖
                   startTracking();
+                  isFollowingUser = true; // 啟動追蹤時，設定為跟隨使用者位置
                   // 立即獲取當前位置並移動地圖
                   navigator.geolocation.getCurrentPosition(
                       (position) => {
@@ -2858,8 +2855,8 @@
       function updateLocateButtonTitle() {
           const locateButton = document.getElementById('locateButton');
           if (locateButton) {
-              locateButton.title = isTrackingActive
-                  ? (currentLang === "en" ? "Stop tracking my location" : "停止追蹤我目前位置")
+              locateButton.title = isTrackingActive && isFollowingUser
+                  ? (currentLang === "en" ? "Stop auto-following" : "停止自動跟隨")
                   : (currentLang === "en" ? "Go to my location" : "定位到我目前位置");
           }
       }
@@ -3117,16 +3114,6 @@
           
           return nearestRegion;
       }
-    </script>
-    <script>
-      // 監聽頁面可見性變化
-      document.addEventListener('visibilitychange', () => {
-        // 當頁面從背景切回前景時
-        if (document.visibilityState === 'visible') {
-          // 直接執行更新
-          countdownTimer.update();
-        }
-      });
     </script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
