@@ -848,7 +848,7 @@
         top: 8px;
         left: 50%;
         transform: translateX(-50%); /* 使用 transform 來置中 */
-        z-index: 9000 !important;
+        z-index: 999 !important; /* 從 9000 改為 999 */
         width: 90%;
         max-width: 800px;
         display: flex;
@@ -874,6 +874,11 @@
         text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
       }
 
+      #mapControls, #mapControls * {
+        z-index: 999 !important; /* 從 9000 改為 999 */
+        pointer-events: none !important;
+      }
+
       /* 修改：僅當 body 有 dark-mode 類別時，將濾鏡套用於地圖層與控制項 */
       body.dark-mode .leaflet-layer,
       body.dark-mode .leaflet-control-zoom-in,
@@ -887,7 +892,7 @@
         z-index: 12000 !important;
       }
       #mapControls, #mapControls * {
-        z-index: 9000 !important;
+        z-index: 999 !important;
         pointer-events: none !important;
       }
       #mapControls input,
@@ -2797,18 +2802,16 @@
                       weight: 3,
                       pane: 'markerPane'
                   }).addTo(leafletMap);
-              }
-              if (pulsingMarker) {
-                pulsingMarker.setLatLng([defaultLatitude, defaultLongitude]);
-              } else if (leafletMap) {
+
                   const pulsingIcon = L.divIcon({
                       className: 'pulsing-icon',
                       html: '<div class="pulse"></div>',
                       iconSize: [20, 20]
                   });
-                  pulsingMarker = L.marker([defaultLatitude, defaultLongitude], {
-                      icon: pulsingIcon,
-                      pane: 'markerPane'
+                  
+                  pulsingMarker = L.marker([defaultLatitude, defaultLongitude], { 
+                    icon: pulsingIcon,
+                    pane: 'markerPane'
                   }).addTo(leafletMap);
               }
               userLocation = { latitude: defaultLatitude, longitude: defaultLongitude }; // 更新 userLocation 為預設
