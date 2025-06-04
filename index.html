@@ -1784,8 +1784,10 @@
             const result = await response.json();
             if (result.retCode === 1 && result.retVal && result.retVal.data) {
               console.log("queryVehicleData: API response data:", result.retVal.data); // 添加日誌
+
               const dataArray = result.retVal.data;
               dataArray.forEach(item => {
+               
                 allVehicleData[item.station_no] = {
                   available_2_0: item.available_spaces_detail ? item.available_spaces_detail.yb2 : 0,
                   available_e: item.available_spaces_detail ? item.available_spaces_detail.eyb : 0,
@@ -2154,8 +2156,8 @@
                   } else {
                       handleGeolocationError(e);
                   }
-                  // 即使出錯，如果開關是開啟的，也嘗試啟動追蹤 (可能之前被拒絕，但現在用戶允許了)
-                  // 但如果錯誤是 PERMISSION_DENIED 或 POSITION_UNAVAILABLE，則不應啟動追蹤
+                  // 即使出錯，如果開關是開啟的，則嘗試啟動追蹤 (可能之前被拒絕，但現在用戶允許了)
+                  // 但如果錯誤是 PERMISSION_DENIED 或 POSITION_UNAVAILABLE，則不應啟动追蹤
                   if (e.code !== GeolocationPositionError.PERMISSION_DENIED && e.code !== GeolocationPositionError.POSITION_UNAVAILABLE) {
                       startTracking(); 
                   }
@@ -2228,31 +2230,43 @@
         updateMapMarkers(); // 新增：根據定位距離與搜尋狀態更新站點圖標的顏色
       }
       
-      // 修改 updateVehicleData 函數，使其更健壯
+      // 修改 updateVehicleData 函數來保存和復用舊的資料
       function updateVehicleData() {
         const stationElements = document.querySelectorAll('.station');
         if (!stationElements.length) return;
+
+        // 保存當前顯示的資料
+        const currentData = {};
+        stationElements.forEach(card => {
+          const id = card.dataset.id;
+          currentData[id] = {
+            available_2_0: card.querySelector('.vehicle_yb2').textContent,
+            available_e: card.querySelector('.vehicle_ybe').textContent,
+            empty_spaces: card.querySelector('.vehicle_empty').textContent
+          };
+        });
+
         const stationIds = Array.from(stationElements).map(el => el.dataset.id);
         
         queryVehicleData(stationIds)
           .then(vehicleData => {
             stationElements.forEach(card => {
               const id = card.dataset.id;
-              const newVehicleData = vehicleData[id]; // 獲取該站點的新資料
+              const newVehicleData = vehicleData[id];
+              const oldData = currentData[id];
               
               const yb2El = card.querySelector('.vehicle_yb2');
               const ybeEl = card.querySelector('.vehicle_ybe');
               const emptyEl = card.querySelector('.vehicle_empty');
               const unknownValue = currentLang === "en" ? "Unknown" : "未知";
 
-              // 只有當有新資料時才更新卡片上的值
-              if (newVehicleData) {
-                if (yb2El) yb2El.textContent = (newVehicleData.available_2_0 !== undefined ? newVehicleData.available_2_0 : unknownValue);
-                if (ybeEl) ybeEl.textContent = (newVehicleData.available_e !== undefined ? newVehicleData.available_e : unknownValue);
-                if (emptyEl) emptyEl.textContent = (newVehicleData.empty_spaces !== undefined ? newVehicleData.empty_spaces : unknownValue);
-              } 
-              // 如果沒有新資料，則保持現有值不變，避免將已顯示的資料重置為「未知」
-              // 如果初始就是「未知」，則保持「未知」
+              // 使用新資料或保留舊資料，僅在真正的"未知"情況下顯示 unknownValue
+              if (yb2El) yb2El.textContent = newVehicleData?.available_2_0 !== undefined ? newVehicleData.available_2_0 : 
+                                      (oldData?.available_2_0 !== unknownValue && oldData?.available_2_0 !== "Unknown" ? oldData.available_2_0 : unknownValue);
+              if (ybeEl) ybeEl.textContent = newVehicleData?.available_e !== undefined ? newVehicleData.available_e :
+                                      (oldData?.available_e !== unknownValue && oldData?.available_e !== "Unknown" ? oldData.available_e : unknownValue);
+              if (emptyEl) emptyEl.textContent = newVehicleData?.empty_spaces !== undefined ? newVehicleData.empty_spaces :
+                                      (oldData?.empty_spaces !== unknownValue && oldData?.empty_spaces !== "Unknown" ? oldData.empty_spaces : unknownValue);
             });
             updateResultsOrder();
           })
@@ -2808,7 +2822,6 @@
                       html: '<div class="pulse"></div>',
                       iconSize: [20, 20]
                   });
-                  
                   pulsingMarker = L.marker([defaultLatitude, defaultLongitude], { 
                     icon: pulsingIcon,
                     pane: 'markerPane'
@@ -2900,12 +2913,42 @@
         });
 
         // 語言切換開關
-        centralLangToggle.addEventListener('change', () => {
+        centralLangToggle.addEventListener('change', async () => {
+          const oldVehicleData = {};
+          document.querySelectorAll('.station').forEach(card => {
+            const id = card.dataset.id;
+            oldVehicleData[id] = {
+              available_2_0: card.querySelector('.vehicle_yb2').textContent,
+              available_e: card.querySelector('.vehicle_ybe').textContent,
+              empty_spaces: card.querySelector('.vehicle_empty').textContent
+            };
+          });
+
+          // 更新語言設定
           currentLang = currentLang === "en" ? "zh" : "en";
           localStorage.setItem("lang", currentLang);
           updateLanguageTexts();
-          searchYouBike(false);
-          updateVehicleData(); // 確保即時資料更新
+          
+          // 更新卡片但保留車輛資料
+          await searchYouBike(false);
+          
+          // 恢復之前的車輛資料
+          document.querySelectorAll('.station').forEach(card => {
+            const id = card.dataset.id;
+            const data = oldVehicleData[id];
+            if (data) {
+              const yb2El = card.querySelector('.vehicle_yb2');
+              const ybeEl = card.querySelector('.vehicle_ybe');
+              const emptyEl = card.querySelector('.vehicle_empty');
+              
+              if (yb2El && data.available_2_0) yb2El.textContent = data.available_2_0;
+              if (ybeEl && data.available_e) ybeEl.textContent = data.available_e;
+              if (emptyEl && data.empty_spaces) emptyEl.textContent = data.empty_spaces;
+            }
+          });
+          
+          // 最後更新即時資料
+          await updateVehicleData();
         });
 
         // 位置服務開關
