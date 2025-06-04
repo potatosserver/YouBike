@@ -2601,8 +2601,8 @@
 
         // 監聽地圖移動事件，如果地圖被手動移動，則停止跟隨
         leafletMap.on('movestart', () => {
-          // 只有當追蹤功能開啟且移動不是由追蹤引起時，才停止跟隨地圖
-          if (isTrackingActive && !isMapMovingDueToTracking) {
+          // 只有當追蹤功能開啟、移動不是由追蹤引起，且正在跟隨使用者位置時，才停止跟隨地圖並提示
+          if (isTrackingActive && !isMapMovingDueToTracking && isFollowingUser) {
             isFollowingUser = false; // 停止跟隨地圖
             showNotification(currentLang === "en" ? "Map manually moved, auto-following stopped." : "地圖被手動移動，已停止自動跟隨。");
             updateLocateButtonTitle(); // 更新按鈕標題
