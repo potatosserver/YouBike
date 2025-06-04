@@ -2107,12 +2107,16 @@
 
       // 停止定位追蹤
       function stopTracking() {
-          if (watchId !== null) {
+          const centralLocationToggle = document.getElementById('centralLocationToggle');
+          if (watchId !== null) { // 檢查追蹤是否確實處於活動狀態
               navigator.geolocation.clearWatch(watchId);
               watchId = null;
+              // 只有當定位服務開關仍開啟時才顯示「追蹤功能已關閉」的訊息
+              if (centralLocationToggle.checked) {
+                  showNotification(currentLang === "en" ? "Tracking disabled." : "追蹤功能已關閉。");
+              }
           }
-          isTrackingActive = false;
-          showNotification(currentLang === "en" ? "Tracking disabled." : "追蹤功能已關閉。");
+          isTrackingActive = false; // 始終設定為 false
       }
 
       // 取得或設定初始位置
