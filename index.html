@@ -1538,12 +1538,16 @@
             });
           }
           youbikeResults = youbikeResults.sort((a, b) => {
-            // 使用 userLocation 或 defaultLatitude/Longitude 進行距離計算
-            const latToUse = userLocation ? userLocation.latitude : defaultLatitude;
-            const lngToUse = userLocation ? userLocation.longitude : defaultLongitude;
-
-            const distA = calculateDistance(latToUse, lngToUse, a.lat, a.lng);
-            const distB = calculateDistance(latToUse, lngToUse, b.lat, b.lng);
+            const distA = calculateDistance(
+              userLocation ? userLocation.latitude : defaultLatitude,
+              userLocation ? userLocation.longitude : defaultLongitude,
+              a.lat, a.lng
+            );
+            const distB = calculateDistance(
+              userLocation ? userLocation.latitude : defaultLatitude,
+              userLocation ? userLocation.longitude : defaultLongitude,
+              b.lat, b.lng
+            );
             return distA - distB;
           });
           let limit = keyword ? 50 : 20;
@@ -1552,17 +1556,29 @@
             const pinnedFromLocal = youbikeResults.filter(station => pinnedStations.has(String(station.station_no)));
             const unpinned = youbikeResults.filter(station => !pinnedStations.has(String(station.station_no)));
             pinnedFromLocal.sort((a, b) => {
-              const latToUse = userLocation ? userLocation.latitude : defaultLatitude;
-              const lngToUse = userLocation ? userLocation.longitude : defaultLongitude;
-              const distA = calculateDistance(latToUse, lngToUse, a.lat, a.lng);
-              const distB = calculateDistance(latToUse, lngToUse, b.lat, b.lng);
+              const distA = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                a.lat, a.lng
+              );
+              const distB = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                b.lat, b.lng
+              );
               return distA - distB;
             });
             unpinned.sort((a, b) => {
-              const latToUse = userLocation ? userLocation.latitude : defaultLatitude;
-              const lngToUse = userLocation ? userLocation.longitude : defaultLongitude;
-              const distA = calculateDistance(latToUse, lngToUse, a.lat, a.lng);
-              const distB = calculateDistance(latToUse, lngToUse, b.lat, b.lng);
+              const distA = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                a.lat, a.lng
+              );
+              const distB = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                b.lat, b.lng
+              );
               return distA - distB;
             });
             usedStations = [...pinnedFromLocal, ...unpinned].slice(0, limit);
@@ -1571,17 +1587,29 @@
             const pinnedList = usedStations.filter(station => pinnedStations.has(String(station.station_no)));
             const nonPinnedList = usedStations.filter(station => !pinnedStations.has(String(station.station_no)));
             pinnedList.sort((a, b) => {
-              const latToUse = userLocation ? userLocation.latitude : defaultLatitude;
-              const lngToUse = userLocation ? userLocation.longitude : defaultLongitude;
-              const distA = calculateDistance(latToUse, lngToUse, a.lat, a.lng);
-              const distB = calculateDistance(latToUse, lngToUse, b.lat, b.lng);
+              const distA = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                a.lat, a.lng
+              );
+              const distB = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                b.lat, b.lng
+              );
               return distA - distB;
             });
             nonPinnedList.sort((a, b) => {
-              const latToUse = userLocation ? userLocation.latitude : defaultLatitude;
-              const lngToUse = userLocation ? userLocation.longitude : defaultLongitude;
-              const distA = calculateDistance(latToUse, lngToUse, a.lat, a.lng);
-              const distB = calculateDistance(latToUse, lngToUse, b.lat, b.lng);
+              const distA = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                a.lat, a.lng
+              );
+              const distB = calculateDistance(
+                userLocation ? userLocation.latitude : defaultLatitude,
+                userLocation ? userLocation.longitude : defaultLongitude,
+                b.lat, b.lng
+              );
               return distA - distB;
             });
             usedStations = [...pinnedList, ...nonPinnedList];
@@ -1612,7 +1640,6 @@
               onclick="togglePinStation('${info.id}', event)"
             >${isPinned ? '★' : '☆'}</span>`;
 
-            // 距離計算始終使用 userLocation (如果有) 或 defaultLatitude/Longitude
             const distance = calculateDistance(
               userLocation ? userLocation.latitude : defaultLatitude,
               userLocation ? userLocation.longitude : defaultLongitude,
@@ -1621,10 +1648,8 @@
             );
             const displayDistance = distance < 1 ? Math.round(distance * 1000) + (currentLang === "en" ? " m" : " 公尺")
                                              : distance.toFixed(2) + (currentLang === "en" ? " km" : " 公里");
-            // 判斷是否使用預設位置，如果 userLocation 為 null 或與 defaultLatitude/Longitude 相同，則顯示「距離：未知」
-            const isUsingDefaultLocation = !userLocation || (userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude);
-            const distanceHTML = isUsingDefaultLocation ? `<p class="distance">${distanceLabel} ${currentLang === "en" ? "Unknown" : "未知"}</p>` : `<p class="distance">${distanceLabel} ${displayDistance}</p>`;
-
+            const isDefaultLocation = userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude;
+            const distanceHTML = !isDefaultLocation ? `<p class="distance">${distanceLabel} ${displayDistance}</p>` : "";
 
             const cardContent = `
                       ${pinButtonHtml}
@@ -1689,8 +1714,8 @@
             }
           }
 
-          // 更新地圖釘標，傳入 usedStations 以高亮顯示
-          updateMapMarkers(usedStations);
+          // 更新地圖釘標但不移動視圖
+          updateMapMarkers();
 
           dataLoaded = true;
           if (showLoadingIndicator) {
@@ -1751,10 +1776,18 @@
           const bPinned = pinnedStations.has(b.dataset.id);
           if (aPinned && !bPinned) return -1;
           if (!aPinned && bPinned) return 1;
-          const latToUse = userLocation ? userLocation.latitude : defaultLatitude;
-          const lngToUse = userLocation ? userLocation.longitude : defaultLongitude;
-          const distanceA = calculateDistance(latToUse, lngToUse, parseFloat(a.dataset.lat), parseFloat(a.dataset.lng));
-          const distanceB = calculateDistance(latToUse, lngToUse, parseFloat(b.dataset.lat), parseFloat(b.dataset.lng));
+          const distanceA = calculateDistance(
+            userLocation ? userLocation.latitude : defaultLatitude,
+            userLocation ? userLocation.longitude : defaultLongitude,
+            parseFloat(a.dataset.lat),
+            parseFloat(a.dataset.lng)
+          );
+          const distanceB = calculateDistance(
+            userLocation ? userLocation.latitude : defaultLatitude,
+            userLocation ? userLocation.longitude : defaultLongitude,
+            parseFloat(b.dataset.lat),
+            parseFloat(b.dataset.lng)
+          );
           return distanceA - distanceB;
         });
         cards.forEach(card => {
@@ -1840,10 +1873,14 @@
             }
           }
           
-          // 確保在定位成功後重新搜尋並更新地圖標記
-          await searchYouBike(); // This will now correctly call updateMapMarkers with the new nearest stations
-          await updateVehicleData(); // 確保即時資料更新
-          // updateResultsOrder(); // This is redundant if searchYouBike already sorts and appends
+          if (wasDefault) {
+            await searchYouBike(); // 重新觸發搜尋和卡片渲染
+            await updateVehicleData(); // 確保即時資料更新
+            updateResultsOrder();
+          } else {
+            updateCardDistances();
+            await updateVehicleData(); // 確保即時資料更新
+          }
       }      
       function handleGeolocationError(error) {
         console.error("Geolocation error:", error);
@@ -1930,42 +1967,14 @@
               // 重置通知顏色
               notification.style.backgroundColor = "";
             }, 300);
-          }, 5000);
+          }, 5000); // 延長顯示時間到 5 秒
 
           hasShownDefaultLocationMessage = true;
         }
 
-        // 即使定位失敗，也將 userLocation 設置為預設座標，確保距離計算和地圖藍點正確
         userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-        // 如果定位開關關閉，則在定位失敗時，藍點會自動回到預設位置
-        if (!centralLocationToggle?.checked && leafletMap) {
-            if (locationMarker) {
-                locationMarker.setLatLng([defaultLatitude, defaultLongitude]);
-            } else {
-                locationMarker = L.circleMarker([defaultLatitude, defaultLongitude], {
-                    radius: 10,
-                    fillColor: '#2196F3',
-                    fillOpacity: 0.8,
-                    color: '#ffffff',
-                    weight: 3,
-                    pane: 'markerPane'
-                }).addTo(leafletMap);
-                const pulsingIcon = L.divIcon({
-                    className: 'pulsing-icon',
-                    html: '<div class="pulse"></div>',
-                    iconSize: [20, 20]
-                });
-                pulsingMarker = L.marker([defaultLatitude, defaultLongitude], {
-                    icon: pulsingIcon,
-                    pane: 'markerPane'
-                }).addTo(leafletMap);
-            }
-            leafletMap.setView([defaultLatitude, defaultLongitude], 18, { animate: true });
-        }
-
-
         if (!shouldDisableLocationToggle) {
-          searchYouBike(); // 即使定位失敗，也重新搜尋以更新列表和標記
+          searchYouBike();
           updateVehicleData(); // 確保即時資料更新
         }
       }      
@@ -1998,8 +2007,6 @@
 
           updateCardDistances();
           updateVehicleData(); // 確保即時資料更新
-          // 重新搜尋以更新顯示的站點列表和地圖標記
-          searchYouBike(false, false);
       }      
       function handleGeoUpdateError(error) {
           console.error("Geolocation update error:", error);
@@ -2099,7 +2106,7 @@
             }
           }, 10000);
         } else {
-          showNotification(currentLang === "en" ? 
+          showModal(currentLang === "en" ? 
             "Your browser doesn't support geolocation. Using default location." : 
             "您的瀏覽器不支援地理位置功能。將使用預設座標進行定位。"
           );
@@ -2114,17 +2121,15 @@
         cards.forEach(card => {
           const lat = parseFloat(card.dataset.lat);
           const lng = parseFloat(card.dataset.lng);
-          // 距離計算始終使用 userLocation (如果有) 或 defaultLatitude/Longitude
-          const latToUse = userLocation ? userLocation.latitude : defaultLatitude;
-          const lngToUse = userLocation ? userLocation.longitude : defaultLongitude;
-
-          const newDistance = calculateDistance(latToUse, lngToUse, lat, lng);
+          const newDistance = calculateDistance(
+            userLocation ? userLocation.latitude : defaultLatitude,
+            userLocation ? userLocation.longitude : defaultLongitude,
+            lat, lng
+          );
           const distanceEl = card.querySelector('.distance');
           if (distanceEl) {
-            // 判斷是否使用預設位置，如果 userLocation 為 null 或與 defaultLatitude/Longitude 相同，則顯示「距離：未知」
-            const isUsingDefaultLocation = !userLocation || (userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude);
-            if (isUsingDefaultLocation) {
-              distanceEl.textContent = currentLang === "en" ? "Distance: Unknown" : "距離: 未知";
+            if (userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude) {
+              distanceEl.textContent = "";
             } else {
               const distanceLabel = currentLang === "en" ? "Distance:" : "距離:";
               const unit = newDistance < 1 ? (currentLang === "en" ? " m" : " 公尺") : (currentLang === "en" ? " km" : " 公里");
@@ -2134,7 +2139,7 @@
           }
         });
         updateResultsOrder();
-        // REMOVED: updateMapMarkers(); // This call is now handled by searchYouBike
+        updateMapMarkers(); // 新增：根據定位距離與搜尋狀態更新站點圖標的顏色
       }
       
       // 修改 updateVehicleData 函數，使其更健壯
@@ -2157,7 +2162,7 @@
               // 只有當有新資料時才更新卡片上的值
               if (newVehicleData) {
                 if (yb2El) yb2El.textContent = (newVehicleData.available_2_0 !== undefined ? newVehicleData.available_2_0 : unknownValue);
-                if (ybeEl) yb2El.textContent = (newVehicleData.available_e !== undefined ? newVehicleData.available_e : unknownValue);
+                if (ybeEl) ybeEl.textContent = (newVehicleData.available_e !== undefined ? newVehicleData.available_e : unknownValue);
                 if (emptyEl) emptyEl.textContent = (newVehicleData.empty_spaces !== undefined ? newVehicleData.empty_spaces : unknownValue);
               } 
               // 如果沒有新資料，則保持現有值不變，避免將已顯示的資料重置為「未知」
@@ -2367,42 +2372,11 @@
           setTimeout(async () => {
             const centralLocationToggleChecked = document.getElementById('centralLocationToggle')?.checked;
             if (centralLocationToggleChecked) {
-              await getLocation(); // getLocation 內部會呼叫 handleGeolocationSuccess，進而呼叫 searchYouBike 和 updateVehicleData
+              await getLocation(); // getLocation 內部會呼叫 searchYouBike 和 updateVehicleData
             } else {
-              // 如果定位服務關閉，則直接將 userLocation 設置為預設座標
               userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-              // 確保地圖藍點在預設位置
-              if (leafletMap) {
-                  if (locationMarker) {
-                      locationMarker.setLatLng([defaultLatitude, defaultLongitude]);
-                  } else {
-                      locationMarker = L.circleMarker([defaultLatitude, defaultLongitude], {
-                          radius: 10,
-                          fillColor: '#2196F3',
-                          fillOpacity: 0.8,
-                          color: '#ffffff',
-                          weight: 3,
-                          pane: 'markerPane'
-                      }).addTo(leafletMap);
-                  }
-                  if (pulsingMarker) {
-                      pulsingMarker.setLatLng([defaultLatitude, defaultLongitude]);
-                  } else {
-                      const pulsingIcon = L.divIcon({
-                          className: 'pulsing-icon',
-                          html: '<div class="pulse"></div>',
-                          iconSize: [20, 20]
-                      });
-                      pulsingMarker = L.marker([defaultLatitude, defaultLongitude], {
-                          icon: pulsingIcon,
-                          pane: 'markerPane'
-                      }).addTo(leafletMap);
-                  }
-                  leafletMap.setView([defaultLatitude, defaultLongitude], 18, { animate: true });
-              }
+              // 如果定位服務關閉，則直接更新即時車輛資料
               await updateVehicleData(); 
-              // 確保在非定位模式下也更新地圖標記，以防萬一
-              updateMapMarkers(allStations.slice(0, 20)); // 顯示前20個站點的標記
             }
             // 確保在所有資料載入和處理後顯示主內容
             if (!mainContentShown) {
@@ -2457,8 +2431,6 @@
         },
         update: function() {
             updateVehicleData(); // 只更新車輛資料
-            // 重新呼叫 searchYouBike 以確保地圖標記和列表同步
-            searchYouBike(false, false); 
             this.reset();
         }
     };
@@ -2494,7 +2466,6 @@
           }
         }
         
-        // 確保初始地圖視圖使用 userLocation (如果存在) 或 defaultLatitude/Longitude
         const initialLat = userLocation ? userLocation.latitude : defaultLatitude;
         const initialLng = userLocation ? userLocation.longitude : defaultLongitude;
         
@@ -2508,27 +2479,27 @@
         }).setView([initialLat, initialLng], 18);
 
         // 如果有用戶位置，立即創建位置標記
-        // 這裡的邏輯需要修改，確保即使沒有定位權限，藍點也會顯示在預設位置
-        if (!locationMarker) { // 只有當 locationMarker 不存在時才創建
-            // 創建定位標記與脈衝動畫，無論是否有定位權限，都先顯示在預設位置
-            locationMarker = L.circleMarker([initialLat, initialLng], {
-                radius: 10,
-                fillColor: '#2196F3',
-                fillOpacity: 0.8,
-                color: '#ffffff',
-                weight: 3,
-                pane: 'markerPane'
-            }).addTo(leafletMap);
-
-            const pulsingIcon = L.divIcon({
-                className: 'pulsing-icon',
-                html: '<div class="pulse"></div>',
-                iconSize: [20, 20]
-            });
-            pulsingMarker = L.marker([initialLat, initialLng], {
-                icon: pulsingIcon,
-                pane: 'markerPane'
-            }).addTo(leafletMap);
+        if (userLocation) {
+          locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
+            radius: 10,
+            fillColor: '#2196F3',
+            fillOpacity: 0.8,
+            color: '#ffffff',
+            weight: 3,
+            pane: 'markerPane'
+          }).addTo(leafletMap);
+          
+          // 添加脈衝動畫效果
+          const pulsingIcon = L.divIcon({
+            className: 'pulsing-icon',
+            html: '<div class="pulse"></div>',
+            iconSize: [20, 20]
+          });
+          
+          pulsingMarker = L.marker([userLocation.latitude, userLocation.longitude], { // 將脈衝標記存儲到 pulsingMarker
+            icon: pulsingIcon,
+            pane: 'markerPane'
+          }).addTo(leafletMap);
         }
         
         // 將 popupPane 的 z-index 設定為最高
@@ -2640,15 +2611,15 @@
       }
       
       // 更新地圖釘標函數現在只需要處理搜尋結果的高亮顯示
-      function updateMapMarkers(stationsToHighlight = []) { // Accept an array of stations to highlight
-        // Check if offline and map components are not initialized
+      function updateMapMarkers() {
+        // 檢查是否離線且地圖元件未初始化
         if (!markerClusterGroup) {
           console.log('Map features are limited in offline mode or map not initialized');
           return;
         }
 
         try {
-          // Reset all markers to default blue icon
+          // 重置所有釘標的樣式
           markerClusterGroup.eachLayer(marker => {
             marker.setIcon(L.icon({
               iconUrl: 'https://unpkg.com/leaflet/dist/images/marker-icon.png',
@@ -2657,16 +2628,15 @@
             }));
           });
           
-          // Highlight specified stations with red icon
-          stationsToHighlight.forEach(station => {
-            const lat = parseFloat(station.lat);
-            const lng = parseFloat(station.lng);
+          // 高亮顯示搜尋結果的釘標
+          const stationCards = document.querySelectorAll('.station');
+          stationCards.forEach(card => {
+            const lat = parseFloat(card.dataset.lat);
+            const lng = parseFloat(card.dataset.lng);
             
             if (markerClusterGroup && typeof markerClusterGroup.eachLayer === 'function') {
               markerClusterGroup.eachLayer(marker => {
                 const markerLatLng = marker.getLatLng();
-                // Use a small tolerance for floating point comparison if needed, or rely on station_no
-                // For now, direct comparison should be fine if lat/lng are consistent
                 if (markerLatLng.lat === lat && markerLatLng.lng === lng) {
                   marker.setIcon(L.icon({
                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
@@ -2679,7 +2649,7 @@
           });
         } catch (error) {
           console.error('Error updating map markers:', error);
-          // Do not interrupt application execution, just log the error
+          // 不中斷應用程式運行，僅記錄錯誤
         }
       }
       
@@ -2776,8 +2746,6 @@
                       }
                       updateCardDistances();
                       updateVehicleData();
-                      // 重新搜尋以更新顯示的站點列表和地圖標記
-                      searchYouBike(false, false);
                   },
                   (error) => {
                       console.error('Error watching position:', error);
@@ -2839,7 +2807,7 @@
             
             // 不再需要重新初始化地圖，移除舊的重置邏輯
             if (leafletMap) {
-              // 這裡不再需要呼叫 updateMapMarkers，因為它會在 searchYouBike 中被呼叫
+              updateMapMarkers();
             }
           });
         });
@@ -2849,7 +2817,7 @@
           currentLang = currentLang === "en" ? "zh" : "en";
           localStorage.setItem("lang", currentLang);
           updateLanguageTexts();
-          searchYouBike(false, false); // 重新搜尋以更新列表和地圖標記
+          searchYouBike(false);
           updateVehicleData(); // 確保即時資料更新
         });
 
@@ -2913,7 +2881,7 @@
                   leafletMap.setView([coords.lat, coords.lng], 18, { animate: true });
                 }
                 
-                searchYouBike(); // 重新搜尋以更新列表和地圖標記
+                searchYouBike();
                 updateVehicleData(); // 確保即時資料更新
             }
         });
@@ -2974,7 +2942,7 @@
               if (leafletMap) {
                   leafletMap.setView([coords.lat, coords.lng], 18, { animate: true });
               }
-              searchYouBike(); // 重新搜尋以更新列表和地圖標記
+              searchYouBike();
               updateVehicleData(); // 確保即時資料更新
           }
         });
@@ -2993,7 +2961,7 @@
                     localStorage.setItem('selectedRegion', nearestRegion);
                     const centralRegionSelect = document.getElementById('centralRegionSelect');
                     if (centralRegionSelect) {
-                      centralRegionSelect.value = nearestRegion; // 修正這裡，應該是 nearestRegion
+                      centralRegionSelect.value = savedRegion;
                     }
 
                     // 如果沒有使用定位服務,則移動到最近區域
@@ -3005,7 +2973,7 @@
                       if (leafletMap) {
                         leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
                       }
-                      searchYouBike(); // 重新搜尋以更新列表和地圖標記
+                      searchYouBike();
                       updateVehicleData(); // 確保即時資料更新
                     }
                 },
