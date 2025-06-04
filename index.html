@@ -1887,7 +1887,7 @@
         locationDenied = true;
         let errorMessage = "";
         let errorType = "";
-        let shouldDisableLocationToggle = false; // 新增變數控制是否要關閉開關
+        let shouldDisableLocationToggle = false;
         
         // 停止跟隨使用者位置
         isFollowingUser = false;
@@ -1928,14 +1928,36 @@
           localStorage.setItem("useLocation", "false");
         }
 
-        // 如果定位開關關閉，移除定位標記
-        if (!centralLocationToggle?.checked && locationMarker) {
-          locationMarker.remove();
-          locationMarker = null;
-          if (pulsingMarker) { // 移除脈衝標記
-            pulsingMarker.remove();
-            pulsingMarker = null;
+        // 總是將 userLocation 設定為預設位置
+        userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+
+        // 更新或建立定位標記在預設位置
+        if (locationMarker) {
+          locationMarker.setLatLng([defaultLatitude, defaultLongitude]);
+          if (pulsingMarker) {
+            pulsingMarker.setLatLng([defaultLatitude, defaultLongitude]);
           }
+        } else if (leafletMap) {
+          // 如果標記不存在，則在預設位置建立它
+          locationMarker = L.circleMarker([defaultLatitude, defaultLongitude], {
+            radius: 10,
+            fillColor: '#2196F3',
+            fillOpacity: 0.8,
+            color: '#ffffff',
+            weight: 3,
+            pane: 'markerPane'
+          }).addTo(leafletMap);
+
+          const pulsingIcon = L.divIcon({
+            className: 'pulsing-icon',
+            html: '<div class="pulse"></div>',
+            iconSize: [20, 20]
+          });
+
+          pulsingMarker = L.marker([defaultLatitude, defaultLongitude], {
+            icon: pulsingIcon,
+            pane: 'markerPane'
+          }).addTo(leafletMap);
         }
 
         // 只在第一次顯示錯誤提示
@@ -1967,15 +1989,15 @@
               // 重置通知顏色
               notification.style.backgroundColor = "";
             }, 300);
-          }, 5000); // 延長顯示時間到 5 秒
+          }, 5000);
 
           hasShownDefaultLocationMessage = true;
         }
 
-        userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-        if (!shouldDisableLocationToggle) {
+        // 只有當定位開關仍然啟用或因錯誤而停用時才搜尋並更新車輛資料
+        if (!shouldDisableLocationToggle || (shouldDisableLocationToggle && centralLocationToggle?.checked === false)) {
           searchYouBike();
-          updateVehicleData(); // 確保即時資料更新
+          updateVehicleData();
         }
       }      
       function handleGeoUpdateSuccess(position) {
@@ -2034,17 +2056,14 @@
       let locationIntervalId; // Add this global variable
       async function getLocation() {
         const centralLocationToggle = document.getElementById('centralLocationToggle');
-        if (!centralLocationToggle?.checked) {
-          if (locationIntervalId) {
-            clearInterval(locationIntervalId);
-            locationIntervalId = null;
-          }
-          return;
-        }
-        
-        // 先使用預設位置創建藍點
+        const isLocationEnabled = centralLocationToggle?.checked; // 取得目前狀態
+
+        // 總是在目前 userLocation (可能初始為預設值) 或預設位置顯示藍點
+        const currentLat = userLocation ? userLocation.latitude : defaultLatitude;
+        const currentLng = userLocation ? userLocation.longitude : defaultLongitude;
+
         if (!locationMarker && leafletMap) {
-          locationMarker = L.circleMarker([defaultLatitude, defaultLongitude], {
+          locationMarker = L.circleMarker([currentLat, currentLng], {
             radius: 10,
             fillColor: '#2196F3',
             fillOpacity: 0.8,
@@ -2053,19 +2072,41 @@
             pane: 'markerPane'
           }).addTo(leafletMap);
 
-          // 添加脈衝動畫
           const pulsingIcon = L.divIcon({
             className: 'pulsing-icon',
             html: '<div class="pulse"></div>',
             iconSize: [20, 20]
           });
           
-          pulsingMarker = L.marker([defaultLatitude, defaultLongitude], { // 將脈衝標記存儲到 pulsingMarker
+          pulsingMarker = L.marker([currentLat, currentLng], {
             icon: pulsingIcon,
             pane: 'markerPane'
           }).addTo(leafletMap);
+        } else if (locationMarker) { // 如果標記存在，確保它在目前 userLocation
+          locationMarker.setLatLng([currentLat, currentLng]);
+          if (pulsingMarker) {
+            pulsingMarker.setLatLng([currentLat, currentLng]);
+          }
         }
 
+        if (!isLocationEnabled) {
+          // 如果定位被停用，確保標記在預設位置並停止追蹤
+          if (locationIntervalId) {
+            clearInterval(locationIntervalId);
+            locationIntervalId = null;
+          }
+          userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+          if (locationMarker) {
+            locationMarker.setLatLng([defaultLatitude, defaultLongitude]);
+            if (pulsingMarker) {
+              pulsingMarker.setLatLng([defaultLatitude, defaultLongitude]);
+            }
+          }
+          // 不需要在這裡呼叫 searchYouBike 或 updateVehicleData，因為它會在切換監聽器中處理
+          return;
+        }
+
+        // 只有在定位啟用時才進行地理定位 API 呼叫
         if (navigator.geolocation) {
           try {
             const positionPromise = new Promise((resolve, reject) => {
@@ -2093,24 +2134,34 @@
             }
           }
           
-          locationIntervalId = setInterval(() => {
-            if (centralLocationToggle?.checked) {
-              navigator.geolocation.getCurrentPosition(
-                handleGeoUpdateSuccess,
-                handleGeoUpdateError,
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-              );
-            } else if (locationIntervalId) {
-              clearInterval(locationIntervalId);
-              locationIntervalId = null;
-            }
-          }, 10000);
+          // 如果尚未執行，則開始監控位置的間隔
+          if (!locationIntervalId) {
+            locationIntervalId = setInterval(() => {
+              if (centralLocationToggle?.checked) { // 再次檢查是否啟用
+                navigator.geolocation.getCurrentPosition(
+                  handleGeoUpdateSuccess,
+                  handleGeoUpdateError,
+                  { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+              } else {
+                clearInterval(locationIntervalId);
+                locationIntervalId = null;
+              }
+            }, 10000);
+          }
         } else {
-          showModal(currentLang === "en" ? 
+          showNotification(currentLang === "en" ? 
             "Your browser doesn't support geolocation. Using default location." : 
             "您的瀏覽器不支援地理位置功能。將使用預設座標進行定位。"
           );
           userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+          // 如果瀏覽器不支援地理定位，確保標記在預設位置
+          if (locationMarker) {
+            locationMarker.setLatLng([defaultLatitude, defaultLongitude]);
+            if (pulsingMarker) {
+              pulsingMarker.setLatLng([defaultLatitude, defaultLongitude]);
+            }
+          }
           searchYouBike();
           updateVehicleData(); // 確保即時資料更新
           hideLoading();
@@ -2356,7 +2407,37 @@
       // *** 修改 window load 事件 ***
       window.addEventListener('load', async () => {
         try {
-          // 1. 先載入站點基本資料 (youbikeDataCache) 並渲染卡片，車輛資料會先顯示「未知」
+          // 根據儲存的偏好或預設值初始化 userLocation
+          const centralLocationToggle = document.getElementById('centralLocationToggle');
+          const useLocationFromStorage = localStorage.getItem("useLocation");
+
+          if (useLocationFromStorage === "true" && navigator.geolocation) {
+            // 嘗試先取得目前位置以設定 initMap 的 userLocation
+            try {
+              const position = await new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject, {
+                  enableHighAccuracy: true,
+                  timeout: 5000, // 初始位置的較短逾時
+                  maximumAge: 0
+                });
+              });
+              userLocation = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+              };
+            } catch (e) {
+              console.warn("初始地理定位失敗，使用預設位置進行地圖設定:", e);
+              userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+              centralLocationToggle.checked = false; // 如果初始地理定位失敗，則停用開關
+              localStorage.setItem("useLocation", "false");
+            }
+          } else {
+            userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+            centralLocationToggle.checked = false; // 如果不使用定位，確保開關已關閉
+            localStorage.setItem("useLocation", "false");
+          }
+
+          // 1. 載入站點基本資料並渲染卡片 (車輛資料初始會顯示「未知」)
           await searchYouBike(false, false); 
 
           // 2. 初始化地圖並載入所有站點標記
@@ -2368,24 +2449,17 @@
               : "離線模式：地圖功能受限");
           }
 
-          // 3. 延遲執行定位請求，並在定位成功後更新即時車輛資料
-          setTimeout(async () => {
-            const centralLocationToggleChecked = document.getElementById('centralLocationToggle')?.checked;
-            if (centralLocationToggleChecked) {
-              await getLocation(); // getLocation 內部會呼叫 searchYouBike 和 updateVehicleData
-            } else {
-              userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-              // 如果定位服務關閉，則直接更新即時車輛資料
-              await updateVehicleData(); 
-            }
-            // 確保在所有資料載入和處理後顯示主內容
-            if (!mainContentShown) {
-                 showMainContent();
-            }
-          }, 100);
+          // 3. 在地圖初始化且初始 userLocation 設定後，呼叫 getLocation 處理即時更新
+          // 並確保藍點正確定位和動畫化。
+          await getLocation(); // 這將處理設定 watchPosition (如果啟用) 和更新標記
+
+          // 確保所有資料載入和處理後顯示主內容
+          if (!mainContentShown) {
+               showMainContent();
+          }
 
         } catch (error) {
-          console.error('Initialization error:', error);
+          console.error('初始化錯誤:', error);
           showNotification(currentLang === "en"
             ? "Error initializing app. Some features may be limited."
             : "初始化應用程式時發生錯誤，部分功能可能受限。");
@@ -2478,9 +2552,9 @@
           zoomControl: true
         }).setView([initialLat, initialLng], 18);
 
-        // 如果有用戶位置，立即創建位置標記
-        if (userLocation) {
-          locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
+        // 只有當 locationMarker 不存在時才建立定位標記
+        if (!locationMarker) {
+          locationMarker = L.circleMarker([initialLat, initialLng], {
             radius: 10,
             fillColor: '#2196F3',
             fillOpacity: 0.8,
@@ -2496,7 +2570,7 @@
             iconSize: [20, 20]
           });
           
-          pulsingMarker = L.marker([userLocation.latitude, userLocation.longitude], { // 將脈衝標記存儲到 pulsingMarker
+          pulsingMarker = L.marker([initialLat, initialLng], {
             icon: pulsingIcon,
             pane: 'markerPane'
           }).addTo(leafletMap);
@@ -2853,6 +2927,9 @@
                 // 更新藍點位置到預設區域
                 if (locationMarker) {
                     locationMarker.setLatLng([coords.lat, coords.lng]);
+                    if (pulsingMarker) {
+                        pulsingMarker.setLatLng([coords.lat, coords.lng]);
+                    }
                 } else if (leafletMap) { // 確保 leafletMap 已初始化
                     locationMarker = L.circleMarker([coords.lat, coords.lng], {
                         radius: 10,
@@ -2916,6 +2993,9 @@
               // 更新或創建位置標記
               if (locationMarker) {
                   locationMarker.setLatLng([coords.lat, coords.lng]);
+                  if (pulsingMarker) {
+                      pulsingMarker.setLatLng([coords.lat, coords.lng]);
+                  }
               } else if (leafletMap) { // 確保 leafletMap 已初始化
                   locationMarker = L.circleMarker([coords.lat, coords.lng], {
                       radius: 10,
@@ -2961,7 +3041,7 @@
                     localStorage.setItem('selectedRegion', nearestRegion);
                     const centralRegionSelect = document.getElementById('centralRegionSelect');
                     if (centralRegionSelect) {
-                      centralRegionSelect.value = savedRegion;
+                      centralRegionSelect.value = nearestRegion; // 修正這裡，savedRegion 應該是 nearestRegion
                     }
 
                     // 如果沒有使用定位服務,則移動到最近區域
