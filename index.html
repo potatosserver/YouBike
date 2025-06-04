@@ -1861,7 +1861,9 @@
             // 第一次定位或從預設位置更新時，設定 isFollowingUser 為 true
             if (isFirstLocation || wasDefault) {
               isFollowingUser = true; 
+              isMapMovingDueToTracking = true; // Set flag before moving map
               leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true, duration: 1 });
+              setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Clear flag after a short delay
             } else if (isFollowingUser) { // 如果正在跟隨，則持續移動地圖
               isMapMovingDueToTracking = true; // Set flag before moving map
               leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 });
@@ -2589,10 +2591,11 @@
 
         // 監聽地圖移動事件，如果地圖被手動移動，則停止跟隨
         leafletMap.on('movestart', () => {
+          // 只有當追蹤功能開啟且移動不是由追蹤引起時，才停止追蹤
           if (isTrackingActive && !isMapMovingDueToTracking) {
             stopTracking();
             showNotification(currentLang === "en" ? "Map manually moved, tracking stopped." : "地圖被手動移動，追蹤功能已關閉。");
-            updateLocateButtonTitle(); // Update button title after stopping tracking
+            updateLocateButtonTitle(); // 更新按鈕標題
           }
         });
         
@@ -2759,16 +2762,37 @@
       function toggleTracking() {
           const centralLocationToggle = document.getElementById('centralLocationToggle');
           if (isTrackingActive) {
+              // 如果目前正在追蹤，則停止追蹤
               stopTracking();
+              // 停止追蹤後，將地圖移動到選定的預設區域
+              const selectedRegion = document.getElementById('centralRegionSelect').value;
+              const coords = regionCoordinates[selectedRegion];
+              userLocation = { latitude: coords.lat, longitude: coords.lng }; // 更新 userLocation 為預設區域
+              if (leafletMap) {
+                  isMapMovingDueToTracking = true; // Set flag before moving map
+                  leafletMap.setView([coords.lat, coords.lng], 18, { animate: true, duration: 1 });
+                  setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Clear flag after a short delay
+              }
+              // 更新藍點位置到預設區域
+              if (locationMarker) {
+                  locationMarker.setLatLng([coords.lat, coords.lng]);
+              }
+              if (pulsingMarker) {
+                  pulsingMarker.setLatLng([coords.lat, coords.lng]);
+              }
+              updateCardDistances();
+              updateVehicleData();
           } else {
+              // 如果目前沒有追蹤，則嘗試開啟追蹤
               if (!centralLocationToggle.checked) {
-                  // If location service is off, only move to default location, don't start tracking
+                  // 如果位置服務開關是關閉的，則提示並移動到預設位置，不啟動追蹤
                   showNotification(currentLang === "en" ? "Location service is off, cannot start tracking. Moving to default location." : "位置服務已關閉，無法開啟追蹤功能。將移動至預設位置。");
-                  // Move map to default location
                   if (leafletMap) {
+                      isMapMovingDueToTracking = true; // Set flag before moving map
                       leafletMap.setView([defaultLatitude, defaultLongitude], 18, { animate: true, duration: 1 });
+                      setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Clear flag after a short delay
                   }
-                  // Ensure default marker is shown
+                  // 確保預設標記顯示
                   if (locationMarker) {
                       locationMarker.setLatLng([defaultLatitude, defaultLongitude]);
                   } else if (leafletMap) {
@@ -2794,12 +2818,38 @@
                           pane: 'markerPane'
                       }).addTo(leafletMap);
                   }
-                  userLocation = { latitude: defaultLatitude, longitude: defaultLongitude }; // Update userLocation to default
-                  updateCardDistances(); // Update distances based on default location
-                  updateVehicleData(); // Update vehicle data
+                  userLocation = { latitude: defaultLatitude, longitude: defaultLongitude }; // 更新 userLocation 為預設
+                  updateCardDistances(); // 根據預設位置更新距離
+                  updateVehicleData(); // 更新車輛資料
               } else {
-                  // If location service is on, start tracking
+                  // 如果定位服務開關是開啟的，則啟動追蹤並立即移動地圖
                   startTracking();
+                  // 立即獲取當前位置並移動地圖
+                  navigator.geolocation.getCurrentPosition(
+                      (position) => {
+                          userLocation = {
+                              latitude: position.coords.latitude,
+                              longitude: position.coords.longitude
+                          };
+                          if (leafletMap) {
+                              isMapMovingDueToTracking = true; // Set flag before moving map
+                              leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true, duration: 1 });
+                              setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Clear flag after a short delay
+                          }
+                          if (locationMarker) {
+                              locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+                          }
+                          if (pulsingMarker) {
+                              pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+                          }
+                          updateCardDistances();
+                          updateVehicleData();
+                      },
+                      (error) => {
+                          handleGeolocationError(error); // 處理定位錯誤
+                      },
+                      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                  );
               }
           }
           updateLocateButtonTitle(); // Update button title after toggle
@@ -2907,7 +2957,9 @@
                 
                 // 移動地圖到選擇的區域
                 if (leafletMap) {
+                  isMapMovingDueToTracking = true; // Set flag before moving map
                   leafletMap.setView([coords.lat, coords.lng], 18, { animate: true });
+                  setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Clear flag after a short delay
                 }
                 
                 searchYouBike();
@@ -2964,7 +3016,9 @@
               }
               
               if (leafletMap) {
+                  isMapMovingDueToTracking = true; // Set flag before moving map
                   leafletMap.setView([coords.lat, coords.lng], 18, { animate: true });
+                  setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Clear flag after a short delay
               }
               searchYouBike();
               updateVehicleData(); 
@@ -2996,7 +3050,9 @@
                         longitude: regionCoordinates[nearestRegion].lng 
                       };
                       if (leafletMap) {
+                        isMapMovingDueToTracking = true; // Set flag before moving map
                         leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
+                        setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Clear flag after a short delay
                       }
                       searchYouBike();
                       updateVehicleData(); 
