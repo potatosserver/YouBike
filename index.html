@@ -1787,7 +1787,7 @@
 
               const dataArray = result.retVal.data;
               dataArray.forEach(item => {
-               
+                              
                 allVehicleData[item.station_no] = {
                   available_2_0: item.available_spaces_detail ? item.available_spaces_detail.yb2 : 0,
                   available_e: item.available_spaces_detail ? item.available_spaces_detail.eyb : 0,
@@ -2181,10 +2181,7 @@
                           weight: 3,
                           pane: 'markerPane'
                       }).addTo(leafletMap);
-                  }
-                  if (pulsingMarker) {
-                      pulsingMarker.setLatLng([coords.lat, coords.lng]);
-                  } else {
+
                       const pulsingIcon = L.divIcon({
                           className: 'pulsing-icon',
                           html: '<div class="pulse"></div>',
@@ -2912,8 +2909,9 @@
           });
         });
 
-        // 語言切換開關
+        // 語言切換開關 - 修改後的版本
         centralLangToggle.addEventListener('change', async () => {
+          // 在更新語言前先儲存當前所有車輛資料
           const oldVehicleData = {};
           document.querySelectorAll('.station').forEach(card => {
             const id = card.dataset.id;
@@ -2929,10 +2927,10 @@
           localStorage.setItem("lang", currentLang);
           updateLanguageTexts();
           
-          // 更新卡片但保留車輛資料
+          // 更新卡片但使用 false 參數避免顯示載入指示器
           await searchYouBike(false);
           
-          // 恢復之前的車輛資料
+          // 立即使用儲存的資料更新車輛資訊
           document.querySelectorAll('.station').forEach(card => {
             const id = card.dataset.id;
             const data = oldVehicleData[id];
@@ -2947,7 +2945,7 @@
             }
           });
           
-          // 最後更新即時資料
+          // 最後再更新即時資料以確保資料最新
           await updateVehicleData();
         });
 
