@@ -2229,6 +2229,11 @@
       
       // 修改 updateVehicleData 函數來保存和復用舊的資料
       function updateVehicleData() {
+	// 新增：若上次更新不到 10 秒則跳過後續更新（10,000 毫秒）
+	if (window.lastVehicleDataUpdate && Date.now() - window.lastVehicleDataUpdate < 10000) {
+		return;
+	}
+	window.lastVehicleDataUpdate = Date.now();
         const stationElements = document.querySelectorAll('.station');
         if (!stationElements.length) return;
 
@@ -2242,35 +2247,34 @@
             empty_spaces: card.querySelector('.vehicle_empty').textContent
           };
         });
-
-        const stationIds = Array.from(stationElements).map(el => el.dataset.id);
         
-        queryVehicleData(stationIds)
-          .then(vehicleData => {
-            stationElements.forEach(card => {
-              const id = card.dataset.id;
-              const newVehicleData = vehicleData[id];
-              const oldData = currentData[id];
-              
-              const yb2El = card.querySelector('.vehicle_yb2');
-              const ybeEl = card.querySelector('.vehicle_ybe');
-              const emptyEl = card.querySelector('.vehicle_empty');
-              const unknownValue = currentLang === "en" ? "Unknown" : "未知";
-
-              // 使用新資料或保留舊資料，僅在真正的"未知"情況下顯示 unknownValue
-              if (yb2El) yb2El.textContent = newVehicleData?.available_2_0 !== undefined ? newVehicleData.available_2_0 : 
-                                      (oldData?.available_2_0 !== unknownValue && oldData?.available_2_0 !== "Unknown" ? oldData.available_2_0 : unknownValue);
-              if (ybeEl) ybeEl.textContent = newVehicleData?.available_e !== undefined ? newVehicleData.available_e :
-                                      (oldData?.available_e !== unknownValue && oldData?.available_e !== "Unknown" ? oldData.available_e : unknownValue);
-              if (emptyEl) emptyEl.textContent = newVehicleData?.empty_spaces !== undefined ? newVehicleData.empty_spaces :
-                                      (oldData?.empty_spaces !== unknownValue && oldData?.empty_spaces !== "Unknown" ? oldData.empty_spaces : unknownValue);
-            });
-            updateResultsOrder();
-          })
-          .catch(error => {
-            console.error("Vehicle data update failed:", error);
-            showNotification(currentLang === "en" ? "Failed to update real-time data." : "即時資料更新失敗。");
-          });
+        const stationIds = Array.from(stationElements).map(el => el.dataset.id);
+  
+	queryVehicleData(stationIds)
+		.then(vehicleData => {
+			stationElements.forEach(card => {
+				const id = card.dataset.id;
+				const newVehicleData = vehicleData[id];
+				const oldData = currentData[id];
+			  
+				const yb2El = card.querySelector('.vehicle_yb2');
+				const ybeEl = card.querySelector('.vehicle_ybe');
+				const emptyEl = card.querySelector('.vehicle_empty');
+				const unknownValue = currentLang === "en" ? "Unknown" : "未知";
+  
+				if (yb2El) yb2El.textContent = newVehicleData?.available_2_0 !== undefined ? newVehicleData.available_2_0 : 
+					(oldData?.available_2_0 !== unknownValue && oldData?.available_2_0 !== "Unknown" ? oldData.available_2_0 : unknownValue);
+				if (ybeEl) ybeEl.textContent = newVehicleData?.available_e !== undefined ? newVehicleData.available_e :
+					(oldData?.available_e !== unknownValue && oldData?.available_e !== "Unknown" ? oldData.available_e : unknownValue);
+				if (emptyEl) emptyEl.textContent = newVehicleData?.empty_spaces !== undefined ? newVehicleData.empty_spaces :
+					(oldData?.empty_spaces !== unknownValue && oldData?.empty_spaces !== "Unknown" ? oldData.empty_spaces : unknownValue);
+			});
+			updateResultsOrder();
+		})
+		.catch(error => {
+			console.error("Vehicle data update failed:", error);
+			showNotification(currentLang === "en" ? "Failed to update real-time data." : "即時資料更新失敗。");
+		});
       }
 
       let currentLang = localStorage.getItem("lang") || "zh";
