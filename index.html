@@ -8,9 +8,6 @@
     <meta name="keywords" content="YouBike, youBike, YouBike2.0, youBike2.0, ubike, ibike, obike, kbike, 微笑單車，公共自行車, 腳踏車，YouBike站點搜尋, 站點搜尋, YouBike 資訊, YouBike據點，ubike據點 ，附近站點, 附近YouBike站點, 全台YouBike, 台北YouBike, 新北YouBike, 桃園YouBike, 新竹YouBike, 苗栗YouBike, 臺中YouBike, 嘉義YouBike , 臺南YouBike, 高雄YouBike, 屏東YouBike, 臺東YouBike , YouBike即時資訊, 定位功能, Github, github.io" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>YouBike 站點搜尋 : 一個簡單、美觀、低流量的YouBike站點搜尋器</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="manifest" href="/YouBike/manifest.json" />
     <link rel="icon" type="image/x-icon" href="https://potatosserver.github.io/YouBike/icons/icon.ico" />
@@ -19,7 +16,8 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
     <style>
       body {
-        font-family: 'Noto Sans TC', Arial, sans-serif;
+        /* 將字體設定為系統預設字體，以加速載入 */
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
         margin: 0; /* 移除預設 body 邊距 */
         background: #f4f4f4; /* 預設亮色模式背景 */
         color: #333; /* 預設亮色模式文字顏色 */
@@ -1247,8 +1245,6 @@
             leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
           }
           searchYouBike(); // 新增：按下清除後立即用空關鍵字搜尋
-          // 移除定位按鈕關閉定位追蹤的功能，所以這裡不再呼叫 stopTracking
-          // stopTracking(); // 停止追蹤功能
           updateLocateButtonTitle(); // 更新按鈕標題
       });
       const maxResults = 100;
@@ -1929,8 +1925,6 @@
         
         // 停止跟隨使用者位置
         isFollowingUser = false;
-        // 移除定位按鈕關閉定位追蹤的功能，所以這裡不再呼叫 stopTracking
-        // stopTracking(); // Ensure tracking is stopped on error
 
         switch (error.code) {
           case error.PERMISSION_DENIED:
@@ -2999,13 +2993,6 @@
   }
   updateLocateButtonTitle(); // 更新按鈕標題
 });
-        // 初始化時檢查定位開關狀態 (這部分邏輯已移至 window load 事件)
-        // if (centralLocationToggle.checked) {
-        //   getLocation();
-        // } else {
-        //   userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-        //   searchYouBike();
-        // }
 
         // 初始化地區選單
         centralRegionSelect.addEventListener('change', function() {
