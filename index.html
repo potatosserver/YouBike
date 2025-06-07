@@ -1775,59 +1775,52 @@
         return R * c;
       }      
       async function handleGeolocationSuccess(position) {
-	const isFirstLocation = !locationMarker;
-	userLocation = {
-		latitude: position.coords.latitude,
-		longitude: position.coords.longitude
-	};
+          userLocation = {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+          };
 
-	if (leafletMap) {
-		if (isFirstLocation) {
-			isFollowingUser = true;
-			isMapMovingDueToTracking = true;
-			leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true, duration: 1 });
-			setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
-		} else if (isFollowingUser) {
-			isMapMovingDueToTracking = true;
-			leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 });
-			setTimeout(() => { isMapMovingDueToTracking = false; }, 500);
-		}
+          if (leafletMap) {
+              // 確保標記點被創建，如果它們不存在
+              if (!locationMarker) {
+                  locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
+                      radius: 10,
+                      fillColor: '#2196F3',
+                      fillOpacity: 0.8,
+                      color: '#ffffff',
+                      weight: 3,
+                      pane: 'markerPane'
+                  }).addTo(leafletMap);
 
-		if (!locationMarker) {
-			locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
-				radius: 10,
-				fillColor: '#2196F3',
-				fillOpacity: 0.8,
-				color: '#ffffff',
-				weight: 3,
-				pane: 'markerPane'
-			}).addTo(leafletMap);
+                  const pulsingIcon = L.divIcon({
+                      className: 'pulsing-icon',
+                      html: '<div class="pulse"></div>',
+                      iconSize: [20, 20]
+                  });
+                  pulsingMarker = L.marker([userLocation.latitude, userLocation.longitude], {
+                      icon: pulsingIcon,
+                      pane: 'markerPane'
+                  }).addTo(leafletMap);
+              } else {
+                  // 更新標記點位置
+                  locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+                  if (pulsingMarker) {
+                      pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+                  }
+              }
 
-			const pulsingIcon = L.divIcon({
-				className: 'pulsing-icon',
-				html: '<div class="pulse"></div>',
-				iconSize: [20, 20]
-			});
-			pulsingMarker = L.marker([userLocation.latitude, userLocation.longitude], { 
-				icon: pulsingIcon,
-				pane: 'markerPane'
-			}).addTo(leafletMap);
-		} else {
-			locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
-			if (pulsingMarker) { // Ensure pulsingMarker also moves if locationMarker exists
-				pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
-			}
-		}
-	}
+              // 如果正在跟隨使用者，則移動地圖
+              if (isFollowingUser) {
+                  isMapMovingDueToTracking = true;
+                  leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 });
+                  setTimeout(() => { isMapMovingDueToTracking = false; }, 500);
+              }
+          }
 
-	if (isFirstLocation) {
-		await searchYouBike();
-		await updateVehicleData();
-		updateResultsOrder();
-	} else {
-		updateCardDistances();
-		await updateVehicleData();
-	}
+          // 這些更新在成功獲取位置資訊後總是需要
+          updateCardDistances();
+          await updateVehicleData(); // 使用 await
+          updateResultsOrder(); // 根據新距離重新排序結果
       }      
       function handleGeolocationError(error) {
         console.error("Geolocation error:", error);
@@ -1926,7 +1919,7 @@
           }).addTo(leafletMap);
         } else if (locationMarker) {
           locationMarker.setLatLng([defaultLatitude, defaultLongitude]);
-          if (pulsingMarker) { // Ensure pulsingMarker also moves if locationMarker exists
+          if (pulsingMarker) { // 確保脈衝波也隨藍點移動
             pulsingMarker.setLatLng([defaultLatitude, defaultLongitude]);
           }
         }
@@ -2057,6 +2050,9 @@
               if (leafletMap) {
                   if (locationMarker) {
                       locationMarker.setLatLng([coords.lat, coords.lng]);
+                      if (pulsingMarker) { // 確保脈衝波也隨藍點移動
+                          pulsingMarker.setLatLng([coords.lat, coords.lng]);
+                      }
                   } else {
                       locationMarker = L.circleMarker([coords.lat, coords.lng], {
                           radius: 10,
@@ -2630,19 +2626,22 @@
       function toggleTracking() {
           const centralLocationToggle = document.getElementById('centralLocationToggle');
           if (!centralLocationToggle.checked) {
+              // 當定位服務關閉時的邏輯
               showNotification(currentLang === "en" ? "Location service is off, cannot start tracking. Moving to default location." : "位置服務已關閉，無法開啟追蹤功能。將移動至預設位置。");
-              if (leafletMap) {
-                  isMapMovingDueToTracking = true;
-                  leafletMap.setView([defaultLatitude, defaultLongitude], 18, { animate: true });
-                  setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
-              }
+              stopTracking(); // 確保停止追蹤
+              
+              const selectedRegion = document.getElementById('centralRegionSelect').value;
+              const coords = regionCoordinates[selectedRegion];
+              userLocation = { latitude: coords.lat, longitude: coords.lng }; // 將 userLocation 設定為預設位置
+              
+              // 立即更新標記點位置
               if (locationMarker) {
-                  locationMarker.setLatLng([defaultLatitude, defaultLongitude]);
+                  locationMarker.setLatLng([coords.lat, coords.lng]);
                   if (pulsingMarker) { // 確保脈衝波也隨藍點移動
-                      pulsingMarker.setLatLng([defaultLatitude, defaultLongitude]);
+                      pulsingMarker.setLatLng([coords.lat, coords.lng]);
                   }
-              } else if (leafletMap) {
-                  locationMarker = L.circleMarker([defaultLatitude, defaultLongitude], {
+              } else if (leafletMap) { // 如果標記點不存在則創建它們
+                  locationMarker = L.circleMarker([coords.lat, coords.lng], {
                       radius: 10,
                       fillColor: '#2196F3',
                       fillOpacity: 0.8,
@@ -2656,37 +2655,48 @@
                       html: '<div class="pulse"></div>',
                       iconSize: [20, 20]
                   });
-                  pulsingMarker = L.marker([defaultLatitude, defaultLongitude], { 
+                  pulsingMarker = L.marker([coords.lat, coords.lng], { 
                     icon: pulsingIcon,
                     pane: 'markerPane'
                   }).addTo(leafletMap);
               }
-              userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-              updateCardDistances();
-              updateVehicleData();
+              
+              if (leafletMap) { // 立即移動地圖
+                  isMapMovingDueToTracking = true;
+                  leafletMap.setView([coords.lat, coords.lng], 18, { animate: true });
+                  setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
+              }
+              
+              window.lastVehicleDataUpdate = 0;
               searchYouBike(true, false); 
-          } else {
-              startTracking();
-              isFollowingUser = true;
+              updateVehicleData();
+              countdownTimer.update();
+          } else { // 當定位服務開啟時
+              startTracking(); // 啟動 watchPosition，設定 isTrackingActive = true
+              isFollowingUser = true; // 啟用地圖跟隨，以便後續更新時移動地圖
+
+              // 如果 userLocation 已存在，立即將地圖移動到藍點位置
+              if (userLocation && leafletMap) {
+                  isMapMovingDueToTracking = true;
+                  leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 });
+                  setTimeout(() => { isMapMovingDueToTracking = false; }, 500);
+
+                  // 更新標記點位置
+                  if (locationMarker) {
+                      locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+                  }
+                  if (pulsingMarker) {
+                      pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+                  }
+                  updateCardDistances();
+                  updateVehicleData();
+              }
+              
+              // 再次呼叫 getCurrentPosition 以確保獲取最準確的當前位置
               navigator.geolocation.getCurrentPosition(
                   (position) => {
-                      userLocation = {
-                          latitude: position.coords.latitude,
-                          longitude: position.coords.longitude
-                      };
-                      if (leafletMap) {
-                          isMapMovingDueToTracking = true;
-                          leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
-                          setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
-                      }
-                      if (locationMarker) {
-                          locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
-                      }
-                      if (pulsingMarker) {
-                          pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
-                      }
-                      updateCardDistances();
-                      updateVehicleData();
+                      // handleGeolocationSuccess 會更新標記點和地圖視圖
+                      handleGeolocationSuccess(position);
                   },
                   (error) => {
                       handleGeolocationError(error);
