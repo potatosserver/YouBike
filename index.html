@@ -16,25 +16,21 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
     <style>
       body {
-        /* 將字體設定為系統預設字體，以加速載入 */
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-        margin: 0; /* 移除預設 body 邊距 */
-        background: #f4f4f4; /* 預設亮色模式背景 */
-        color: #333; /* 預設亮色模式文字顏色 */
+        margin: 0;
+        background: #f4f4f4;
+        color: #333;
         transition: background 0.5s ease, color 0.5s ease;
-        padding-top: 20px; /* 增加頂部填充 */
+        padding-top: 20px;
         --map-filter: none;
         --map-transition: filter 0.3s ease;
-        /* 新增全域顏色過渡 */
         --color-transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
       }
 
-      /* 為所有元素添加顏色過渡效果 */
       *, *::before, *::after {
         transition: var(--color-transition);
       }
 
-      /* 確保特定元素有正確的過渡效果 */
       .station, 
       .station h3, 
       .station p,
@@ -75,98 +71,92 @@
         opacity: 0;
         transform: translateY(-20px);
       }
-      /* 主標題專用樣式，避免被其他 h1 樣式覆蓋 */
       .main-title {
         color: #007bff;
         text-align: center;
-        margin-bottom: 8px; /* 從 12px 改為 8px */
+        margin-bottom: 8px;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-        padding: 4px; /* 從 6px 改為 4px */
+        padding: 4px;
         background-color: rgba(255, 255, 255, 0.8);
         border-radius: 8px;
         display: inline-block;
-        font-size: 1.4em; /* 加入字體大小縮小 */
+        font-size: 1.4em;
       }
       body.dark-mode .main-title {
         color: #90CAF9;
       }
-      /* Material 3 風格的搜尋欄容器 */
       #searchContainer {
         display: flex;
         align-items: center;
         margin-left: auto;
         margin-right: auto;
         max-width: 500px;
-        width: calc(100% - 40px); /* Adjust width for padding */
+        width: calc(100% - 40px);
         position: relative;
-        padding: 8px 16px; /* Adjusted internal padding */
-        box-sizing: border-box; /* Ensure padding doesn't increase total width */
-        background-color: white; /* Default background */
-        border-radius: 28px; /* Large rounded corners */
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* subtle elevation */
+        padding: 8px 16px;
+        box-sizing: border-box;
+        background-color: white;
+        border-radius: 28px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         transition: box-shadow 0.3s ease;
       }
 
       body.dark-mode #searchContainer {
-          background-color: #1e1e1e; /* Dark mode background */
-          box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1); /* Dark mode subtle elevation */
+          background-color: #1e1e1e;
+          box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
       }
 
-      /* Material 3 風格的搜尋輸入框 */
       #keyword {
-        padding: 0; /* Remove input's own padding, controlled by container */
-        width: calc(100% - 34px); /* Adjust width to leave space for icon and spacing */
-        border: none; /* Remove border */
-        border-radius: 0; /* Rounded corners controlled by container */
-        margin: 0; /* Remove margin */
+        padding: 0;
+        width: calc(100% - 34px);
+        border: none;
+        border-radius: 0;
+        margin: 0;
         font-size: 16px;
-        box-shadow: none; /* Shadow controlled by container */
+        box-shadow: none;
         word-wrap: break-word;
         overflow-wrap: break-word;
         display: block;
-        background-color: transparent; /* Transparent background to show container background */
-        color: #333; /* Default text color */
+        background-color: transparent;
+        color: #333;
       }
 
       body.dark-mode #keyword {
-          color: #ffffff; /* Dark mode text color */
+          color: #ffffff;
       }
 
       #keyword::placeholder {
-        color: #888; /* Placeholder text color */
+        color: #888;
       }
       #keyword:focus {
-        outline: none; /* Remove default focus outline */
-        /* Add Material 3 style focus effect here if needed */
+        outline: none;
       }
 
-      /* Search icon style (Material Icons) */
       #searchIcon {
-        position: static; /* Let icon flow naturally in flex layout */
-        margin-left: 10px; /* Spacing between input and icon */
-        font-size: 24px; /* Material Icons default size */
+        position: static;
+        margin-left: 10px;
+        font-size: 24px;
         cursor: pointer;
-        color: #555; /* Default icon color */
+        color: #555;
         transition: color 0.3s ease;
-        flex-shrink: 0; /* Prevent icon from shrinking */
-        display: inline-flex; /* Use flex to center icon */
+        flex-shrink: 0;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 24px; /* Set width */
-        height: 24px; /* Set height */
+        width: 24px;
+        height: 24px;
       }
 
       body.dark-mode #searchIcon {
-          color: #ccc; /* Dark mode icon color */
+          color: #ccc;
       }
 
       #searchIcon:hover {
-        color: #007BFF; /* Hover color */
+        color: #007BFF;
       }
 
-      /* Adjust spacing below the search container */
       #searchContainer + #locationSwitchContainer {
-           margin-top: 6px; /* 從 10px 改為 6px */
+           margin-top: 6px;
       }
 
       #locationSwitchContainer {
@@ -204,7 +194,7 @@
         flex-wrap: wrap;
         gap: 20px;
         justify-content: center;
-        padding: 0 20px; /* Add padding to results container */
+        padding: 0 20px;
       }
       .station {
         background-color: white;
@@ -321,34 +311,32 @@
       .modal button:hover {
         background-color: #0056b3;
       }
-      /* Dark mode styles */
       body.dark-mode {
         background: #333;
         color: #ffffff;
         transition: background 0.5s ease, color 0.5s ease;
       }
       body.dark-mode h1 {
-        color: #90CAF9; /* 與暗色模式站點名稱一致 */
+        color: #90CAF9;
       }
       body.dark-mode #keyword {
-        /* 在暗色模式下，關鍵字背景應透明以顯示搜尋容器背景 */
         background-color: transparent;
         color: #ffffff;
-        border-color: #90caf9; /* 此邊框顏色不會顯示，因為 border: none */
+        border-color: #90caf9;
       }
       body.dark-mode #keyword::placeholder {
-         color: #888; /* 調整暗色模式下佔位符顏色 */
+         color: #888;
       }
 
        body.dark-mode #searchContainer {
-          background-color: #1e1e1e; /* 暗色模式容器背景 */
-          box-shadow: 0 2px 4px rgba(255,255,255,0.1); /* 暗色模式細微陰影 */
+          background-color: #1e1e1e;
+          box-shadow: 0 2px 4px rgba(255,255,255,0.1);
       }
        body.dark-mode #searchIcon {
-          color: #ccc; /* 暗色模式圖標顏色 */
+          color: #ccc;
       }
       body.dark-mode #searchIcon:hover {
-        color: #ffffff; /* 暗色模式下懸停時為白色圖標 */
+        color: #ffffff;
       }
       body.dark-mode button {
         background-color: #90caf9;
@@ -419,7 +407,6 @@
       body.dark-mode #toggleDarkMode:hover {
         background: linear-gradient(135deg, #64b5f6, #42a5f5);
       }
-      /* 新增地圖與浮動卡片樣式 */
       #map {
         position: fixed;
         top: 0;
@@ -427,7 +414,7 @@
         width: 100vw;
         height: 100vh;
         z-index: 1;
-        touch-action: none; /* 防止預設觸控行為 */
+        touch-action: none;
       }
       #floatingCard {
         position: fixed;
@@ -460,29 +447,29 @@
         border-top-right-radius: 20px;
         box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
         padding: 20px;
-        padding-top: 0; /* 移除上方 padding */
+        padding-top: 0;
         overflow-y: auto;
-        width: 85%; /* 從 94% 改為 85% */
-        max-width: 1000px; /* 從 1200px 改為 1000px */
+        width: 85%;
+        max-width: 1000px;
         margin: 0 auto;
         left: 50%;
         transform: translateX(-50%);
-        touch-action: pan-y; /* 修改：允許垂直捲動 */
-        -webkit-overflow-scrolling: touch; /* 增加：提供 iOS 的平滑捲動 */
+        touch-action: pan-y;
+        -webkit-overflow-scrolling: touch;
       }
 
       #mainContent::before {
         content: '';
         display: block;
-        height: 24px; /* 設定頂部空間高度 */
-        background: inherit; /* 繼承父元素背景色 */
+        height: 24px;
+        background: inherit;
         position: sticky;
         top: 0;
         z-index: 99;
       }
 
       #mainContent::-webkit-scrollbar {
-        display: none;  /* Chrome, Safari and Opera */
+        display: none;
       }
 
       body.dark-mode #mainContent {
@@ -490,18 +477,17 @@
         box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
       }
 
-      /* 拖曳手柄樣式 */
       #dragHandle {
         position: sticky;
-        top: 8px; /* 調整橫條在頂部空間中的位置 */
+        top: 8px;
         z-index: 100;
-        height: 20px; /* 增加可點擊區域 */
+        height: 20px;
         cursor: ns-resize;
         background: transparent;
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: -10px 0; /* 負邊距讓實際高度不影響布局 */
+        margin: -10px 0;
       }
 
       #dragHandle::before {
@@ -518,53 +504,45 @@
 
       @media (max-width: 768px) {
         #mainContent {
-          width: 80%; /* 從 92% 改為 80% */
+          width: 80%;
         }
       }
 
       @media (max-width: 480px) {
         #mainContent {
           width: 100%;
-          padding: 0; /* 移除上下 padding */
+          padding: 0;
           max-width: none;
         }
-        /* 移除 results 的左右 padding */
         #results {
-          padding: 0 16px; /* 改為固定的左右 padding */
+          padding: 0 16px;
         }
-        /* 移除 station 卡片的左右邊距 */
         .station {
-          margin: 10px 0; /* 只保留上下邊距 */
-          width: calc(100% - 32px); /* 配合 results 的 padding */
-          border-radius: 10px; /* 保持圓角 */
+          margin: 10px 0;
+          width: calc(100% - 32px);
+          border-radius: 10px;
         }
-      }      /* Adjustments for narrow screens */
-      @media (max-width: 768px) {
+      }      @media (max-width: 768px) {
         .station {
           width: calc(50% - 20px);
         }
-        /* Adjusted search container for horizontal layout */
         #searchContainer {
-            /* Removed flex-direction: column; to keep items in a row */
-            padding: 8px 12px; /* Adjust padding */
-            /* Ensure display: flex and align-items: center; are effective */
+            padding: 8px 12px;
         }
         #keyword {
-          /* Adjusted width to leave space for the icon */
-          width: calc(100% - 34px); /* Assuming 24px icon + 10px margin */
+          width: calc(100% - 34px);
           margin-right: 0;
-          margin-bottom: 0; /* No margin-bottom in row layout */
-          border-radius: 28px; /* Keep rounded corners like default */
+          margin-bottom: 0;
+          border-radius: 28px;
           display: block;
-          padding: 0 12px; /* Padding controlled by container */
+          padding: 0 12px;
         }
          #searchIcon {
-             position: static; /* Remain in static flow within flex container */
-             margin-left: 10px; /* Space between input and icon */
-             margin-top: 0; /* No margin-top in row layout */
-             align-self: auto; /* Default alignment in flex row */
-             /* Ensure font-size, width, height are set for the icon */
-             font-size: 24px; /* Material Icons size */
+             position: static;
+             margin-left: 10px;
+             margin-top: 0;
+             align-self: auto;
+             font-size: 24px;
              width: 24px;
              height: 24px;
              display: inline-flex;
@@ -590,25 +568,21 @@
           width: 100%;
         }
         #searchContainer {
-             padding: 10px; /* Smaller screen spacing */
+             padding: 10px;
          }
          #keyword {
-             /* Adjusted width for smaller screens if needed, keeping room for icon */
-             width: calc(100% - 34px); /* Assuming 24px icon + 10px margin */
-             padding: 0 10px; /* Padding controlled by container */
+             width: calc(100% - 34px);
+             padding: 0 10px;
          }
          #results {
-        /* 新增左右內邊距 */
         padding-left: 16px;
         padding-right: 16px;
     }
     .station {
-        /* 為區塊加入左右間距，保持 100% 寬度時左右仍有間隙 */
         margin-left: 8px;
         margin-right: 8px;
     }
-      }      /* 新增脈衝動畫樣式 */
-      @keyframes pulse {
+      }      @keyframes pulse {
         0% {
           transform: scale(0.8);
           opacity: 1;
@@ -623,7 +597,7 @@
         width: 100%;
         height: 100%;
         border-radius: 50%;
-        background-color: #2196F3; /* 藍色 */
+        background-color: #2196F3;
         animation: pulse 2s infinite ease-out;
       }
       #loadingOverlay {
@@ -640,7 +614,6 @@
         transition: opacity 0.5s ease;
       }
       
-      /* 新增通知樣式 */
       #locationNotification {
         position: fixed;
         top: 20px;
@@ -717,9 +690,7 @@
       input:checked + .slider:before {
         transform: translateX(26px);
       }
-      /* Removed installButton styles */
-      /* #installButton { ... } */
-      /* #installButton img { ... } */      @keyframes popUp {
+      @keyframes popUp {
           0% { transform: translateX(100%) scale(0.5); opacity: 0; }
           100% { transform: translateX(0) scale(1); opacity: 1; }
       }
@@ -773,7 +744,7 @@
           z-index: 1200;
           transform: translateX(100%) scale(0.5);
           opacity: 0;
-          transition: all 0.2s ease; /* 從 0.3s 改為 0.2s */
+          transition: all 0.2s ease;
           background: rgba(255, 255, 255, 0.9);
           padding: 10px;
           border-radius: 30px;
@@ -783,15 +754,15 @@
       }
       
       #settingsPanel.show {
-          animation: popUpSettings 0.2s forwards; /* 從 0.3s 改為 0.2s */
+          animation: popUpSettings 0.2s forwards;
       }
 
       #settingsPanel.hiding {
-          animation: popDownSettings 0.2s forwards; /* 從 0.3s 改為 0.2s */
+          animation: popDownSettings 0.2s forwards;
       }
       
       #darkModeToggle {
-          display: none; /* 隱藏這個按鈕 */
+          display: none;
       }
       
       #settingsPanel a,
@@ -806,7 +777,6 @@
           box-shadow: 0 4px 10px rgba(0,0,0,0.2);
       }
 
-      /* Settings Panel Animations */
       @keyframes popUpSettings {
           0% { 
               transform: translateX(100%) scale(0.5);
@@ -830,11 +800,11 @@
       }
 
       #settingsPanel.show {
-          animation: popUpSettings 0.2s forwards; /* 從 0.3s 改為 0.2s */
+          animation: popUpSettings 0.2s forwards;
       }
 
       #settingsPanel.hiding {
-          animation: popDownSettings 0.2s forwards; /* 從 0.3s 改為 0.2s */
+          animation: popDownSettings 0.2s forwards;
       }
 
       #updateCountdown {
@@ -845,19 +815,19 @@
         position: fixed;
         top: 8px;
         left: 50%;
-        transform: translateX(-50%); /* 使用 transform 來置中 */
-        z-index: 999 !important; /* 從 9000 改為 999 */
+        transform: translateX(-50%);
+        z-index: 999 !important;
         width: 90%;
         max-width: 800px;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 4px; /* 從 6px 改為 4px */
-        pointer-events: none; /* 允許點擊穿透到地圖 */
+        gap: 4px;
+        pointer-events: none;
       }
 
       #mapControls > * {
-        pointer-events: auto; /* 恢復控制項的點擊功能 */
+        pointer-events: auto;
       }
 
       #mapControls h1 {
@@ -873,11 +843,10 @@
       }
 
       #mapControls, #mapControls * {
-        z-index: 999 !important; /* 從 9000 改為 999 */
+        z-index: 999 !important;
         pointer-events: none !important;
       }
 
-      /* 修改：僅當 body 有 dark-mode 類別時，將濾鏡套用於地圖層與控制項 */
       body.dark-mode .leaflet-layer,
       body.dark-mode .leaflet-control-zoom-in,
       body.dark-mode .leaflet-control-zoom-out,
@@ -885,7 +854,6 @@
         filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
       }
 
-      /* 強制 popup 在所有搜尋框內容之上 */
       .leaflet-popup-pane {
         z-index: 12000 !important;
       }
@@ -901,7 +869,6 @@
         pointer-events: auto !important;
       }
 
-      /* 新增中央設定面板樣式 */
       #centralSettingsPanel {
           display: none;
           position: fixed;
@@ -919,7 +886,7 @@
           max-height: calc(100vh - 80px);
           overflow-y: scroll;
           scrollbar-width: none;
-          transition: background-color 0.1s ease; /* 加快背景色過渡 */
+          transition: background-color 0.1s ease;
           animation-duration: 0.3s;
           animation-fill-mode: forwards;
           opacity: 0;
@@ -927,7 +894,7 @@
 
       body.dark-mode #centralSettingsPanel {
           background: rgba(30, 30, 30, 0.95);
-          transition: background-color 0.1s ease; /* 加快深色模式過渡 */
+          transition: background-color 0.1s ease;
       }
 
       .settings-group {
@@ -937,7 +904,7 @@
           border: 1px solid #000;
           border-radius: 10px;
           color: #333;
-          transition: border-color 0.1s ease, color 0.2s ease; /* 加快邊框和文字顏色過渡 */
+          transition: border-color 0.1s ease, color 0.2s ease;
       }
       
       body.dark-mode .settings-group {
@@ -954,40 +921,34 @@
           background: #f0f0f0;
           border-radius: 8px;
           color: inherit;
-          transition: background-color 0.2s ease, color 0.2s ease; /* 加快設定項目過渡 */
+          transition: background-color 0.2s ease, color 0.2s ease;
       }
 
       body.dark-mode .setting-item {
           background: #455a64;
       }
 
-      /* 移除這個通用的過渡效果，改用更精確的控制 */
-      /* #centralSettingsPanel, #centralSettingsPanel * {
-          transition: background-color 0.3s ease, color 0.3s ease;
-      } */
-
-      /* 設定面板關閉按鈕樣式 */
       #closeCentralSettings {
           position: absolute;
-          top: 2vh;   /* 增加上間距 */
-          right: 2vh; /* 增加右間距 */
+          top: 2vh;
+          right: 2vh;
           background: none;
           border: none;
           font-size: 24px;
           cursor: pointer;
           color: #666;
-          padding: 8px;  /* 增加內間距 */
-          border-radius: 50%;  /* 新增圓形邊框 */
-          width: 40px;   /* 固定寬度 */
-          height: 40px;  /* 固定高度 */
-          display: flex;  /* 使用 flex 置中 */
+          padding: 8px;
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          display: flex;
           align-items: center;
           justify-content: center;
-          transition: background-color 0.3s;  /* 新增過渡效果 */
+          transition: background-color 0.3s;
       }
 
       #closeCentralSettings:hover {
-          background-color: rgba(0, 0, 0, 0.1);  /* 新增懸停效果 */
+          background-color: rgba(0, 0, 0, 0.1);
       }
 
       body.dark-mode #closeCentralSettings {
@@ -995,7 +956,7 @@
       }
 
       body.dark-mode #closeCentralSettings:hover {
-          background-color: rgba(255, 255, 255, 0.1);  /* 暗色模式懸停效果 */
+          background-color: rgba(255, 255, 255, 0.1);
       }
 
       @keyframes fadeIn {
@@ -1012,7 +973,6 @@
         to { transform: translate(-50%, -60%) scale(0.8); opacity: 0; }
       }
       #centralSettingsPanel {
-        /* ...existing code... */
         animation-duration: 0.3s;
         animation-fill-mode: forwards;
         opacity: 0;
@@ -1023,19 +983,17 @@
       #centralSettingsPanel.panel-close {
         animation-name: slideOut;
       }
-      /* 新增地區選擇下拉選單的深色模式樣式 */
       body.dark-mode #centralRegionSelect {
-          background-color: #555; /* 深色背景 */
-          color: #fff; /* 白色文字 */
-          border: 1px solid #777; /* 深色邊框 */
+          background-color: #555;
+          color: #fff;
+          border: 1px solid #777;
       }
 
       body.dark-mode #centralRegionSelect option {
-          background-color: #555; /* 深色背景 */
-          color: #fff; /* 白色文字 */
+          background-color: #555;
+          color: #fff;
       }
 
-      /* 添加淡入動畫樣式 */
       #mainContent {
         opacity: 0;
         transition: opacity 0.5s ease-in-out;
@@ -1055,7 +1013,6 @@
         pointer-events: none;
       }
 
-      /* 新增 GitHub 連結樣式 */
       .github-link {
         text-decoration: none;
         color: #007BFF;
@@ -1080,17 +1037,15 @@
           color: #fff;
       }
 
-      /* 旋轉動畫樣式 */
-      /* 已修正：移除重複的 transform-origin 和 display，並統一過渡時間 */
       .rotate-right {
         transform: rotate(360deg);
-        transition: transform 0.8s ease; /* 移除 !important */
+        transition: transform 0.8s ease;
         backface-visibility: hidden;
         will-change: transform;
       }
       .rotate-left {
         transform: rotate(-360deg);
-        transition: transform 0.8s ease; /* 移除 !important */
+        transition: transform 0.8s ease;
         backface-visibility: hidden;
         will-change: transform;
       }
@@ -1192,21 +1147,20 @@
       </div>
     </div>
     <script>
-      // 新增全域變數
       let leafletMap, markerClusterGroup, tileLayer;
       let userLocation = null;
-      let locationMarker = null; // 新增位置標記變數
-      let pulsingMarker = null; // 新增脈衝動畫標記變數
+      let locationMarker = null;
+      let pulsingMarker = null;
       let sortingLocked = false;
       let initialLoad = true;
       let locationDenied = false;
       let geolocationErrorMessage = null;
       let dataLoaded = false;
-      let hasShownDefaultLocationMessage = false; // 添加新的標記
-      let isFollowingUser = false; // 新增變數，控制地圖是否跟隨使用者位置
-      let isTrackingActive = false; // 新增：控制是否啟用追蹤功能
-      let watchId = null; // 新增：用於儲存 watchPosition 的 ID
-      let isMapMovingDueToTracking = false; // 新增：標記地圖移動是否由追蹤功能引起
+      let hasShownDefaultLocationMessage = false;
+      let isFollowingUser = false;
+      let isTrackingActive = false;
+      let watchId = null;
+      let isMapMovingDueToTracking = false;
       const regionCoordinates = {
         taipei: { lat: 25.047924, lng: 121.517081 },
         newTaipei: { lat: 25.0215339197085, lng: 121.4568090197085 },
@@ -1222,7 +1176,7 @@
         pingtung: { lat: 22.683036253664, lng: 120.48790854724 },
         taitung: { lat: 22.755711056126138, lng: 121.15035332587574 }
       };
-      let defaultRegion = 'kaohsiung';  // 暫時設定高雄市作為後備預設值
+      let defaultRegion = 'kaohsiung';
       let defaultLatitude = regionCoordinates.kaohsiung.lat;
       let defaultLongitude = regionCoordinates.kaohsiung.lng;
       const overlay = document.querySelector('.overlay');
@@ -1232,7 +1186,6 @@
       const resultsDiv = document.getElementById('results');
       const loadingDiv = document.getElementById('loading');
       const keywordInput = document.getElementById('keyword');
-      // 新增 clearTextBtn 相關程式碼
       const clearTextBtn = document.getElementById('clearTextBtn');
       keywordInput.addEventListener('input', () => {
           clearTextBtn.style.display = keywordInput.value.trim() ? 'inline-flex' : 'none';
@@ -1240,17 +1193,16 @@
       clearTextBtn.addEventListener('click', () => {
           keywordInput.value = '';
           clearTextBtn.style.display = 'none';
-          // 移動地圖到使用者當前定位（使用 userLocation 與 leafletMap）
           if (userLocation && leafletMap) {
             leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
           }
-          searchYouBike(); // 新增：按下清除後立即用空關鍵字搜尋
-          updateLocateButtonTitle(); // 更新按鈕標題
+          searchYouBike();
+          updateLocateButtonTitle();
       });
       const maxResults = 100;
       const defaultSearchArea = "";
       const pinnedStations = new Set(JSON.parse(localStorage.getItem('pinnedStations') || '[]').map(id => String(id)));
-      const useLocation = true; // 直接設定為 true
+      const useLocation = true;
       
       function togglePinStation(stationId, event) {
         event.stopPropagation();
@@ -1284,22 +1236,14 @@
           const overlay = document.getElementById("loadingOverlay");
           const mainContent = document.getElementById("mainContent");
 
-          // 添加淡出效果到 loading overlay
           overlay.classList.add('fade-out');
-
-          // 顯示主內容
           mainContent.style.display = "block";
           
-          // 強制重繪以觸發動畫
           mainContent.offsetHeight;
           
-          // 添加淡入效果到主內容
           mainContent.classList.add('fade-in');
-
-          // 更新倒數計時器顯示
           document.getElementById('updateCountdown').style.display = navigator.onLine ? "block" : "none";
           
-          // 在動畫完成後完全移除 overlay
           setTimeout(() => {
             overlay.style.display = "none";
           }, 500);
@@ -1355,60 +1299,51 @@
       })();
 
       let youbikeDataCache = null;
-      let allStations = []; // 全域變數，用於儲存所有站點資料以供地圖使用
+      let allStations = [];
 
-      // IndexedDB 操作函數
       function openYoubikeDB() {
         return new Promise((resolve, reject) => {
-          // 請求持久性儲存空間
           if (navigator.storage && navigator.storage.persist) {
             navigator.storage.persist().then(isPersisted => {
               console.log(`持久性儲存權限: ${isPersisted ? '已授權' : '未授權'}`);
             });
           }
 
-          // 修改此處：將版本號從3改為1
-          const request = indexedDB.open('YouBikeDB', 1); // 版本改為 1
+          const request = indexedDB.open('YouBikeDB', 1);
           
           request.onupgradeneeded = function(event) {
             const db = event.target.result;
             
-            // 新增資料庫版本更新的錯誤處理
             db.onerror = function(event) {
               console.error('資料庫更新失敗:', event.target.error);
             };
             
-            // 站點資料存儲
             if (!db.objectStoreNames.contains('youbikeData')) {
               const youbikeStore = db.createObjectStore('youbikeData', { keyPath: 'id' });
-              youbikeStore.createIndex('timestamp', 'timestamp'); // 新增時間戳記索引
+              youbikeStore.createIndex('timestamp', 'timestamp');
             }
             
-            // 地圖圖磚存儲
             if (!db.objectStoreNames.contains('mapTiles')) {
               const tileStore = db.createObjectStore('mapTiles', { keyPath: 'url' });
               tileStore.createIndex('timestamp', 'timestamp');
             }
             
-            // 區域資料存儲
             if (!db.objectStoreNames.contains('regionData')) {
               const regionStore = db.createObjectStore('regionData', { keyPath: 'region' });
-              regionStore.createIndex('timestamp', 'timestamp'); // 新增時間戳記索引
+              regionStore.createIndex('timestamp', 'timestamp');
             }
           };
 
           request.onsuccess = function(event) {
             const db = event.target.result;
             
-            // 新增自動錯誤處理
             db.onerror = function(event) {
               console.error('資料庫操作錯誤:', event.target.error);
             };
 
-            // 定期檢查並備份資料
             setInterval(() => {
               backupData(db);
-            }, 24 * 60 * 60 * 1000); // 每24小時執行一次
+            }, 24 * 60 * 60 * 1000);
             resolve(db);
           };
           
@@ -1419,18 +1354,15 @@
         });
       }
 
-      // 新增資料備份功能
       async function backupData(db) {
         try {
           const tx = db.transaction(['youbikeData', 'regionData'], 'readonly');
           const youbikeStore = tx.objectStore('youbikeData');
           const regionStore = tx.objectStore('regionData');
 
-          // 獲取所有資料
           const youbikeData = await getAllData(youbikeStore);
           const regionData = await getAllData(regionStore);
 
-          // 將資料存入 localStorage 作為備份
           try {
             localStorage.setItem('youbikeData_backup', JSON.stringify(youbikeData));
             localStorage.setItem('regionData_backup', JSON.stringify(regionData));
@@ -1443,7 +1375,6 @@
         }
       }
 
-      // 輔助函數：從 store 獲取所有資料
       function getAllData(store) {
         return new Promise((resolve, reject) => {
           const data = [];
@@ -1459,25 +1390,21 @@
         });
       }
 
-      // 修改站點資料儲存函數
       async function saveYoubikeDataToDB(dataArray) {
         const db = await openYoubikeDB();
         const tx = db.transaction('youbikeData', 'readwrite');
         const store = tx.objectStore('youbikeData');
         
-        // 清除舊資料
         await store.clear();
         
-        // 儲存新資料
         for (const [idx, item] of dataArray.entries()) {
           await store.put({ 
-            id: idx, // 使用索引作為 keyPath
+            id: idx,
             value: item,
             timestamp: Date.now()
           });
         }
         
-        // 儲存區域資料
         const regionTx = db.transaction('regionData', 'readwrite');
         const regionStore = regionTx.objectStore('regionData');
         await regionStore.put({
@@ -1502,7 +1429,7 @@
             req.onsuccess = function(event) {
               const cursor = event.target.result;
               if (cursor) {
-                data.push(cursor.value.value); // 只取 value 部分
+                data.push(cursor.value.value);
                 cursor.continue();
               } else {
                 resolve(data);
@@ -1513,12 +1440,11 @@
         });
       }
 
-      // 修改 searchYouBike 函數
       async function searchYouBike(showLoadingIndicator = true, shouldMoveMap = false) {
         if (showLoadingIndicator) showLoading();
         const keyword = keywordInput.value.trim().toLowerCase();
         try {
-          if (!youbikeDataCache || youbikeDataCache.length === 0) { // 確保快取存在且有資料
+          if (!youbikeDataCache || youbikeDataCache.length === 0) {
             if (navigator.onLine) {
               try {
                 const youbikeUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
@@ -1546,10 +1472,9 @@
             }
           }
 
-          // *** 將站點資料指派給全域變數 allStations ***
-          allStations = [...youbikeDataCache]; // 複製一份以避免直接修改快取
+          allStations = [...youbikeDataCache];
 
-          let youbikeResults = [...youbikeDataCache]; // 使用複製的資料進行篩選和排序
+          let youbikeResults = [...youbikeDataCache];
           if (keyword) {
             youbikeResults = youbikeResults.filter(station => {
               const stationNameTW = station.name_tw ? station.name_tw.toLowerCase() : '';
@@ -1638,7 +1563,6 @@
             usedStations = [...pinnedList, ...nonPinnedList];
           }
 
-          // 清空舊的搜尋結果並渲染站點基本資訊
           resultsDiv.innerHTML = ''; 
           const unknownValue = currentLang === "en" ? "Unknown" : "未知";
           const addressLabel = currentLang === "en" ? "Address:" : "地址:";
@@ -1697,18 +1621,16 @@
               if (!isNaN(lat) && !isNaN(lng) && leafletMap) {
                 leafletMap.setView([lat, lng], 18, { animate: true, duration: 1 });
               }
-              // 點擊卡片時停止跟隨，但不停止追蹤
               isFollowingUser = false;
-              updateLocateButtonTitle(); // 更新按鈕標題
+              updateLocateButtonTitle();
             });
             resultsDiv.appendChild(card);
           });
 
-          updateResultsOrder(); // 重新排序卡片，確保釘選和距離正確
+          updateResultsOrder();
 
-          // 找到搜尋結果中距離最近的站點（已按距離排序）
           const stationCards = document.querySelectorAll('.station');
-          if (stationCards.length > 0 && shouldMoveMap) {  // 加入 shouldMoveMap 條件檢查
+          if (stationCards.length > 0 && shouldMoveMap) {
             let nearestStation = null;
             let minDistance = Infinity;
             
@@ -1732,17 +1654,16 @@
               const lat = parseFloat(nearestStation.dataset.lat);
               const lng = parseFloat(nearestStation.dataset.lng);
               if (!isNaN(lat) && !isNaN(lng) && leafletMap) {
-                isMapMovingDueToTracking = true; // Set flag before moving map
-                leafletMap.setView([lat, lng], 18, { // 由16變更為18
+                isMapMovingDueToTracking = true;
+                leafletMap.setView([lat, lng], 18, {
                   animate: true,
                   duration: 1
                 });
-                setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Clear flag after a short delay
+                setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
               }
             }
           }
 
-          // 更新地圖釘標但不移動視圖
           updateMapMarkers();
 
           dataLoaded = true;
@@ -1779,8 +1700,7 @@
             });
             const result = await response.json();
             if (result.retCode === 1 && result.retVal && result.retVal.data) {
-              console.log("queryVehicleData: API response data:", result.retVal.data); // 添加日誌
-
+              console.log("queryVehicleData: API response data:", result.retVal.data);
 
 
               const dataArray = result.retVal.data;
@@ -1793,7 +1713,7 @@
                 };
               });
             } else {
-              console.error("API 請求失敗或無資料:", result.retMsg, "Response:", result); // 改進錯誤日誌
+              console.error("API 請求失敗或無資料:", result.retMsg, "Response:", result);
             }
           } catch (e) {
             console.error(e);
@@ -1834,7 +1754,6 @@
       }
       function showNotification(message) {
          
-          // 將提示轉換成右上角顯示的通知
           const notification = document.getElementById('locationNotification');
           notification.textContent = message;
                    notification.classList.add('show');
@@ -1844,7 +1763,6 @@
       }
 
       function hideModal() {
-          // 不再使用 modal 提示，保留空函式
       }
       function calculateDistance(lat1, lon1, lat2, lon2) {
         const R = 6371;
@@ -1856,9 +1774,8 @@
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
       }      
-      // 處理初始定位成功
       async function handleGeolocationSuccess(position) {
-	const isFirstLocation = !locationMarker; // 判斷是否為第一次定位
+	const isFirstLocation = !locationMarker;
 	userLocation = {
 		latitude: position.coords.latitude,
 		longitude: position.coords.longitude
@@ -1867,17 +1784,16 @@
 	if (leafletMap) {
 		if (isFirstLocation) {
 			isFollowingUser = true;
-			isMapMovingDueToTracking = true; // Set flag before moving map
+			isMapMovingDueToTracking = true;
 			leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true, duration: 1 });
-			setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Clear flag after a short delay
-		} else if (isFollowingUser) { // 持續跟隨時移動地圖
+			setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
+		} else if (isFollowingUser) {
 			isMapMovingDueToTracking = true;
 			leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 });
 			setTimeout(() => { isMapMovingDueToTracking = false; }, 500);
 		}
 
 		if (!locationMarker) {
-			// 第一次定位時建立定位標記與脈衝動畫
 			locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
 				radius: 10,
 				fillColor: '#2196F3',
@@ -1897,17 +1813,15 @@
 				pane: 'markerPane'
 			}).addTo(leafletMap);
 		} else {
-			// 更新標記位置
 			locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
-			if (pulsingMarker) {
+			if (pulsingMarker) { // Ensure pulsingMarker also moves if locationMarker exists
 				pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
 			}
 		}
 	}
 
-	// 修改處：只在第一次定位時重新呼叫 searchYouBike
 	if (isFirstLocation) {
-		await searchYouBike(); // 第一次定位時重新渲染站點卡片
+		await searchYouBike();
 		await updateVehicleData();
 		updateResultsOrder();
 	} else {
@@ -1915,15 +1829,13 @@
 		await updateVehicleData();
 	}
       }      
-      // 處理定位錯誤
       function handleGeolocationError(error) {
         console.error("Geolocation error:", error);
         locationDenied = true;
         let errorMessage = "";
         let errorType = "";
-        let shouldDisableLocationToggle = false; // 新增變數控制是否要關閉開關
+        let shouldDisableLocationToggle = false;
         
-        // 停止跟隨使用者位置
         isFollowingUser = false;
 
         switch (error.code) {
@@ -1932,53 +1844,50 @@
               ? "Location permission denied. The app needs location permission to show nearby stations."
               : "您尚未提供定位權限。需要定位權限才能顯示附近站點。";
             errorType = "permission";
-            shouldDisableLocationToggle = true; // 權限被拒絕時關閉開關            break;
+            shouldDisableLocationToggle = true;            break;
           case error.POSITION_UNAVAILABLE:
             errorMessage = currentLang === "en"
               ? "Your device doesn't support or has disabled location services. Please check your device settings."
               : "您的裝置不支援或已停用定位服務，請檢查裝置設定。";
                        errorType = "unavailable";
-            shouldDisableLocationToggle = true; // 不支援定位時關閉開關
+            shouldDisableLocationToggle = true;
             break;
           case error.TIMEOUT:
             errorMessage = currentLang === "en"
               ? "Location request timed out. Please check your internet connection and try again."
               : "定位請求逾時，請檢查網路連線後再試一次。";
             errorType = "timeout";
-            shouldDisableLocationToggle = false; // 定位逾時時保持開關狀態
+            shouldDisableLocationToggle = false;
             break;
           default:
             errorMessage = currentLang === "en"
               ? "Unable to get location. Please check your device settings."
               : "無法取得位置資訊，請檢查裝置設定。";
             errorType = "unknown";
-            shouldDisableLocationToggle = false; // 其他錯誤保持開關開啟
+            shouldDisableLocationToggle = false;
         }
 
-        // 更新中央設定面板的定位開關
         const centralLocationToggle = document.getElementById('centralLocationToggle');
         if (shouldDisableLocationToggle && centralLocationToggle) {
           centralLocationToggle.checked = false;
           localStorage.setItem("useLocation", "false");
         }
 
-        // 只在第一次顯示錯誤提示
         if (!hasShownDefaultLocationMessage) {
           const notification = document.getElementById('locationNotification');
           
-          // 根據錯誤類型設定不同的背景顏色
           switch (errorType) {
             case "permission":
-              notification.style.backgroundColor = "rgba(244, 67, 54, 0.9)"; // 紅色
+              notification.style.backgroundColor = "rgba(244, 67, 54, 0.9)";
               break;
             case "unavailable":
-              notification.style.backgroundColor = "rgba(255, 152, 0, 0.9)"; // 橙色
+              notification.style.backgroundColor = "rgba(255, 152, 0, 0.9)";
               break;
             case "timeout":
-              notification.style.backgroundColor = "rgba(255, 193, 7, 0.9)"; // 黃色
+              notification.style.backgroundColor = "rgba(255, 193, 7, 0.9)";
               break;
             default:
-              notification.style.backgroundColor = "rgba(158, 158, 158, 0.9)"; // 灰色 
+              notification.style.backgroundColor = "rgba(158, 158, 158, 0.9)";
           }
           
           notification.textContent = errorMessage;
@@ -1988,7 +1897,6 @@
             notification.classList.add('hide');
             setTimeout(() => {
               notification.classList.remove('show', 'hide');
-              // 重置通知顏色
               notification.style.backgroundColor = "";
             }, 300);
           }, 5000);
@@ -1997,7 +1905,6 @@
         }
 
         userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
-        // 即使定位失敗，也要確保地圖上顯示預設藍點
         if (leafletMap && !locationMarker) {
           locationMarker = L.circleMarker([defaultLatitude, defaultLongitude], {
             radius: 10,
@@ -2019,24 +1926,22 @@
           }).addTo(leafletMap);
         } else if (locationMarker) {
           locationMarker.setLatLng([defaultLatitude, defaultLongitude]);
-          if (pulsingMarker) {
+          if (pulsingMarker) { // Ensure pulsingMarker also moves if locationMarker exists
             pulsingMarker.setLatLng([defaultLatitude, defaultLongitude]);
           }
         }
         
         if (!shouldDisableLocationToggle) {
           searchYouBike();
-          updateVehicleData(); // 確保即時資料更新
+          updateVehicleData();
         }
       }      
-      // 處理持續定位更新成功
       function handleGeoUpdate(position) {
           userLocation = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude
           };
           
-          // 更新位置標記
           if (locationMarker) {
             locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
           }
@@ -2044,7 +1949,6 @@
             pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
           }
           
-          // 如果 isFollowingUser 為 true，則移動地圖視圖
           if (isFollowingUser && leafletMap) {
             isMapMovingDueToTracking = true; 
             leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 });
@@ -2054,14 +1958,9 @@
           updateCardDistances();
           updateVehicleData(); 
       }      
-      // 處理持續定位更新錯誤
       function handleGeoUpdateError(error) {
           console.error("Geolocation update error:", error);
-          // 停止跟隨使用者位置
           isFollowingUser = false;
-          // 移除定位按鈕關閉定位追蹤的功能，所以這裡不再呼叫 stopTracking
-          // stopTracking(); // Stop tracking on update error
-          // 新增：如果使用預設座標定位，則不顯示使用先前座標定位提示
           if (userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude) {
             return;
           }
@@ -2081,7 +1980,6 @@
           }, 3000);
       }
 
-      // 啟動定位追蹤
       function startTracking() {
           const centralLocationToggle = document.getElementById('centralLocationToggle');
           if (!centralLocationToggle.checked) {
@@ -2090,14 +1988,13 @@
           }
 
           if (navigator.geolocation) {
-              // 如果已經在追蹤，先停止以避免重複啟動
               if (watchId !== null) {
                   navigator.geolocation.clearWatch(watchId);
               }
               isTrackingActive = true;
               showNotification(currentLang === "en" ? "Tracking enabled." : "追蹤功能已開啟。");
               watchId = navigator.geolocation.watchPosition(
-                  handleGeoUpdate, // 使用統一的更新處理函數
+                  handleGeoUpdate,
                   handleGeoUpdateError,
                   { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
               );
@@ -2106,27 +2003,23 @@
           }
       }
 
-      // 停止定位追蹤
       function stopTracking() {
           const centralLocationToggle = document.getElementById('centralLocationToggle');
-          if (watchId !== null) { // 檢查追蹤是否確實處於活動狀態
+          if (watchId !== null) {
               navigator.geolocation.clearWatch(watchId);
               watchId = null;
-              // 只有當定位服務開關仍開啟時才顯示「追蹤功能已關閉」的訊息
               if (centralLocationToggle.checked) {
                   showNotification(currentLang === "en" ? "Tracking disabled." : "追蹤功能已關閉。");
               }
           }
-          isTrackingActive = false; // 始終設定為 false
+          isTrackingActive = false;
       }
 
-      // 取得或設定初始位置
       async function getLocation() {
           const centralLocationToggle = document.getElementById('centralLocationToggle');
           const isLocationServiceOn = centralLocationToggle?.checked;
 
           if (isLocationServiceOn) {
-              // 如果定位服務開啟，嘗試獲取當前位置並啟動追蹤
               try {
                   const positionPromise = new Promise((resolve, reject) => {
                       navigator.geolocation.getCurrentPosition(resolve, reject, {
@@ -2139,8 +2032,8 @@
                       setTimeout(() => reject(new Error("TIMEOUT")), 10000);
                   });
                   const position = await Promise.race([positionPromise, timeoutPromise]);
-                  await handleGeolocationSuccess(position); // 處理初始成功
-                  startTracking(); // 啟動持續追蹤
+                  await handleGeolocationSuccess(position);
+                  startTracking();
               } catch (e) {
                   if (e.message === "TIMEOUT") {
                       handleGeolocationError({
@@ -2150,17 +2043,15 @@
                   } else {
                       handleGeolocationError(e);
                   }
-                  // 即使出錯，如果開關是開啟的，則嘗試啟動追蹤 (可能之前被拒絕，但現在用戶允許了)
-                  // 但如果錯誤是 PERMISSION_DENIED 或 POSITION_UNAVAILABLE，則不應啟动追蹤
                   if (e.code !== GeolocationPositionError.PERMISSION_DENIED && e.code !== GeolocationPositionError.POSITION_UNAVAILABLE) {
                       startTracking(); 
                   }
               }
           } else {
-              // 如果定位服務關閉，設定為預設區域位置
-              stopTracking(); // 確保停止所有追蹤
+              stopTracking();
               const selectedRegion = document.getElementById('centralRegionSelect').value;
               const coords = regionCoordinates[selectedRegion];
+              // 更新 userLocation 以反映選定區域的中心
               userLocation = { latitude: coords.lat, longitude: coords.lng };
 
               if (leafletMap) {
@@ -2186,14 +2077,12 @@
                           pane: 'markerPane'
                       }).addTo(leafletMap);
                   }
-                  isMapMovingDueToTracking = true; // Set flag before moving map
+                  isMapMovingDueToTracking = true;
                   leafletMap.setView([coords.lat, coords.lng], 18, { animate: true });
-                  setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Clear flag after a short delay
+                  setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
               }
-              // 強制重置最近更新時間，使 updateVehicleData 執行（解決車輛資料顯示未知的問題）
               window.lastVehicleDataUpdate = 0;
-              // 立即更新站點卡片與車輛資料，並移動地圖
-              searchYouBike(true, true);
+              searchYouBike(true, false); 
               updateVehicleData();
               countdownTimer.update();
           }
@@ -2222,12 +2111,10 @@
           }
         });
         updateResultsOrder();
-        updateMapMarkers(); // 新增：根據定位距離與搜尋狀態更新站點圖標的顏色
+        updateMapMarkers();
       }
       
-      // 修改 updateVehicleData 函數來保存和復用舊的資料
       function updateVehicleData() {
-	// 新增：若上次更新不到 10 秒則跳過後續更新（10,000 毫秒）
 	if (window.lastVehicleDataUpdate && Date.now() - window.lastVehicleDataUpdate < 10000) {
 		return;
 	}
@@ -2235,7 +2122,6 @@
         const stationElements = document.querySelectorAll('.station');
         if (!stationElements.length) return;
 
-        // 保存當前顯示的資料
         const currentData = {};
         stationElements.forEach(card => {
           const id = card.dataset.id;
@@ -2299,7 +2185,6 @@
         if (loadingDiv) {
           loadingDiv.textContent = currentLang === "en" ? "Loading, please wait..." : "載入中，請稍候...";
         }
-        // 新增設定面板文字更新
         const settingsPanelTitle = document.getElementById('settingsPanelTitle');
         if (settingsPanelTitle) {
           settingsPanelTitle.textContent = currentLang === "en" ? "System Settings" : "系統設定";
@@ -2309,7 +2194,6 @@
           settingGroups[0].textContent = currentLang === "en" ? "Basic Settings" : "基本設定";
           settingGroups[1].textContent = currentLang === "en" ? "GitHub Repositories" : "GitHub 儲存庫";
         }
-        // 更新基本設定中各選項標籤
         const locationLabel = document.querySelector('#centralSettingsPanel .setting-item label[for="centralLocationToggle"]');
         if (locationLabel) {
           locationLabel.textContent = currentLang === "en" ? "Location Service" : "位置服務";
@@ -2323,7 +2207,6 @@
           langLabel.textContent = currentLang === "en" ? "Chinese/English" : "中文/English";
         }
 
-        // 新增區域選單文字更新
         const regionNames = {
             taipei: { en: "Taipei City", zh: "台北市" },
             newTaipei: { en: "New Taipei City", zh: "新北市" },
@@ -2355,18 +2238,14 @@
       }
       updateLanguageTexts();
 
-      // Initialize settings panel and button
       const settingsButton = document.getElementById('settingsButton');
       const centralSettingsPanel = document.getElementById('centralSettingsPanel');
       const closeCentralSettings = document.getElementById('closeCentralSettings');
       
-      // Settings button click handler
       settingsButton.addEventListener('click', (event) => {
         event.stopPropagation();
-        // 移除現有旋轉類別
         settingsButton.classList.remove('rotate-right', 'rotate-left');
         if (centralSettingsPanel.style.display === 'block') {
-            // 關閉面板時
             centralSettingsPanel.classList.remove('panel-open');
             centralSettingsPanel.classList.add('panel-close');
             centralSettingsPanel.addEventListener('animationend', function handler() {
@@ -2374,23 +2253,19 @@
               centralSettingsPanel.classList.remove('panel-close');
               centralSettingsPanel.removeEventListener('animationend', handler);
             });
-            // 加入反向旋轉類別
             settingsButton.classList.add('rotate-left');
             if (history.state && history.state.panelOpen) {
               history.back();
             }
         } else {
-            // 開啟面板時
             centralSettingsPanel.style.display = 'block';
             centralSettingsPanel.classList.remove('panel-close');
             centralSettingsPanel.classList.add('panel-open');
             history.pushState({ panelOpen: true }, 'Settings', '#settings');
-            // 加入正向旋轉類別
             settingsButton.classList.add('rotate-right');
           }
       });
       
-      // Close settings panel button click handler
       closeCentralSettings.addEventListener('click', () => {
         centralSettingsPanel.classList.remove('panel-open');
         centralSettingsPanel.classList.add('panel-close');
@@ -2400,7 +2275,6 @@
           centralSettingsPanel.removeEventListener('animationend', handler);
         });
 
-        // 新增：設定按鈕旋轉動畫
         settingsButton.classList.add('rotate-left');
         setTimeout(() => {
           settingsButton.classList.remove('rotate-left');
@@ -2411,7 +2285,6 @@
         }
       });
 
-      // 當使用者透過瀏覽器返回按鈕也要執行相同關閉動畫
       window.addEventListener('popstate', (event) => {
         if (centralSettingsPanel.style.display === 'block') {
           centralSettingsPanel.classList.remove('panel-open');
@@ -2424,13 +2297,11 @@
         }
       });
 
-      // 修改：點擊頁面其他區域時以動畫關閉中央設定面板，並讓設定按鈕向左旋轉
       document.addEventListener('click', (event) => {
 	if (!centralSettingsPanel.contains(event.target) && event.target !== settingsButton) {
 		if (centralSettingsPanel.style.display === 'block') {
 			centralSettingsPanel.classList.remove('panel-open');
 			centralSettingsPanel.classList.add('panel-close');
-			// 新增：設定按鈕向左旋轉
 			settingsButton.classList.add('rotate-left');
 			setTimeout(() => {
 				settingsButton.classList.remove('rotate-left');
@@ -2447,18 +2318,14 @@
 	}
 });
       
-      // Prevent settings panel from closing when clicking inside it
       centralSettingsPanel.addEventListener('click', (event) => {
         event.stopPropagation();
       });
 
-      // *** 修改 window load 事件 ***
       window.addEventListener('load', async () => {
         try {
-          // 1. 先載入站點基本資料 (youbikeDataCache) 並渲染卡片，車輛資料會先顯示「未知」
           await searchYouBike(false, false); 
 
-          // 2. 初始化地圖並載入所有站點標記
           if (navigator.onLine) {
             await initMap(allStations); 
           } else {
@@ -2467,14 +2334,11 @@
               : "離線模式：地圖功能受限");
           }
 
-          // 3. 延遲執行定位請求，並在定位成功後更新即時車輛資料
           setTimeout(async () => {
-            await getLocation(); // getLocation 內部會根據開關狀態處理定位和追蹤
-            // 確保在所有資料載入和處理後顯示主內容
+            await getLocation();
             if (!mainContentShown) {
                  showMainContent();
             }
-            // 在載入畫面後或第一次定位成功移動地圖後自動觸發一次更新
             countdownTimer.update(); 
           }, 100);
 
@@ -2483,18 +2347,16 @@
           showNotification(currentLang === "en"
             ? "Error initializing app. Some features may be limited."
             : "初始化應用程式時發生錯誤，部分功能可能受限。");
-           if (!mainContentShown) { // 即使出錯也要嘗試顯示主內容
+           if (!mainContentShown) {
                 showMainContent();
            }
         }
       });
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
-          searchYouBike(true, true); // 移動地圖
-          updateVehicleData(); // 確保即時資料更新
-          // 移除定位按鈕關閉定位追蹤的功能，所以這裡不再呼叫 stopTracking
-          // stopTracking(); // 搜尋時停止追蹤
-          updateLocateButtonTitle(); // 更新按鈕標題
+          searchYouBike(true, true);
+          updateVehicleData();
+          updateLocateButtonTitle();
         }
       });
 
@@ -2510,13 +2372,10 @@
     });
     const searchIcon = document.getElementById('searchIcon');
     searchIcon.addEventListener('click', () => {
-      searchYouBike(true, true); // 移動地圖
-      updateVehicleData(); // 確保即時資料更新
-      // 移除定位按鈕關閉定位追蹤的功能，所以這裡不再呼叫 stopTracking
-      // stopTracking(); // 搜尋時停止追蹤
-      updateLocateButtonTitle(); // 更新按鈕標題
+      searchYouBike(true, true);
+      updateVehicleData();
+      updateLocateButtonTitle();
     });
-    // 修改倒數計時器物件
     let countdownTimer = {
         remaining: 60,
         updateButton: document.getElementById('updateCountdown'),
@@ -2530,33 +2389,28 @@
             this.updateDisplay();
         },
         update: function() {
-            updateVehicleData(); // 只更新車輛資料
+            updateVehicleData();
             this.reset();
         }
     };
 
-    // 修改更新按鈕的事件監聽器
     countdownTimer.updateButton.addEventListener('click', () => {
-        countdownTimer.update();  // 使用更新的 update 方法
+        countdownTimer.update();
     });
 
-    // 修改自動更新的計時器
     setInterval(() => {
         countdownTimer.remaining--;
         if (countdownTimer.remaining <= 0) {
-            countdownTimer.update();  // 使用更新的 update 方法
+            countdownTimer.update();
         }
         countdownTimer.updateDisplay();
     }, 1000);
 
-      // *** 修改 initMap 函式 ***
-      async function initMap(stations) { // 接受 stations 參數
-        // 檢查地圖是否已經初始化
+      async function initMap(stations) {
         if (leafletMap) {
-          return;  // 如果已初始化就直接返回
+          return;
         }
         
-        // 修改：離線模式通知邏輯，不再直接 return
         if (!navigator.onLine) {
           if (!window.offlineNotified) {
             showNotification(currentLang === "en" 
@@ -2578,7 +2432,6 @@
           zoomControl: true
         }).setView([initialLat, initialLng], 18);
 
-        // 將 popupPane 的 z-index 設定為最高
         leafletMap.getPanes().popupPane.style.zIndex = "9999";
         
         try {
@@ -2597,11 +2450,10 @@
           leafletMap.addLayer(markerClusterGroup);
         }
         
-        // 新增定位按鈕，顯示於地圖左上角縮放按鈕下方
         let locateControl = L.control({ position: 'topleft' });
         locateControl.onAdd = function(map) {
             let btn = L.DomUtil.create('button', 'leaflet-bar leaflet-control leaflet-control-custom');
-            btn.id = 'locateButton'; // Add an ID to the button
+            btn.id = 'locateButton';
             btn.innerHTML = '<i class="material-icons" style="font-size:18px; line-height:30px;">my_location</i>';
             btn.style.width = '30px';
             btn.style.height = '30px';
@@ -2614,34 +2466,29 @@
             L.DomEvent.on(btn, 'click', function(e) {
                 L.DomEvent.stopPropagation(e);
                 L.DomEvent.preventDefault(e);
-                toggleTracking(); // Call the new toggleTracking function
-                updateLocateButtonTitle(); // Update button title after toggle
+                toggleTracking();
+                updateLocateButtonTitle();
             });
             return btn;
         };
         locateControl.addTo(leafletMap);
 
-        // 監聽地圖移動事件，如果地圖被手動移動，則停止跟隨
         leafletMap.on('movestart', () => {
-          // 只有當追蹤功能開啟、移動不是由追蹤引起，且正在跟隨使用者位置時，才停止跟隨地圖並提示
           if (isTrackingActive && !isMapMovingDueToTracking && isFollowingUser) {
-            isFollowingUser = false; // 停止跟隨地圖
+            isFollowingUser = false;
             showNotification(currentLang === "en" ? "Map manually moved, auto-following stopped." : "地圖被手動移動，已停止自動跟隨。");
-            updateLocateButtonTitle(); // 更新按鈕標題
+            updateLocateButtonTitle();
           }
         });
         
         try {
-          // 確保 stations 參數是有效的陣列
           const currentStations = Array.isArray(stations) ? stations : [];
 
 
-          // 清除現有標記
           if (markerClusterGroup) {
             markerClusterGroup.clearLayers();
           }
 
-          // 建立新標記
           currentStations.forEach(station => {
             const lat = parseFloat(station.lat);
             const lng = parseFloat(station.lng);
@@ -2668,11 +2515,9 @@
                     ` : `<p>${currentLang === "en" ? "Offline mode: Real-time data unavailable" : "離線模式：無法取得即時資料"}</p>`}
                   `;
 
-                  // 使用地圖內建 Popup 顯示詳細資訊
                   marker.bindPopup(content).openPopup();
-                  // 點擊地圖上的站點標記時停止跟隨，但不停止追蹤
                   isFollowingUser = false;
-                  updateLocateButtonTitle(); // 更新按鈕標題
+                  updateLocateButtonTitle();
                 } catch (error) {
                   console.error('取得站點資訊失敗:', error);
                   showNotification(currentLang === "en" ? "Failed to get station information." : "無法取得站點資訊。");
@@ -2683,7 +2528,7 @@
               markerClusterGroup.addLayer(marker);
             }
           });
-          if (leafletMap && markerClusterGroup) { // 再次檢查 leafletMap 是否存在
+          if (leafletMap && markerClusterGroup) {
              leafletMap.addLayer(markerClusterGroup);
           }
           
@@ -2693,16 +2538,13 @@
         }
       }
       
-      // 更新地圖釘標函數現在只需要處理搜尋結果的高亮顯示
       function updateMapMarkers() {
-        // 檢查是否離線且地圖元件未初始化
         if (!markerClusterGroup) {
           console.log('Map features are limited in offline mode or map not initialized');
           return;
         }
 
         try {
-          // 重置所有釘標的樣式
           markerClusterGroup.eachLayer(marker => {
             marker.setIcon(L.icon({
               iconUrl: 'https://unpkg.com/leaflet/dist/images/marker-icon.png',
@@ -2711,7 +2553,6 @@
             }));
           });
           
-          // 高亮顯示搜尋結果的釘標
           const stationCards = document.querySelectorAll('.station');
           stationCards.forEach(card => {
             const lat = parseFloat(card.dataset.lat);
@@ -2732,11 +2573,9 @@
           });
         } catch (error) {
           console.error('Error updating map markers:', error);
-          // 不中斷應用程式運行，僅記錄錯誤
         }
       }
       
-      // 點擊頁面其他區域時，隱藏浮動卡片
       document.addEventListener('click', (e) => {
         const floatingCard = document.getElementById('floatingCard');
         if (floatingCard && !e.target.closest('#floatingCard') && floatingCard.style.display === 'block') {
@@ -2745,7 +2584,6 @@
       });
 
 
-      // 重寫拖曳功能
       const mainContent = document.getElementById('mainContent');
       const dragHandle = document.getElementById('dragHandle');
       let startY = 0;
@@ -2780,32 +2618,29 @@
         mainContent.style.transition = 'height 0.2s ease';
       }
 
-      // 滑鼠事件
       dragHandle.addEventListener('mousedown', onStart);
       document.addEventListener('mousemove', onMove);
       document.addEventListener('mouseup', onEnd);
 
-      // 觸控事件
       dragHandle.addEventListener('touchstart', onStart, { passive: false });
       document.addEventListener('touchmove', onMove, { passive: true });
       document.addEventListener('touchend', onEnd);
       document.addEventListener('touchcancel', onEnd);
 
-      // 新增：追蹤功能相關函數
       function toggleTracking() {
           const centralLocationToggle = document.getElementById('centralLocationToggle');
-          // 定位按鈕只會嘗試開啟追蹤，不會關閉
           if (!centralLocationToggle.checked) {
-              // 如果位置服務開關是關閉的，則提示並移動到預設位置，不啟動追蹤
               showNotification(currentLang === "en" ? "Location service is off, cannot start tracking. Moving to default location." : "位置服務已關閉，無法開啟追蹤功能。將移動至預設位置。");
               if (leafletMap) {
-                  isMapMovingDueToTracking = true; // Set flag before moving map
+                  isMapMovingDueToTracking = true;
                   leafletMap.setView([defaultLatitude, defaultLongitude], 18, { animate: true });
-                  setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Clear flag after a short delay
+                  setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
               }
-              // 確保預設標記顯示
               if (locationMarker) {
                   locationMarker.setLatLng([defaultLatitude, defaultLongitude]);
+                  if (pulsingMarker) { // 確保脈衝波也隨藍點移動
+                      pulsingMarker.setLatLng([defaultLatitude, defaultLongitude]);
+                  }
               } else if (leafletMap) {
                   locationMarker = L.circleMarker([defaultLatitude, defaultLongitude], {
                       radius: 10,
@@ -2826,14 +2661,13 @@
                     pane: 'markerPane'
                   }).addTo(leafletMap);
               }
-              userLocation = { latitude: defaultLatitude, longitude: defaultLongitude }; // 更新 userLocation 為預設
-              updateCardDistances(); // 根據預設位置更新距離
-              updateVehicleData(); // 更新車輛資料
+              userLocation = { latitude: defaultLatitude, longitude: defaultLongitude };
+              updateCardDistances();
+              updateVehicleData();
+              searchYouBike(true, false); 
           } else {
-              // 如果定位服務開關是開啟的，則啟動追蹤並立即移動地圖
               startTracking();
-              isFollowingUser = true; // 啟動追蹤時，設定為跟隨使用者位置
-              // 立即獲取當前位置並移動地圖
+              isFollowingUser = true;
               navigator.geolocation.getCurrentPosition(
                   (position) => {
                       userLocation = {
@@ -2841,9 +2675,9 @@
                           longitude: position.coords.longitude
                       };
                       if (leafletMap) {
-                          isMapMovingDueToTracking = true; // Set flag before moving map
+                          isMapMovingDueToTracking = true;
                           leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
-                          setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Clear flag after a short delay
+                          setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
                       }
                       if (locationMarker) {
                           locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
@@ -2855,12 +2689,12 @@
                       updateVehicleData();
                   },
                   (error) => {
-                      handleGeolocationError(error); // 處理定位錯誤
+                      handleGeolocationError(error);
                   },
                   { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
               );
           }
-          updateLocateButtonTitle(); // Update button title after toggle
+          updateLocateButtonTitle();
       }
 
       function updateLocateButtonTitle() {
@@ -2870,7 +2704,6 @@
           }
       }
 
-      // 初始化中央設定面板
       document.addEventListener('DOMContentLoaded', () => {
         const centralSettingsPanel = document.getElementById('centralSettingsPanel');
         const centralDarkModeToggle = document.getElementById('centralDarkModeToggle');
@@ -2878,42 +2711,34 @@
         const centralLocationToggle = document.getElementById('centralLocationToggle');
         const centralRegionSelect = document.getElementById('centralRegionSelect');
 
-        // 從本地儲存讀取深色模式設定
         const isDarkMode = localStorage.getItem("dark_mode") === "true";
         if (isDarkMode) {
           document.body.classList.add('dark-mode');
         }
         centralDarkModeToggle.checked = isDarkMode;
 
-        // 初始化開關狀態
         centralDarkModeToggle.checked = document.body.classList.contains('dark-mode');
         centralLangToggle.checked = currentLang === "en";
-        // 確保從 localStorage 讀取位置服務的初始狀態
         if (localStorage.getItem("useLocation") === null) {
-          localStorage.setItem("useLocation", "true"); // 預設為開啟
+          localStorage.setItem("useLocation", "true");
         }
         centralLocationToggle.checked = localStorage.getItem("useLocation") === "true";
 
 
-        // 深色模式開關
         centralDarkModeToggle.addEventListener('change', () => {
           const isDark = centralDarkModeToggle.checked;
           
-          // 先執行 DOM 操作
           requestAnimationFrame(() => {
             document.body.classList.toggle('dark-mode', isDark);
             localStorage.setItem("dark_mode", isDark.toString());
             
-            // 不再需要重新初始化地圖，移除舊的重置邏輯
             if (leafletMap) {
               updateMapMarkers();
             }
           });
         });
 
-        // 語言切換開關 - 修改後的版本
         centralLangToggle.addEventListener('change', async () => {
-          // 在更新語言前先儲存當前所有車輛資料
           const oldVehicleData = {};
           document.querySelectorAll('.station').forEach(card => {
             const id = card.dataset.id;
@@ -2924,15 +2749,12 @@
             };
           });
 
-          // 更新語言設定
           currentLang = currentLang === "en" ? "zh" : "en";
           localStorage.setItem("lang", currentLang);
           updateLanguageTexts();
           
-          // 更新卡片但使用 false 參數避免顯示載入指示器
           await searchYouBike(false);
           
-          // 立即使用儲存的資料更新車輛資訊
           document.querySelectorAll('.station').forEach(card => {
             const id = card.dataset.id;
             const data = oldVehicleData[id];
@@ -2947,29 +2769,27 @@
             }
           });
           
-          // 最後再更新即時資料以確保資料最新
           await updateVehicleData();
         });
 
-        // 位置服務開關
         centralLocationToggle.addEventListener('change', async function() {
   const isChecked = this.checked;
   localStorage.setItem("useLocation", isChecked);
   
   if (isChecked) {
-    // 開啟定位：嘗試獲取當前位置並啟動追蹤
     await getLocation(); 
   } else {
-    // 關閉定位：停止追蹤，並將地圖移至選定區域
     stopTracking(); 
     const selectedRegion = document.getElementById('centralRegionSelect').value;
     const coords = regionCoordinates[selectedRegion];
     
     userLocation = { latitude: coords.lat, longitude: coords.lng };
     
-    // 更新或創建位置標記
     if (locationMarker) {
         locationMarker.setLatLng([coords.lat, coords.lng]);
+        if (pulsingMarker) { // 確保脈衝波也隨藍點移動
+            pulsingMarker.setLatLng([coords.lat, coords.lng]);
+        }
     } else if (leafletMap) { 
         locationMarker = L.circleMarker([coords.lat, coords.lng], {
             radius: 10,
@@ -2991,17 +2811,14 @@
             pane: 'markerPane'
           }).addTo(leafletMap);
     }
-    // 強制重置最近更新時間，使 updateVehicleData 執行（解決車輛資料顯示未知的問題）
     window.lastVehicleDataUpdate = 0;
-    // 立即更新站點卡片與車輛資料，並移動地圖
-    searchYouBike(true, true);
+    searchYouBike(true, false); 
     updateVehicleData();
     countdownTimer.update();
   }
-  updateLocateButtonTitle(); // 更新按鈕標題
+  updateLocateButtonTitle();
 });
 
-        // 初始化地區選單
         centralRegionSelect.addEventListener('change', function() {
           const selectedRegion = this.value;
           defaultRegion = selectedRegion;
@@ -3009,14 +2826,19 @@
           
           const coords = regionCoordinates[selectedRegion];
           
-          // 只有在未使用定位服務時才更新預設座標和位置標記
+          // 更新 defaultLatitude 和 defaultLongitude
+          defaultLatitude = coords.lat;
+          defaultLongitude = coords.lng;
+
           if (!centralLocationToggle.checked) {
               userLocation = { latitude: coords.lat, longitude: coords.lng };
               
 
-              // 更新或創建位置標記
               if (locationMarker) {
                   locationMarker.setLatLng([coords.lat, coords.lng]);
+                  if (pulsingMarker) { // 確保脈衝波也隨藍點移動
+                      pulsingMarker.setLatLng([coords.lat, coords.lng]);
+                  }
               } else if (leafletMap) { 
                   locationMarker = L.circleMarker([coords.lat, coords.lng], {
                       radius: 10,
@@ -3027,7 +2849,6 @@
                       pane: 'markerPane'
                   }).addTo(leafletMap);
 
-                  // 添加脈衝動畫效果
                   const pulsingIcon = L.divIcon({
                       className: 'pulsing-icon',
                       html: '<div class="pulse"></div>',
@@ -3041,53 +2862,46 @@
               }
               
               if (leafletMap) {
-                  isMapMovingDueToTracking = true; // Set flag before moving map
+                  isMapMovingDueToTracking = true;
                   leafletMap.setView([coords.lat, coords.lng], 18, { animate: true });
-                  setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Clear flag after a short delay
+                  setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
               }
-              // 強制重置最近更新時間，使 updateVehicleData 執行（解決車輛資料顯示未知的問題）
               window.lastVehicleDataUpdate = 0;
-              // 立即更新站點卡片與車輛資料，並移動地圖
-              searchYouBike(true, true);
+              searchYouBike(true, false); 
               updateVehicleData();
               countdownTimer.update();
           }
         });
 
-        // 修改定位服務初始化處理
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 position => {
-                    // 找到最近的區域並設為預設值
                     const nearestRegion = findNearestRegion(position.coords.latitude, position.coords.longitude);
                     defaultRegion = nearestRegion;
                     defaultLatitude = regionCoordinates[nearestRegion].lat;
                     defaultLongitude = regionCoordinates[nearestRegion].lng;
                     
-                    // 更新本地儲存和選單值
                     localStorage.setItem('selectedRegion', nearestRegion);
                     const centralRegionSelect = document.getElementById('centralRegionSelect');
                     if (centralRegionSelect) {
                       centralRegionSelect.value = nearestRegion; 
                     }
 
-                    // 如果沒有使用定位服務,則移動到最近區域
                     if (!centralLocationToggle.checked) {
                       userLocation = { 
                         latitude: regionCoordinates[nearestRegion].lat, 
                         longitude: regionCoordinates[nearestRegion].lng 
                       };
                       if (leafletMap) {
-                        isMapMovingDueToTracking = true; // Set flag before moving map
+                        isMapMovingDueToTracking = true;
                         leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
-                        setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Clear flag after a short delay
+                        setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
                       }
                       searchYouBike();
                       updateVehicleData(); 
                     }
                 },
                 error => {
-                  // 定位失敗時使用儲存的區域,如果沒有則使用高雄市
                   console.warn('Geolocation failed:', error);
                   const savedRegion = localStorage.getItem('selectedRegion') || 'kaohsiung';
                   defaultRegion = savedRegion;
@@ -3098,7 +2912,6 @@
                     centralRegionSelect.value = savedRegion;
                   }
 
-                  // 即使定位失敗，也要確保地圖上顯示預設藍點
                   if (leafletMap && !locationMarker) {
                     locationMarker = L.circleMarker([defaultLatitude, defaultLongitude], {
                       radius: 10,
@@ -3120,17 +2933,16 @@
                     }).addTo(leafletMap);
                   } else if (locationMarker) {
                     locationMarker.setLatLng([defaultLatitude, defaultLongitude]);
-                    if (pulsingMarker) {
+                    if (pulsingMarker) { // 確保脈衝波也隨藍點移動
                       pulsingMarker.setLatLng([defaultLatitude, defaultLongitude]);
                     }
                   }
                 }
             );
         }
-        updateLocateButtonTitle(); // Initial update of button title
+        updateLocateButtonTitle();
       });
 
-      // 新增尋找最近區域的輔助函數
       function findNearestRegion(lat, lng) {
           let nearestRegion = 'kaohsiung';
           let minDistance = Infinity;
