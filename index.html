@@ -2190,8 +2190,12 @@
                   leafletMap.setView([coords.lat, coords.lng], 18, { animate: true });
                   setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Clear flag after a short delay
               }
-              searchYouBike();
+              // 強制重置最近更新時間，使 updateVehicleData 執行（解決車輛資料顯示未知的問題）
+              window.lastVehicleDataUpdate = 0;
+              // 立即更新站點卡片與車輛資料，並移動地圖
+              searchYouBike(true, true);
               updateVehicleData();
+              countdownTimer.update();
           }
       }
 
@@ -2796,7 +2800,7 @@
               showNotification(currentLang === "en" ? "Location service is off, cannot start tracking. Moving to default location." : "位置服務已關閉，無法開啟追蹤功能。將移動至預設位置。");
               if (leafletMap) {
                   isMapMovingDueToTracking = true; // Set flag before moving map
-                  leafletMap.setView([defaultLatitude, defaultLongitude], 18, { animate: true, duration: 1 });
+                  leafletMap.setView([defaultLatitude, defaultLongitude], 18, { animate: true });
                   setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Clear flag after a short delay
               }
               // 確保預設標記顯示
@@ -2838,7 +2842,7 @@
                       };
                       if (leafletMap) {
                           isMapMovingDueToTracking = true; // Set flag before moving map
-                          leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true, duration: 1 });
+                          leafletMap.setView([userLocation.latitude, userLocation.longitude], 18, { animate: true });
                           setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Clear flag after a short delay
                       }
                       if (locationMarker) {
@@ -2963,7 +2967,7 @@
     
     userLocation = { latitude: coords.lat, longitude: coords.lng };
     
-    // 更新或建立位置標記
+    // 更新或創建位置標記
     if (locationMarker) {
         locationMarker.setLatLng([coords.lat, coords.lng]);
     } else if (leafletMap) { 
@@ -2987,9 +2991,12 @@
             pane: 'markerPane'
           }).addTo(leafletMap);
     }
-    // 模仿模式切換：僅更新卡片距離與車輛資料，不重繪站點資料
-    updateCardDistances();
+    // 強制重置最近更新時間，使 updateVehicleData 執行（解決車輛資料顯示未知的問題）
+    window.lastVehicleDataUpdate = 0;
+    // 立即更新站點卡片與車輛資料，並移動地圖
+    searchYouBike(true, true);
     updateVehicleData();
+    countdownTimer.update();
   }
   updateLocateButtonTitle(); // 更新按鈕標題
 });
@@ -3038,9 +3045,12 @@
                   leafletMap.setView([coords.lat, coords.lng], 18, { animate: true });
                   setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Clear flag after a short delay
               }
-              searchYouBike();
-              updateVehicleData(); 
-              countdownTimer.update(); 
+              // 強制重置最近更新時間，使 updateVehicleData 執行（解決車輛資料顯示未知的問題）
+              window.lastVehicleDataUpdate = 0;
+              // 立即更新站點卡片與車輛資料，並移動地圖
+              searchYouBike(true, true);
+              updateVehicleData();
+              countdownTimer.update();
           }
         });
 
