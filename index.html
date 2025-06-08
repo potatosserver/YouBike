@@ -1536,6 +1536,7 @@
               onclick="togglePinStation('${info.id}', event)"
             >${isPinned ? '★' : '☆'}</span>`;
 
+
             const distance = calculateDistance(
               userLocation ? userLocation.latitude : defaultLatitude,
               userLocation ? userLocation.longitude : defaultLongitude,
@@ -2175,8 +2176,9 @@
       });
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
-          searchYouBike(true, true);
+          isFollowingUser = false;
           updateLocateButtonTitle();
+          searchYouBike(true, true);
         }
       });
 
@@ -2192,8 +2194,9 @@
     });
     const searchIcon = document.getElementById('searchIcon');
     searchIcon.addEventListener('click', () => {
-      searchYouBike(true, true);
+      isFollowingUser = false;
       updateLocateButtonTitle();
+      searchYouBike(true, true);
     });
     let countdownTimer = {
         remaining: 60,
