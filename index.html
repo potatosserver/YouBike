@@ -1488,6 +1488,18 @@
 
           usedStations = [...pinnedFromResults, ...unpinnedFromResults].slice(0, limit);
 
+          // Add this block to move the map if shouldMoveMap is true and there are results
+          if (shouldMoveMap && usedStations.length > 0 && leafletMap) {
+              const firstStation = usedStations[0];
+              const lat = parseFloat(firstStation.lat);
+              const lng = parseFloat(firstStation.lng);
+              if (!isNaN(lat) && !isNaN(lng)) {
+                  isMapMovingDueToTracking = true; // Set flag before moving
+                  leafletMap.setView([lat, lng], leafletMap.getZoom() || 18, { animate: true, duration: 1 });
+                  setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Reset flag after animation
+              }
+          }
+          // End of added block
 
           resultsDiv.innerHTML = '';
           const unknownValue = currentLang === "en" ? "Unknown" : "未知";
@@ -1838,7 +1850,7 @@
               }
 
               isMapMovingDueToTracking = true;
-              leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 1 });
+              leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
               setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
           }
 
@@ -2131,15 +2143,6 @@
               await initMap([]);
           }
 
-          const isDarkMode = localStorage.getItem("dark_mode") === "true";
-          if (isDarkMode && leafletMap && tileLayer && tileLayer._container) {
-              tileLayer._container.style.filter = 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)';
-              const attribution = document.querySelector('.leaflet-control-attribution');
-              if (attribution) {
-                  attribution.style.color = '#ccc';
-              }
-          }
-
           await getLocation();
 
         } catch (error) {
@@ -2430,48 +2433,60 @@
           const locateButton = document.getElementById('locateButton');
 
           if (!isLocationServiceOn) {
-              showNotification(currentLang === "en" ? "Location service is off, cannot start tracking. Moving to default location." : "位置服務已關閉，無法開啟追蹤功能。將移動至預設位置。");
-              if (leafletMap && userLocation) {
+              // If location service is off in settings
+              showNotification(currentLang === "en" ? "Location service is off (using default region)." : "位置服務已關閉 (使用預設地區)。"); // Updated notification text
+              isFollowingUser = false; // Ensure following is off
+              stopTracking(); // Ensure watchPosition is stopped
+
+              // Set userLocation to default region and move map
+              const selectedRegion = document.getElementById('centralRegionSelect').value;
+              const coords = regionCoordinates[selectedRegion];
+              userLocation = { latitude: coords.lat, longitude: coords.lng }; // Update userLocation to default region
+
+              if (leafletMap) {
                   isMapMovingDueToTracking = true;
                   leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
                   setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
               }
-              isFollowingUser = false;
-          } else {
-              if (isFollowingUser) {
-                  isFollowingUser = false;
-                  showNotification(currentLang === "en" ? "Auto-following stopped." : "已停止自動跟隨。");
-              } else {
-                  isFollowingUser = true;
-                  showNotification(currentLang === "en" ? "Attempting to get location and follow..." : "嘗試取得位置並自動跟隨...");
-                  navigator.geolocation.getCurrentPosition(
-                      (position) => {
-                          userLocation = {
-                              latitude: position.coords.latitude,
-                              longitude: position.coords.longitude
-                          };
-                          if (leafletMap) {
-                              isMapMovingDueToTracking = true;
-                              leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
-                              setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
-                          }
-                          if (locationMarker) {
-                              locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
-                          }
-                          if (pulsingMarker) {
-                              pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
-                          }
-                          updateCardDistances();
-                          updateVehicleData();
-                          updateResultsOrder();
-                      },
-                      (error) => {
-                          console.error("Geolocation error on locate button click:", error);
-                          isFollowingUser = false;
-                          showNotification(currentLang === "en" ? "Failed to get current location." : "無法取得目前位置。");
-                           const selectedRegion = document.getElementById('centralRegionSelect').value;
-                           const coords = regionCoordinates[selectedRegion];
-                           userLocation = { latitude: coords.lat, longitude: coords.lng };
+              // Update markers, distances, data based on the new userLocation (default region)
+              if (locationMarker) {
+                  locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+              }
+              if (pulsingMarker) {
+                  pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+              }
+              updateCardDistances();
+              updateVehicleData();
+              updateResultsOrder();
+
+          } else { // Location services are ON in settings
+              // Always set isFollowingUser to true when button is clicked and location is ON
+              isFollowingUser = true;
+
+              // Show notification when attempting to locate
+              showNotification(currentLang === "en" ? "Location tracking enabled." : "已開啟位置追蹤功能。"); // Added notification
+
+              // Ensure tracking is active (watchPosition)
+              startTracking(); // This function is idempotent if watchId is not null
+
+              // Immediately move map to the current userLocation (where the blue dot is)
+              // userLocation is kept updated by the watchPosition started in getLocation or startTracking
+              if (leafletMap && userLocation) {
+                   isMapMovingDueToTracking = true;
+                   leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
+                   setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
+                   // No success notification needed, the map moving is the feedback
+               } else if (leafletMap) {
+                   // If userLocation is not yet set (e.g., very first click before watchPosition gets a fix)
+                   // Try to get it once and move the map. watchPosition is already running.
+                   navigator.geolocation.getCurrentPosition(
+                       (position) => {
+                           // userLocation will be updated by handleGeoUpdate from watchPosition anyway,
+                           // but we can use this fix to move the map immediately if userLocation was null.
+                           userLocation = {
+                               latitude: position.coords.latitude,
+                               longitude: position.coords.longitude
+                           };
                            if (leafletMap) {
                                isMapMovingDueToTracking = true;
                                leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
@@ -2479,15 +2494,40 @@
                            }
                            if (locationMarker) {
                                locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
-                               if (pulsingMarker) pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+                           }
+                           if (pulsingMarker) {
+                               pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
                            }
                            updateCardDistances();
                            updateVehicleData();
                            updateResultsOrder();
-                      },
-                      { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-                  );
-              }
+                       },
+                       (error) => {
+                           console.error("Geolocation error on locate button click (initial fix):", error);
+                           // Show notification only if this initial fix fails
+                           showNotification(currentLang === "en" ? "Failed to get immediate location." : "無法立即取得目前位置。");
+                           // Fallback to default region if userLocation is still null after this failure
+                           if (!userLocation) {
+                               const selectedRegion = document.getElementById('centralRegionSelect').value;
+                               const coords = regionCoordinates[selectedRegion];
+                               userLocation = { latitude: coords.lat, longitude: coords.lng };
+                               if (leafletMap) {
+                                   isMapMovingDueToTracking = true;
+                                   leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
+                                   setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
+                               }
+                               if (locationMarker) {
+                                   locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+                                   if (pulsingMarker) pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+                               }
+                               updateCardDistances();
+                               updateVehicleData();
+                               updateResultsOrder();
+                           }
+                       },
+                       { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 } // Short timeout for quick check
+                   );
+               }
           }
           updateLocateButtonTitle();
       }
@@ -2502,9 +2542,11 @@
                   locateButton.title = currentLang === "en" ? "Location service off (using default region)" : "定位服務已關閉 (使用預設地區)";
                   locateButton.style.color = '#666';
               } else if (isFollowingUser) {
-                  locateButton.title = currentLang === "en" ? "Following your location (click to stop)" : "正在跟隨您的位置 (點擊停止)";
+                  // Title when following - clicking doesn't stop following anymore
+                  locateButton.title = currentLang === "en" ? "Following your location" : "正在跟隨您的位置"; // Updated title
                   locateButton.style.color = '#007BFF';
               } else {
+                  // Title when not following, but location service is ON
                   locateButton.title = currentLang === "en" ? "Go to my location" : "定位到我目前位置";
                   locateButton.style.color = '#333';
               }
@@ -2549,7 +2591,6 @@
             document.body.classList.toggle('dark-mode', isDark);
             localStorage.setItem("dark_mode", isDark.toString());
 
-            // Keep this logic for when the toggle is clicked
             if (leafletMap && tileLayer && tileLayer._container) {
                 if (isDark) {
                     tileLayer._container.style.filter = 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)';
@@ -2566,7 +2607,8 @@
                     attribution.style.color = '#333';
                 }
             }
-            // End of toggle logic
+
+
           });
         });
 
