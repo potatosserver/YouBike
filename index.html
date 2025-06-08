@@ -1499,6 +1499,19 @@
               }
           }
 
+
+          const stationIdsToQuery = usedStations.map(station => station.station_no);
+          let vehicleData = {};
+          if (navigator.onLine && stationIdsToQuery.length > 0) {
+              try {
+                  vehicleData = await queryVehicleData(stationIdsToQuery);
+              } catch (e) {
+                  console.error("Failed to fetch vehicle data:", e);
+                  showNotification(currentLang === "en" ? "Failed to get real-time data." : "無法取得即時資料。");
+              }
+          }
+
+
           resultsDiv.innerHTML = '';
           const unknownValue = currentLang === "en" ? "Unknown" : "未知";
           const addressLabel = currentLang === "en" ? "Address:" : "地址:";
@@ -1535,14 +1548,20 @@
             const distanceHTML = !isAtDefaultLocation ? `<p class="distance">${distanceLabel} ${displayDistance}</p>` : "";
 
 
+            const stationVehicleData = vehicleData[info.id];
+            const displayAvailable20 = stationVehicleData?.available_2_0 !== undefined ? stationVehicleData.available_2_0 : unknownValue;
+            const displayAvailableE = stationVehicleData?.available_e !== undefined ? stationVehicleData.available_e : unknownValue;
+            const displayEmptySpaces = stationVehicleData?.empty_spaces !== undefined ? stationVehicleData.empty_spaces : unknownValue;
+
+
             const cardContent = `
                       ${pinButtonHtml}
                       <h3>${info.name || unknownStation}</h3>
                       ${distanceHTML}
                       <p>${addressLabel} ${info.address || unknownAddress}</p>
-                      <p>YouBike 2.0: <span class="vehicle_yb2">${unknownValue}</span></p>
-                      <p>YouBike 2.0E: <span class="vehicle_ybe">${unknownValue}</span></p>
-                      <p>${slotsLabel} <span class="vehicle_empty">${unknownValue}</span></p>
+                      <p>YouBike 2.0: <span class="vehicle_yb2">${displayAvailable20}</span></p>
+                      <p>YouBike 2.0E: <span class="vehicle_ybe">${displayAvailableE}</span></p>
+                      <p>${slotsLabel} <span class="vehicle_empty">${displayEmptySpaces}</span></p>
                   `;
 
             let card = document.createElement('div');
@@ -1804,7 +1823,7 @@
                        centralLocationToggle.checked = false;
                        localStorage.setItem("useLocation", "false");
                   }
-                  handleGeolocationError(e);
+
                   stopTracking();
 
                   const selectedRegion = document.getElementById('centralRegionSelect').value;
@@ -1854,7 +1873,8 @@
 
           if (locationSet) {
               await searchYouBike(true, false);
-              await updateVehicleData();
+
+
               updateResultsOrder();
               showMainContent();
               countdownTimer.update();
@@ -2156,7 +2176,6 @@
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
           searchYouBike(true, true);
-          updateVehicleData();
           updateLocateButtonTitle();
         }
       });
@@ -2174,7 +2193,6 @@
     const searchIcon = document.getElementById('searchIcon');
     searchIcon.addEventListener('click', () => {
       searchYouBike(true, true);
-      updateVehicleData();
       updateLocateButtonTitle();
     });
     let countdownTimer = {
@@ -2594,15 +2612,6 @@
         });
 
         centralLangToggle.addEventListener('change', async () => {
-          const oldVehicleData = {};
-          document.querySelectorAll('.station').forEach(card => {
-            const id = card.dataset.id;
-            oldVehicleData[id] = {
-              available_2_0: card.querySelector('.vehicle_yb2').textContent,
-              available_e: card.querySelector('.vehicle_ybe').textContent,
-              empty_spaces: card.querySelector('.vehicle_empty').textContent
-            };
-          });
 
           currentLang = currentLang === "en" ? "zh" : "en";
           localStorage.setItem("lang", currentLang);
@@ -2610,20 +2619,6 @@
 
           await searchYouBike(false, false);
 
-          document.querySelectorAll('.station').forEach(card => {
-            const id = card.dataset.id;
-            const data = oldVehicleData[id];
-            if (data) {
-              const yb2El = card.querySelector('.vehicle_yb2');
-              const ybeEl = card.querySelector('.vehicle_ybe');
-              const emptyEl = card.querySelector('.vehicle_empty');
-
-              const unknownValue = currentLang === "en" ? "Unknown" : "未知";
-              if (yb2El && data.available_2_0 !== (currentLang === "en" ? "未知" : "Unknown")) yb2El.textContent = data.available_2_0;
-              if (ybeEl && data.available_e !== (currentLang === "en" ? "未知" : "Unknown")) ybeEl.textContent = data.available_e;
-              if (emptyEl && data.empty_spaces !== (currentLang === "en" ? "未知" : "Unknown")) emptyEl.textContent = data.empty_spaces;
-            }
-          });
 
           await updateVehicleData();
           updateCardDistances();
