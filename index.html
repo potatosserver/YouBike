@@ -1488,18 +1488,16 @@
 
           usedStations = [...pinnedFromResults, ...unpinnedFromResults].slice(0, limit);
 
-          // Add this block to move the map if shouldMoveMap is true and there are results
           if (shouldMoveMap && usedStations.length > 0 && leafletMap) {
               const firstStation = usedStations[0];
               const lat = parseFloat(firstStation.lat);
               const lng = parseFloat(firstStation.lng);
               if (!isNaN(lat) && !isNaN(lng)) {
-                  isMapMovingDueToTracking = true; // Set flag before moving
+                  isMapMovingDueToTracking = true;
                   leafletMap.setView([lat, lng], leafletMap.getZoom() || 18, { animate: true, duration: 1 });
-                  setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Reset flag after animation
+                  setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
               }
           }
-          // End of added block
 
           resultsDiv.innerHTML = '';
           const unknownValue = currentLang === "en" ? "Unknown" : "未知";
@@ -2433,22 +2431,19 @@
           const locateButton = document.getElementById('locateButton');
 
           if (!isLocationServiceOn) {
-              // If location service is off in settings
-              showNotification(currentLang === "en" ? "Location service is off (using default region)." : "位置服務已關閉 (使用預設地區)。"); // Updated notification text
-              isFollowingUser = false; // Ensure following is off
-              stopTracking(); // Ensure watchPosition is stopped
+              showNotification(currentLang === "en" ? "Location service is off (using default region)." : "位置服務已關閉 (使用預設地區)。");
+              isFollowingUser = false;
+              stopTracking();
 
-              // Set userLocation to default region and move map
               const selectedRegion = document.getElementById('centralRegionSelect').value;
               const coords = regionCoordinates[selectedRegion];
-              userLocation = { latitude: coords.lat, longitude: coords.lng }; // Update userLocation to default region
+              userLocation = { latitude: coords.lat, longitude: coords.lng };
 
               if (leafletMap) {
                   isMapMovingDueToTracking = true;
                   leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
                   setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
               }
-              // Update markers, distances, data based on the new userLocation (default region)
               if (locationMarker) {
                   locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
               }
@@ -2459,30 +2454,20 @@
               updateVehicleData();
               updateResultsOrder();
 
-          } else { // Location services are ON in settings
-              // Always set isFollowingUser to true when button is clicked and location is ON
+          } else {
               isFollowingUser = true;
 
-              // Show notification when attempting to locate
-              showNotification(currentLang === "en" ? "Location tracking enabled." : "已開啟位置追蹤功能。"); // Added notification
+              showNotification(currentLang === "en" ? "Location tracking enabled." : "已開啟位置追蹤功能。");
 
-              // Ensure tracking is active (watchPosition)
-              startTracking(); // This function is idempotent if watchId is not null
+              startTracking();
 
-              // Immediately move map to the current userLocation (where the blue dot is)
-              // userLocation is kept updated by the watchPosition started in getLocation or startTracking
               if (leafletMap && userLocation) {
                    isMapMovingDueToTracking = true;
                    leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
                    setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
-                   // No success notification needed, the map moving is the feedback
                } else if (leafletMap) {
-                   // If userLocation is not yet set (e.g., very first click before watchPosition gets a fix)
-                   // Try to get it once and move the map. watchPosition is already running.
                    navigator.geolocation.getCurrentPosition(
                        (position) => {
-                           // userLocation will be updated by handleGeoUpdate from watchPosition anyway,
-                           // but we can use this fix to move the map immediately if userLocation was null.
                            userLocation = {
                                latitude: position.coords.latitude,
                                longitude: position.coords.longitude
@@ -2504,9 +2489,7 @@
                        },
                        (error) => {
                            console.error("Geolocation error on locate button click (initial fix):", error);
-                           // Show notification only if this initial fix fails
                            showNotification(currentLang === "en" ? "Failed to get immediate location." : "無法立即取得目前位置。");
-                           // Fallback to default region if userLocation is still null after this failure
                            if (!userLocation) {
                                const selectedRegion = document.getElementById('centralRegionSelect').value;
                                const coords = regionCoordinates[selectedRegion];
@@ -2525,7 +2508,7 @@
                                updateResultsOrder();
                            }
                        },
-                       { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 } // Short timeout for quick check
+                       { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
                    );
                }
           }
@@ -2542,11 +2525,9 @@
                   locateButton.title = currentLang === "en" ? "Location service off (using default region)" : "定位服務已關閉 (使用預設地區)";
                   locateButton.style.color = '#666';
               } else if (isFollowingUser) {
-                  // Title when following - clicking doesn't stop following anymore
-                  locateButton.title = currentLang === "en" ? "Following your location" : "正在跟隨您的位置"; // Updated title
+                  locateButton.title = currentLang === "en" ? "Following your location" : "正在跟隨您的位置";
                   locateButton.style.color = '#007BFF';
               } else {
-                  // Title when not following, but location service is ON
                   locateButton.title = currentLang === "en" ? "Go to my location" : "定位到我目前位置";
                   locateButton.style.color = '#333';
               }
