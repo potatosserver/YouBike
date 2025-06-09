@@ -210,19 +210,26 @@
         word-wrap: break-word;
         overflow-wrap: break-word;
         cursor: pointer;
-        position: relative;
+        position: relative; /* Keep relative for potential future use, but icons are flexed */
       }
       .station:hover {
         transform: translateY(-5px);
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
       }
+      .station .header { /* New class for the header div */
+          display: flex;
+          align-items: center;
+          justify-content: space-between; /* Distribute space */
+          margin-bottom: 10px;
+      }
       .station h3 {
-        margin: 0 0 10px 0;
+        margin: 0; /* Remove margin to align with flex items */
         color: #007BFF;
         font-size: 1.2em;
         word-wrap: break-word;
         overflow-wrap: break-word;
-        padding-right: 30px;
+        flex-grow: 1; /* Allow name to take available space */
+        margin-right: 10px; /* Add some space between name and icons */
       }
       .station p {
         margin: 0 0 5px 0;
@@ -231,15 +238,20 @@
         word-wrap: break-word;
         overflow-wrap: break-word;
       }
+      .station .icon-group { /* New class for the icon group */
+          display: flex;
+          align-items: center;
+          gap: 5px; /* Space between icons */
+          flex-shrink: 0; /* Prevent icons from shrinking */
+      }
       .station .pin-button {
-        position: absolute;
-        top: 10px;
-        right: 10px;
+        position: static; /* Change from absolute */
         font-size: 24px;
         cursor: pointer;
         color: #007BFF;
         transition: transform 0.2s ease, color 0.2s ease;
         user-select: none;
+        line-height: 1; /* Ensure consistent height */
       }
       .station .pin-button:hover {
         transform: scale(1.2);
@@ -249,15 +261,14 @@
         color: #FFD700;
       }
       .station .electric-icon {
-          position: absolute;
-          top: 18px; /* 調整到與星星完全對齊 */
-          right: 40px;
-          font-size: 23px;
+          position: static; /* Change from absolute */
+          font-size: 23px; /* Keep original size */
           color: #4CAF50;
-          display: none;
+          display: none; /* Hide by default */
+          line-height: 1; /* Ensure consistent height */
       }
       .station .electric-icon.show {
-          display: block;
+          display: block; /* Show when needed */
       }
       #loading {
         position: fixed;
@@ -786,7 +797,7 @@
       #settingsPanel a:hover,
       #settingsPanel button:hover {
           transform: translateY(-2px);
-          box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+          box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
       }
 
       @keyframes popUpSettings {
@@ -1566,10 +1577,10 @@
 
             const isPinned = pinnedStations.has(String(info.id));
             const pinButtonHtml = `<span
-              class="pin-button ${isPinned ? 'pinned' : ''}"
+              class="material-icons pin-button ${isPinned ? 'pinned' : ''}"
               data-id="${info.id}"
               onclick="togglePinStation('${info.id}', event)"
-            >${isPinned ? '★' : '☆'}</span>`;
+            >${isPinned ? 'star' : 'star_border'}</span>`; /* Use Material Icons names */
 
             const stationVehicleData = vehicleData[info.id];
             const displayAvailable20 = stationVehicleData?.available_2_0 !== undefined ? stationVehicleData.available_2_0 : unknownValue;
@@ -1594,9 +1605,13 @@
 
 
             const cardContent = `
-                      ${pinButtonHtml}
-                      ${electricIconHtml}
-                      <h3>${info.name || unknownStation}</h3>
+                      <div class="header"> <!-- New header div -->
+                          <h3>${info.name || unknownStation}</h3>
+                          <div class="icon-group"> <!-- New icon group div -->
+                              ${electricIconHtml}
+                              ${pinButtonHtml}
+                          </div>
+                      </div>
                       ${distanceHTML}
                       <p>${addressLabel} ${info.address || unknownAddress}</p>
                       <p>YouBike 2.0: <span class="vehicle_yb2">${displayAvailable20}</span></p>
