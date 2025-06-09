@@ -250,11 +250,11 @@
       }
       .station .electric-icon {
           position: absolute;
-          top: 38px; /* Adjust based on pin button size */
-          right: 10px;
-          font-size: 22px; /* Changed from 18px to 24px */
-          color: #4CAF50; /* Green color for electric icon */
-          display: none; /* Hidden by default */
+          top: 16px; /* 調整到與星星完全對齊 */
+          right: 40px;
+          font-size: 22px;
+          color: #4CAF50;
+          display: none;
       }
       .station .electric-icon.show {
           display: block;
@@ -1967,7 +1967,7 @@
          
          
           const id = card.dataset.id;
-          currentData[id] = {
+                   currentData[id] = {
             available_2_0: card.querySelector('.vehicle_yb2').textContent,
             available_e: card.querySelector('.vehicle_ybe').textContent,
             empty_spaces: card.querySelector('.vehicle_empty').textContent
