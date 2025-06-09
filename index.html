@@ -1970,7 +1970,7 @@
 				const oldData = currentData[id];
 			  
 				const yb2El = card.querySelector('.vehicle_yb2');
-							const ybeEl = card.querySelector('.vehicle_ybe');
+										const ybeEl = card.querySelector('.vehicle_ybe');
 				const emptyEl = card.querySelector('.vehicle_empty');
 				const unknownValue = currentLang === "en" ? "Unknown" : "未知";
   
@@ -2247,8 +2247,14 @@
             document.getElementById('updateCountdownText').textContent = text;
         },
         reset: function() {
+            const icon = this.updateButton.querySelector('.material-icons');
+            icon.classList.add('spin-update');
+            setTimeout(() => {
+                icon.classList.remove('spin-update');
+            }, 500);
             this.remaining = 60;
             this.updateDisplay();
+            updateVehicleData();
         },
         update: function() {
             const icon = this.updateButton.querySelector('.material-icons');
