@@ -1080,7 +1080,7 @@
     </button>
     </div>
     <div id="floatingCard"></div>
-    <button id="updateCountdown" style="display:none; position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; padding: 6px 12px; background-color: white; color: #007bff; border: 2px solid #007bff; border-radius: 25px; font-size: 0.8em; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: all 0.3s ease; width: 120px;">
+    <button id="updateCountdown" style="display:none; position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; padding: 6px 12px; background-color: white; color: #007bff; border: 2px solid #007bff; border-radius: 25px; font-size: 0.8em; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: all 0.3s ease; width: var(--button-width, 140px);">
   <span class="material-icons" style="vertical-align: middle; margin-right: 4px; font-size: 16px; display: inline-flex; align-items: center;">autorenew</span>
   <span id="updateCountdownText" style="vertical-align: middle;">60秒後更新</span>
 </button>
@@ -1091,7 +1091,10 @@
       <div class="settings-group">
               <h3>基本設定</h3>
               <div class="setting-item">
-                  <label for="centralRegionSelect" id="regionSelectLabel">地區選擇</label>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                      <span class="material-icons">location_on</span>
+                      <label for="centralRegionSelect" id="regionSelectLabel">地區選擇</label>
+                  </div>
                   <select id="centralRegionSelect" style="padding: 5px; border-radius: 5px;">
                       <option value="taipei">台北市</option>
                       <option value="newTaipei">新北市</option>
@@ -1109,21 +1112,30 @@
                   </select>
               </div>
               <div class="setting-item">
-                  <label for="centralLocationToggle">位置服務</label>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                      <span class="material-icons">my_location</span>
+                      <label for="centralLocationToggle">位置服務</label>
+                  </div>
                   <label class="switch">
                       <input type="checkbox" id="centralLocationToggle">
                       <span class="slider"></span>
                   </label>
               </div>
               <div class="setting-item">
-                  <label for="centralDarkModeToggle">深色模式</label>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                      <span class="material-icons">dark_mode</span>
+                      <label for="centralDarkModeToggle">深色模式</label>
+                  </div>
                   <label class="switch">
                       <input type="checkbox" id="centralDarkModeToggle">
                       <span class="slider"></span>
                   </label>
               </div>
               <div class="setting-item">
-                  <label for="centralLangToggle">中文/English</label>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                      <span class="material-icons">language</span>
+                      <label for="centralLangToggle">中文/English</label>
+                  </div>
                   <label class="switch">
                       <input type="checkbox" id="centralLangToggle">
                       <span class="slider"></span>
@@ -1952,6 +1964,8 @@
 
         const currentData = {};
         stationElements.forEach(card => {
+         
+         
           const id = card.dataset.id;
           currentData[id] = {
             available_2_0: card.querySelector('.vehicle_yb2').textContent,
@@ -2019,6 +2033,7 @@
                const updateCountdownBtn = document.getElementById('updateCountdownText');
         if (updateCountdownBtn) {
           updateCountdownBtn.textContent = currentLang === "en" ? "60 sec update" : "60秒後更新";
+          updateCountdownBtn.parentElement.style.setProperty('--button-width', currentLang === "en" ? "140px" : "120px");
         }
         const loadingDiv = document.getElementById('loading');
         if (loadingDiv) {
