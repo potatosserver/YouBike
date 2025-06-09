@@ -1961,6 +1961,7 @@
               distanceEl.textContent = "";
             } else {
               const distanceLabel = currentLang === "en" ? "Distance:" : "距離:";
+             
               const unit = newDistance < 1 ? (currentLang === "en" ? " m" : " 公尺") : (currentLang === "en" ? " km" : " 公里");
               const displayDistance = newDistance < 1 ? Math.round(newDistance * 1000) : newDistance.toFixed(2);
               distanceEl.textContent = distanceLabel + " " + displayDistance + unit;
@@ -2339,6 +2340,16 @@
                 maxZoom: 19,
                 attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(leafletMap);
+
+            // 檢查是否為深色模式並立即應用圖層效果
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            if (isDarkMode && tileLayer._container) {
+                tileLayer._container.style.filter = 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)';
+                const attribution = document.querySelector('.leaflet-control-attribution');
+                if (attribution) {
+                    attribution.style.color = '#ccc';
+                }
+            }
         } catch(err) {
             console.error("Tile layer failed:", err);
             showNotification(currentLang === "en"
@@ -2646,6 +2657,14 @@
         const isDarkMode = localStorage.getItem("dark_mode") === "true";
         if (isDarkMode) {
           document.body.classList.add('dark-mode');
+          // 確保地圖圖層在初始化時也套用深色模式
+          if (tileLayer && tileLayer._container) {
+            tileLayer._container.style.filter = 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)';
+            const attribution = document.querySelector('.leaflet-control-attribution');
+            if (attribution) {
+                attribution.style.color = '#ccc';
+            }
+          }
         }
         centralDarkModeToggle.checked = isDarkMode;
 
