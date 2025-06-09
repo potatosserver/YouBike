@@ -2281,9 +2281,10 @@
             setTimeout(() => {
                 icon.classList.remove('spin-update');
             }, 500);
-            // Call searchYouBike to refresh the list and update vehicle data
-            await searchYouBike(false, false); // Pass false for showLoadingIndicator and shouldMoveMap
-            this.reset(); // Reset timer after data is fetched and processed
+            // Call searchYouBike to re-fetch data, sort by distance, and update display/markers
+            // Pass false for showLoadingIndicator and shouldMoveMap
+            await searchYouBike(false, false);
+            this.reset(); // Reset timer after searchYouBike completes
         }
     };
 
