@@ -2273,16 +2273,17 @@
             }, 500);
             this.remaining = 60;
             this.updateDisplay();
-            updateVehicleData();
+            // updateVehicleData(); // This is now called within searchYouBike
         },
-        update: function() {
+        update: async function() { // Make update async
             const icon = this.updateButton.querySelector('.material-icons');
             icon.classList.add('spin-update');
             setTimeout(() => {
                 icon.classList.remove('spin-update');
             }, 500);
-            updateVehicleData();
-            this.reset();
+            // Call searchYouBike to refresh the list and update vehicle data
+            await searchYouBike(false, false); // Pass false for showLoadingIndicator and shouldMoveMap
+            this.reset(); // Reset timer after data is fetched and processed
         }
     };
 
