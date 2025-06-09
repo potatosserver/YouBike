@@ -218,9 +218,10 @@
       }
       .station .header { /* New class for the header div */
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           justify-content: space-between; /* Distribute space */
           margin-bottom: 10px;
+          gap: 10px;
       }
       .station h3 {
         margin: 0; /* Remove margin to align with flex items */
@@ -229,46 +230,31 @@
         word-wrap: break-word;
         overflow-wrap: break-word;
         flex-grow: 1; /* Allow name to take available space */
-        margin-right: 10px; /* Add some space between name and icons */
-      }
-      .station p {
-        margin: 0 0 5px 0;
-        color: #555;
-        font-size: 1em;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
       }
       .station .icon-group { /* New class for the icon group */
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           gap: 5px; /* Space between icons */
           flex-shrink: 0; /* Prevent icons from shrinking */
+          padding-top: 2px; /* Align with first line of text */
       }
       .station .pin-button {
-        position: static; /* Change from absolute */
         font-size: 24px;
         cursor: pointer;
         color: #007BFF;
-        transition: transform 0.2s ease, color 0.2s ease;
+        transition: color 0.2s ease;
         user-select: none;
-        line-height: 1; /* Ensure consistent height */
-      }
-      .station .pin-button:hover {
-        transform: scale(1.2);
-        color: #0056b3;
       }
       .station .pin-button.pinned {
         color: #FFD700;
       }
       .station .electric-icon {
-          position: static; /* Change from absolute */
-          font-size: 24px; /* Keep original size */
+          font-size: 24px;
           color: #4CAF50;
-          display: none; /* Hide by default */
-          line-height: 1; /* Ensure consistent height */
+          display: none;
       }
       .station .electric-icon.show {
-          display: block; /* Show when needed */
+          display: block;
       }
       #loading {
         position: fixed;
@@ -1251,7 +1237,7 @@
         if (pinButton) {
           const isPinned = pinnedStations.has(id);
           pinButton.classList.toggle('pinned', isPinned);
-          pinButton.textContent = isPinned ? '★' : '☆';
+          pinButton.textContent = isPinned ? 'star' : 'star_outline';
         }
 
         updateResultsOrder();
@@ -1580,7 +1566,7 @@
               class="material-icons pin-button ${isPinned ? 'pinned' : ''}"
               data-id="${info.id}"
               onclick="togglePinStation('${info.id}', event)"
-            >${isPinned ? 'star' : 'star_border'}</span>`; /* Use Material Icons names */
+            >${isPinned ? 'star' : 'star_outline'}</span>`; /* Use Material Icons names */
 
             const stationVehicleData = vehicleData[info.id];
             const displayAvailable20 = stationVehicleData?.available_2_0 !== undefined ? stationVehicleData.available_2_0 : unknownValue;
