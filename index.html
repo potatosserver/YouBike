@@ -1039,6 +1039,14 @@
         backface-visibility: hidden;
         will-change: transform;
       }
+      @keyframes spin-180 {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(180deg); }
+      }
+
+      .spin-update {
+        animation: spin-180 0.5s ease forwards;
+      }
     </style>
   </head>
   <body>
@@ -1072,7 +1080,10 @@
     </button>
     </div>
     <div id="floatingCard"></div>
-    <button id="updateCountdown" style="display:none; position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; padding: 6px 12px; background-color: white; color: #007bff; border: 2px solid #007bff; border-radius: 25px; font-size: 0.8em; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: all 0.3s ease; width: 100px;">60秒後更新</button>
+    <button id="updateCountdown" style="display:none; position: fixed; bottom: 10px; left: 50%; transform: translateX(-50%); z-index: 1000; padding: 6px 12px; background-color: white; color: #007bff; border: 2px solid #007bff; border-radius: 25px; font-size: 0.8em; box-shadow: 0 2px 6px rgba(0,0,0,0.2); transition: all 0.3s ease; width: 120px;">
+  <span class="material-icons" style="vertical-align: middle; margin-right: 4px; font-size: 16px; display: inline-flex; align-items: center;">autorenew</span>
+  <span id="updateCountdownText" style="vertical-align: middle;">60秒後更新</span>
+</button>
     <div id="centralSettingsPanel">
       <button id="closeCentralSettings">×</button>
       <h2 id="settingsPanelTitle">系統設定</h2>
@@ -1959,7 +1970,7 @@
 				const oldData = currentData[id];
 			  
 				const yb2El = card.querySelector('.vehicle_yb2');
-				const ybeEl = card.querySelector('.vehicle_ybe');
+							const ybeEl = card.querySelector('.vehicle_ybe');
 				const emptyEl = card.querySelector('.vehicle_empty');
 				const unknownValue = currentLang === "en" ? "Unknown" : "未知";
   
@@ -2005,9 +2016,9 @@
         if (keywordInput) {
           keywordInput.placeholder = currentLang === "en" ? "Please enter station name or address" : "請輸入站點名稱、地址";
         }
-               const updateCountdownBtn = document.getElementById('updateCountdown');
+               const updateCountdownBtn = document.getElementById('updateCountdownText');
         if (updateCountdownBtn) {
-          updateCountdownBtn.textContent = currentLang === "en" ? "60 sec update " : "60秒後更新";
+          updateCountdownBtn.textContent = currentLang === "en" ? "60 sec update" : "60秒後更新";
         }
         const loadingDiv = document.getElementById('loading');
         if (loadingDiv) {
@@ -2230,15 +2241,21 @@
         remaining: 60,
         updateButton: document.getElementById('updateCountdown'),
         updateDisplay: function() {
-            this.updateButton.textContent = currentLang === "en"
-                ? `${this.remaining} sec update `
+            const text = currentLang === "en"
+                ? `${this.remaining} sec update`
                 : `${this.remaining}秒後更新`;
+            document.getElementById('updateCountdownText').textContent = text;
         },
         reset: function() {
             this.remaining = 60;
             this.updateDisplay();
         },
         update: function() {
+            const icon = this.updateButton.querySelector('.material-icons');
+            icon.classList.add('spin-update');
+            setTimeout(() => {
+                icon.classList.remove('spin-update');
+            }, 500);
             updateVehicleData();
             this.reset();
         }
