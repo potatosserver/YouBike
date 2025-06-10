@@ -1160,6 +1160,7 @@
     <script>
       let leafletMap, markerClusterGroup, tileLayer;
       let userLocation = null;
+      let previousLocation = null; // 新增：儲存上一次定位點
       let locationMarker = null;
       let pulsingMarker = null;
       let sortingLocked = false;
@@ -1741,9 +1742,22 @@
 
 
       function handleGeoUpdate(position) {
+          // 新增邏輯：若新定位點與前一定位點差距大於500公尺，觸發更新按鈕
+          const newLocation = {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+          };
+          if (previousLocation) {
+              const diff = calculateDistance(previousLocation.latitude, previousLocation.longitude, newLocation.latitude, newLocation.longitude);
+              if (diff >= 0.5) { // 0.5公里 = 500公尺
+                  countdownTimer.update();
+              }
+          }
+          previousLocation = newLocation;
+          
           userLocation = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
+              latitude: newLocation.latitude,
+              longitude: newLocation.longitude
           };
 
           if (locationMarker) {
@@ -1938,6 +1952,7 @@
           const lng = parseFloat(card.dataset.lng);
           const newDistance = calculateDistance(
             userLocation ? userLocation.latitude : defaultLatitude,
+           
             userLocation ? userLocation.longitude : defaultLongitude,
             lat, lng
           );
