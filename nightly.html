@@ -483,24 +483,26 @@
         position: sticky;
         top: 0;
         z-index: 100;
-        height: 20px;  /* 減少整體高度 */
+        height: 24px;  /* Adjusted height to include space */
         width: 100px;
         cursor: ns-resize;
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: 4px auto;  /* 縮小外部間距 */
-        padding: 8px 0;   /* 縮小上下內部間距 */
+        margin: 0 auto;  /* Remove margin */
+        padding: 0;   /* Remove padding */
+        /* Add background or border if needed for visibility */
       }
 
       #dragHandle::before {
         content: '';
         width: 100px;
-        height: 6px;
+        height: 6px; /* Keep the bar height */
         background: #a0a0a0;
         border-radius: 3px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         transition: background 0.3s ease, box-shadow 0.3s ease;
+        /* Centering is handled by flexbox on #dragHandle */
       }
 
       body.dark-mode #dragHandle::before {
