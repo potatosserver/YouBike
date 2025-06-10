@@ -1160,6 +1160,7 @@
     <script>
       let leafletMap, markerClusterGroup, tileLayer;
       let userLocation = null;
+      let previousLocation = null; // 新增: 儲存前一個定位點
       let locationMarker = null;
       let pulsingMarker = null;
       let sortingLocked = false;
@@ -1740,45 +1741,45 @@
       }
 
 
-      let lastLocation = null;
-      
       function handleGeoUpdate(position) {
           const newLocation = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
           };
 
-          // 檢查是否有上一個定位點
-          if (lastLocation) {
-            const distance = calculateDistance(
-              lastLocation.latitude,
-              lastLocation.longitude,
-              newLocation.latitude,
-              newLocation.longitude
-            ) * 1000; // 轉換為公尺
+          // 檢查是否有前一個定位點
+          if (previousLocation) {
+              const distance = calculateDistance(
+                  previousLocation.latitude,
+                  previousLocation.longitude,
+                  newLocation.latitude,
+                  newLocation.longitude
+              ) * 1000; // 轉換為公尺
 
-            // 如果移動距離超過 500 公尺
-            if (distance > 500) {
-              // 觸發更新按鈕點擊事件
-              document.getElementById('updateCountdown').click();
-            }
+              // 如果距離大於500公尺
+              if (distance > 500) {
+                  // 模擬點擊更新按鈕
+                  const updateButton = document.getElementById('updateCountdown');
+                  if (updateButton) {
+                      updateButton.click();
+                  }
+              }
           }
 
-          // 更新最後定位點
-          lastLocation = newLocation;
+          previousLocation = newLocation;
           userLocation = newLocation;
 
           if (locationMarker) {
-            locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+              locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
           }
           if (pulsingMarker) {
-            pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+              pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
           }
 
           if (isFollowingUser && leafletMap) {
-            isMapMovingDueToTracking = true;
-            leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 });
-            setTimeout(() => { isMapMovingDueToTracking = false; }, 500);
+              isMapMovingDueToTracking = true;
+              leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 });
+              setTimeout(() => { isMapMovingDueToTracking = false; }, 500);
           }
 
           updateCardDistances();
@@ -1958,7 +1959,7 @@
         cards.forEach(card => {
           const lat = parseFloat(card.dataset.lat);
           const lng = parseFloat(card.dataset.lng);
-          const newDistance = calculateDistance(
+                   const newDistance = calculateDistance(
             userLocation ? userLocation.latitude : defaultLatitude,
             userLocation ? userLocation.longitude : defaultLongitude,
             lat, lng
