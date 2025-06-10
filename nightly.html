@@ -1743,7 +1743,7 @@
       }
 
 
-      let lastKnownLocation = null;  // 新增變數追蹤上一個位置
+      let lastKnownLocation = null;
       
       function handleGeoUpdate(position) {
           const newLocation = {
@@ -1751,6 +1751,7 @@
             longitude: position.coords.longitude
           };
 
+          let movedSignificantly = false; // 新增旗標
           // 如果有上一個位置，計算距離
           if (lastKnownLocation) {
             const distance = calculateDistance(
@@ -1762,36 +1763,15 @@
 
             // 如果移動距離超過 500 公尺
             if (distance * 1000 > 500) {
-              // 1. 更新使用者位置
-              userLocation = newLocation;
-              
-              // 2. 更新藍點標記位置
-              if (locationMarker) {
-                locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
-              }
-              if (pulsingMarker) {
-                pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
-              }
-              
-              // 3. 在跟隨模式時移動地圖
-              if (isFollowingUser && leafletMap) {
-                isMapMovingDueToTracking = true;
-                leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 });
-                setTimeout(() => { isMapMovingDueToTracking = false; }, 500);
-              }
-
-              // 4. 觸發更新按鈕點擊來重新搜尋站點
-              const updateButton = document.getElementById('updateCountdown');
-              if (updateButton) {
-                updateButton.click();
-              }
+              movedSignificantly = true; // 設定旗標
             }
           }
 
-          // 更新 lastKnownLocation 和其他一般更新
+          // 更新 lastKnownLocation 和 userLocation
           lastKnownLocation = newLocation;
           userLocation = newLocation;
 
+          // 更新藍點標記位置
           if (locationMarker) {
             locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
           }
@@ -1799,14 +1779,27 @@
             pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
           }
 
+          // 在跟隨模式時移動地圖
           if (isFollowingUser && leafletMap) {
             isMapMovingDueToTracking = true;
             leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 });
             setTimeout(() => { isMapMovingDueToTracking = false; }, 500);
           }
 
-          updateCardDistances();
-          updateResultsOrder();
+          // 根據移動距離決定更新方式
+          if (movedSignificantly) {
+              // 如果移動距離超過 500 公尺，觸發完整更新
+              const updateButton = document.getElementById('updateCountdown');
+              if (updateButton) {
+                // 直接呼叫 countdownTimer.update() 來觸發 searchYouBike
+                countdownTimer.update();
+              }
+              // searchYouBike 已經會根據新位置排序並更新列表，所以這裡不需要再呼叫 updateCardDistances 和 updateResultsOrder
+          } else {
+              // 如果移動距離未超過 500 公尺，只更新距離顯示並重新排序
+              updateCardDistances();
+              updateResultsOrder();
+          }
       }
       function handleGeoUpdateError(error) {
           console.error("Geolocation update error:", error);
@@ -1974,9 +1967,6 @@
               }
           }
       }
-
-
-     
 
 
       function updateCardDistances() {
