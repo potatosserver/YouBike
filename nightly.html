@@ -2369,7 +2369,12 @@
                 icon.classList.remove('spin-update');
             }, 500);
 
-            await updateVehicleData();
+            const keyword = document.getElementById('keyword').value.trim();
+            if (keyword === '') {
+                searchYouBike(true, false);
+            } else {
+                await updateVehicleData();
+            }
             this.reset();
         }
     };
