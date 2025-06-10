@@ -1760,12 +1760,12 @@
               newLocation.longitude
             );
 
-            // 如果移動距離超過 500 公尺，執行完整更新
+            // 如果移動距離超過 500 公尺
             if (distance * 1000 > 500) {
+              // 1. 更新使用者位置
               userLocation = newLocation;
-              lastKnownLocation = newLocation;
               
-              // 更新藍點標記位置
+              // 2. 更新藍點標記位置
               if (locationMarker) {
                 locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
               }
@@ -1773,20 +1773,22 @@
                 pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
               }
               
-              // 在跟隨模式時移動地圖
+              // 3. 在跟隨模式時移動地圖
               if (isFollowingUser && leafletMap) {
                 isMapMovingDueToTracking = true;
                 leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 });
                 setTimeout(() => { isMapMovingDueToTracking = false; }, 500);
               }
 
-              // 執行完整搜尋更新，不顯示載入指示器
-              searchYouBike(false, false);
-              return;
+              // 4. 觸發更新按鈕點擊來重新搜尋站點
+              const updateButton = document.getElementById('updateCountdown');
+              if (updateButton) {
+                updateButton.click();
+              }
             }
           }
 
-          // 如果移動距離不到 500 公尺，只更新位置和排序
+          // 更新 lastKnownLocation 和其他一般更新
           lastKnownLocation = newLocation;
           userLocation = newLocation;
 
@@ -1949,7 +1951,7 @@
               } else {
                   locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
                   if (pulsingMarker) pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
-                           }
+              }
 
               isMapMovingDueToTracking = true;
               leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
