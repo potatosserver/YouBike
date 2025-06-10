@@ -1796,6 +1796,11 @@
 
             if (distance * 1000 > 500) {
               movedSignificantly = true;
+              if (leafletMap) {
+                isMapMovingDueToTracking = true;
+                leafletMap.setView([newLocation.latitude, newLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 1 });
+                setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
+              }
             }
           }
 
