@@ -1160,7 +1160,6 @@
     <script>
       let leafletMap, markerClusterGroup, tileLayer;
       let userLocation = null;
-      let previousLocation = null; // 新增: 儲存前一個定位點
       let locationMarker = null;
       let pulsingMarker = null;
       let sortingLocked = false;
@@ -1741,22 +1740,23 @@
       }
 
 
+      let lastKnownPosition = null; // 新增此行在全局變數區域
+
       function handleGeoUpdate(position) {
-          const newLocation = {
+          const newPosition = {
               latitude: position.coords.latitude,
               longitude: position.coords.longitude
           };
 
-          // 檢查是否有前一個定位點
-          if (previousLocation) {
+          // 檢查與上次位置的距離
+          if (lastKnownPosition) {
               const distance = calculateDistance(
-                  previousLocation.latitude,
-                  previousLocation.longitude,
-                  newLocation.latitude,
-                  newLocation.longitude
+                  lastKnownPosition.latitude,
+                  lastKnownPosition.longitude,
+                  newPosition.latitude,
+                  newPosition.longitude
               ) * 1000; // 轉換為公尺
 
-              // 如果距離大於500公尺
               if (distance > 500) {
                   // 模擬點擊更新按鈕
                   const updateButton = document.getElementById('updateCountdown');
@@ -1766,8 +1766,9 @@
               }
           }
 
-          previousLocation = newLocation;
-          userLocation = newLocation;
+          // 更新最後已知位置
+          lastKnownPosition = newPosition;
+          userLocation = newPosition;
 
           if (locationMarker) {
               locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
@@ -1959,7 +1960,7 @@
         cards.forEach(card => {
           const lat = parseFloat(card.dataset.lat);
           const lng = parseFloat(card.dataset.lng);
-                   const newDistance = calculateDistance(
+          const newDistance = calculateDistance(
             userLocation ? userLocation.latitude : defaultLatitude,
             userLocation ? userLocation.longitude : defaultLongitude,
             lat, lng
