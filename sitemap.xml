@@ -2,7 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://potatosserver.github.io/YouBike/index.html</loc>
-    <lastmod>2025-6-9</lastmod>
+    <lastmod>2025-6-10</lastmod>
+    <changefreq>always</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://potatosserver.github.io/YouBike/nightly.html</loc>
+    <lastmod>2025-6-10</lastmod>
     <changefreq>always</changefreq>
     <priority>1.0</priority>
   </url>
