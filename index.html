@@ -26,6 +26,10 @@
         --map-filter: none;
         --map-transition: filter 0.3s ease;
         --color-transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
       }
 
       *, *::before, *::after {
@@ -457,7 +461,6 @@
         box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
         padding: 20px;
         padding-top: 0;
-        overflow-y: auto;
         width: 85%;
         max-width: 1000px;
         margin: 0 auto;
@@ -2014,7 +2017,7 @@
 
 
       function updateCardDistances() {
-        const cards = document.querySelectorAll('.station');
+               const cards = document.querySelectorAll('.station');
         cards.forEach(card => {
           const lat = parseFloat(card.dataset.lat);
           const lng = parseFloat(card.dataset.lng);
@@ -2562,6 +2565,7 @@
       });
 
 
+      // JS拖曳區塊
       const mainContent = document.getElementById('mainContent');
       const dragHandle = document.getElementById('dragHandle');
       let startY = 0;
@@ -2575,13 +2579,13 @@
         isDragging = true;
         e.preventDefault();
         mainContent.style.transition = 'none';
-        // 新增：添加全域拖曳游標樣式
         document.body.style.cursor = 'ns-resize';
+        // 禁止滾動
+        mainContent.style.overflowY = 'hidden';
       }
 
       function onMove(e) {
         if (!isDragging) return;
-
         const touch = e.touches ? e.touches[0] : e;
         const currentY = touch.clientY;
         const deltaY = startY - currentY;
@@ -2589,15 +2593,15 @@
           Math.max(startHeight + deltaY, 200),
           window.innerHeight * 0.85
         );
-
         mainContent.style.height = `${newHeight}px`;
       }
 
       function onEnd() {
         isDragging = false;
         mainContent.style.transition = 'height 0.2s ease';
-        // 新增：移除全域拖曳游標樣式
         document.body.style.cursor = '';
+        // 拖曳結束恢復滾動
+        mainContent.style.overflowY = 'auto';
       }
 
       dragHandle.addEventListener('mousedown', onStart);
