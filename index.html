@@ -1464,7 +1464,6 @@
       }
 
       async function searchYouBike(showLoadingIndicator = true, shouldMoveMap = false) {
-        if (showLoadingIndicator) showLoading();
         const keyword = keywordInput.value.trim().toLowerCase();
 
         try {
@@ -1642,12 +1641,8 @@
           updateMapMarkers();
 
           dataLoaded = true;
-          if (showLoadingIndicator) {
-          }
         } catch (error) {
           resultsDiv.innerHTML = `發生錯誤: ${error.message}`;
-        } finally {
-          if (showLoadingIndicator) hideLoading();
         }
       }
       async function queryVehicleData(stationIds) {
@@ -1796,6 +1791,11 @@
 
             if (distance * 1000 > 500) {
               movedSignificantly = true;
+              if (leafletMap) {
+                isMapMovingDueToTracking = true;
+                leafletMap.setView([newLocation.latitude, newLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 1 });
+                setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
+              }
             }
           }
 
@@ -2003,6 +2003,8 @@
               updateResultsOrder();
               showMainContent();
 
+
+         
 
           } else {
               showNotification(currentLang === "en" ? "Could not determine location. Please check settings." : "無法確定位置，請檢查設定。");
@@ -2369,7 +2371,12 @@
                 icon.classList.remove('spin-update');
             }, 500);
 
-            await updateVehicleData();
+            const keyword = document.getElementById('keyword').value.trim();
+            if (keyword === '') {
+                searchYouBike(true, false);
+            } else {
+                await updateVehicleData();
+            }
             this.reset();
         }
     };
