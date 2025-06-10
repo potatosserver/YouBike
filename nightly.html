@@ -467,16 +467,6 @@
         -webkit-overflow-scrolling: touch;
       }
 
-      #mainContent::before {
-        content: '';
-        display: block;
-        height: 24px;
-        background: inherit;
-        position: sticky;
-        top: 0;
-        z-index: 99;
-      }
-
       #mainContent::-webkit-scrollbar {
         display: none;
       }
@@ -488,27 +478,34 @@
 
       #dragHandle {
         position: sticky;
-        top: 8px;
+        top: 0;
         z-index: 100;
-        height: 20px;
+        height: 6px;
+        width: 100px;
         cursor: ns-resize;
-        background: transparent;
+        background: #a0a0a0;
+        border-radius: 3px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        transition: background 0.3s ease, box-shadow 0.3s ease;
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: -10px 0;
+        margin: 8px auto; /* 調整邊距 */
       }
 
-      #dragHandle::before {
-        content: '';
-        width: 40px;
-        height: 4px;
-        background: #ccc;
-        border-radius: 2px;
+      body.dark-mode #dragHandle {
+        background: #888;
+        box-shadow: 0 1px 3px rgba(255,255,255,0.1);
       }
 
-      body.dark-mode #dragHandle::before {
-        background: #666;
+      #dragHandle:hover {
+          background: #888;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      }
+
+      body.dark-mode #dragHandle:hover {
+          background: #aaa;
+          box-shadow: 0 2px 5px rgba(255,255,255,0.2);
       }
 
       @media (max-width: 768px) {
@@ -906,7 +903,7 @@
           justify-content: space-between;
           margin-bottom: 15px;
           padding: 10px;
-          background: #f0f0f0;
+          background: #ffe8d6;
           border-radius: 8px;
           color: inherit;
           transition: background-color 0.2s ease, color 0.2s ease;
@@ -1044,6 +1041,14 @@
 
       .spin-update {
         animation: spin-180 0.5s ease forwards;
+      }
+      .station p {
+        margin: 4px 0;
+        color: #666;
+      }
+
+      body.dark-mode .station p {
+        color: #cccccc;
       }
     </style>
   </head>
@@ -1977,7 +1982,7 @@
               }
 
               isMapMovingDueToTracking = true;
-              leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
+              leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() ||  18, { animate: true });
               setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
           }
 
@@ -2010,6 +2015,7 @@
           );
           const distanceEl = card.querySelector('.distance');
           if (distanceEl) {
+
             const isAtDefaultLocation = userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude;
             if (isAtDefaultLocation) {
               distanceEl.textContent = "";
