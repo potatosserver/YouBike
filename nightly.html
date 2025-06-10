@@ -96,7 +96,7 @@
         position: relative;
         padding: 8px 16px;
         box-sizing: border-box;
-        background-color: #ffe8d6; /* Changed from #ffffff */
+        background-color: #ffe8d6;
         border-radius: 28px;
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         transition: box-shadow 0.3s ease;
@@ -198,7 +198,7 @@
         padding: 0 20px;
       }
       .station {
-        background-color: #fff2ec; /* Changed from white */
+        background-color: #fff2ec;
         border: 1px solid #e0e0e0;
         padding: 20px;
         border-radius: 10px;
@@ -210,33 +210,33 @@
         word-wrap: break-word;
         overflow-wrap: break-word;
         cursor: pointer;
-        position: relative; /* Keep relative for potential future use, but icons are flexed */
+        position: relative;
       }
       .station:hover {
         transform: translateY(-5px);
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
       }
-      .station .header { /* New class for the header div */
+      .station .header {
           display: flex;
           align-items: flex-start;
-          justify-content: space-between; /* Distribute space */
+          justify-content: space-between;
           margin-bottom: 10px;
           gap: 10px;
       }
       .station h3 {
-        margin: 0; /* Remove margin to align with flex items */
+        margin: 0;
         color: #007BFF;
         font-size: 1.2em;
         word-wrap: break-word;
         overflow-wrap: break-word;
-        flex-grow: 1; /* Allow name to take available space */
+        flex-grow: 1;
       }
-      .station .icon-group { /* New class for the icon group */
+      .station .icon-group {
           display: flex;
           align-items: flex-start;
-          gap: 5px; /* Space between icons */
-          flex-shrink: 0; /* Prevent icons from shrinking */
-          padding-top: 2px; /* Align with first line of text */
+          gap: 5px;
+          flex-shrink: 0;
+          padding-top: 2px;
       }
       .station .pin-button {
         font-size: 24px;
@@ -447,7 +447,7 @@
         bottom: 0;
         left: 0;
         right: 0;
-        background: #fff5f0; /* Changed from white */
+        background: #fff5f0;
         height: 40vh;
         min-height: 200px;
         max-height: 85vh;
@@ -864,7 +864,7 @@
           transform: translate(-50%, -50%);
           width: 80%;
           max-width: 320px;
-          background: #fff5f0; /* Changed from rgba(255, 255, 255, 0.95) */
+          background: #fff5f0;
           border-radius: 20px;
           padding: 25px;
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
@@ -887,7 +887,7 @@
       .settings-group {
           margin-bottom: 20px;
           padding: 15px;
-          background: #fff2ec; /* Changed from transparent */
+          background: #fff2ec;
           border: 1px solid #000;
           border-radius: 10px;
           color: #333;
@@ -897,7 +897,7 @@
       body.dark-mode .settings-group {
           border-color: #fff;
           color: #fff;
-          background: transparent; /* Keep dark mode background transparent */
+          background: transparent;
       }
 
       .setting-item {
@@ -906,7 +906,7 @@
           justify-content: space-between;
           margin-bottom: 15px;
           padding: 10px;
-          background: #fff2ec; /* Changed from #f0f0f0 */
+          background: #f0f0f0;
           border-radius: 8px;
           color: inherit;
           transition: background-color 0.2s ease, color 0.2s ease;
@@ -1394,7 +1394,7 @@
           store.openCursor().onsuccess = function(event) {
             const cursor = event.target.result;
             if (cursor) {
-              data.push(cursor.value);
+              data.push(cursor.value.value);
               cursor.continue();
             } else {
               resolve(data);
@@ -1514,8 +1514,7 @@
             return distA - distB;
           });
 
-          // 修改為只顯示最近的 10 個站點
-          let limit = keyword ? 50 : 10; // 如果有關鍵字搜尋則保持 50，否則顯示最近 10 個
+          let limit = keyword ? 50 : 10;
           
           let usedStations;
 
@@ -1570,7 +1569,7 @@
               class="material-icons pin-button ${isPinned ? 'pinned' : ''}"
               data-id="${info.id}"
               onclick="togglePinStation('${info.id}', event)"
-            >${isPinned ? 'star' : 'star_outline'}</span>`; /* Use Material Icons names */
+            >${isPinned ? 'star' : 'star_outline'}</span>`;
 
             const stationVehicleData = vehicleData[info.id];
             const displayAvailable20 = stationVehicleData?.available_2_0 !== undefined ? stationVehicleData.available_2_0 : unknownValue;
@@ -1595,9 +1594,9 @@
 
 
             const cardContent = `
-                      <div class="header"> <!-- New header div -->
+                      <div class="header">
                           <h3>${info.name || unknownStation}</h3>
-                          <div class="icon-group"> <!-- New icon group div -->
+                          <div class="icon-group">
                               ${electricIconHtml}
                               ${pinButtonHtml}
                           </div>
@@ -1744,15 +1743,14 @@
 
 
       let lastKnownLocation = null;
-      
+
       function handleGeoUpdate(position) {
           const newLocation = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude
           };
 
-          let movedSignificantly = false; // 新增旗標
-          // 如果有上一個位置，計算距離
+          let movedSignificantly = false;
           if (lastKnownLocation) {
             const distance = calculateDistance(
               lastKnownLocation.latitude,
@@ -1761,17 +1759,14 @@
               newLocation.longitude
             );
 
-            // 如果移動距離超過 500 公尺
             if (distance * 1000 > 500) {
-              movedSignificantly = true; // 設定旗標
+              movedSignificantly = true;
             }
           }
 
-          // 更新 lastKnownLocation 和 userLocation
           lastKnownLocation = newLocation;
           userLocation = newLocation;
 
-          // 更新藍點標記位置
           if (locationMarker) {
             locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
           }
@@ -1779,24 +1774,18 @@
             pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
           }
 
-          // 在跟隨模式時移動地圖
           if (isFollowingUser && leafletMap) {
             isMapMovingDueToTracking = true;
             leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 });
             setTimeout(() => { isMapMovingDueToTracking = false; }, 500);
           }
 
-          // 根據移動距離決定更新方式
           if (movedSignificantly) {
-              // 如果移動距離超過 500 公尺，觸發完整更新
               const updateButton = document.getElementById('updateCountdown');
               if (updateButton) {
-                // 直接呼叫 countdownTimer.update() 來觸發 searchYouBike
                 countdownTimer.update();
               }
-              // searchYouBike 已經會根據新位置排序並更新列表，所以這裡不需要再呼叫 updateCardDistances 和 updateResultsOrder
           } else {
-              // 如果移動距離未超過 500 公尺，只更新距離顯示並重新排序
               updateCardDistances();
               updateResultsOrder();
           }
@@ -1892,7 +1881,7 @@
                   };
                   locationSet = true;
                   isFollowingUser = true;
-                  startTracking();
+                  startTracking(); // Start watching after successful initial fix
 
               } catch (e) {
                   console.error("Geolocation error:", e);
@@ -1900,17 +1889,25 @@
                   let shouldDisableToggle = false;
                   if (e.code === GeolocationPositionError.PERMISSION_DENIED || e.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
                        shouldDisableToggle = true;
-                       centralLocationToggle.checked = false;
+                       centralLocationToggle.checked = false; // Disable toggle if permission denied or unavailable
                        localStorage.setItem("useLocation", "false");
                   }
 
-                  stopTracking();
-
+                  // Always fall back to default region if getCurrentPosition fails
                   const selectedRegion = document.getElementById('centralRegionSelect').value;
                   const coords = regionCoordinates[selectedRegion];
                   userLocation = { latitude: coords.lat, longitude: coords.lng };
-                  locationSet = true;
-                  isFollowingUser = false;
+                  locationSet = true; // We have a location (default or last known)
+                  isFollowingUser = false; // Not following user location initially after failure
+
+                  // If the toggle is still checked (meaning it wasn't permission denied/unavailable, or user re-enabled it),
+                  // start watching for position updates. watchPosition handles retries.
+                  if (centralLocationToggle.checked) {
+                      startTracking(); // This will initiate watchPosition
+                      isFollowingUser = true; // Start following if tracking is successfully initiated
+                  } else {
+                      stopTracking(); // Ensure tracking is stopped if toggle is off
+                  }
               }
           } else {
               stopTracking();
@@ -2136,11 +2133,11 @@
       const settingsButton = document.getElementById('settingsButton');
       const centralSettingsPanel = document.getElementById('centralSettingsPanel');
       const closeCentralSettings = document.getElementById('closeCentralSettings');
-      const settingsIcon = settingsButton.querySelector('.material-icons'); // Get the icon element
+      const settingsIcon = settingsButton.querySelector('.material-icons');
 
       settingsButton.addEventListener('click', (event) => {
         event.stopPropagation();
-        settingsIcon.classList.remove('rotate-right', 'rotate-left'); // Remove classes from icon
+        settingsIcon.classList.remove('rotate-right', 'rotate-left');
         if (centralSettingsPanel.style.display === 'block') {
             centralSettingsPanel.classList.remove('panel-open');
             centralSettingsPanel.classList.add('panel-close');
@@ -2149,7 +2146,7 @@
               centralSettingsPanel.classList.remove('panel-close');
               centralSettingsPanel.removeEventListener('animationend', handler);
             });
-            settingsIcon.classList.add('rotate-left'); // Add class to icon
+            settingsIcon.classList.add('rotate-left');
             if (history.state && history.state.panelOpen) {
               history.back();
             }
@@ -2158,7 +2155,7 @@
             centralSettingsPanel.classList.remove('panel-close');
             centralSettingsPanel.classList.add('panel-open');
             history.pushState({ panelOpen: true }, 'Settings', '#settings');
-            settingsIcon.classList.add('rotate-right'); // Add class to icon
+            settingsIcon.classList.add('rotate-right');
           }
       });
 
@@ -2171,9 +2168,9 @@
           centralSettingsPanel.removeEventListener('animationend', handler);
         });
 
-        settingsIcon.classList.add('rotate-left'); // Add class to icon
+        settingsIcon.classList.add('rotate-left');
         setTimeout(() => {
-          settingsIcon.classList.remove('rotate-left'); // Remove class from icon
+          settingsIcon.classList.remove('rotate-left');
         }, 1000);
 
         if (history.state && history.state.panelOpen) {
@@ -2198,9 +2195,9 @@
 		if (centralSettingsPanel.style.display === 'block') {
 			centralSettingsPanel.classList.remove('panel-open');
 			centralSettingsPanel.classList.add('panel-close');
-			settingsIcon.classList.add('rotate-left'); // Add class to icon
+			settingsIcon.classList.add('rotate-left');
 			setTimeout(() => {
-				settingsIcon.classList.remove('rotate-left'); // Remove class from icon
+				settingsIcon.classList.remove('rotate-left');
 			}, 1000);
 			centralSettingsPanel.addEventListener('animationend', function handler() {
 				centralSettingsPanel.style.display = 'none';
@@ -2311,18 +2308,15 @@
             }, 500);
             this.remaining = 60;
             this.updateDisplay();
-            // updateVehicleData(); // This is now called within searchYouBike
         },
-        update: async function() { // Make update async
+        update: async function() {
             const icon = this.updateButton.querySelector('.material-icons');
             icon.classList.add('spin-update');
             setTimeout(() => {
                 icon.classList.remove('spin-update');
             }, 500);
-            // Call searchYouBike to re-fetch data, sort by distance, and update display/markers
-            // Pass false for showLoadingIndicator and shouldMoveMap
             await searchYouBike(false, false);
-            this.reset(); // Reset timer after searchYouBike completes
+            this.reset();
         }
     };
 
@@ -2369,7 +2363,6 @@
                 attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(leafletMap);
 
-            // 檢查是否為深色模式並立即應用圖層效果
             const isDarkMode = document.body.classList.contains('dark-mode');
             if (isDarkMode && tileLayer._container) {
                 tileLayer._container.style.filter = 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)';
@@ -2600,8 +2593,9 @@
 
               showNotification(currentLang === "en" ? "Location tracking enabled." : "已開啟位置追蹤功能。");
 
-              startTracking();
+              startTracking(); // Always start tracking if toggle is on
 
+              // Attempt to get immediate location for map centering, but watchPosition is the main mechanism
               if (leafletMap && userLocation) {
                    isMapMovingDueToTracking = true;
                    leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
@@ -2631,6 +2625,8 @@
                        (error) => {
                            console.error("Geolocation error on locate button click (initial fix):", error);
                            showNotification(currentLang === "en" ? "Failed to get immediate location." : "無法立即取得目前位置。");
+                           // If getCurrentPosition fails here, watchPosition is already running from startTracking()
+                           // Fallback to default region if userLocation is still null (shouldn't happen if startTracking was called, but as a safeguard)
                            if (!userLocation) {
                                const selectedRegion = document.getElementById('centralRegionSelect').value;
                                const coords = regionCoordinates[selectedRegion];
@@ -2655,7 +2651,6 @@
           }
           updateLocateButtonTitle();
       }
-
       function updateLocateButtonTitle() {
           const locateButton = document.getElementById('locateButton');
           if (locateButton) {
@@ -2685,7 +2680,6 @@
         const isDarkMode = localStorage.getItem("dark_mode") === "true";
         if (isDarkMode) {
           document.body.classList.add('dark-mode');
-          // 確保地圖圖層在初始化時也套用深色模式
           if (tileLayer && tileLayer._container) {
             tileLayer._container.style.filter = 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)';
             const attribution = document.querySelector('.leaflet-control-attribution');
