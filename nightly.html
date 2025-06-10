@@ -1765,6 +1765,7 @@
               userLocation = newLocation;
               lastKnownLocation = newLocation;
               
+              // 更新藍點標記位置
               if (locationMarker) {
                 locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
               }
@@ -1779,13 +1780,13 @@
                 setTimeout(() => { isMapMovingDueToTracking = false; }, 500);
               }
 
-              // 執行完整的資料更新
+              // 執行完整搜尋更新，不顯示載入指示器
               searchYouBike(false, false);
-              return; // 提前結束函數
+              return;
             }
           }
 
-          // 如果移動距離小於 500 公尺，只做簡單更新
+          // 如果移動距離不到 500 公尺，只更新位置和排序
           lastKnownLocation = newLocation;
           userLocation = newLocation;
 
@@ -1802,7 +1803,6 @@
             setTimeout(() => { isMapMovingDueToTracking = false; }, 500);
           }
 
-          // 只做簡單的距離更新和排序
           updateCardDistances();
           updateResultsOrder();
       }
@@ -1949,7 +1949,7 @@
               } else {
                   locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
                   if (pulsingMarker) pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
-              }
+                           }
 
               isMapMovingDueToTracking = true;
               leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
