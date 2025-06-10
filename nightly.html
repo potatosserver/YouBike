@@ -1172,6 +1172,8 @@
       let isTrackingActive = false;
       let watchId = null;
       let isMapMovingDueToTracking = false;
+      let hasObtainedRealLocation = false; // 新增旗標
+
       const regionCoordinates = {
         taipei: { lat: 25.047924, lng: 121.517081 },
         newTaipei: { lat: 25.0215339197085, lng: 121.4568090197085 },
@@ -1456,7 +1458,7 @@
       async function searchYouBike(showLoadingIndicator = true, shouldMoveMap = false) {
         if (showLoadingIndicator) showLoading();
         const keyword = keywordInput.value.trim().toLowerCase();
-        
+
         try {
           if (!youbikeDataCache || youbikeDataCache.length === 0) {
              if (navigator.onLine) {
@@ -1750,6 +1752,31 @@
             longitude: position.coords.longitude
           };
 
+          // 檢查這是否是第一次成功取得真實定位
+          if (!hasObtainedRealLocation) {
+              hasObtainedRealLocation = true; // 設定旗標為 true
+              userLocation = newLocation; // 更新使用者位置
+              console.log("First real location obtained via watchPosition. Performing full search.");
+
+              // 更新地圖上的使用者位置標記
+              if (locationMarker) {
+                  locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+              }
+              if (pulsingMarker) {
+                  pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+              }
+
+              // 執行一次完整的站點搜尋，並將地圖中心移到新位置
+              searchYouBike(true, true);
+
+              isFollowingUser = true; // 開始跟隨使用者位置
+              updateLocateButtonTitle(); // 更新定位按鈕狀態
+
+              // 第一次取得真實定位後，後續的更新邏輯交給下面的部分處理
+              return;
+          }
+
+          // 以下是第一次取得真實定位後的後續更新邏輯
           let movedSignificantly = false;
           if (lastKnownLocation) {
             const distance = calculateDistance(
@@ -1795,6 +1822,12 @@
           isFollowingUser = false;
           updateLocateButtonTitle();
 
+          // 如果 watchPosition 失敗，且之前沒有成功取得過真實定位，則保持 hasObtainedRealLocation 為 false
+          if (!hasObtainedRealLocation) {
+             // 保持 hasObtainedRealLocation 為 false
+          }
+
+
           if (isTrackingActive || error.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
               let errorMessage = currentLang === "en"
                 ? "Unable to update location, continuing with last known position"
@@ -1804,6 +1837,10 @@
                     ? "Location services unavailable, stopping tracking."
                     : "定位服務無法使用，已停止追蹤。";
                   stopTracking();
+                  // 如果定位服務無法使用，且之前沒有成功取得過真實定位，則將 hasObtainedRealLocation 設為 false
+                  if (!hasObtainedRealLocation) {
+                      hasObtainedRealLocation = false;
+                  }
               } else if (error.code === GeolocationPositionError.TIMEOUT) {
                    errorMessage = currentLang === "en"
                     ? "Location update timed out."
@@ -1849,6 +1886,8 @@
                  centralLocationToggle.checked = false;
                  localStorage.setItem("useLocation", "false");
               }
+              // 如果瀏覽器不支援定位，則將 hasObtainedRealLocation 設為 false
+              hasObtainedRealLocation = false;
           }
       }
 
@@ -1881,6 +1920,7 @@
                   };
                   locationSet = true;
                   isFollowingUser = true;
+                  hasObtainedRealLocation = true; // 第一次成功取得真實定位
                   startTracking(); // Start watching after successful initial fix
 
               } catch (e) {
@@ -1896,15 +1936,16 @@
                   // Always fall back to default region if getCurrentPosition fails
                   const selectedRegion = document.getElementById('centralRegionSelect').value;
                   const coords = regionCoordinates[selectedRegion];
-                  userLocation = { latitude: coords.lat, longitude: coords.lng };
+                  userLocation = { latitude: coords.lat, longitude: coords.lng }; // Fallback location
                   locationSet = true; // We have a location (default or last known)
                   isFollowingUser = false; // Not following user location initially after failure
+                  hasObtainedRealLocation = false; // 初始取得失敗，旗標設為 false
 
                   // If the toggle is still checked (meaning it wasn't permission denied/unavailable, or user re-enabled it),
                   // start watching for position updates. watchPosition handles retries.
                   if (centralLocationToggle.checked) {
                       startTracking(); // This will initiate watchPosition
-                      isFollowingUser = true; // Start following if tracking is successfully initiated
+                      // isFollowingUser remains false until watchPosition gets a fix
                   } else {
                       stopTracking(); // Ensure tracking is stopped if toggle is off
                   }
@@ -1913,9 +1954,11 @@
               stopTracking();
               const selectedRegion = document.getElementById('centralRegionSelect').value;
               const coords = regionCoordinates[selectedRegion];
-              userLocation = { latitude: coords.lat, longitude: coords.lng };
+              userLocation = { latitude: coords.lat, longitude: coords.lng }; // Default location
               locationSet = true;
               isFollowingUser = false;
+              hasObtainedRealLocation = false; // 位置服務關閉，旗標設為 false
+         
           }
 
           if (locationSet && leafletMap) {
@@ -1949,12 +1992,12 @@
           }
 
           if (locationSet) {
-              await searchYouBike(true, false);
+              await searchYouBike(true, false); // Perform the initial search based on the determined location (real or default)
 
 
               updateResultsOrder();
               showMainContent();
-              countdownTimer.update();
+              // countdownTimer.update(); // REMOVED: Moved to window.load
               updateLocateButtonTitle();
           } else {
               console.error("Could not determine any location.");
@@ -2255,7 +2298,12 @@
               await initMap([]);
           }
 
-          await getLocation();
+          await getLocation(); // This will determine location and call searchYouBike(true, false)
+
+          // Start the countdown timer and initial vehicle data update AFTER the first search is done
+          countdownTimer.update();
+          document.getElementById('updateCountdown').style.display = navigator.onLine ? "block" : "none";
+
 
         } catch (error) {
           console.error('Initialization error:', error);
@@ -2315,7 +2363,8 @@
             setTimeout(() => {
                 icon.classList.remove('spin-update');
             }, 500);
-            await searchYouBike(false, false);
+            // This update only fetches vehicle data and updates cards, not a full station search
+            await updateVehicleData(); // Changed from searchYouBike(false, false) to updateVehicleData()
             this.reset();
         }
     };
@@ -2568,6 +2617,7 @@
               showNotification(currentLang === "en" ? "Location service is off (using default region)." : "位置服務已關閉 (使用預設地區)。");
               isFollowingUser = false;
               stopTracking();
+              hasObtainedRealLocation = false; // 關閉定位服務時，重置旗標
 
               const selectedRegion = document.getElementById('centralRegionSelect').value;
               const coords = regionCoordinates[selectedRegion];
@@ -2596,46 +2646,28 @@
               startTracking(); // Always start tracking if toggle is on
 
               // Attempt to get immediate location for map centering, but watchPosition is the main mechanism
-              if (leafletMap && userLocation) {
+              if (leafletMap && userLocation && hasObtainedRealLocation) { // 只有在已經有真實定位時才立即移動地圖
                    isMapMovingDueToTracking = true;
                    leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
                    setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
                } else if (leafletMap) {
+                   // 如果還沒有真實定位，嘗試立即取得一次，成功後 handleGeoUpdate 會處理搜尋和地圖移動
                    navigator.geolocation.getCurrentPosition(
                        (position) => {
-                           userLocation = {
-                               latitude: position.coords.latitude,
-                               longitude: position.coords.longitude
-                           };
-                           if (leafletMap) {
-                               isMapMovingDueToTracking = true;
-                               leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
-                               setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
-                           }
-                           if (locationMarker) {
-                               locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
-                           }
-                           if (pulsingMarker) {
-                               pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
-                           }
-                           updateCardDistances();
-                           updateVehicleData();
-                           updateResultsOrder();
+                           // handleGeoUpdate 會被呼叫並處理第一次成功定位的邏輯
                        },
                        (error) => {
                            console.error("Geolocation error on locate button click (initial fix):", error);
                            showNotification(currentLang === "en" ? "Failed to get immediate location." : "無法立即取得目前位置。");
-                           // If getCurrentPosition fails here, watchPosition is already running from startTracking()
-                           // Fallback to default region if userLocation is still null (shouldn't happen if startTracking was called, but as a safeguard)
-                           if (!userLocation) {
+                           // 如果 getCurrentPosition 失敗，watchPosition 仍在運行，等待後續成功
+                           // 如果 userLocation 仍然是預設位置，可以選擇移動到預設位置
+                           if (!hasObtainedRealLocation && leafletMap) {
                                const selectedRegion = document.getElementById('centralRegionSelect').value;
                                const coords = regionCoordinates[selectedRegion];
                                userLocation = { latitude: coords.lat, longitude: coords.lng };
-                               if (leafletMap) {
-                                   isMapMovingDueToTracking = true;
-                                   leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
-                                   setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
-                               }
+                               isMapMovingDueToTracking = true;
+                               leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
+                               setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
                                if (locationMarker) {
                                    locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
                                    if (pulsingMarker) pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
@@ -2755,6 +2787,7 @@
           localStorage.setItem("useLocation", isChecked);
 
           window.lastVehicleDataUpdate = 0;
+          hasObtainedRealLocation = false; // 位置服務狀態改變時，重置旗標
 
           await getLocation();
         });
@@ -2771,6 +2804,7 @@
           const centralLocationToggle = document.getElementById('centralLocationToggle');
           if (!centralLocationToggle.checked) {
               window.lastVehicleDataUpdate = 0;
+              hasObtainedRealLocation = false; // 地區改變時，如果位置服務關閉，重置旗標
               await getLocation();
           }
         });
@@ -2788,6 +2822,7 @@
                     if (centralRegionSelect) {
                       centralRegionSelect.value = nearestRegion;
                     }
+                    // 這裡不設定 hasObtainedRealLocation = true，因為 getLocation 會處理
 
                 },
                 error => {
@@ -2800,6 +2835,7 @@
                   if (centralRegionSelect) {
                     centralRegionSelect.value = savedRegion;
                   }
+                  // 這裡不設定 hasObtainedRealLocation = false，因為 getLocation 會處理
                 }
             );
         }
