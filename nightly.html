@@ -1760,12 +1760,11 @@
               newLocation.longitude
             );
 
-            // 如果移動距離超過 500 公尺
+            // 如果移動距離超過 500 公尺，執行完整更新
             if (distance * 1000 > 500) {
-              // 1. 更新使用者位置
               userLocation = newLocation;
+              lastKnownLocation = newLocation;
               
-              // 2. 更新藍點標記位置
               if (locationMarker) {
                 locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
               }
@@ -1773,22 +1772,20 @@
                 pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
               }
               
-              // 3. 在跟隨模式時移動地圖
+              // 在跟隨模式時移動地圖
               if (isFollowingUser && leafletMap) {
                 isMapMovingDueToTracking = true;
                 leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 });
                 setTimeout(() => { isMapMovingDueToTracking = false; }, 500);
               }
 
-              // 4. 觸發更新按鈕點擊來重新搜尋站點
-              const updateButton = document.getElementById('updateCountdown');
-              if (updateButton) {
-                updateButton.click();
-              }
+              // 執行完整的資料更新
+              searchYouBike(false, false);
+              return; // 提前結束函數
             }
           }
 
-          // 更新 lastKnownLocation 和其他一般更新
+          // 如果移動距離小於 500 公尺，只做簡單更新
           lastKnownLocation = newLocation;
           userLocation = newLocation;
 
@@ -1805,6 +1802,7 @@
             setTimeout(() => { isMapMovingDueToTracking = false; }, 500);
           }
 
+          // 只做簡單的距離更新和排序
           updateCardDistances();
           updateResultsOrder();
       }
