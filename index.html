@@ -51,6 +51,11 @@
         transition: var(--color-transition), transform 0.2s ease, box-shadow 0.2s ease;
       }
 
+      /* Add this rule to remove tap highlight on interactive elements */
+      .station, #settingsButton, #closeCentralSettings {
+          -webkit-tap-highlight-color: transparent;
+      }
+
       #locationNotification {
         position: fixed;
         top: 20px;
@@ -745,7 +750,6 @@
           border-radius: 50%;
           display: flex;
           align-items: center;
-          justify: center;
           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
           text-decoration: none;
           transition: background-color 0.3s ease;
@@ -2086,8 +2090,6 @@
               showMainContent();
 
 
-         
-
           } else {
               showNotification(currentLang === "en" ? "Could not determine location. Please check settings." : "無法確定位置，請檢查設定。");
               if (!mainContentShown) {
@@ -2095,10 +2097,6 @@
               }
           }
       }
-
-
-
-
 
       function updateCardDistances() {
                const cards = document.querySelectorAll('.station');
