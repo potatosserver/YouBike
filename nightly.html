@@ -1172,7 +1172,7 @@
       let isTrackingActive = false;
       let watchId = null;
       let isMapMovingDueToTracking = false;
-      let hasObtainedRealLocation = false; // 新增旗標
+      let hasObtainedRealLocation = false;
 
       const regionCoordinates = {
         taipei: { lat: 25.047924, lng: 121.517081 },
@@ -1233,7 +1233,6 @@
         try {
           localStorage.setItem('pinnedStations', JSON.stringify([...pinnedStations]));
         } catch (e) {
-          console.error('Failed to save pinned stations:', e);
         }
 
         const pinButton = document.querySelector(`.pin-button[data-id="${id}"]`);
@@ -1320,7 +1319,6 @@
         return new Promise((resolve, reject) => {
           if (navigator.storage && navigator.storage.persist) {
             navigator.storage.persist().then(isPersisted => {
-              console.log(`持久性儲存權限: ${isPersisted ? '已授權' : '未授權'}`);
             });
           }
 
@@ -1330,7 +1328,6 @@
             const db = event.target.result;
 
             db.onerror = function(event) {
-              console.error('資料庫更新失敗:', event.target.error);
             };
 
             if (!db.objectStoreNames.contains('youbikeData')) {
@@ -1353,7 +1350,6 @@
             const db = event.target.result;
 
             db.onerror = function(event) {
-              console.error('資料庫操作錯誤:', event.target.error);
             };
 
             setInterval(() => {
@@ -1363,7 +1359,6 @@
           };
 
           request.onerror = function(event) {
-            console.error('無法開啟資料庫:', event.target.error);
             reject(event.target.error);
           };
         });
@@ -1383,10 +1378,8 @@
             localStorage.setItem('regionData_backup', JSON.stringify(regionData));
             localStorage.setItem('backup_timestamp', Date.now().toString());
           } catch (e) {
-            console.warn('localStorage 備份失敗，可能是空間不足:', e);
           }
         } catch (error) {
-          console.error('資料備份失敗:', error);
         }
       }
 
@@ -1477,7 +1470,6 @@
                       : [];
                     await saveYoubikeDataToDB(youbikeDataCache);
                 } catch (error) {
-                    console.warn('Failed to fetch online data in searchYouBike, trying IndexedDB:', error);
                     youbikeDataCache = await getYoubikeDataFromDB();
                 }
              } else {
@@ -1543,7 +1535,6 @@
               try {
                   vehicleData = await queryVehicleData(stationIdsToQuery);
               } catch (e) {
-                  console.error("Failed to fetch vehicle data:", e);
                   showNotification(currentLang === "en" ? "Failed to get real-time data." : "無法取得即時資料。");
               }
           }
@@ -1639,7 +1630,6 @@
           if (showLoadingIndicator) {
           }
         } catch (error) {
-          console.error("Fetch error:", error);
           resultsDiv.innerHTML = `發生錯誤: ${error.message}`;
         } finally {
           if (showLoadingIndicator) hideLoading();
@@ -1668,7 +1658,6 @@
             });
             const result = await response.json();
             if (result.retCode === 1 && result.retVal && result.retVal.data) {
-              console.log("queryVehicleData: API response data:", result.retVal.data);
 
 
               const dataArray = result.retVal.data;
@@ -1681,10 +1670,8 @@
                 };
               });
             } else {
-              console.error("API 請求失敗或無資料:", result.retMsg, "Response:", result);
             }
           } catch (e) {
-            console.error(e);
           }
         }
         return allVehicleData;
@@ -1752,13 +1739,12 @@
             longitude: position.coords.longitude
           };
 
-          // 檢查這是否是第一次成功取得真實定位
-          if (!hasObtainedRealLocation) {
-              hasObtainedRealLocation = true; // 設定旗標為 true
-              userLocation = newLocation; // 更新使用者位置
-              console.log("First real location obtained via watchPosition. Centering map on user and performing search.");
 
-              // 更新地圖上的使用者位置標記
+          if (!hasObtainedRealLocation) {
+              hasObtainedRealLocation = true;
+              userLocation = newLocation;
+
+
               if (locationMarker) {
                   locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
               }
@@ -1766,24 +1752,24 @@
                   pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
               }
 
-              // 將地圖中心移到使用者位置
+
               if (leafletMap) {
                   isMapMovingDueToTracking = true;
                   leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
                   setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
               }
 
-              // 執行一次完整的站點搜尋 (不需要讓 searchYouBike 移動地圖)
+
               searchYouBike(true, false);
 
-              isFollowingUser = true; // 開始跟隨使用者位置
-              updateLocateButtonTitle(); // 更新定位按鈕狀態
+              isFollowingUser = true;
+              updateLocateButtonTitle();
 
-              // 第一次取得真實定位後，後續的更新邏輯交給下面的部分處理
+
               return;
           }
 
-          // 以下是第一次取得真實定位後的後續更新邏輯
+
           let movedSignificantly = false;
           if (lastKnownLocation) {
             const distance = calculateDistance(
@@ -1825,13 +1811,11 @@
           }
       }
       function handleGeoUpdateError(error) {
-          console.error("Geolocation update error:", error);
           isFollowingUser = false;
           updateLocateButtonTitle();
 
-          // 如果 watchPosition 失敗，且之前沒有成功取得過真實定位，則保持 hasObtainedRealLocation 為 false
+
           if (!hasObtainedRealLocation) {
-             // 保持 hasObtainedRealLocation 為 false
           }
 
 
@@ -1844,7 +1828,7 @@
                     ? "Location services unavailable, stopping tracking."
                     : "定位服務無法使用，已停止追蹤。";
                   stopTracking();
-                  // 如果定位服務無法使用，且之前沒有成功取得過真實定位，則將 hasObtainedRealLocation 設為 false
+
                   if (!hasObtainedRealLocation) {
                       hasObtainedRealLocation = false;
                   }
@@ -1893,7 +1877,7 @@
                  centralLocationToggle.checked = false;
                  localStorage.setItem("useLocation", "false");
               }
-              // 如果瀏覽器不支援定位，則將 hasObtainedRealLocation 設為 false
+
               hasObtainedRealLocation = false;
           }
       }
@@ -1927,34 +1911,32 @@
                   };
                   locationSet = true;
                   isFollowingUser = true;
-                  hasObtainedRealLocation = true; // 第一次成功取得真實定位
-                  startTracking(); // Start watching after successful initial fix
+                  hasObtainedRealLocation = true;
+                  startTracking();
 
               } catch (e) {
-                  console.error("Geolocation error:", e);
                   locationDenied = true;
                   let shouldDisableToggle = false;
                   if (e.code === GeolocationPositionError.PERMISSION_DENIED || e.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
                        shouldDisableToggle = true;
-                       centralLocationToggle.checked = false; // Disable toggle if permission denied or unavailable
+                       centralLocationToggle.checked = false;
                        localStorage.setItem("useLocation", "false");
                   }
 
-                  // Always fall back to default region if getCurrentPosition fails
+
                   const selectedRegion = document.getElementById('centralRegionSelect').value;
                   const coords = regionCoordinates[selectedRegion];
-                  userLocation = { latitude: coords.lat, longitude: coords.lng }; // Fallback location
-                  locationSet = true; // We have a location (default or last known)
-                  isFollowingUser = false; // Not following user location initially after failure
-                  hasObtainedRealLocation = false; // 初始取得失敗，旗標設為 false
+                  userLocation = { latitude: coords.lat, longitude: coords.lng };
+                  locationSet = true;
+                  isFollowingUser = false;
+                  hasObtainedRealLocation = false;
 
-                  // If the toggle is still checked (meaning it wasn't permission denied/unavailable, or user re-enabled it),
-                  // start watching for position updates. watchPosition handles retries.
+
                   if (centralLocationToggle.checked) {
-                      startTracking(); // This will initiate watchPosition
-                      // isFollowingUser remains false until watchPosition gets a fix
+                      startTracking();
+
                   } else {
-                      stopTracking(); // Ensure tracking is stopped if toggle is off
+                      stopTracking();
                   }
               }
          
@@ -1962,10 +1944,10 @@
               stopTracking();
               const selectedRegion = document.getElementById('centralRegionSelect').value;
               const coords = regionCoordinates[selectedRegion];
-              userLocation = { latitude: coords.lat, longitude: coords.lng }; // Default location
+              userLocation = { latitude: coords.lat, longitude: coords.lng };
               locationSet = true;
               isFollowingUser = false;
-              hasObtainedRealLocation = false; // 位置服務關閉，旗標設為 false
+              hasObtainedRealLocation = false;
          
           }
 
@@ -2000,15 +1982,14 @@
           }
 
           if (locationSet) {
-              await searchYouBike(true, false); // Perform the initial search based on the determined location (real or default)
+              await searchYouBike(true, false);
 
 
               updateResultsOrder();
               showMainContent();
-              // countdownTimer.update(); // REMOVED: Moved to window.load
-              updateLocateButtonTitle();
+
+
           } else {
-              console.error("Could not determine any location.");
               showNotification(currentLang === "en" ? "Could not determine location. Please check settings." : "無法確定位置，請檢查設定。");
               if (!mainContentShown) {
                    showMainContent();
@@ -2098,7 +2079,6 @@
 			});
 		})
 		.catch(error => {
-			console.error("Vehicle data update failed:", error);
 		 showNotification(currentLang === "en" ? "Failed to update real-time data." : "即時資料更新失敗。");
 		});
       }
@@ -2285,7 +2265,6 @@
                       : [];
                     await saveYoubikeDataToDB(youbikeDataCache);
                 } catch (error) {
-                    console.warn('Failed to fetch online data on load, trying IndexedDB:', error);
                     youbikeDataCache = await getYoubikeDataFromDB();
                 }
              } else {
@@ -2306,15 +2285,14 @@
               await initMap([]);
           }
 
-          await getLocation(); // This will determine location and call searchYouBike(true, false)
+          await getLocation();
 
-          // Start the countdown timer and initial vehicle data update AFTER the first search is done
-          countdownTimer.update();
-          document.getElementById('updateCountdown').style.display = navigator.onLine ? "block" : "none";
+
+          updateResultsOrder();
+          showMainContent();
 
 
         } catch (error) {
-          console.error('Initialization error:', error);
           showNotification(currentLang === "en"
             ? "Error initializing app. Some features may be limited."
             : "初始化應用程式時發生錯誤，部分功能可能受限。");
@@ -2371,8 +2349,8 @@
             setTimeout(() => {
                 icon.classList.remove('spin-update');
             }, 500);
-            // This update only fetches vehicle data and updates cards, not a full station search
-            await updateVehicleData(); // Changed from searchYouBike(false, false) to updateVehicleData()
+
+            await updateVehicleData();
             this.reset();
         }
     };
@@ -2429,7 +2407,6 @@
                 }
             }
         } catch(err) {
-            console.error("Tile layer failed:", err);
             showNotification(currentLang === "en"
                 ? "Offline mode: Map tiles unavailable."
                 : "離線模式：地圖圖層無法載入。");
@@ -2508,7 +2485,6 @@
                   isFollowingUser = false;
                   updateLocateButtonTitle();
                 } catch (error) {
-                  console.error('取得站點資訊失敗:', error);
                   showNotification(currentLang === "en" ? "Failed to get station information." : "無法取得站點資訊。");
                 }
               });
@@ -2522,14 +2498,12 @@
           }
 
         } catch (error) {
-          console.error('初始化地圖失敗:', error);
           showNotification(currentLang === "en" ? "Failed to initialize map." : "初始化地圖失敗。");
         }
       }
 
       function updateMapMarkers() {
         if (!markerClusterGroup || !leafletMap) {
-          console.log('Map features are limited in offline mode or map not initialized');
           return;
         }
 
@@ -2561,7 +2535,6 @@
             }
           });
         } catch (error) {
-          console.error('Error updating map markers:', error);
         }
       }
       
@@ -2625,7 +2598,7 @@
               showNotification(currentLang === "en" ? "Location service is off (using default region)." : "位置服務已關閉 (使用預設地區)。");
               isFollowingUser = false;
               stopTracking();
-              hasObtainedRealLocation = false; // 關閉定位服務時，重置旗標
+              hasObtainedRealLocation = false;
 
               const selectedRegion = document.getElementById('centralRegionSelect').value;
               const coords = regionCoordinates[selectedRegion];
@@ -2651,24 +2624,22 @@
 
               showNotification(currentLang === "en" ? "Location tracking enabled." : "已開啟位置追蹤功能。");
 
-              startTracking(); // Always start tracking if toggle is on
+              startTracking();
 
-              // Attempt to get immediate location for map centering, but watchPosition is the main mechanism
-              if (leafletMap && userLocation && hasObtainedRealLocation) { // 只有在已經有真實定位時才立即移動地圖
+
+              if (leafletMap && userLocation && hasObtainedRealLocation) {
                    isMapMovingDueToTracking = true;
                    leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
                    setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
                } else if (leafletMap) {
-                   // 如果還沒有真實定位，嘗試立即取得一次，成功後 handleGeoUpdate 會處理第一次成功定位的邏輯
+
                    navigator.geolocation.getCurrentPosition(
                        (position) => {
-                           // handleGeoUpdate 會被呼叫並處理第一次成功定位的邏輯
+
                        },
                        (error) => {
-                           console.error("Geolocation error on locate button click (initial fix):", error);
                            showNotification(currentLang === "en" ? "Failed to get immediate location." : "無法立即取得目前位置。");
-                           // 如果 getCurrentPosition 失敗，watchPosition 仍在運行，等待後續成功
-                           // 如果 userLocation 仍然是預設位置，可以選擇移動到預設位置
+
                            if (!hasObtainedRealLocation && leafletMap) {
                                const selectedRegion = document.getElementById('centralRegionSelect').value;
                                const coords = regionCoordinates[selectedRegion];
@@ -2795,7 +2766,7 @@
           localStorage.setItem("useLocation", isChecked);
 
           window.lastVehicleDataUpdate = 0;
-          hasObtainedRealLocation = false; // 位置服務狀態改變時，重置旗標
+          hasObtainedRealLocation = false;
 
           await getLocation();
         });
@@ -2812,7 +2783,7 @@
           const centralLocationToggle = document.getElementById('centralLocationToggle');
           if (!centralLocationToggle.checked) {
               window.lastVehicleDataUpdate = 0;
-              hasObtainedRealLocation = false; // 地區改變時，如果位置服務關閉，重置旗標
+              hasObtainedRealLocation = false;
               await getLocation();
           }
         });
@@ -2830,11 +2801,10 @@
                     if (centralRegionSelect) {
                       centralRegionSelect.value = nearestRegion;
                     }
-                    // 這裡不設定 hasObtainedRealLocation = true，因為 getLocation 會處理
+
 
                 },
                 error => {
-                  console.warn('Geolocation failed to find nearest region:', error);
                   const savedRegion = localStorage.getItem('selectedRegion') || 'kaohsiung';
                   defaultRegion = savedRegion;
                   defaultLatitude = regionCoordinates[savedRegion].lat;
@@ -2843,7 +2813,7 @@
                   if (centralRegionSelect) {
                     centralRegionSelect.value = savedRegion;
                   }
-                  // 這裡不設定 hasObtainedRealLocation = false，因為 getLocation 會處理
+
                 }
             );
         }
