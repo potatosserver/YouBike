@@ -1456,6 +1456,7 @@
       async function searchYouBike(showLoadingIndicator = true, shouldMoveMap = false) {
         if (showLoadingIndicator) showLoading();
         const keyword = keywordInput.value.trim().toLowerCase();
+        
         try {
           if (!youbikeDataCache || youbikeDataCache.length === 0) {
              if (navigator.onLine) {
@@ -1513,7 +1514,9 @@
             return distA - distB;
           });
 
-          let limit = keyword ? 50 : 20;
+          // 修改為只顯示最近的 10 個站點
+          let limit = keyword ? 50 : 10; // 如果有關鍵字搜尋則保持 50，否則顯示最近 10 個
+          
           let usedStations;
 
           const pinnedFromResults = youbikeResults.filter(station => pinnedStations.has(String(station.station_no)));
@@ -1740,47 +1743,49 @@
       }
 
 
-      let lastKnownPosition = null; // 新增此行在全局變數區域
-
+      let lastKnownLocation = null;  // 新增變數追蹤上一個位置
+      
       function handleGeoUpdate(position) {
-          const newPosition = {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude
+          const newLocation = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
           };
 
-          // 檢查與上次位置的距離
-          if (lastKnownPosition) {
-              const distance = calculateDistance(
-                  lastKnownPosition.latitude,
-                  lastKnownPosition.longitude,
-                  newPosition.latitude,
-                  newPosition.longitude
-              ) * 1000; // 轉換為公尺
+          // 如果有上一個位置，計算距離
+          if (lastKnownLocation) {
+            const distance = calculateDistance(
+              lastKnownLocation.latitude,
+              lastKnownLocation.longitude,
+              newLocation.latitude,
+              newLocation.longitude
+            );
 
-              if (distance > 500) {
-                  // 模擬點擊更新按鈕
-                  const updateButton = document.getElementById('updateCountdown');
-                  if (updateButton) {
-                      updateButton.click();
-                  }
+            // 如果移動距離超過 500 公尺
+            if (distance * 1000 > 500) {
+              // 模擬點擊更新按鈕
+              const updateButton = document.getElementById('updateCountdown');
+              if (updateButton) {
+                updateButton.click();
               }
+            }
           }
 
-          // 更新最後已知位置
-          lastKnownPosition = newPosition;
-          userLocation = newPosition;
+          // 更新 lastKnownLocation
+          lastKnownLocation = newLocation;
+          
+          userLocation = newLocation;
 
           if (locationMarker) {
-              locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+            locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
           }
           if (pulsingMarker) {
-              pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+            pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
           }
 
           if (isFollowingUser && leafletMap) {
-              isMapMovingDueToTracking = true;
-              leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 });
-              setTimeout(() => { isMapMovingDueToTracking = false; }, 500);
+            isMapMovingDueToTracking = true;
+            leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 });
+            setTimeout(() => { isMapMovingDueToTracking = false; }, 500);
           }
 
           updateCardDistances();
@@ -1953,6 +1958,9 @@
               }
           }
       }
+
+
+     
 
 
       function updateCardDistances() {
