@@ -1756,7 +1756,7 @@
           if (!hasObtainedRealLocation) {
               hasObtainedRealLocation = true; // 設定旗標為 true
               userLocation = newLocation; // 更新使用者位置
-              console.log("First real location obtained via watchPosition. Performing full search.");
+              console.log("First real location obtained via watchPosition. Centering map on user and performing search.");
 
               // 更新地圖上的使用者位置標記
               if (locationMarker) {
@@ -1766,8 +1766,15 @@
                   pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
               }
 
-              // 執行一次完整的站點搜尋，並將地圖中心移到新位置
-              searchYouBike(true, true);
+              // 將地圖中心移到使用者位置
+              if (leafletMap) {
+                  isMapMovingDueToTracking = true;
+                  leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
+                  setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
+              }
+
+              // 執行一次完整的站點搜尋 (不需要讓 searchYouBike 移動地圖)
+              searchYouBike(true, false);
 
               isFollowingUser = true; // 開始跟隨使用者位置
               updateLocateButtonTitle(); // 更新定位按鈕狀態
@@ -1950,6 +1957,7 @@
                       stopTracking(); // Ensure tracking is stopped if toggle is off
                   }
               }
+         
           } else {
               stopTracking();
               const selectedRegion = document.getElementById('centralRegionSelect').value;
@@ -2091,7 +2099,7 @@
 		})
 		.catch(error => {
 			console.error("Vehicle data update failed:", error);
-			showNotification(currentLang === "en" ? "Failed to update real-time data." : "即時資料更新失敗。");
+		 showNotification(currentLang === "en" ? "Failed to update real-time data." : "即時資料更新失敗。");
 		});
       }
 
@@ -2651,7 +2659,7 @@
                    leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
                    setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
                } else if (leafletMap) {
-                   // 如果還沒有真實定位，嘗試立即取得一次，成功後 handleGeoUpdate 會處理搜尋和地圖移動
+                   // 如果還沒有真實定位，嘗試立即取得一次，成功後 handleGeoUpdate 會處理第一次成功定位的邏輯
                    navigator.geolocation.getCurrentPosition(
                        (position) => {
                            // handleGeoUpdate 會被呼叫並處理第一次成功定位的邏輯
