@@ -1074,10 +1074,10 @@
       }
 
       #routeModal h3 {
-          margin-top: 0; /* Adjusted margin */
-          color: #007BFF;
+          margin-top: 40px; /* 調整標題上方間距 */
           margin-bottom: 15px;
-          padding-right: 30px;
+          padding-right: 30px; /* Ensure space for close button */
+          color: #007BFF;
       }
 
       body.dark-mode #routeModal h3 {
@@ -1085,16 +1085,21 @@
       }
 
       #routeModal .bike-item { /* Added style for bike list items */
-          border-bottom: 1px solid #eee;
-          padding: 8px 0;
+          padding: 16px !important;
+          margin-bottom: 12px !important;
+          background-color: #fff !important;
+          border-radius: 8px !important;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
       }
-
-      body.dark-mode #routeModal .bike-item {
-          border-bottom-color: #555;
-      }
-
-      #routeModal .bike-item:last-child {
-          border-bottom: none;
+      #routeModal .bike-item p {
+          margin: 0 !important;
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
       }
 
       #closeRouteModal {
@@ -1128,6 +1133,24 @@
           background-color: rgba(255, 255, 255, 0.1);
       }
 
+      /* 針對電輔車列表卡片在黑暗模式下調整背景與文字顏色 */
+body.dark-mode #routeModal .bike-item {
+    background-color: #555 !important;
+    color: #fff !important;
+}
+body.dark-mode #routeModal .bike-item p {
+    color: #fff !important;
+}
+
+/* 新增 CSS 以置中電輔車列表卡片於彈窗中 */
+#routeModal ul {
+    list-style: none;
+    padding: 0;
+    text-align: center;
+}
+#routeModal .bike-item {
+    margin: 0 auto !important;
+}
     </style>
   </head>
   <body>
@@ -3120,9 +3143,9 @@
                   data.retVal.forEach(bike => {
                       bikeListHtml += `
                           <li class="bike-item">
-                              <p>${window.langStrings.bikeNumberLabel[currentLang]}${bike.bike_no}</p>
-                              <p>${window.langStrings.pillarNumberLabel[currentLang]}${bike.pillar_no}</p>
-                              <p>${window.langStrings.batteryPowerLabel[currentLang]}${bike.battery_power}%</p>
+                              <p><span class="material-icons">directions_bike</span>${window.langStrings.bikeNumberLabel[currentLang]}${bike.bike_no}</p>
+                              <p><span class="material-icons">location_on</span>${window.langStrings.pillarNumberLabel[currentLang]}${bike.pillar_no}</p>
+                              <p><span class="material-icons">battery_charging_full</span>${window.langStrings.batteryPowerLabel[currentLang]}${bike.battery_power}%</p>
                           </li>
                       `;
                   });
