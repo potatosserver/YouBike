@@ -1148,6 +1148,7 @@
           mainContent.offsetHeight;
 
           mainContent.classList.add('fade-in');
+          mainContent.style.overflowY = 'auto'; // 新增此行以確保滾動條啟用
           document.getElementById('updateCountdown').style.display = navigator.onLine ? "block" : "none";
 
           setTimeout(() => {
