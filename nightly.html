@@ -50,6 +50,7 @@
         transition: var(--color-transition), transform 0.2s ease, box-shadow 0.2s ease;
       }
 
+      /* Add this rule to remove tap highlight on interactive elements */
       .station, #settingsButton, #closeCentralSettings, #closeRouteModal {
           -webkit-tap-highlight-color: transparent;
       }
@@ -252,6 +253,9 @@
         transition: color 0.2s ease;
         user-select: none;
       }
+      .station .pin-button.pinned {
+          color: #FFD700;
+      }
       .navigate-button {
         background: none;
         border: none;
@@ -443,20 +447,20 @@
         position: sticky;
         top: 0;
         z-index: 100;
-        height: 24px;
+        height: 24px;  /* Adjusted height to include space */
         width: 100px;
         cursor: ns-resize;
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: 0 auto;
-        padding: 0;
+        margin: 0 auto;  /* Remove margin */
+        padding: 0;   /* Remove padding */
       }
 
       #dragHandle::before {
         content: '';
         width: 100px;
-        height: 6px;
+        height: 6px; /* Keep the bar height */
         background: #a0a0a0;
         border-radius: 3px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.2);
@@ -729,41 +733,41 @@
         left: 50%;
         transform: translateX(-50%);
         z-index: 1000;
-        padding: 8px 16px;
-        background-color: #ffdacf;
-        color: #333;
-        border: none;
-        border-radius: 20px;
-        font-size: 0.9em;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        padding: 8px 16px; /* 增加內距 */
+        background-color: #ffdacf; /* 使用設定按鈕的亮色背景 */
+        color: #333; /* 使用設定按鈕的亮色文字 */
+        border: none; /* 移除邊框 */
+        border-radius: 20px; /* 更圓潤的邊角 */
+        font-size: 0.9em; /* 字體大小 */
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* 較柔和的陰影 */
         transition: all 0.3s ease;
-        width: auto;
-        min-width: 120px;
-        display: flex;
+        width: auto; /* 寬度自動 */
+        min-width: 120px; /* 最小寬度 */
+        display: flex; /* 使用 flexbox 對齊內容 */
         align-items: center;
         justify-content: center;
-        gap: 6px;
+        gap: 6px; /* 圖標和文字間距 */
       }
 
       #updateCountdown:hover {
-          background-color: #ffc0a8;
+          background-color: #ffc0a8; /* 亮色懸停效果 */
           box-shadow: 0 3px 6px rgba(0,0,0,0.3);
       }
 
       body.dark-mode #updateCountdown {
-          background-color: #e8def8;
-          color: #1c1b1f;
+          background-color: #e8def8; /* 淺紫色背景 */
+          color: #1c1b1f; /* 深色文字 */
           box-shadow: 0 2px 4px rgba(0,0,0,0.3);
       }
 
       body.dark-mode #updateCountdown:hover {
-          background-color: #d0bcff;
+          background-color: #d0bcff; /* 黑暗模式懸停效果 */
           color: #1c1b1f;
           box-shadow: 0 3px 6px rgba(0,0,0,0.4);
       }
 
       #updateCountdown .material-icons {
-          font-size: 18px;
+          font-size: 18px; /* 圖標大小 */
           vertical-align: middle;
       }
 
@@ -774,8 +778,8 @@
           z-index: 1600;
           width: 56px;
           height: 56px;
-          background: #ffdacf;
-          color: #333;
+          background: #ffdacf; /* 亮色模式背景 */
+          color: #333; /* 亮色模式文字 */
           border: none;
           border-radius: 16px;
           cursor: pointer;
@@ -788,18 +792,18 @@
       }
 
       #settingsButton:hover {
-          background-color: #ffc0a8;
+          background-color: #ffc0a8; /* 亮色模式懸停 */
           box-shadow: 0 4px 8px rgba(0,0,0,0.3);
       }
 
       body.dark-mode #settingsButton {
-          background-color: #e8def8;
-          color: #1c1b1f;
+          background-color: #e8def8; /* 黑暗模式背景 (淺紫色) */
+          color: #1c1b1f; /* 黑暗模式文字 */
           box-shadow: 0 3px 5px rgba(0,0,0,0.3);
       }
 
       body.dark-mode #settingsButton:hover {
-          background-color: #d0bcff;
+          background-color: #d0bcff; /* 黑暗模式懸停 */
           color: #1c1b1f;
           box-shadow: 0 4px 8px rgba(0,0,0,0.4);
       }
@@ -929,6 +933,184 @@
       }
 
       body.dark-mode #closeCentralSettings:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      @keyframes fadeIn {
+          from { opacity: 0; transform: translate(-50%, -48%); }
+          to { opacity: 1; transform: translate(-50%, -50%); }
+      }
+
+      @keyframes slideIn {
+        from { transform: translate(-50%, -60%) scale(0.8); opacity: 0; }
+        to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      }
+      @keyframes slideOut {
+        from { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        to { transform: translate(-50%, -60%) scale(0.8); opacity: 0; }
+      }
+      #centralSettingsPanel {
+        animation-duration: 0.3s;
+        animation-fill-mode: forwards;
+        opacity: 0;
+      }
+      #centralSettingsPanel.panel-open {
+        animation-name: slideIn;
+      }
+      #centralSettingsPanel.panel-close {
+        animation-name: slideOut;
+      }
+      body.dark-mode #centralRegionSelect {
+          background-color: #555;
+          color: #fff;
+          border: 1px solid #777;
+      }
+
+      body.dark-mode #centralRegionSelect option {
+          background-color: #555;
+          color: #fff;
+      }
+
+      #mainContent {
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+      }
+
+      #mainContent.fade-in {
+        opacity: 1;
+      }
+
+      #loadingOverlay {
+        opacity: 1;
+        transition: opacity 0.5s ease-in-out;
+      }
+
+      #loadingOverlay.fade-out {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .github-link {
+        text-decoration: none;
+        color: #007BFF;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      body.dark-mode .github-link {
+        color: #90CAF9;
+      }
+
+      .github-link span {
+        flex: 1;
+      }
+
+      #settingsPanelTitle {
+          color: #333;
+      }
+
+      body.dark-mode #settingsPanelTitle {
+          color: #fff;
+      }
+
+      .rotate-right {
+        transform: rotate(360deg);
+        transition: transform 0.8s ease;
+        backface-visibility: hidden;
+        will-change: transform;
+      }
+      .rotate-left {
+        transform: rotate(-360deg);
+        transition: transform 0.8s ease;
+        backface-visibility: hidden;
+        will-change: transform;
+      }
+      @keyframes spin-180 {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(180deg); }
+      }
+
+      .spin-update {
+        animation: spin-180 0.5s ease forwards;
+      }
+      .station p {
+        margin: 4px 0;
+        color: #666;
+      }
+
+      body.dark-mode .station p {
+        color: #cccccc;
+      }
+
+      #routeModal {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background-color: white;
+          padding: 25px;
+          border-radius: 10px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          z-index: 1000;
+          display: none;
+          width: 80%;
+          max-width: 320px;
+          max-height: 80vh;
+          overflow-y: auto;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+          text-align: left;
+      }
+
+      #routeModal::-webkit-scrollbar {
+          display: none;
+      }
+
+      body.dark-mode #routeModal {
+          background-color: #333;
+          color: #ffffff;
+      }
+
+      #routeModal h3 {
+          margin-top: 20px;
+          color: #007BFF;
+          margin-bottom: 15px;
+          padding-right: 30px;
+      }
+
+      body.dark-mode #routeModal h3 {
+          color: #90CAF9;
+      }
+
+      #closeRouteModal {
+          position: absolute;
+          top: 2vh;
+          right: 2vh;
+          background: none;
+          border: none;
+          font-size: 24px;
+          cursor: pointer;
+          color: #666;
+          padding: 8px;
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background-color 0.3s;
+      }
+
+      #closeRouteModal:hover {
+          background-color: rgba(0, 0, 0, 0.1);
+      }
+
+      body.dark-mode #closeRouteModal {
+          color: #fff;
+      }
+
+      body.dark-mode #closeRouteModal:hover {
           background-color: rgba(255, 255, 255, 0.1);
       }
 
@@ -1140,6 +1322,7 @@
 
           mainContent.classList.add('fade-in');
           mainContent.style.overflowY = 'auto';
+
           document.getElementById('updateCountdown').style.display = navigator.onLine ? "block" : "none";
 
           setTimeout(() => {
@@ -1392,7 +1575,7 @@
           });
 
           let limit = keyword ? 50 : 10;
-          
+
           let usedStations;
 
           const pinnedFromResults = youbikeResults.filter(station => pinnedStations.has(String(station.station_no)));
@@ -1788,16 +1971,16 @@
               watchId = null;
               isTrackingActive = false;
           }
- 
+
       }
 
-     
+
       async function getLocation() {
           const centralLocationToggle = document.getElementById('centralLocationToggle');
           const isLocationServiceOn = centralLocationToggle?.checked;
           let locationSet = false;
 
-         
+
           if (isLocationServiceOn) {
               try {
                   const position = await new Promise((resolve, reject) => {
@@ -1840,16 +2023,16 @@
                       stopTracking();
                   }
               }
-         
+
           } else {
               stopTracking();
-                           const selectedRegion = document.getElementById('centralRegionSelect').value;
+                                                     const selectedRegion = document.getElementById('centralRegionSelect').value;
               const coords = regionCoordinates[selectedRegion];
               userLocation = { latitude: coords.lat, longitude: coords.lng };
               locationSet = true;
               isFollowingUser = false;
               hasObtainedRealLocation = false;
-         
+
           }
 
           if (locationSet && leafletMap) {
@@ -1916,7 +2099,6 @@
               distanceEl.textContent = "";
             } else {
               const distanceLabel = currentLang === "en" ? "Distance:" : "距離：";
-             
               const unit = newDistance < 1 ? (currentLang === "en" ? " m" : " 公尺") : (currentLang === "en" ? " km" : " 公里");
               const displayDistance = newDistance < 1 ? Math.round(newDistance * 1000) : newDistance.toFixed(2);
               distanceEl.textContent = distanceLabel + " " + displayDistance + unit;
@@ -1935,8 +2117,6 @@
 
         const currentData = {};
         stationElements.forEach(card => {
-         
-         
           const id = card.dataset.id;
                    currentData[id] = {
             available_2_0: card.querySelector('.vehicle_yb2').textContent,
