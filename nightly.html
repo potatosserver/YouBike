@@ -1049,7 +1049,7 @@
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
-          background-color: white;
+          background-color: #fff5f0;
           padding: 25px;
           border-radius: 10px;
           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -1086,10 +1086,10 @@
 
       #routeModal .bike-item { /* Added style for bike list items */
           padding: 16px !important;
-          margin-bottom: 12px !important;
-          background-color: #fff !important;
+          margin-bottom: 12px !important; /* Increased margin */
+          background-color: #fff2ec !important; /* Added background color */
           border-radius: 8px !important;
-          box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important; /* Added box shadow */
           display: flex;
           flex-direction: column;
           gap: 8px;
@@ -1135,8 +1135,9 @@
 
       /* 針對電輔車列表卡片在黑暗模式下調整背景與文字顏色 */
 body.dark-mode #routeModal .bike-item {
-    background-color: #555 !important;
+    background-color: #444 !important; /* Dark mode background */
     color: #fff !important;
+    box-shadow: 0 4px 8px rgba(255,255,255,0.1) !important; /* Dark mode shadow */
 }
 body.dark-mode #routeModal .bike-item p {
     color: #fff !important;
@@ -1146,10 +1147,10 @@ body.dark-mode #routeModal .bike-item p {
 #routeModal ul {
     list-style: none;
     padding: 0;
-    text-align: center;
+    list-style: disc inside; /* Added bullet points */
 }
 #routeModal .bike-item {
-    margin: 0 auto !important;
+    margin-bottom: 12px !important; /* Adjusted margin for bottom space */
 }
     </style>
   </head>
@@ -1989,7 +1990,7 @@ body.dark-mode #routeModal .bike-item p {
       function startTracking() {
           const centralLocationToggle = document.getElementById('centralLocationToggle');
           if (!centralLocationToggle.checked) {
-              stopTracking();
+                           stopTracking();
               return;
           }
 
@@ -3043,7 +3044,7 @@ body.dark-mode #routeModal .bike-item p {
 
       async function getRoute(startLat, startLng, endLat, endLng, stationName) {
           if (!navigator.onLine) {
-              showNotification(currentLang === "en" ? "Offline: Cannot get route information." : "離線狀態：無法取得路線資訊。");
+              showNotification(currentLang === "en" ? "Offline: Cannot get route information." : "離線狀態：無法取得路線資訊");
               return;
           }
           if (!userLocation) {
