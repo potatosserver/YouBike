@@ -51,7 +51,7 @@
       }
 
       /* Add this rule to remove tap highlight on interactive elements */
-      .station, #settingsButton, #closeCentralSettings {
+      .station, #settingsButton, #closeCentralSettings, #closeRouteModal {
           -webkit-tap-highlight-color: transparent;
       }
 
@@ -253,8 +253,36 @@
         transition: color 0.2s ease;
         user-select: none;
       }
-      .station .pin-button.pinned {
-        color: #FFD700;
+      /* 新增導航按鈕樣式 */
+      .navigate-button {
+        background: none;
+        border: none;
+        padding: 0;
+        font-size: 24px;
+        color: #007BFF;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.3s ease, background-color 0.3s ease;
+        -webkit-tap-highlight-color: transparent;
+        outline: none;
+        border-radius: 50%;
+      }
+
+      .navigate-button:hover {
+        background-color: transparent;
+        color: #0056b3;
+      }
+
+      body.dark-mode .navigate-button {
+        color: #90CAF9;
+        background-color: transparent;
+      }
+
+      body.dark-mode .navigate-button:hover {
+        color: #64b5f6;
+        background-color: rgba(255, 255, 255, 0.1);
       }
       .station .electric-icon {
           font-size: 24px;
@@ -1022,7 +1050,7 @@
           left: 50%;
           transform: translate(-50%, -50%);
           background-color: white;
-          padding: 20px;
+          padding: 25px;
           border-radius: 10px;
           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
           z-index: 1000;
@@ -1030,8 +1058,15 @@
           width: 80%; /* Match settings panel width */
           max-width: 320px; /* Match settings panel max-width */
           max-height: 80vh;
-          overflow-y: hidden; /* Change from auto to hidden */
+          overflow-y: auto; /* Change from hidden to auto */
+          scrollbar-width: none;  /* Hide scrollbar for Firefox */
+          -ms-overflow-style: none;  /* Hide scrollbar for IE and Edge */
           text-align: left; /* Align text left for readability */
+      }
+
+      /* Hide scrollbar for Chrome, Safari and Opera */
+      #routeModal::-webkit-scrollbar {
+          display: none;
       }
 
       body.dark-mode #routeModal {
@@ -1040,100 +1075,46 @@
       }
 
       #routeModal h3 {
-          margin-top: 0;
-          color: #007BFF; /* Match station title color */
+          margin-top: 20px; /* 增加上方空間，避免與關閉按鈕重疊 */
+          color: #007BFF;
           margin-bottom: 15px;
+          padding-right: 30px; /* 為關閉按鈕留出空間 */
       }
 
       body.dark-mode #routeModal h3 {
-          color: #90CAF9; /* Match dark mode station title color */
+          color: #90CAF9;
       }
 
-      #routeModal p {
-          margin: 5px 0;
-          color: #333; /* Default text color */
-      }
-
-      body.dark-mode #routeModal p {
-          color: #cccccc; /* Dark mode text color */
-      }
-
-      #routeModal ul {
-          padding-left: 20px;
-          margin-top: 15px;
-      }
-
-      #routeModal li {
-          margin-bottom: 8px;
-          line-height: 1.4;
-      }
-
-      #routeModal button {
-          margin-top: 20px;
-          display: block;
-          width: auto; /* Allow button to size based on content */
-          padding: 10px 20px;
-          background-color: #007BFF;
-          color: white;
+      /* 移除舊的關閉按鈕樣式並新增與設定面板相同的樣式 */
+      #closeRouteModal {
+          position: absolute;
+          top: 2vh;
+          right: 2vh;
+          background: none;
           border: none;
-          border-radius: 5px;
+          font-size: 24px;
           cursor: pointer;
-          font-size: 16px;
-          transition: background-color 0.3s ease;
-      }
-
-      #routeModal button:hover {
-          background-color: #0056b3;
-      }
-
-      body.dark-mode #routeModal button {
-          background-color: #90caf9;
-          color: #121212;
-      }
-
-      body.dark-mode #routeModal button:hover {
-          background-color: #64b5f6;
-      }
-
-      .navigate-button {
-          display: inline-flex;
+          color: #666;
+          padding: 8px;
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          display: flex;
           align-items: center;
           justify-content: center;
-          margin-top: 0;
-          padding: 0; /* Adjusted padding */
-          background: none;
-          color: #007BFF; /* Match pin button color */
-          border: none;
-          border-radius: 0;
-          cursor: pointer;
-          font-size: 24px; /* Match pin button font size */
-          transition: color 0.2s ease; /* Add transition */
-          height: 24px; /* Match pin button height */
-          width: 24px; /* Add width to make it square */
+          transition: background-color 0.3s;
       }
 
-      .navigate-button:hover {
-          /* Removed background and color changes */
-          background: none;
-          color: #007BFF; /* Keep original color on hover */
+      #closeRouteModal:hover {
+          background-color: rgba(0, 0, 0, 0.1);
       }
 
-      body.dark-mode .navigate-button {
-          color: #90CAF9; /* Match dark mode pin button color */
-          background-color: transparent; /* Remove background */
-          border-radius: 0; /* Remove border-radius */
+      body.dark-mode #closeRouteModal {
+          color: #fff;
       }
 
-      body.dark-mode .navigate-button:hover {
-          /* Removed background and color changes */
-          background: none;
-          color: #90CAF9; /* Keep original color on hover in dark mode */
-      }
-
-      .station .footer {
-          display: none; /* Hide the footer div */
-          /* justify-content: flex-end; */
-          /* margin-top: 10px; */
+      body.dark-mode #closeRouteModal:hover {
+          background-color: rgba(255, 255, 255, 0.1);
       }
 
     </style>
@@ -1166,12 +1147,12 @@
       </div>
       <!-- New Route Modal -->
       <div class="modal" id="routeModal">
-          <button id="closeRouteModal" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 24px; cursor: pointer; color: #666; padding: 0;">×</button>
+          <button id="closeRouteModal">×</button>
           <h3 id="routeModalTitle">路線資訊</h3>
           <div id="routeDetails">
               <!-- Route details will be inserted here -->
           </div>
-          <button id="routeModalCloseButton">關閉</button>
+          <!-- Removed routeModalCloseButton -->
       </div>
     <button id="settingsButton" title="設定">
         <span class="material-icons">settings</span>
@@ -2013,7 +1994,7 @@
               try {
                   const position = await new Promise((resolve, reject) => {
                       navigator.geolocation.getCurrentPosition(resolve, reject, {
-                          enableHighAccuracy: true,
+                                                   enableHighAccuracy: true,
                           timeout: 10000,
                           maximumAge: 0
                       });
@@ -2054,7 +2035,7 @@
          
           } else {
               stopTracking();
-              const selectedRegion = document.getElementById('centralRegionSelect').value;
+                           const selectedRegion = document.getElementById('centralRegionSelect').value;
               const coords = regionCoordinates[selectedRegion];
               userLocation = { latitude: coords.lat, longitude: coords.lng };
               locationSet = true;
@@ -2272,10 +2253,11 @@
     if (routeModalTitle) {
         routeModalTitle.textContent = currentLang === "en" ? "Route Information" : "路線資訊";
     }
-    const routeModalCloseButton = document.getElementById('routeModalCloseButton');
-    if (routeModalCloseButton) {
-        routeModalCloseButton.textContent = currentLang === "en" ? "Close" : "關閉";
-    }
+    // Removed routeModalCloseButton text update
+    // const routeModalCloseButton = document.getElementById('routeModalCloseButton');
+    // if (routeModalCloseButton) {
+    //     routeModalCloseButton.textContent = currentLang === "en" ? "Close" : "關閉";
+    // }
     // Update navigate button text on existing cards
     document.querySelectorAll('.navigate-button').forEach(button => {
         // Remove existing text content if any
@@ -2514,8 +2496,8 @@
         if (!navigator.onLine) {
           if (!window.offlineNotified) {
             showNotification(currentLang === "en"
-              ? "Offline mode: Using cached map data"
-              : "離線模式：使用快取地圖資料");
+              ? "Offline: Cannot get route information."
+              : "離線狀態：無法取得路線資訊");
             window.offlineNotified = true;
           }
         }
@@ -2983,7 +2965,8 @@
       const routeModal = document.getElementById('routeModal');
       const routeDetailsDiv = document.getElementById('routeDetails');
       const closeRouteModalButton = document.getElementById('closeRouteModal');
-      const routeModalCloseButton = document.getElementById('routeModalCloseButton');
+      // Removed routeModalCloseButton variable
+      // const routeModalCloseButton = document.getElementById('routeModalCloseButton');
       const routeModalTitle = document.getElementById('routeModalTitle');
 
       // Close modal listeners
@@ -2991,10 +2974,11 @@
           routeModal.style.display = 'none';
           overlay.classList.remove('show');
       });
-      routeModalCloseButton.addEventListener('click', () => {
-          routeModal.style.display = 'none';
-          overlay.classList.remove('show');
-      });
+      // Removed routeModalCloseButton listener
+      // routeModalCloseButton.addEventListener('click', () => {
+      //     routeModal.style.display = 'none';
+      //     overlay.classList.remove('show');
+      // });
       overlay.addEventListener('click', () => {
           if (routeModal.style.display === 'block') {
               routeModal.style.display = 'none';
