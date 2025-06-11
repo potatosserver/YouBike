@@ -2012,8 +2012,7 @@
           if (isLocationServiceOn) {
               try {
                   const position = await new Promise((resolve, reject) => {
-                     
-                      navigator.geolocation.getCurrentPosition(resolve, reject, {
+                                           navigator.geolocation.getCurrentPosition(resolve, reject, {
                                                    enableHighAccuracy: true,
                           timeout: 10000,
                           maximumAge: 0
@@ -3114,6 +3113,9 @@
               const data = await response.json();
 
               if (data.retCode === 1 && data.retVal && data.retVal.length > 0) {
+                  // Sort bikes by battery power descending
+                  data.retVal.sort((a, b) => b.battery_power - a.battery_power);
+
                   let bikeListHtml = '<ul>';
                   data.retVal.forEach(bike => {
                       bikeListHtml += `
