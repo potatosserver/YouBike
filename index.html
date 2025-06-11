@@ -112,7 +112,7 @@
 
       body.dark-mode #searchContainer {
           background-color: #1e1e1e;
-          border: 0.5px solid #90CAF9;
+          box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
       }
 
       #keyword {
@@ -1096,23 +1096,38 @@
       }
 
       .navigate-button {
-          display: inline-flex; /* Use inline-flex to align icon and text if any */
-          align-items: center; /* Vertically center content */
-          justify-content: center; /* Horizontally center content */
-          margin-top: 0; /* Remove margin-top */
-          padding: 0; /* 移除內邊距 */
-          background: none; /* 移除綠色背景 */
-          color: blue; /* 圖示使用藍色 */
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          margin-top: 0;
+          padding: 0; /* Adjusted padding */
+          background: none;
+          color: #007BFF; /* Match pin button color */
           border: none;
-          border-radius: 0; /* 移除圓角 */
+          border-radius: 0;
           cursor: pointer;
-          font-size: 0.8em; /* Adjust font size */
-          transition: none;
-          height: 24px; /* Match icon height */
+          font-size: 24px; /* Match pin button font size */
+          transition: color 0.2s ease; /* Add transition */
+          height: 24px; /* Match pin button height */
+          width: 24px; /* Add width to make it square */
       }
 
       .navigate-button:hover {
-          background: none; /* 移除懸停時的背景變化 */
+          /* Removed background and color changes */
+          background: none;
+          color: #007BFF; /* Keep original color on hover */
+      }
+
+      body.dark-mode .navigate-button {
+          color: #90CAF9; /* Match dark mode pin button color */
+          background-color: transparent; /* Remove background */
+          border-radius: 0; /* Remove border-radius */
+      }
+
+      body.dark-mode .navigate-button:hover {
+          /* Removed background and color changes */
+          background: none;
+          color: #90CAF9; /* Keep original color on hover in dark mode */
       }
 
       .station .footer {
@@ -1643,7 +1658,7 @@
 
             // Moved navigate button HTML here
             const navigateButtonHtml = `<button class="navigate-button" data-lat="${info.coords[0]}" data-lng="${info.coords[1]}" data-name="${info.name}">
-                <span class="material-icons" style="color: blue;">navigation</span>
+                <span class="material-icons">navigation</span>
             </button>`;
 
 
@@ -2263,7 +2278,19 @@
     }
     // Update navigate button text on existing cards
     document.querySelectorAll('.navigate-button').forEach(button => {
-        button.textContent = currentLang === "en" ? "Navigate" : "導航";
+        // Remove existing text content if any
+        button.childNodes.forEach(node => {
+            if (node.nodeType === Node.TEXT_NODE) {
+                node.remove();
+            }
+        });
+        // Ensure only the icon remains
+        if (!button.querySelector('.material-icons')) {
+             const iconSpan = document.createElement('span');
+             iconSpan.className = 'material-icons';
+             iconSpan.textContent = 'navigation';
+             button.appendChild(iconSpan);
+        }
     });
       }
       updateLanguageTexts();
