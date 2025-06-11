@@ -50,6 +50,7 @@
         transition: var(--color-transition), transform 0.2s ease, box-shadow 0.2s ease;
       }
 
+      /* Add this rule to remove tap highlight on interactive elements */
       .station, #settingsButton, #closeCentralSettings, #closeRouteModal {
           -webkit-tap-highlight-color: transparent;
       }
@@ -240,10 +241,10 @@
       }
       .station .icon-group {
           display: flex;
-          align-items: center;
+          align-items: center; /* Align items vertically in the center */
           gap: 5px;
           flex-shrink: 0;
-          padding-top: 0;
+          padding-top: 0; /* Remove padding-top */
       }
       .station .pin-button {
         font-size: 24px;
@@ -252,6 +253,7 @@
         transition: color 0.2s ease;
         user-select: none;
       }
+      /* 新增導航按鈕樣式 */
       .navigate-button {
         background: none;
         border: none;
@@ -443,24 +445,26 @@
         position: sticky;
         top: 0;
         z-index: 100;
-        height: 24px;
+        height: 24px;  /* Adjusted height to include space */
         width: 100px;
         cursor: ns-resize;
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: 0 auto;
-        padding: 0;
+        margin: 0 auto;  /* Remove margin */
+        padding: 0;   /* Remove padding */
+        /* Add background or border if needed for visibility */
       }
 
       #dragHandle::before {
         content: '';
         width: 100px;
-        height: 6px;
+        height: 6px; /* Keep the bar height */
         background: #a0a0a0;
         border-radius: 3px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         transition: background 0.3s ease, box-shadow 0.3s ease;
+        /* Centering is handled by flexbox on #dragHandle */
       }
 
       body.dark-mode #dragHandle::before {
@@ -729,41 +733,41 @@
         left: 50%;
         transform: translateX(-50%);
         z-index: 1000;
-        padding: 8px 16px;
-        background-color: #ffdacf;
-        color: #333;
-        border: none;
-        border-radius: 20px;
-        font-size: 0.9em;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        padding: 8px 16px; /* 增加內距 */
+        background-color: #ffdacf; /* 使用設定按鈕的亮色背景 */
+        color: #333; /* 使用設定按鈕的亮色文字 */
+        border: none; /* 移除邊框 */
+        border-radius: 20px; /* 更圓潤的邊角 */
+        font-size: 0.9em; /* 字體大小 */
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* 較柔和的陰影 */
         transition: all 0.3s ease;
-        width: auto;
-        min-width: 120px;
-        display: flex;
+        width: auto; /* 寬度自動 */
+        min-width: 120px; /* 最小寬度 */
+        display: flex; /* 使用 flexbox 對齊內容 */
         align-items: center;
         justify-content: center;
-        gap: 6px;
+        gap: 6px; /* 圖標和文字間距 */
       }
 
       #updateCountdown:hover {
-          background-color: #ffc0a8;
+          background-color: #ffc0a8; /* 亮色懸停效果 */
           box-shadow: 0 3px 6px rgba(0,0,0,0.3);
       }
 
       body.dark-mode #updateCountdown {
-          background-color: #e8def8;
-          color: #1c1b1f;
+          background-color: #e8def8; /* 淺紫色背景 */
+          color: #1c1b1f; /* 深色文字 */
           box-shadow: 0 2px 4px rgba(0,0,0,0.3);
       }
 
       body.dark-mode #updateCountdown:hover {
-          background-color: #d0bcff;
+          background-color: #d0bcff; /* 黑暗模式懸停效果 */
           color: #1c1b1f;
           box-shadow: 0 3px 6px rgba(0,0,0,0.4);
       }
 
       #updateCountdown .material-icons {
-          font-size: 18px;
+          font-size: 18px; /* 圖標大小 */
           vertical-align: middle;
       }
 
@@ -774,8 +778,8 @@
           z-index: 1600;
           width: 56px;
           height: 56px;
-          background: #ffdacf;
-          color: #333;
+          background: #ffdacf; /* 亮色模式背景 */
+          color: #333; /* 亮色模式文字 */
           border: none;
           border-radius: 16px;
           cursor: pointer;
@@ -788,18 +792,18 @@
       }
 
       #settingsButton:hover {
-          background-color: #ffc0a8;
+          background-color: #ffc0a8; /* 亮色模式懸停 */
           box-shadow: 0 4px 8px rgba(0,0,0,0.3);
       }
 
       body.dark-mode #settingsButton {
-          background-color: #e8def8;
-          color: #1c1b1f;
+          background-color: #e8def8; /* 黑暗模式背景 (淺紫色) */
+          color: #1c1b1f; /* 黑暗模式文字 */
           box-shadow: 0 3px 5px rgba(0,0,0,0.3);
       }
 
       body.dark-mode #settingsButton:hover {
-          background-color: #d0bcff;
+          background-color: #d0bcff; /* 黑暗模式懸停 */
           color: #1c1b1f;
           box-shadow: 0 4px 8px rgba(0,0,0,0.4);
       }
@@ -932,6 +936,187 @@
           background-color: rgba(255, 255, 255, 0.1);
       }
 
+      @keyframes fadeIn {
+          from { opacity: 0; transform: translate(-50%, -48%); }
+          to { opacity: 1; transform: translate(-50%, -50%); }
+      }
+
+      @keyframes slideIn {
+        from { transform: translate(-50%, -60%) scale(0.8); opacity: 0; }
+        to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      }
+      @keyframes slideOut {
+        from { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        to { transform: translate(-50%, -60%) scale(0.8); opacity: 0; }
+      }
+      #centralSettingsPanel {
+        animation-duration: 0.3s;
+        animation-fill-mode: forwards;
+        opacity: 0;
+      }
+      #centralSettingsPanel.panel-open {
+        animation-name: slideIn;
+      }
+      #centralSettingsPanel.panel-close {
+        animation-name: slideOut;
+      }
+      body.dark-mode #centralRegionSelect {
+          background-color: #555;
+          color: #fff;
+          border: 1px solid #777;
+      }
+
+      body.dark-mode #centralRegionSelect option {
+          background-color: #555;
+          color: #fff;
+      }
+
+      #mainContent {
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+      }
+
+      #mainContent.fade-in {
+        opacity: 1;
+      }
+
+      #loadingOverlay {
+        opacity: 1;
+        transition: opacity 0.5s ease-in-out;
+      }
+
+      #loadingOverlay.fade-out {
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .github-link {
+        text-decoration: none;
+        color: #007BFF;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      body.dark-mode .github-link {
+        color: #90CAF9;
+      }
+
+      .github-link span {
+        flex: 1;
+      }
+
+      #settingsPanelTitle {
+          color: #333;
+      }
+
+      body.dark-mode #settingsPanelTitle {
+          color: #fff;
+      }
+
+      .rotate-right {
+        transform: rotate(360deg);
+        transition: transform 0.8s ease;
+        backface-visibility: hidden;
+        will-change: transform;
+      }
+      .rotate-left {
+        transform: rotate(-360deg);
+        transition: transform 0.8s ease;
+        backface-visibility: hidden;
+        will-change: transform;
+      }
+      @keyframes spin-180 {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(180deg); }
+      }
+
+      .spin-update {
+        animation: spin-180 0.5s ease forwards;
+      }
+      .station p {
+        margin: 4px 0;
+        color: #666;
+      }
+
+      body.dark-mode .station p {
+        color: #cccccc;
+      }
+
+      /* New styles for route modal */
+      #routeModal {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background-color: white;
+          padding: 25px;
+          border-radius: 10px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          z-index: 1000;
+          display: none;
+          width: 80%; /* Match settings panel width */
+          max-width: 320px; /* Match settings panel max-width */
+          max-height: 80vh;
+          overflow-y: auto; /* Change from hidden to auto */
+          scrollbar-width: none;  /* Hide scrollbar for Firefox */
+          -ms-overflow-style: none;  /* Hide scrollbar for IE and Edge */
+          text-align: left; /* Align text left for readability */
+      }
+
+      /* Hide scrollbar for Chrome, Safari and Opera */
+      #routeModal::-webkit-scrollbar {
+          display: none;
+      }
+
+      body.dark-mode #routeModal {
+          background-color: #333;
+          color: #ffffff;
+      }
+
+      #routeModal h3 {
+          margin-top: 20px; /* 增加上方空間，避免與關閉按鈕重疊 */
+          color: #007BFF;
+          margin-bottom: 15px;
+          padding-right: 30px; /* 為關閉按鈕留出空間 */
+      }
+
+      body.dark-mode #routeModal h3 {
+          color: #90CAF9;
+      }
+
+      /* 移除舊的關閉按鈕樣式並新增與設定面板相同的樣式 */
+      #closeRouteModal {
+          position: absolute;
+          top: 2vh;
+          right: 2vh;
+          background: none;
+          border: none;
+          font-size: 24px;
+          cursor: pointer;
+          color: #666;
+          padding: 8px;
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background-color 0.3s;
+      }
+
+      #closeRouteModal:hover {
+          background-color: rgba(0, 0, 0, 0.1);
+      }
+
+      body.dark-mode #closeRouteModal {
+          color: #fff;
+      }
+
+      body.dark-mode #closeRouteModal:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+      }
+
     </style>
   </head>
   <body>
@@ -960,11 +1145,14 @@
         <p id="modalText"></p>
         <button id="modalButton">確定</button>
       </div>
+      <!-- New Route Modal -->
       <div class="modal" id="routeModal">
           <button id="closeRouteModal">×</button>
           <h3 id="routeModalTitle">路線資訊</h3>
           <div id="routeDetails">
+              <!-- Route details will be inserted here -->
           </div>
+          <!-- Removed routeModalCloseButton -->
       </div>
     <button id="settingsButton" title="設定">
         <span class="material-icons">settings</span>
@@ -1139,7 +1327,8 @@
           mainContent.offsetHeight;
 
           mainContent.classList.add('fade-in');
-          mainContent.style.overflowY = 'auto';
+          mainContent.style.overflowY = 'auto'; // 新增此行以確保滾動條啟用
+
           document.getElementById('updateCountdown').style.display = navigator.onLine ? "block" : "none";
 
           setTimeout(() => {
@@ -1450,6 +1639,7 @@
             >${isPinned ? 'star' : 'star_outline'}</span>`;
 
 
+            // Moved navigate button HTML here
             const navigateButtonHtml = `<button class="navigate-button" data-lat="${info.coords[0]}" data-lng="${info.coords[1]}" data-name="${info.name}">
                 <span class="material-icons">navigation</span>
             </button>`;
@@ -1483,7 +1673,7 @@
                           <div class="icon-group">
                               ${electricIconHtml}
                               ${pinButtonHtml}
-                              ${navigateButtonHtml}
+                              ${navigateButtonHtml} <!-- Insert navigate button here -->
                           </div>
                       </div>
                       ${distanceHTML}
@@ -1492,6 +1682,7 @@
                       <p>YouBike 2.0E: <span class="vehicle_ybe">${displayAvailableE}</span></p>
                       <p>${slotsLabel} <span class="vehicle_empty">${displayEmptySpaces}</span></p>
                       <div class="footer">
+                          <!-- Navigate button was here -->
                       </div>
                   `;
 
@@ -1503,9 +1694,11 @@
             card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
             card.innerHTML = cardContent;
 
+            // Add event listener to the navigate button specifically
             const navigateButton = card.querySelector('.navigate-button');
             navigateButton.addEventListener('click', (event) => {
-                event.stopPropagation();
+                event.stopPropagation(); // Prevent the card click event
+                // 改用 event.currentTarget 取得正確的 dataset
                 const button = event.currentTarget;
                 const stationLat = parseFloat(button.dataset.lat);
                 const stationLng = parseFloat(button.dataset.lng);
@@ -1513,12 +1706,13 @@
                 if (userLocation && !isNaN(stationLat) && !isNaN(stationLng)) {
                     getRoute(userLocation.latitude, userLocation.longitude, stationLat, stationLng, stationName);
                 } else {
-                    showNotification(currentLang === "en"
-                        ? "Your location is not available for navigation."
+                    showNotification(currentLang === "en" 
+                        ? "Your location is not available for navigation." 
                         : "無法取得您的位置，無法規劃路線。");
                 }
             });
 
+            // Keep the original card click listener for map centering
             card.addEventListener("click", () => {
               const lat = parseFloat(info.coords[0]);
               const lng = parseFloat(info.coords[1]);
@@ -2056,16 +2250,25 @@
         regionSelectLabel.textContent = currentLang === "en" ? "Region" : "地區選擇";
     }
 
+    // Update route modal texts
     const routeModalTitle = document.getElementById('routeModalTitle');
     if (routeModalTitle) {
         routeModalTitle.textContent = currentLang === "en" ? "Route Information" : "路線資訊";
     }
+    // Removed routeModalCloseButton text update
+    // const routeModalCloseButton = document.getElementById('routeModalCloseButton');
+    // if (routeModalCloseButton) {
+    //     routeModalCloseButton.textContent = currentLang === "en" ? "Close" : "關閉";
+    // }
+    // Update navigate button text on existing cards
     document.querySelectorAll('.navigate-button').forEach(button => {
+        // Remove existing text content if any
         button.childNodes.forEach(node => {
             if (node.nodeType === Node.TEXT_NODE) {
                 node.remove();
             }
         });
+        // Ensure only the icon remains
         if (!button.querySelector('.material-icons')) {
              const iconSpan = document.createElement('span');
              iconSpan.className = 'material-icons';
@@ -2466,6 +2669,7 @@
       });
 
 
+      // JS拖曳區塊
       const mainContent = document.getElementById('mainContent');
       const dragHandle = document.getElementById('dragHandle');
       let startY = 0;
@@ -2480,6 +2684,7 @@
         e.preventDefault();
         mainContent.style.transition = 'none';
         document.body.style.cursor = 'ns-resize';
+        // 禁止滾动
         mainContent.style.overflowY = 'hidden';
       }
 
@@ -2499,6 +2704,7 @@
         isDragging = false;
         mainContent.style.transition = 'height 0.2s ease';
         document.body.style.cursor = '';
+        // 拖曳結束恢復滾動
         mainContent.style.overflowY = 'auto';
       }
 
@@ -2756,15 +2962,25 @@
           return nearestRegion;
       }
 
+      // --- New GraphHopper API Integration ---
+
       const routeModal = document.getElementById('routeModal');
       const routeDetailsDiv = document.getElementById('routeDetails');
       const closeRouteModalButton = document.getElementById('closeRouteModal');
+      // Removed routeModalCloseButton variable
+      // const routeModalCloseButton = document.getElementById('routeModalCloseButton');
       const routeModalTitle = document.getElementById('routeModalTitle');
 
+      // Close modal listeners
       closeRouteModalButton.addEventListener('click', () => {
           routeModal.style.display = 'none';
           overlay.classList.remove('show');
       });
+      // Removed routeModalCloseButton listener
+      // routeModalCloseButton.addEventListener('click', () => {
+      //     routeModal.style.display = 'none';
+      //     overlay.classList.remove('show');
+      // });
       overlay.addEventListener('click', () => {
           if (routeModal.style.display === 'block') {
               routeModal.style.display = 'none';
@@ -2783,8 +2999,9 @@
                return;
           }
 
+          // Replace with your actual API key
           const apiKey = '7cb4eb19-e0f4-40a3-a5e0-f2c039366f32';
-          const profile = 'foot';
+          const profile = 'foot'; // Or 'bike' if appropriate
           const locale = currentLang === "en" ? "en" : "zh-TW";
 
           const url = `https://graphhopper.com/api/1/route?profile=${profile}&locale=${locale}&key=${apiKey}&elevation=false&instructions=true&point=${startLat},${startLng}&point=${endLat},${endLng}`;
@@ -2819,11 +3036,13 @@
       function displayRouteDetails(routeData, stationName) {
           let html = `<h4>${currentLang === "en" ? "Route to " : "前往 "}${stationName}</h4>`;
 
+          // Distance and Time
           const distanceKm = (routeData.distance / 1000).toFixed(2);
           const timeMinutes = Math.round(routeData.time / 60000);
           html += `<p>${currentLang === "en" ? "Distance: " : "距離："} ${distanceKm} km</p>`;
           html += `<p>${currentLang === "en" ? "Estimated Time: " : "預計時間："} ${timeMinutes} ${currentLang === "en" ? "minutes" : "分鐘"}</p>`;
 
+          // Instructions
           if (routeData.instructions && routeData.instructions.length > 0) {
               html += `<h4>${currentLang === "en" ? "Instructions:" : "導航步驟："}</h4><ul>`;
               routeData.instructions.forEach(instruction => {
@@ -2836,6 +3055,8 @@
 
           routeDetailsDiv.innerHTML = html;
       }
+
+      // --- End New GraphHopper API Integration ---
 
     </script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
