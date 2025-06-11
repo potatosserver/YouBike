@@ -290,6 +290,7 @@
           font-size: 24px;
           color: #4CAF50;
           display: none;
+          cursor: pointer; /* Add cursor pointer to indicate clickability */
       }
       .station .electric-icon.show {
           display: block;
@@ -313,7 +314,7 @@
         left: 50%;
         transform: translate(-50%, -50%);
         background-color: white;
-        padding: 20px;
+        padding: 25px;
         border-radius: 10px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         z-index: 1000;
@@ -1073,7 +1074,7 @@
       }
 
       #routeModal h3 {
-          margin-top: 20px;
+          margin-top: 0; /* Adjusted margin */
           color: #007BFF;
           margin-bottom: 15px;
           padding-right: 30px;
@@ -1081,6 +1082,19 @@
 
       body.dark-mode #routeModal h3 {
           color: #90CAF9;
+      }
+
+      #routeModal .bike-item { /* Added style for bike list items */
+          border-bottom: 1px solid #eee;
+          padding: 8px 0;
+      }
+
+      body.dark-mode #routeModal .bike-item {
+          border-bottom-color: #555;
+      }
+
+      #routeModal .bike-item:last-child {
+          border-bottom: none;
       }
 
       #closeRouteModal {
@@ -1261,7 +1275,7 @@
       let defaultLatitude = regionCoordinates.kaohsiung.lat;
       let defaultLongitude = regionCoordinates.kaohsiung.lng;
       const overlay = document.querySelector('.overlay');
-      const modal = document.querySelector('.modal');
+      const modal = document.querySelector('.modal'); // This is permissionModal
       const modalText = document.getElementById('modalText');
       const modalButton = document.getElementById('modalButton');
       const resultsDiv = document.getElementById('results');
@@ -1644,8 +1658,8 @@
             const displayEmptySpaces = stationVehicleData?.empty_spaces !== undefined ? stationVehicleData.empty_spaces : unknownValue;
 
             const electricIconHtml = (displayAvailableE !== unknownValue && parseInt(displayAvailableE) > 0)
-                ? `<span class="material-symbols-outlined electric-icon show" title="${currentLang === "en" ? "Electric Bike Available" : "有電輔車"}">offline_bolt</span>`
-                : `<span class="material-symbols-outlined electric-icon" title="${currentLang === "en" ? "Electric Bike Available" : "有電輔車"}">offline_bolt</span>`;
+                ? `<span class="material-symbols-outlined electric-icon show" title="${currentLang === "en" ? "Electric Bike Available" : "有電輔車"}" data-station-id="${info.id}" data-station-name="${info.name}">offline_bolt</span>` // Added data attributes and event listener
+                : `<span class="material-symbols-outlined electric-icon" title="${currentLang === "en" ? "Electric Bike Available" : "有電輔車"}" data-station-id="${info.id}" data-station-name="${info.name}">offline_bolt</span>`; // Added data attributes
 
 
             const distance = calculateDistance(
@@ -1701,6 +1715,20 @@
                         : "無法取得您的位置，無法規劃路線。");
                 }
             });
+
+            // Add event listener for the electric bike icon
+            const electricIcon = card.querySelector('.electric-icon');
+            if (electricIcon) {
+                electricIcon.addEventListener('click', (event) => {
+                    event.stopPropagation(); // Prevent card click event
+                    const stationId = event.target.dataset.stationId;
+                    const stationName = event.target.dataset.stationName;
+                    if (stationId) {
+                        showElectricBikeDetailsModal(stationId, stationName);
+                    }
+                });
+            }
+
 
             card.addEventListener("click", () => {
               const lat = parseFloat(info.coords[0]);
@@ -1984,6 +2012,7 @@
           if (isLocationServiceOn) {
               try {
                   const position = await new Promise((resolve, reject) => {
+                     
                       navigator.geolocation.getCurrentPosition(resolve, reject, {
                                                    enableHighAccuracy: true,
                           timeout: 10000,
@@ -2150,6 +2179,7 @@
                     if (electricIcon) {
                         if (availableE !== unknownValue && parseInt(availableE) > 0) {
                             electricIcon.classList.add('show');
+                            // No need to re-add listener here, it's added during card creation
                         } else {
                             electricIcon.classList.remove('show');
                         }
@@ -2238,8 +2268,44 @@
 
     const routeModalTitle = document.getElementById('routeModalTitle');
     if (routeModalTitle) {
-        routeModalTitle.textContent = currentLang === "en" ? "Route Information" : "路線資訊";
+        // Keep the default title for now, it will be updated by getRoute or showElectricBikeDetailsModal
+        // routeModalTitle.textContent = currentLang === "en" ? "Route Information" : "路線資訊";
     }
+
+    // Add language strings for electric bike modal
+    window.langStrings = {
+        ...window.langStrings, // Keep existing strings if any
+        electricBikeDetailsTitle: {
+            zh: "電輔車列表 - ",
+            en: "Electric Bikes - "
+        },
+        bikeNumberLabel: {
+            zh: "車輛編號：",
+            en: "Bike No.: "
+        },
+        pillarNumberLabel: {
+            zh: "停車柱編號：",
+            en: "Pillar No.: "
+        },
+        batteryPowerLabel: {
+            zh: "電量：",
+            en: "Battery: "
+        },
+        noElectricBikes: {
+            zh: "此站點目前沒有可用的電輔車。",
+            en: "No electric bikes available at this station."
+        },
+        failedToGetBikeData: {
+            zh: "無法取得電輔車資料。",
+            en: "Failed to get electric bike data."
+        },
+        gettingBikeData: {
+            zh: "取得電輔車資料中...",
+            en: "Getting electric bike data..."
+        }
+    };
+
+
     document.querySelectorAll('.navigate-button').forEach(button => {
         button.childNodes.forEach(node => {
             if (node.nodeType === Node.TEXT_NODE) {
@@ -2963,8 +3029,8 @@
                return;
           }
 
-          const apiKey = '7cb4eb19-e0f4-40a3-a5e0-f2c039366f32';
-          const profile = 'foot';
+          const apiKey = '7cb4eb19-e0f4-40a3-a5e0-f2c039366f32'; // Replace with your actual GraphHopper API key
+          const profile = 'foot'; // or 'bike'
           const locale = currentLang === "en" ? "en" : "zh-TW";
 
           const url = `https://graphhopper.com/api/1/route?profile=${profile}&locale=${locale}&key=${apiKey}&elevation=false&instructions=true&point=${startLat},${startLng}&point=${endLat},${endLng}`;
@@ -3016,6 +3082,60 @@
 
           routeDetailsDiv.innerHTML = html;
       }
+
+      // New function to show electric bike details
+      async function showElectricBikeDetailsModal(stationId, stationName) {
+          if (!navigator.onLine) {
+              showNotification(currentLang === "en" ? "Offline: Cannot get electric bike details." : "離線狀態：無法取得電輔車詳細資訊。");
+              return;
+          }
+
+          const bikeListUrl = `https://apis.youbike.com.tw/api/front/bike/lists?station_no=${stationId}`;
+
+          routeModalTitle.textContent = window.langStrings.electricBikeDetailsTitle[currentLang] + stationName;
+          routeDetailsDiv.innerHTML = window.langStrings.gettingBikeData[currentLang];
+          routeModal.style.display = 'block';
+          overlay.classList.add('show');
+
+          try {
+              const response = await fetch(bikeListUrl, {
+                  headers: {
+                      'Accept': '*/*',
+                      'Accept-Language': 'zh-TW,zh;q=0.9',
+                      'Origin': 'https://www.youbike.com.tw',
+                      'Referer': 'https://www.youbike.com.tw/'
+                  }
+              });
+
+              if (!response.ok) {
+                  throw new Error(`HTTP error! status: ${response.status}`);
+              }
+
+              const data = await response.json();
+
+              if (data.retCode === 1 && data.retVal && data.retVal.length > 0) {
+                  let bikeListHtml = '<ul>';
+                  data.retVal.forEach(bike => {
+                      bikeListHtml += `
+                          <li class="bike-item">
+                              <p>${window.langStrings.bikeNumberLabel[currentLang]}${bike.bike_no}</p>
+                              <p>${window.langStrings.pillarNumberLabel[currentLang]}${bike.pillar_no}</p>
+                              <p>${window.langStrings.batteryPowerLabel[currentLang]}${bike.battery_power}%</p>
+                          </li>
+                      `;
+                  });
+                  bikeListHtml += '</ul>';
+                  routeDetailsDiv.innerHTML = bikeListHtml;
+              } else {
+                  routeDetailsDiv.innerHTML = `<p>${window.langStrings.noElectricBikes[currentLang]}</p>`;
+              }
+
+          } catch (error) {
+              console.error("Error fetching electric bike data:", error);
+              routeDetailsDiv.innerHTML = `<p>${window.langStrings.failedToGetBikeData[currentLang]}</p>`;
+          }
+      }
+
 
     </script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
