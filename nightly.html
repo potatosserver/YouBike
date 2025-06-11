@@ -51,7 +51,7 @@
       }
 
       /* Add this rule to remove tap highlight on interactive elements */
-      .station, #settingsButton, #closeCentralSettings {
+      .station, #settingsButton, #closeCentralSettings, #closeRouteModal {
           -webkit-tap-highlight-color: transparent;
       }
 
@@ -241,10 +241,10 @@
       }
       .station .icon-group {
           display: flex;
-          align-items: flex-start;
+          align-items: center; /* Align items vertically in the center */
           gap: 5px;
           flex-shrink: 0;
-          padding-top: 2px;
+          padding-top: 0; /* Remove padding-top */
       }
       .station .pin-button {
         font-size: 24px;
@@ -253,8 +253,36 @@
         transition: color 0.2s ease;
         user-select: none;
       }
-      .station .pin-button.pinned {
-        color: #FFD700;
+      /* 新增導航按鈕樣式 */
+      .navigate-button {
+        background: none;
+        border: none;
+        padding: 0;
+        font-size: 24px;
+        color: #007BFF;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.3s ease, background-color 0.3s ease;
+        -webkit-tap-highlight-color: transparent;
+        outline: none;
+        border-radius: 50%;
+      }
+
+      .navigate-button:hover {
+        background-color: transparent;
+        color: #0056b3;
+      }
+
+      body.dark-mode .navigate-button {
+        color: #90CAF9;
+        background-color: transparent;
+      }
+
+      body.dark-mode .navigate-button:hover {
+        color: #64b5f6;
+        background-color: rgba(255, 255, 255, 0.1);
       }
       .station .electric-icon {
           font-size: 24px;
@@ -908,112 +936,8 @@
           background-color: rgba(255, 255, 255, 0.1);
       }
 
-      @keyframes fadeIn {
-          from { opacity: 0; transform: translate(-50%, -48%); }
-          to { opacity: 1; transform: translate(-50%, -50%); }
-      }
+      /* Removed routeModalCloseButton styles */
 
-      @keyframes slideIn {
-        from { transform: translate(-50%, -60%) scale(0.8); opacity: 0; }
-        to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-      }
-      @keyframes slideOut {
-        from { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        to { transform: translate(-50%, -60%) scale(0.8); opacity: 0; }
-      }
-      #centralSettingsPanel {
-        animation-duration: 0.3s;
-        animation-fill-mode: forwards;
-        opacity: 0;
-      }
-      #centralSettingsPanel.panel-open {
-        animation-name: slideIn;
-      }
-      #centralSettingsPanel.panel-close {
-        animation-name: slideOut;
-      }
-      body.dark-mode #centralRegionSelect {
-          background-color: #555;
-          color: #fff;
-          border: 1px solid #777;
-      }
-
-      body.dark-mode #centralRegionSelect option {
-          background-color: #555;
-          color: #fff;
-      }
-
-      #mainContent {
-        opacity: 0;
-        transition: opacity 0.5s ease-in-out;
-      }
-
-      #mainContent.fade-in {
-        opacity: 1;
-      }
-
-      #loadingOverlay {
-        opacity: 1;
-        transition: opacity 0.5s ease-in-out;
-      }
-
-      #loadingOverlay.fade-out {
-        opacity: 0;
-        pointer-events: none;
-      }
-
-      .github-link {
-        text-decoration: none;
-        color: #007BFF;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      body.dark-mode .github-link {
-        color: #90CAF9;
-      }
-
-      .github-link span {
-        flex: 1;
-      }
-
-      #settingsPanelTitle {
-          color: #333;
-      }
-
-      body.dark-mode #settingsPanelTitle {
-          color: #fff;
-      }
-
-      .rotate-right {
-        transform: rotate(360deg);
-        transition: transform 0.8s ease;
-        backface-visibility: hidden;
-        will-change: transform;
-      }
-      .rotate-left {
-        transform: rotate(-360deg);
-        transition: transform 0.8s ease;
-        backface-visibility: hidden;
-        will-change: transform;
-      }
-      @keyframes spin-180 {
-        from { transform: rotate(0deg); }
-        to { transform: rotate(180deg); }
-      }
-
-      .spin-update {
-        animation: spin-180 0.5s ease forwards;
-      }
-      .station p {
-        margin: 4px 0;
-        color: #666;
-      }
-
-      body.dark-mode .station p {
-        color: #cccccc;
-      }
     </style>
   </head>
   <body>
@@ -1031,17 +955,27 @@
     <div id="mainContent">
       <div id="dragHandle"></div>
       <div id="searchContainer">
-        <input type="text" id="keyword" placeholder="請輸入站點名稱、地址" value="" />
+        <input type="text" id="keyword" placeholder="請輸入站點名稱、地址" value="" onfocus="this.placeholder=''" onblur="this.placeholder='請輸入站點名稱、地址'" />
         <span id="searchIcon" class="material-icons" title="搜尋">search</span>
         <span id="clearTextBtn" class="material-icons" title="清除" style="display:none; margin-left:10px; cursor:pointer;">close</span>
       </div>
       <div id="results"></div>
+      </div>
       <div class="overlay"></div>
       <div class="modal" id="permissionModal">
         <p id="modalText"></p>
         <button id="modalButton">確定</button>
       </div>
-      </div>      <button id="settingsButton" title="設定">
+      <!-- New Route Modal -->
+      <div class="modal" id="routeModal">
+          <button id="closeRouteModal">×</button>
+          <h3 id="routeModalTitle">路線資訊</h3>
+          <div id="routeDetails">
+              <!-- Route details will be inserted here -->
+          </div>
+          <!-- Removed routeModalCloseButton -->
+      </div>
+    <button id="settingsButton" title="設定">
         <span class="material-icons">settings</span>
     </button>
     </div>
@@ -1504,6 +1438,8 @@
           const unknownStation = currentLang === "en" ? "Unknown Station" : "未知站點";
           const unknownAddress = currentLang === "en" ? "Unknown Address" : "未知地址";
           const distanceLabel = currentLang === "en" ? "Distance:" : "距離:";
+          const navigateButtonText = currentLang === "en" ? "Navigate" : "導航";
+
 
           usedStations.forEach(site => {
             const info = {
@@ -1520,6 +1456,12 @@
               data-id="${info.id}"
               onclick="togglePinStation('${info.id}', event)"
             >${isPinned ? 'star' : 'star_outline'}</span>`;
+
+
+            // Moved navigate button HTML here
+            const navigateButtonHtml = `<button class="navigate-button" data-lat="${info.coords[0]}" data-lng="${info.coords[1]}" data-name="${info.name}">
+                <span class="material-icons">navigation</span>
+            </button>`;
 
 
             const stationVehicleData = vehicleData[info.id];
@@ -1550,6 +1492,7 @@
                           <div class="icon-group">
                               ${electricIconHtml}
                               ${pinButtonHtml}
+                              ${navigateButtonHtml} <!-- Insert navigate button here -->
                           </div>
                       </div>
                       ${distanceHTML}
@@ -1557,6 +1500,9 @@
                       <p>YouBike 2.0: <span class="vehicle_yb2">${displayAvailable20}</span></p>
                       <p>YouBike 2.0E: <span class="vehicle_ybe">${displayAvailableE}</span></p>
                       <p>${slotsLabel} <span class="vehicle_empty">${displayEmptySpaces}</span></p>
+                      <div class="footer">
+                          <!-- Navigate button was here -->
+                      </div>
                   `;
 
             let card = document.createElement('div');
@@ -1566,6 +1512,26 @@
             card.dataset.lng = info.coords[1];
             card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
             card.innerHTML = cardContent;
+
+            // Add event listener to the navigate button specifically
+            const navigateButton = card.querySelector('.navigate-button');
+            navigateButton.addEventListener('click', (event) => {
+                event.stopPropagation(); // Prevent the card click event
+                // 改用 event.currentTarget 取得正確的 dataset
+                const button = event.currentTarget;
+                const stationLat = parseFloat(button.dataset.lat);
+                const stationLng = parseFloat(button.dataset.lng);
+                const stationName = button.dataset.name;
+                if (userLocation && !isNaN(stationLat) && !isNaN(stationLng)) {
+                    getRoute(userLocation.latitude, userLocation.longitude, stationLat, stationLng, stationName);
+                } else {
+                    showNotification(currentLang === "en" 
+                        ? "Your location is not available for navigation." 
+                        : "無法取得您的位置，無法規劃路線。");
+                }
+            });
+
+            // Keep the original card click listener for map centering
             card.addEventListener("click", () => {
               const lat = parseFloat(info.coords[0]);
               const lng = parseFloat(info.coords[1]);
@@ -1577,6 +1543,7 @@
               isFollowingUser = false;
               updateLocateButtonTitle();
             });
+
             resultsDiv.appendChild(card);
           });
 
@@ -1834,19 +1801,21 @@
               watchId = null;
               isTrackingActive = false;
           }
-          isFollowingUser = false;
+ 
       }
 
+     
       async function getLocation() {
           const centralLocationToggle = document.getElementById('centralLocationToggle');
           const isLocationServiceOn = centralLocationToggle?.checked;
           let locationSet = false;
 
+         
           if (isLocationServiceOn) {
               try {
                   const position = await new Promise((resolve, reject) => {
                       navigator.geolocation.getCurrentPosition(resolve, reject, {
-                          enableHighAccuracy: true,
+                                                   enableHighAccuracy: true,
                           timeout: 10000,
                           maximumAge: 0
                       });
@@ -1856,7 +1825,7 @@
                       longitude: position.coords.longitude
                   };
                   locationSet = true;
-                  isFollowingUser = true;
+                                   isFollowingUser = true;
                   hasObtainedRealLocation = true;
                   startTracking();
 
@@ -1887,7 +1856,7 @@
          
           } else {
               stopTracking();
-              const selectedRegion = document.getElementById('centralRegionSelect').value;
+                           const selectedRegion = document.getElementById('centralRegionSelect').value;
               const coords = regionCoordinates[selectedRegion];
               userLocation = { latitude: coords.lat, longitude: coords.lng };
               locationSet = true;
@@ -1959,7 +1928,7 @@
             if (isAtDefaultLocation) {
               distanceEl.textContent = "";
             } else {
-              const distanceLabel = currentLang === "en" ? "Distance:" : "距離:";
+              const distanceLabel = currentLang === "en" ? "Distance:" : "距離：";
              
               const unit = newDistance < 1 ? (currentLang === "en" ? " m" : " 公尺") : (currentLang === "en" ? " km" : " 公里");
               const displayDistance = newDistance < 1 ? Math.round(newDistance * 1000) : newDistance.toFixed(2);
@@ -2099,6 +2068,33 @@
     if (regionSelectLabel) {
         regionSelectLabel.textContent = currentLang === "en" ? "Region" : "地區選擇";
     }
+
+    // Update route modal texts
+    const routeModalTitle = document.getElementById('routeModalTitle');
+    if (routeModalTitle) {
+        routeModalTitle.textContent = currentLang === "en" ? "Route Information" : "路線資訊";
+    }
+    // Removed routeModalCloseButton text update
+    // const routeModalCloseButton = document.getElementById('routeModalCloseButton');
+    // if (routeModalCloseButton) {
+    //     routeModalCloseButton.textContent = currentLang === "en" ? "Close" : "關閉";
+    // }
+    // Update navigate button text on existing cards
+    document.querySelectorAll('.navigate-button').forEach(button => {
+        // Remove existing text content if any
+        button.childNodes.forEach(node => {
+            if (node.nodeType === Node.TEXT_NODE) {
+                node.remove();
+            }
+        });
+        // Ensure only the icon remains
+        if (!button.querySelector('.material-icons')) {
+             const iconSpan = document.createElement('span');
+             iconSpan.className = 'material-icons';
+             iconSpan.textContent = 'navigation';
+             button.appendChild(iconSpan);
+        }
+    });
       }
       updateLanguageTexts();
 
@@ -2321,8 +2317,8 @@
         if (!navigator.onLine) {
           if (!window.offlineNotified) {
             showNotification(currentLang === "en"
-              ? "Offline mode: Using cached map data"
-              : "離線模式：使用快取地圖資料");
+              ? "Offline: Cannot get route information."
+              : "離線狀態：無法取得路線資訊");
             window.offlineNotified = true;
           }
         }
@@ -2784,6 +2780,96 @@
 
           return nearestRegion;
       }
+
+      // --- New GraphHopper API Integration ---
+
+      const routeModal = document.getElementById('routeModal');
+      const routeDetailsDiv = document.getElementById('routeDetails');
+      const closeRouteModalButton = document.getElementById('closeRouteModal');
+      const routeModalTitle = document.getElementById('routeModalTitle');
+
+      // Close modal listeners
+      closeRouteModalButton.addEventListener('click', () => {
+          routeModal.style.display = 'none';
+          overlay.classList.remove('show');
+      });
+      overlay.addEventListener('click', () => {
+          if (routeModal.style.display === 'block') {
+              routeModal.style.display = 'none';
+              overlay.classList.remove('show');
+          }
+      });
+
+
+      async function getRoute(startLat, startLng, endLat, endLng, stationName) {
+          if (!navigator.onLine) {
+              showNotification(currentLang === "en" ? "Offline: Cannot get route information." : "離線狀態：無法取得路線資訊。");
+              return;
+          }
+          if (!userLocation) {
+               showNotification(currentLang === "en" ? "Your location is not available." : "無法取得您的位置。");
+               return;
+          }
+
+          // Replace with your actual API key
+          const apiKey = '7cb4eb19-e0f4-40a3-a5e0-f2c039366f32';
+          const profile = 'foot'; // Or 'bike' if appropriate
+          const locale = currentLang === "en" ? "en" : "zh-TW";
+
+          const url = `https://graphhopper.com/api/1/route?profile=${profile}&locale=${locale}&key=${apiKey}&elevation=false&instructions=true&point=${startLat},${startLng}&point=${endLat},${endLng}`;
+
+
+          routeDetailsDiv.innerHTML = currentLang === "en" ? "Calculating route..." : "計算路線中...";
+          routeModalTitle.textContent = currentLang === "en" ? "Route to " + stationName : "前往 " + stationName + " 的路線";
+          routeModal.style.display = 'block';
+          overlay.classList.add('show');
+
+
+          try {
+              const response = await fetch(url);
+              if (!response.ok) {
+                  const errorData = await response.json();
+                  throw new Error(`API error: ${response.status} - ${errorData.message || response.statusText}`);
+              }
+              const data = await response.json();
+
+              if (data.paths && data.paths.length > 0) {
+                  displayRouteDetails(data.paths[0], stationName);
+              } else {
+                  routeDetailsDiv.innerHTML = currentLang === "en" ? "No route found." : "找不到路線。";
+              }
+
+          } catch (error) {
+              console.error("Error fetching route:", error);
+              routeDetailsDiv.innerHTML = `${currentLang === "en" ? "Failed to get route: " : "取得路線失敗："} ${error.message}`;
+          }
+      }
+
+      function displayRouteDetails(routeData, stationName) {
+          let html = `<h4>${currentLang === "en" ? "Route to " : "前往 "}${stationName}</h4>`;
+
+          // Distance and Time
+          const distanceKm = (routeData.distance / 1000).toFixed(2);
+          const timeMinutes = Math.round(routeData.time / 60000);
+          html += `<p>${currentLang === "en" ? "Distance: " : "距離："} ${distanceKm} km</p>`;
+          html += `<p>${currentLang === "en" ? "Estimated Time: " : "預計時間："} ${timeMinutes} ${currentLang === "en" ? "minutes" : "分鐘"}</p>`;
+
+          // Instructions
+          if (routeData.instructions && routeData.instructions.length > 0) {
+              html += `<h4>${currentLang === "en" ? "Instructions:" : "導航步驟："}</h4><ul>`;
+              routeData.instructions.forEach(instruction => {
+                  html += `<li>${instruction.text} (${(instruction.distance / 1000).toFixed(2)} km, ${Math.round(instruction.time / 60000)} min)</li>`;
+              });
+              html += `</ul>`;
+          } else {
+              html += `<p>${currentLang === "en" ? "No detailed instructions available." : "無詳細導航步驟。"}</p>`;
+          }
+
+          routeDetailsDiv.innerHTML = html;
+      }
+
+      // --- End New GraphHopper API Integration ---
+
     </script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
