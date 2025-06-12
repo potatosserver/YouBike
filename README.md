@@ -39,7 +39,7 @@
 
 ## 螢幕截圖
 
-| ![1746933643059_100 (1)](https://github.com/user-attachments/assets/2f299d1a-2249-4bbe-aff7-5586719eaf32) | ![1746933638947_100 (1)](https://github.com/user-attachments/assets/0d15a9fd-9d17-4c62-a441-45fca1ee590a) |
+| ![1746933643059_100 (1)](https://raw.githubusercontent.com/potatosserver/YouBike/refs/heads/main/img/%E4%BA%AE%E8%89%B2%E6%A8%A1%E5%BC%8F.png) | ![1746933638947_100 (1)](https://github.com/user-attachments/assets/0d15a9fd-9d17-4c62-a441-45fca1ee590a) |
 |:---------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------:|
 
 ## 備註
