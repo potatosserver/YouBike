@@ -42,7 +42,7 @@
       #searchContainer,
       #keyword,
       #mainContent,
-      .modal, /* Add .modal here */
+      .modal,
       #locationSwitchContainer,
       #settingsPanel,
       .settings-group,
@@ -304,12 +304,9 @@
         background-color: rgba(0, 0, 0, 0.5);
         z-index: 999;
         display: none;
-        transition: opacity 0.3s ease; /* Add transition for smoother fade */
-        opacity: 0; /* Start hidden */
       }
       .overlay.show {
         display: block;
-        opacity: 1; /* Fade in */
       }
       .modal {
         position: fixed;
@@ -322,15 +319,11 @@
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         z-index: 1000;
         text-align: center;
-        display: none; /* Start hidden */
-        animation-duration: 0.3s; /* Match settings panel animation duration */
-        animation-fill-mode: forwards;
-        opacity: 0; /* Start hidden */
+        display: none;
       }
-      /* Remove .modal.show rule */
-      /* .modal.show {
+      .modal.show {
         display: block;
-      } */
+      }
       .modal button {
         margin: 10px auto;
         display: block;
@@ -392,7 +385,7 @@
         color: #cccccc;
       }
       body.dark-mode .modal {
-        background-color: #333; /* Match dark mode settings panel */
+        background-color: #333;
         color: #ffffff;
       }
       body.dark-mode .overlay {
@@ -968,16 +961,6 @@
       #centralSettingsPanel.panel-close {
         animation-name: slideOut;
       }
-
-      /* Add animation classes for modals */
-      .modal.modal-open {
-          animation-name: slideIn;
-      }
-      .modal.modal-close {
-          animation-name: slideOut;
-      }
-
-
       body.dark-mode #centralRegionSelect {
           background-color: #555;
           color: #fff;
@@ -1070,7 +1053,7 @@
           border-radius: 20px; /* Changed to match settings panel */
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Changed to match settings panel */
           z-index: 1000;
-          display: none; /* Start hidden */
+          display: none; /* Changed to none */
           width: 80%;
           max-width: 360px;
           max-height: calc(100vh - 80px); /* Changed to match settings panel */
@@ -1080,9 +1063,17 @@
           text-align: left;
           transition: background-color 0.3s ease, box-shadow 0.3s ease;
           backdrop-filter: blur(10px); /* Added backdrop filter */
-          animation-duration: 0.3s; /* Match settings panel animation duration */
-          animation-fill-mode: forwards;
-          opacity: 0; /* Start hidden */
+          animation-duration: 0.3s; /* Added animation duration */
+          animation-fill-mode: forwards; /* Added animation fill mode */
+          opacity: 0; /* Added initial opacity */
+      }
+
+      #routeModal.modal-open {
+          animation-name: slideIn; /* Use slideIn animation */
+      }
+
+      #routeModal.modal-close {
+          animation-name: slideOut; /* Use slideOut animation */
       }
 
       #routeModal::-webkit-scrollbar {
@@ -1333,8 +1324,7 @@ body.dark-mode #routeModal .bike-item p {
       let defaultLatitude = regionCoordinates.kaohsiung.lat;
       let defaultLongitude = regionCoordinates.kaohsiung.lng;
       const overlay = document.querySelector('.overlay');
-      const modal = document.querySelector('.modal'); // This selects the first modal, need to be specific
-      const permissionModal = document.getElementById('permissionModal'); // Get permission modal specifically
+      const modal = document.querySelector('.modal');
       const modalText = document.getElementById('modalText');
       const modalButton = document.getElementById('modalButton');
       const resultsDiv = document.getElementById('results');
@@ -2317,7 +2307,12 @@ body.dark-mode #routeModal .bike-item p {
             options[i].text = regionNames[value][currentLang === "en" ? "en" : "zh"];
         }
 
-        const routeModalTitle = document.getElementById('routeModalTitle');
+        const regionSelectLabel = document.querySelector('label[for="centralRegionSelect"]');
+    if (regionSelectLabel) {
+        regionSelectLabel.textContent = currentLang === "en" ? "Region" : "地區選擇";
+    }
+
+    const routeModalTitle = document.getElementById('routeModalTitle');
     if (routeModalTitle) {
     }
 
@@ -2381,6 +2376,7 @@ body.dark-mode #routeModal .bike-item p {
         if (centralSettingsPanel.style.display === 'block') {
             centralSettingsPanel.classList.remove('panel-open');
             centralSettingsPanel.classList.add('panel-close');
+            overlay.classList.remove('show'); // Hide overlay
             centralSettingsPanel.addEventListener('animationend', function handler() {
               centralSettingsPanel.style.display = 'none';
               centralSettingsPanel.classList.remove('panel-close');
@@ -2390,20 +2386,20 @@ body.dark-mode #routeModal .bike-item p {
             if (history.state && history.state.panelOpen) {
               history.back();
             }
-            overlay.classList.remove('show'); // Hide overlay
         } else {
             centralSettingsPanel.style.display = 'block';
             centralSettingsPanel.classList.remove('panel-close');
             centralSettingsPanel.classList.add('panel-open');
+            overlay.classList.add('show'); // Show overlay
             history.pushState({ panelOpen: true }, 'Settings', '#settings');
             settingsIcon.classList.add('rotate-right');
-            overlay.classList.add('show'); // Show overlay
           }
       });
 
       closeCentralSettings.addEventListener('click', () => {
         centralSettingsPanel.classList.remove('panel-open');
         centralSettingsPanel.classList.add('panel-close');
+        overlay.classList.remove('show'); // Hide overlay
         centralSettingsPanel.addEventListener('animationend', function handler() {
           centralSettingsPanel.style.display = 'none';
           centralSettingsPanel.classList.remove('panel-close');
@@ -2418,30 +2414,18 @@ body.dark-mode #routeModal .bike-item p {
         if (history.state && history.state.panelOpen) {
           history.back();
         }
-        overlay.classList.remove('show'); // Hide overlay
       });
 
       window.addEventListener('popstate', (event) => {
         if (centralSettingsPanel.style.display === 'block') {
           centralSettingsPanel.classList.remove('panel-open');
           centralSettingsPanel.classList.add('panel-close');
+          overlay.classList.remove('show'); // Hide overlay
           centralSettingsPanel.addEventListener('animationend', function handler() {
             centralSettingsPanel.style.display = 'none';
             centralSettingsPanel.classList.remove('panel-close');
             centralSettingsPanel.removeEventListener('animationend', handler);
           });
-          overlay.classList.remove('show'); // Hide overlay
-        }
-        // Add popstate handling for routeModal
-        if (routeModal.style.display === 'block') {
-             routeModal.classList.remove('modal-open');
-             routeModal.classList.add('modal-close');
-             routeModal.addEventListener('animationend', function handler() {
-                 routeModal.style.display = 'none';
-                 routeModal.classList.remove('modal-close');
-                 routeModal.removeEventListener('animationend', handler);
-             });
-             overlay.classList.remove('show');
         }
       });
 
@@ -2450,6 +2434,7 @@ body.dark-mode #routeModal .bike-item p {
 		if (centralSettingsPanel.style.display === 'block') {
 			centralSettingsPanel.classList.remove('panel-open');
 			centralSettingsPanel.classList.add('panel-close');
+            overlay.classList.remove('show'); // Hide overlay
 			settingsIcon.classList.add('rotate-left');
 			setTimeout(() => {
 				settingsIcon.classList.remove('rotate-left');
@@ -2462,7 +2447,6 @@ body.dark-mode #routeModal .bike-item p {
 			if (history.state && history.state.panelOpen) {
 				history.back();
 			}
-            overlay.classList.remove('show'); // Hide overlay
 		}
 	}
 });
@@ -3072,38 +3056,29 @@ body.dark-mode #routeModal .bike-item p {
       const routeModalTitle = document.getElementById('routeModalTitle');
 
       closeRouteModalButton.addEventListener('click', () => {
-          // Add close animation
           routeModal.classList.remove('modal-open');
           routeModal.classList.add('modal-close');
           routeModal.addEventListener('animationend', function handler() {
               routeModal.style.display = 'none';
+              overlay.classList.remove('show');
               routeModal.classList.remove('modal-close');
               routeModal.removeEventListener('animationend', handler);
           });
-          overlay.classList.remove('show');
       });
-      overlay.addEventListener('click', (e) => {
-          // Check if the click is outside the permission modal as well
-          if (permissionModal.style.display === 'block' && !permissionModal.contains(e.target)) {
-              // Handle permission modal close if needed, or just let the overlay click close it
-              // For now, let's assume clicking overlay closes permission modal too
-              permissionModal.style.display = 'none';
-              overlay.classList.remove('show');
-          } else if (routeModal.style.display === 'block' && !routeModal.contains(e.target)) {
-              // Add close animation for routeModal
+      overlay.addEventListener('click', () => {
+          if (routeModal.style.display === 'block') {
               routeModal.classList.remove('modal-open');
               routeModal.classList.add('modal-close');
               routeModal.addEventListener('animationend', function handler() {
                   routeModal.style.display = 'none';
+                  overlay.classList.remove('show');
                   routeModal.classList.remove('modal-close');
                   routeModal.removeEventListener('animationend', handler);
               });
-              overlay.classList.remove('show');
-          }
-          // Add check for settings panel here
-          if (centralSettingsPanel.style.display === 'block' && !centralSettingsPanel.contains(e.target) && e.target !== settingsButton) {
+          } else if (centralSettingsPanel.style.display === 'block') { // Add check for settings panel
               centralSettingsPanel.classList.remove('panel-open');
               centralSettingsPanel.classList.add('panel-close');
+              overlay.classList.remove('show'); // Hide overlay
               settingsIcon.classList.add('rotate-left');
               setTimeout(() => {
                   settingsIcon.classList.remove('rotate-left');
@@ -3116,7 +3091,6 @@ body.dark-mode #routeModal .bike-item p {
               if (history.state && history.state.panelOpen) {
                   history.back();
               }
-              overlay.classList.remove('show'); // Hide overlay
           }
       });
 
@@ -3140,11 +3114,9 @@ body.dark-mode #routeModal .bike-item p {
 
           routeDetailsDiv.innerHTML = currentLang === "en" ? "Calculating route..." : "計算路線中...";
           routeModalTitle.textContent = currentLang === "en" ? "Route to " + stationName : "前往 " + stationName + " 的路線";
-
-          // Show modal with animation
           routeModal.style.display = 'block';
-          routeModal.classList.remove('modal-close'); // Ensure close class is removed
-          routeModal.classList.add('modal-open');
+          routeModal.classList.remove('modal-close'); // Ensure close animation class is removed
+          routeModal.classList.add('modal-open'); // Add open animation class
           overlay.classList.add('show');
 
 
@@ -3254,13 +3226,10 @@ body.dark-mode #routeModal .bike-item p {
 
           routeModalTitle.textContent = window.langStrings.electricBikeDetailsTitle[currentLang] + stationName;
           routeDetailsDiv.innerHTML = window.langStrings.gettingBikeData[currentLang];
-
-          // Show modal with animation
           routeModal.style.display = 'block';
-          routeModal.classList.remove('modal-close'); // Ensure close class is removed
-          routeModal.classList.add('modal-open');
+          routeModal.classList.remove('modal-close'); // Ensure close animation class is removed
+          routeModal.classList.add('modal-open'); // Add open animation class
           overlay.classList.add('show');
-
 
           try {
               const response = await fetch(bikeListUrl, {
