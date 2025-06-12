@@ -691,7 +691,7 @@
       }      #settingsPanel {
           position: fixed;
           bottom: 60px;
-          right: 80px;
+          right: 20px; /* Adjusted to be consistent with settingsButton */
           display: flex;
           flex-direction: row;
           gap: 10px;
@@ -1049,20 +1049,21 @@
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
-          background-color: #fff;
+          background-color: #fff5f0; /* Changed to match settings panel */
           padding: 24px;
-          border-radius: 16px;
-          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+          border-radius: 20px; /* Changed to match settings panel */
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Changed to match settings panel */
           z-index: 1000;
           display: none;
           width: 80%;
           max-width: 360px;
-          max-height: 85vh;
+          max-height: calc(100vh - 80px); /* Changed to match settings panel */
           overflow-y: auto;
           scrollbar-width: none;
           -ms-overflow-style: none;
           text-align: left;
           transition: background-color 0.3s ease, box-shadow 0.3s ease;
+          backdrop-filter: blur(10px); /* Added backdrop filter */
       }
 
       #routeModal::-webkit-scrollbar {
@@ -1070,9 +1071,9 @@
       }
 
       body.dark-mode #routeModal {
-          background-color: #424242;
+          background-color: rgba(30, 30, 30, 0.95); /* Changed to match settings panel */
           color: #ffffff;
-          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+          box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1); /* Changed for dark mode consistency */
       }
 
       #routeModal h3 {
