@@ -2018,7 +2018,7 @@ body.dark-mode #routeModal .bike-item p {
           }
 
           if (navigator.geolocation) {
-              if (watchId !== null) {
+                           if (watchId !== null) {
                   navigator.geolocation.clearWatch(watchId);
               }
               isTrackingActive = true;
@@ -2436,6 +2436,44 @@ body.dark-mode #routeModal .bike-item p {
         if (history.state && history.state.type === 'settings') {
           history.back();
         }
+      });
+
+      window.addEventListener('popstate', (event) => {
+        // Close settings panel if open
+        if (centralSettingsPanel.style.display === 'block') {
+            centralSettingsPanel.classList.remove('panel-open');
+            centralSettingsPanel.classList.add('panel-close');
+            overlay.classList.remove('show'); // Hide overlay
+            settingsIcon.classList.add('rotate-left');
+            setTimeout(() => {
+                settingsIcon.classList.remove('rotate-left');
+            }, 1000);
+            centralSettingsPanel.addEventListener('animationend', function handler() {
+                centralSettingsPanel.style.display = 'none';
+                centralSettingsPanel.classList.remove('panel-close');
+                centralSettingsPanel.removeEventListener('animationend', handler);
+            });
+        }
+        // Close route modal if open
+        if (routeModal.style.display === 'block') {
+            routeModal.classList.remove('modal-open');
+            routeModal.classList.add('modal-close');
+            overlay.classList.remove('show'); // Hide overlay
+            routeModal.addEventListener('animationend', function handler() {
+                routeModal.style.display = 'none';
+                routeModal.classList.remove('modal-close');
+                routeModal.removeEventListener('animationend', handler);
+            });
+        }
+        // Close permission modal if open (it doesn't use history state, but should still close)
+        if (permissionModal.style.display === 'block') {
+            permissionModal.style.display = 'none';
+            overlay.classList.remove('show');
+        }
+        // Note: If the user navigates *forward* to a state that *should* have a modal open,
+        // this simple popstate listener won't automatically reopen it.
+        // The current implementation doesn't support forward navigation to modals anyway,
+        // so this simplified popstate handler should be sufficient for handling back navigation.
       });
 
       document.addEventListener('click', (e) => {
@@ -3100,10 +3138,6 @@ body.dark-mode #routeModal .bike-item p {
                   routeModal.classList.remove('modal-close');
                   routeModal.removeEventListener('animationend', handler);
               });
-              // Remove state from history when closed by overlay
-              if (history.state && (history.state.type === 'route' || history.state.type === 'electric')) {
-                  history.back();
-              }
           }
           // Close settings panel if open
           else if (centralSettingsPanel.style.display === 'block') {
@@ -3120,7 +3154,11 @@ body.dark-mode #routeModal .bike-item p {
                   centralSettingsPanel.removeEventListener('animationend', handler);
               });
           }
-          // Add check for permissionModal if needed, but it doesn't use history state currently
+          // Close permission modal if open
+          else if (permissionModal.style.display === 'block') {
+              permissionModal.style.display = 'none';
+              overlay.classList.remove('show');
+          }
       });
 
 

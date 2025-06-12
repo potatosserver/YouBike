@@ -1170,9 +1170,6 @@ body.dark-mode #routeModal .bike-item p {
     padding: 0;
     margin: 0;
 }
-#routeModal .bike-item {
-    margin-bottom: 12px;
-}
 #routeModal .bike-item:last-child {
     margin-bottom: 0;
 }
@@ -2021,7 +2018,7 @@ body.dark-mode #routeModal .bike-item p {
           }
 
           if (navigator.geolocation) {
-              if (watchId !== null) {
+                           if (watchId !== null) {
                   navigator.geolocation.clearWatch(watchId);
               }
               isTrackingActive = true;
@@ -2385,7 +2382,8 @@ body.dark-mode #routeModal .bike-item p {
               centralSettingsPanel.removeEventListener('animationend', handler);
             });
             settingsIcon.classList.add('rotate-left');
-            if (history.state && history.state.panelOpen) {
+            // Check if the current state is the settings panel state before going back
+            if (history.state && history.state.type === 'settings') {
               history.back();
             }
         } else {
@@ -2397,15 +2395,25 @@ body.dark-mode #routeModal .bike-item p {
                     routeModal.style.display = 'none';
                     routeModal.classList.remove('modal-close');
                     routeModal.removeEventListener('animationend', handler);
+                    // After route modal closes, open settings panel
+                    openSettingsPanel();
                 });
+                 // If route modal was open, go back first to clear its state
+                 if (history.state && (history.state.type === 'route' || history.state.type === 'electric')) {
+                     history.back();
+                 }
             }
-
-            centralSettingsPanel.style.display = 'block';
-            centralSettingsPanel.classList.remove('panel-close');
-            centralSettingsPanel.classList.add('panel-open');
-            overlay.classList.add('show'); // Show overlay
-            history.pushState({ panelOpen: true }, 'Settings', '#settings');
-            settingsIcon.classList.add('rotate-right');
+            // Close permission modal if open
+            else if (permissionModal.style.display === 'block') {
+                permissionModal.style.display = 'none';
+                overlay.classList.remove('show');
+                // After permission modal closes, open settings panel
+                openSettingsPanel();
+            }
+            // If no other modal is open, open settings panel directly
+            else {
+                openSettingsPanel();
+            }
           }
       });
 
@@ -2424,22 +2432,30 @@ body.dark-mode #routeModal .bike-item p {
           settingsIcon.classList.remove('rotate-left');
         }, 1000);
 
-        if (history.state && history.state.panelOpen) {
+        // Remove state from history when closed by button
+        if (history.state && history.state.type === 'settings') {
           history.back();
         }
       });
 
       window.addEventListener('popstate', (event) => {
+        // Close settings panel if open
         if (centralSettingsPanel.style.display === 'block') {
-          centralSettingsPanel.classList.remove('panel-open');
-          centralSettingsPanel.classList.add('panel-close');
-          overlay.classList.remove('show'); // Hide overlay
-          centralSettingsPanel.addEventListener('animationend', function handler() {
-            centralSettingsPanel.style.display = 'none';
-            centralSettingsPanel.classList.remove('panel-close');
-            centralSettingsPanel.removeEventListener('animationend', handler);
-          });
-        } else if (routeModal.style.display === 'block') { // Add check for route modal
+            centralSettingsPanel.classList.remove('panel-open');
+            centralSettingsPanel.classList.add('panel-close');
+            overlay.classList.remove('show'); // Hide overlay
+            settingsIcon.classList.add('rotate-left');
+            setTimeout(() => {
+                settingsIcon.classList.remove('rotate-left');
+            }, 1000);
+            centralSettingsPanel.addEventListener('animationend', function handler() {
+                centralSettingsPanel.style.display = 'none';
+                centralSettingsPanel.classList.remove('panel-close');
+                centralSettingsPanel.removeEventListener('animationend', handler);
+            });
+        }
+        // Close route modal if open
+        if (routeModal.style.display === 'block') {
             routeModal.classList.remove('modal-open');
             routeModal.classList.add('modal-close');
             overlay.classList.remove('show'); // Hide overlay
@@ -2449,26 +2465,35 @@ body.dark-mode #routeModal .bike-item p {
                 routeModal.removeEventListener('animationend', handler);
             });
         }
+        // Close permission modal if open (it doesn't use history state, but should still close)
+        if (permissionModal.style.display === 'block') {
+            permissionModal.style.display = 'none';
+            overlay.classList.remove('show');
+        }
+        // Note: If the user navigates *forward* to a state that *should* have a modal open,
+        // this simple popstate listener won't automatically reopen it.
+        // The current implementation doesn't support forward navigation to modals anyway,
+        // so this simplified popstate handler should be sufficient for handling back navigation.
       });
 
       document.addEventListener('click', (e) => {
-	if (!centralSettingsPanel.contains(e.target) && e.target !== settingsButton) {
-		if (centralSettingsPanel.style.display === 'block') {
-			centralSettingsPanel.classList.remove('panel-open');
-			centralSettingsPanel.classList.add('panel-close');
-            overlay.classList.remove('show'); // Hide overlay
-			settingsIcon.classList.add('rotate-left');
-			setTimeout(() => {
-				settingsIcon.classList.remove('rotate-left');
-			}, 1000);
-			centralSettingsPanel.addEventListener('animationend', function handler() {
-				centralSettingsPanel.style.display = 'none';
-				centralSettingsPanel.classList.remove('panel-close');
-				centralSettingsPanel.removeEventListener('animationend', handler);
-			});
-			if (history.state && history.state.panelOpen) {
-				history.back();
-			}
+	// Close settings panel if clicking outside
+	if (centralSettingsPanel.style.display === 'block' && !centralSettingsPanel.contains(e.target) && e.target !== settingsButton) {
+		centralSettingsPanel.classList.remove('panel-open');
+		centralSettingsPanel.classList.add('panel-close');
+        overlay.classList.remove('show'); // Hide overlay
+		settingsIcon.classList.add('rotate-left');
+		setTimeout(() => {
+			settingsIcon.classList.remove('rotate-left');
+		}, 1000);
+		centralSettingsPanel.addEventListener('animationend', function handler() {
+			centralSettingsPanel.style.display = 'none';
+			centralSettingsPanel.classList.remove('panel-close');
+			centralSettingsPanel.removeEventListener('animationend', handler);
+		});
+		// Remove state from history when closed by clicking outside
+		if (history.state && history.state.type === 'settings') {
+			history.back();
 		}
 	}
 });
@@ -2476,6 +2501,17 @@ body.dark-mode #routeModal .bike-item p {
       centralSettingsPanel.addEventListener('click', (event) => {
         event.stopPropagation();
       });
+
+      // Helper function to open the settings panel
+      function openSettingsPanel() {
+          centralSettingsPanel.style.display = 'block';
+          centralSettingsPanel.classList.remove('panel-close');
+          centralSettingsPanel.classList.add('panel-open');
+          overlay.classList.add('show'); // Show overlay
+          // Push state for settings panel
+          history.pushState({ modalOpen: true, type: 'settings' }, 'Settings', '#settings');
+          settingsIcon.classList.add('rotate-right');
+      }
 
       window.addEventListener('load', async () => {
         try {
@@ -3092,6 +3128,7 @@ body.dark-mode #routeModal .bike-item p {
           }
       });
       overlay.addEventListener('click', () => {
+          // Close route modal if open
           if (routeModal.style.display === 'block') {
               routeModal.classList.remove('modal-open');
               routeModal.classList.add('modal-close');
@@ -3101,11 +3138,9 @@ body.dark-mode #routeModal .bike-item p {
                   routeModal.classList.remove('modal-close');
                   routeModal.removeEventListener('animationend', handler);
               });
-              // Remove state from history when closed by overlay
-              if (history.state && (history.state.type === 'route' || history.state.type === 'electric')) {
-                  history.back();
-              }
-          } else if (centralSettingsPanel.style.display === 'block') { // Add check for settings panel
+          }
+          // Close settings panel if open
+          else if (centralSettingsPanel.style.display === 'block') {
               centralSettingsPanel.classList.remove('panel-open');
               centralSettingsPanel.classList.add('panel-close');
               overlay.classList.remove('show'); // Hide overlay
@@ -3118,9 +3153,11 @@ body.dark-mode #routeModal .bike-item p {
                   centralSettingsPanel.classList.remove('panel-close');
                   centralSettingsPanel.removeEventListener('animationend', handler);
               });
-              if (history.state && history.state.panelOpen) {
-                  history.back();
-              }
+          }
+          // Close permission modal if open
+          else if (permissionModal.style.display === 'block') {
+              permissionModal.style.display = 'none';
+              overlay.classList.remove('show');
           }
       });
 
@@ -3306,10 +3343,16 @@ body.dark-mode #routeModal .bike-item p {
       }
 
       // Add event listener to update data when the window gets focus
-      window.addEventListener('focus', () => {
-          console.log('Window focused, updating data...'); // Optional: for debugging
-          countdownTimer.update();
+
+
+      // Add event listener to update data when the tab becomes visible
+      document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible') {
+              console.log('Tab became visible, updating data...'); // Optional: for debugging
+              countdownTimer.update();
+          }
       });
+
     </script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
