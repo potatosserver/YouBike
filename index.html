@@ -1053,7 +1053,7 @@
           border-radius: 20px; /* Changed to match settings panel */
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Changed to match settings panel */
           z-index: 1000;
-          display: none;
+          display: none; /* Changed to none */
           width: 80%;
           max-width: 360px;
           max-height: calc(100vh - 80px); /* Changed to match settings panel */
@@ -1063,6 +1063,17 @@
           text-align: left;
           transition: background-color 0.3s ease, box-shadow 0.3s ease;
           backdrop-filter: blur(10px); /* Added backdrop filter */
+          animation-duration: 0.3s; /* Added animation duration */
+          animation-fill-mode: forwards; /* Added animation fill mode */
+          opacity: 0; /* Added initial opacity */
+      }
+
+      #routeModal.modal-open {
+          animation-name: slideIn; /* Use slideIn animation */
+      }
+
+      #routeModal.modal-close {
+          animation-name: slideOut; /* Use slideOut animation */
       }
 
       #routeModal::-webkit-scrollbar {
@@ -2365,6 +2376,7 @@ body.dark-mode #routeModal .bike-item p {
         if (centralSettingsPanel.style.display === 'block') {
             centralSettingsPanel.classList.remove('panel-open');
             centralSettingsPanel.classList.add('panel-close');
+            overlay.classList.remove('show'); // Hide overlay
             centralSettingsPanel.addEventListener('animationend', function handler() {
               centralSettingsPanel.style.display = 'none';
               centralSettingsPanel.classList.remove('panel-close');
@@ -2378,6 +2390,7 @@ body.dark-mode #routeModal .bike-item p {
             centralSettingsPanel.style.display = 'block';
             centralSettingsPanel.classList.remove('panel-close');
             centralSettingsPanel.classList.add('panel-open');
+            overlay.classList.add('show'); // Show overlay
             history.pushState({ panelOpen: true }, 'Settings', '#settings');
             settingsIcon.classList.add('rotate-right');
           }
@@ -2386,6 +2399,7 @@ body.dark-mode #routeModal .bike-item p {
       closeCentralSettings.addEventListener('click', () => {
         centralSettingsPanel.classList.remove('panel-open');
         centralSettingsPanel.classList.add('panel-close');
+        overlay.classList.remove('show'); // Hide overlay
         centralSettingsPanel.addEventListener('animationend', function handler() {
           centralSettingsPanel.style.display = 'none';
           centralSettingsPanel.classList.remove('panel-close');
@@ -2406,6 +2420,7 @@ body.dark-mode #routeModal .bike-item p {
         if (centralSettingsPanel.style.display === 'block') {
           centralSettingsPanel.classList.remove('panel-open');
           centralSettingsPanel.classList.add('panel-close');
+          overlay.classList.remove('show'); // Hide overlay
           centralSettingsPanel.addEventListener('animationend', function handler() {
             centralSettingsPanel.style.display = 'none';
             centralSettingsPanel.classList.remove('panel-close');
@@ -2419,6 +2434,7 @@ body.dark-mode #routeModal .bike-item p {
 		if (centralSettingsPanel.style.display === 'block') {
 			centralSettingsPanel.classList.remove('panel-open');
 			centralSettingsPanel.classList.add('panel-close');
+            overlay.classList.remove('show'); // Hide overlay
 			settingsIcon.classList.add('rotate-left');
 			setTimeout(() => {
 				settingsIcon.classList.remove('rotate-left');
@@ -3040,13 +3056,41 @@ body.dark-mode #routeModal .bike-item p {
       const routeModalTitle = document.getElementById('routeModalTitle');
 
       closeRouteModalButton.addEventListener('click', () => {
-          routeModal.style.display = 'none';
-          overlay.classList.remove('show');
+          routeModal.classList.remove('modal-open');
+          routeModal.classList.add('modal-close');
+          routeModal.addEventListener('animationend', function handler() {
+              routeModal.style.display = 'none';
+              overlay.classList.remove('show');
+              routeModal.classList.remove('modal-close');
+              routeModal.removeEventListener('animationend', handler);
+          });
       });
       overlay.addEventListener('click', () => {
           if (routeModal.style.display === 'block') {
-              routeModal.style.display = 'none';
-              overlay.classList.remove('show');
+              routeModal.classList.remove('modal-open');
+              routeModal.classList.add('modal-close');
+              routeModal.addEventListener('animationend', function handler() {
+                  routeModal.style.display = 'none';
+                  overlay.classList.remove('show');
+                  routeModal.classList.remove('modal-close');
+                  routeModal.removeEventListener('animationend', handler);
+              });
+          } else if (centralSettingsPanel.style.display === 'block') { // Add check for settings panel
+              centralSettingsPanel.classList.remove('panel-open');
+              centralSettingsPanel.classList.add('panel-close');
+              overlay.classList.remove('show'); // Hide overlay
+              settingsIcon.classList.add('rotate-left');
+              setTimeout(() => {
+                  settingsIcon.classList.remove('rotate-left');
+              }, 1000);
+              centralSettingsPanel.addEventListener('animationend', function handler() {
+                  centralSettingsPanel.style.display = 'none';
+                  centralSettingsPanel.classList.remove('panel-close');
+                  centralSettingsPanel.removeEventListener('animationend', handler);
+              });
+              if (history.state && history.state.panelOpen) {
+                  history.back();
+              }
           }
       });
 
@@ -3071,6 +3115,8 @@ body.dark-mode #routeModal .bike-item p {
           routeDetailsDiv.innerHTML = currentLang === "en" ? "Calculating route..." : "計算路線中...";
           routeModalTitle.textContent = currentLang === "en" ? "Route to " + stationName : "前往 " + stationName + " 的路線";
           routeModal.style.display = 'block';
+          routeModal.classList.remove('modal-close'); // Ensure close animation class is removed
+          routeModal.classList.add('modal-open'); // Add open animation class
           overlay.classList.add('show');
 
 
@@ -3181,6 +3227,8 @@ body.dark-mode #routeModal .bike-item p {
           routeModalTitle.textContent = window.langStrings.electricBikeDetailsTitle[currentLang] + stationName;
           routeDetailsDiv.innerHTML = window.langStrings.gettingBikeData[currentLang];
           routeModal.style.display = 'block';
+          routeModal.classList.remove('modal-close'); // Ensure close animation class is removed
+          routeModal.classList.add('modal-open'); // Add open animation class
           overlay.classList.add('show');
 
           try {
