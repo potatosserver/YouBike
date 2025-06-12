@@ -2395,20 +2395,25 @@ body.dark-mode #routeModal .bike-item p {
                     routeModal.style.display = 'none';
                     routeModal.classList.remove('modal-close');
                     routeModal.removeEventListener('animationend', handler);
+                    // After route modal closes, open settings panel
+                    openSettingsPanel();
                 });
                  // If route modal was open, go back first to clear its state
                  if (history.state && (history.state.type === 'route' || history.state.type === 'electric')) {
                      history.back();
                  }
             }
-
-            centralSettingsPanel.style.display = 'block';
-            centralSettingsPanel.classList.remove('panel-close');
-            centralSettingsPanel.classList.add('panel-open');
-            overlay.classList.add('show'); // Show overlay
-            // Push state for settings panel
-            history.pushState({ modalOpen: true, type: 'settings' }, 'Settings', '#settings');
-            settingsIcon.classList.add('rotate-right');
+            // Close permission modal if open
+            else if (permissionModal.style.display === 'block') {
+                permissionModal.style.display = 'none';
+                overlay.classList.remove('show');
+                // After permission modal closes, open settings panel
+                openSettingsPanel();
+            }
+            // If no other modal is open, open settings panel directly
+            else {
+                openSettingsPanel();
+            }
           }
       });
 
@@ -2430,42 +2435,6 @@ body.dark-mode #routeModal .bike-item p {
         // Remove state from history when closed by button
         if (history.state && history.state.type === 'settings') {
           history.back();
-        }
-      });
-
-      window.addEventListener('popstate', (event) => {
-        // Check if the state indicates a modal or panel was open
-        const state = event.state;
-        if (state && state.modalOpen) {
-            // If the state indicates a modal/panel should be open, but it's not, do nothing (browser handled it)
-            // If the state indicates a modal/panel should be open, and it is, do nothing (browser handled it)
-        } else {
-            // If the state indicates no modal/panel should be open, close any that are open
-            if (centralSettingsPanel.style.display === 'block') {
-                centralSettingsPanel.classList.remove('panel-open');
-                centralSettingsPanel.classList.add('panel-close');
-                overlay.classList.remove('show'); // Hide overlay
-                settingsIcon.classList.add('rotate-left');
-                setTimeout(() => {
-                    settingsIcon.classList.remove('rotate-left');
-                }, 1000);
-                centralSettingsPanel.addEventListener('animationend', function handler() {
-                    centralSettingsPanel.style.display = 'none';
-                    centralSettingsPanel.classList.remove('panel-close');
-                    centralSettingsPanel.removeEventListener('animationend', handler);
-                });
-            }
-            if (routeModal.style.display === 'block') {
-                routeModal.classList.remove('modal-open');
-                routeModal.classList.add('modal-close');
-                overlay.classList.remove('show'); // Hide overlay
-                routeModal.addEventListener('animationend', function handler() {
-                    routeModal.style.display = 'none';
-                    routeModal.classList.remove('modal-close');
-                    routeModal.removeEventListener('animationend', handler);
-                });
-            }
-            // Add check for permissionModal if needed, but it doesn't use history state currently
         }
       });
 
@@ -2494,6 +2463,17 @@ body.dark-mode #routeModal .bike-item p {
       centralSettingsPanel.addEventListener('click', (event) => {
         event.stopPropagation();
       });
+
+      // Helper function to open the settings panel
+      function openSettingsPanel() {
+          centralSettingsPanel.style.display = 'block';
+          centralSettingsPanel.classList.remove('panel-close');
+          centralSettingsPanel.classList.add('panel-open');
+          overlay.classList.add('show'); // Show overlay
+          // Push state for settings panel
+          history.pushState({ modalOpen: true, type: 'settings' }, 'Settings', '#settings');
+          settingsIcon.classList.add('rotate-right');
+      }
 
       window.addEventListener('load', async () => {
         try {
@@ -3139,10 +3119,6 @@ body.dark-mode #routeModal .bike-item p {
                   centralSettingsPanel.classList.remove('panel-close');
                   centralSettingsPanel.removeEventListener('animationend', handler);
               });
-              // Remove state from history when closed by overlay
-              if (history.state && history.state.type === 'settings') {
-                  history.back();
-              }
           }
           // Add check for permissionModal if needed, but it doesn't use history state currently
       });
