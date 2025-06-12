@@ -2369,6 +2369,16 @@ body.dark-mode #routeModal .bike-item p {
       const closeCentralSettings = document.getElementById('closeCentralSettings');
       const settingsIcon = settingsButton.querySelector('.material-icons');
 
+      // Function to clear the URL hash
+      function clearUrlHash() {
+          if (history.pushState) {
+              history.pushState('', document.title, window.location.pathname + window.location.search);
+          } else {
+              // Fallback for older browsers
+              window.location.hash = '';
+          }
+      }
+
       settingsButton.addEventListener('click', (event) => {
         event.stopPropagation();
         settingsIcon.classList.remove('rotate-right', 'rotate-left');
@@ -2380,11 +2390,14 @@ body.dark-mode #routeModal .bike-item p {
               centralSettingsPanel.style.display = 'none';
               centralSettingsPanel.classList.remove('panel-close');
               centralSettingsPanel.removeEventListener('animationend', handler);
+              clearUrlHash(); // Clear hash after closing animation
             });
             settingsIcon.classList.add('rotate-left');
             // Check if the current state is the settings panel state before going back
             if (history.state && history.state.type === 'settings') {
               history.back();
+            } else {
+                clearUrlHash(); // Clear hash if not using history.back()
             }
         } else {
             // Close route modal if open
@@ -2395,18 +2408,23 @@ body.dark-mode #routeModal .bike-item p {
                     routeModal.style.display = 'none';
                     routeModal.classList.remove('modal-close');
                     routeModal.removeEventListener('animationend', handler);
+                    clearUrlHash(); // Clear hash after closing animation
                     // After route modal closes, open settings panel
                     openSettingsPanel();
                 });
                  // If route modal was open, go back first to clear its state
                  if (history.state && (history.state.type === 'route' || history.state.type === 'electric')) {
                      history.back();
+                 } else {
+                     clearUrlHash(); // Clear hash if not using history.back()
+                     openSettingsPanel();
                  }
             }
             // Close permission modal if open
             else if (permissionModal.style.display === 'block') {
                 permissionModal.style.display = 'none';
                 overlay.classList.remove('show');
+                clearUrlHash(); // Clear hash after closing
                 // After permission modal closes, open settings panel
                 openSettingsPanel();
             }
@@ -2425,6 +2443,7 @@ body.dark-mode #routeModal .bike-item p {
           centralSettingsPanel.style.display = 'none';
           centralSettingsPanel.classList.remove('panel-close');
           centralSettingsPanel.removeEventListener('animationend', handler);
+          clearUrlHash(); // Clear hash after closing animation
         });
 
         settingsIcon.classList.add('rotate-left');
@@ -2435,6 +2454,8 @@ body.dark-mode #routeModal .bike-item p {
         // Remove state from history when closed by button
         if (history.state && history.state.type === 'settings') {
           history.back();
+        } else {
+            clearUrlHash(); // Clear hash if not using history.back()
         }
       });
 
@@ -2452,6 +2473,7 @@ body.dark-mode #routeModal .bike-item p {
                 centralSettingsPanel.style.display = 'none';
                 centralSettingsPanel.classList.remove('panel-close');
                 centralSettingsPanel.removeEventListener('animationend', handler);
+                clearUrlHash(); // Clear hash after closing animation
             });
         }
         // Close route modal if open
@@ -2463,12 +2485,14 @@ body.dark-mode #routeModal .bike-item p {
                 routeModal.style.display = 'none';
                 routeModal.classList.remove('modal-close');
                 routeModal.removeEventListener('animationend', handler);
+                clearUrlHash(); // Clear hash after closing animation
             });
         }
         // Close permission modal if open (it doesn't use history state, but should still close)
         if (permissionModal.style.display === 'block') {
             permissionModal.style.display = 'none';
             overlay.classList.remove('show');
+            clearUrlHash(); // Clear hash after closing
         }
         // Note: If the user navigates *forward* to a state that *should* have a modal open,
         // this simple popstate listener won't automatically reopen it.
@@ -2490,11 +2514,14 @@ body.dark-mode #routeModal .bike-item p {
 			centralSettingsPanel.style.display = 'none';
 			centralSettingsPanel.classList.remove('panel-close');
 			centralSettingsPanel.removeEventListener('animationend', handler);
+            clearUrlHash(); // Clear hash after closing animation
 		});
 		// Remove state from history when closed by clicking outside
 		if (history.state && history.state.type === 'settings') {
 			history.back();
-		}
+		} else {
+            clearUrlHash(); // Clear hash if not using history.back()
+        }
 	}
 });
       
@@ -3121,10 +3148,13 @@ body.dark-mode #routeModal .bike-item p {
               overlay.classList.remove('show');
               routeModal.classList.remove('modal-close');
               routeModal.removeEventListener('animationend', handler);
+              clearUrlHash(); // Clear hash after closing animation
           });
           // Remove state from history when closed by button
           if (history.state && (history.state.type === 'route' || history.state.type === 'electric')) {
               history.back();
+          } else {
+              clearUrlHash(); // Clear hash if not using history.back()
           }
       });
       overlay.addEventListener('click', () => {
@@ -3137,6 +3167,7 @@ body.dark-mode #routeModal .bike-item p {
                   routeModal.style.display = 'none';
                   routeModal.classList.remove('modal-close');
                   routeModal.removeEventListener('animationend', handler);
+                  clearUrlHash(); // Clear hash after closing animation
               });
           }
           // Close settings panel if open
@@ -3152,12 +3183,14 @@ body.dark-mode #routeModal .bike-item p {
                   centralSettingsPanel.style.display = 'none';
                   centralSettingsPanel.classList.remove('panel-close');
                   centralSettingsPanel.removeEventListener('animationend', handler);
+                  clearUrlHash(); // Clear hash after closing animation
               });
           }
           // Close permission modal if open
           else if (permissionModal.style.display === 'block') {
               permissionModal.style.display = 'none';
               overlay.classList.remove('show');
+              clearUrlHash(); // Clear hash after closing
           }
       });
 
