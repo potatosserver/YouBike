@@ -2437,6 +2437,15 @@ body.dark-mode #routeModal .bike-item p {
             centralSettingsPanel.classList.remove('panel-close');
             centralSettingsPanel.removeEventListener('animationend', handler);
           });
+        } else if (routeModal.style.display === 'block') { // Add check for route modal
+            routeModal.classList.remove('modal-open');
+            routeModal.classList.add('modal-close');
+            overlay.classList.remove('show'); // Hide overlay
+            routeModal.addEventListener('animationend', function handler() {
+                routeModal.style.display = 'none';
+                routeModal.classList.remove('modal-close');
+                routeModal.removeEventListener('animationend', handler);
+            });
         }
       });
 
@@ -3080,9 +3089,9 @@ body.dark-mode #routeModal .bike-item p {
           if (routeModal.style.display === 'block') {
               routeModal.classList.remove('modal-open');
               routeModal.classList.add('modal-close');
+              overlay.classList.remove('show'); // Hide overlay
               routeModal.addEventListener('animationend', function handler() {
                   routeModal.style.display = 'none';
-                  overlay.classList.remove('show');
                   routeModal.classList.remove('modal-close');
                   routeModal.removeEventListener('animationend', handler);
               });
@@ -3129,6 +3138,7 @@ body.dark-mode #routeModal .bike-item p {
           routeModal.classList.remove('modal-close'); // Ensure close animation class is removed
           routeModal.classList.add('modal-open'); // Add open animation class
           overlay.classList.add('show');
+          history.pushState({ modalOpen: true, type: 'route' }, 'Route', '#route'); // Push state for route modal
 
 
           try {
@@ -3241,6 +3251,8 @@ body.dark-mode #routeModal .bike-item p {
           routeModal.classList.remove('modal-close'); // Ensure close animation class is removed
           routeModal.classList.add('modal-open'); // Add open animation class
           overlay.classList.add('show');
+          history.pushState({ modalOpen: true, type: 'electric' }, 'Electric Bikes', '#electric'); // Push state for electric bike modal
+
 
           try {
               const response = await fetch(bikeListUrl, {
