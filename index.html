@@ -3084,6 +3084,10 @@ body.dark-mode #routeModal .bike-item p {
               routeModal.classList.remove('modal-close');
               routeModal.removeEventListener('animationend', handler);
           });
+          // Remove state from history when closed by button
+          if (history.state && (history.state.type === 'route' || history.state.type === 'electric')) {
+              history.back();
+          }
       });
       overlay.addEventListener('click', () => {
           if (routeModal.style.display === 'block') {
@@ -3095,6 +3099,10 @@ body.dark-mode #routeModal .bike-item p {
                   routeModal.classList.remove('modal-close');
                   routeModal.removeEventListener('animationend', handler);
               });
+              // Remove state from history when closed by overlay
+              if (history.state && (history.state.type === 'route' || history.state.type === 'electric')) {
+                  history.back();
+              }
           } else if (centralSettingsPanel.style.display === 'block') { // Add check for settings panel
               centralSettingsPanel.classList.remove('panel-open');
               centralSettingsPanel.classList.add('panel-close');
