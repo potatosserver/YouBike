@@ -6,17 +6,24 @@
 
 **簡介**
 
-此專案為一個簡單的網頁應用程式，提供使用者可以搜尋全國的 YouBike 站點資訊，並查看各站點的車輛狀況。
+此專案為一個簡單的網頁應用程式，
+提供使用者可以搜尋全國的 YouBike 站點資訊，
+並查看各站點的車輛狀況。
 
-使用者可以透過輸入站點名稱或定位，快速查詢 YouBike 2.0 站點的資訊，包括：
+使用者可以透過輸入站點名稱或定位，
+快速查詢 YouBike 2.0 站點的資訊，
+包括：
 * 站點名稱、地址
 * 直線距離
-* YouBike 2.0(E)數量
+* YouBike 2.0 數量
+* YouBike 2.0 E 數量、電量
 * 可停空位數
 * 附近站點
 
 **其他功能**
 * Openstreet Map地圖顯示
+* 預設區域切換
+* 站點路徑指示
 * 定位開關
 * 明亮/黑暗 雙色模式
 * 中/英 雙語模式
@@ -39,7 +46,7 @@
 
 ## 螢幕截圖
 
-| ![1746933643059_100 (1)](https://raw.githubusercontent.com/potatosserver/YouBike/refs/heads/main/img/%E4%BA%AE%E8%89%B2%E6%A8%A1%E5%BC%8F.png) | ![1746933638947_100 (1)](https://raw.githubusercontent.com/potatosserver/YouBike/refs/heads/main/img/%E6%B7%B1%E8%89%B2%E6%A8%A1%E5%BC%8F.png) |
+| ![亮色模式](https://raw.githubusercontent.com/potatosserver/YouBike/refs/heads/main/img/%E4%BA%AE%E8%89%B2%E6%A8%A1%E5%BC%8F.png) | ![暗色模式](https://raw.githubusercontent.com/potatosserver/YouBike/refs/heads/main/img/%E6%B7%B1%E8%89%B2%E6%A8%A1%E5%BC%8F.png) |
 |:---------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------:|
 
 ## 備註
