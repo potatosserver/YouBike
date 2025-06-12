@@ -2387,6 +2387,17 @@ body.dark-mode #routeModal .bike-item p {
               history.back();
             }
         } else {
+            // Close route modal if open
+            if (routeModal.style.display === 'block') {
+                routeModal.classList.remove('modal-open');
+                routeModal.classList.add('modal-close');
+                routeModal.addEventListener('animationend', function handler() {
+                    routeModal.style.display = 'none';
+                    routeModal.classList.remove('modal-close');
+                    routeModal.removeEventListener('animationend', handler);
+                });
+            }
+
             centralSettingsPanel.style.display = 'block';
             centralSettingsPanel.classList.remove('panel-close');
             centralSettingsPanel.classList.add('panel-open');
