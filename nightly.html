@@ -1800,6 +1800,8 @@ body.dark-mode #routeModal .bike-item p {
         } catch (error) {
           resultsDiv.innerHTML = `發生錯誤: ${error.message}`;
         }
+        // Reset the countdown timer after search completes
+        countdownTimer.reset();
       }
       async function queryVehicleData(stationIds) {
         if (stationIds.length > 60) {
@@ -3303,7 +3305,11 @@ body.dark-mode #routeModal .bike-item p {
           }
       }
 
-
+      // Add event listener to update data when the window gets focus
+      window.addEventListener('focus', () => {
+          console.log('Window focused, updating data...'); // Optional: for debugging
+          countdownTimer.update();
+      });
     </script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
