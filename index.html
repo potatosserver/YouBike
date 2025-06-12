@@ -290,7 +290,7 @@
           font-size: 24px;
           color: #4CAF50;
           display: none;
-          cursor: pointer; /* Add cursor pointer to indicate clickability */
+          cursor: pointer;
       }
       .station .electric-icon.show {
           display: block;
@@ -448,20 +448,20 @@
         position: sticky;
         top: 0;
         z-index: 100;
-        height: 24px;  /* Adjusted height to include space */
+        height: 24px;
         width: 100px;
         cursor: ns-resize;
         display: flex;
         justify-content: center;
         align-items: center;
-        margin: 0 auto;  /* Remove margin */
-        padding: 0;   /* Remove padding */
+        margin: 0 auto;
+        padding: 0;
       }
 
       #dragHandle::before {
         content: '';
         width: 100px;
-        height: 6px; /* Keep the bar height */
+        height: 6px;
         background: #a0a0a0;
         border-radius: 3px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.2);
@@ -734,41 +734,41 @@
         left: 50%;
         transform: translateX(-50%);
         z-index: 1000;
-        padding: 8px 16px; /* 增加內距 */
-        background-color: #ffdacf; /* 使用設定按鈕的亮色背景 */
-        color: #333; /* 使用設定按鈕的亮色文字 */
-        border: none; /* 移除邊框 */
-        border-radius: 20px; /* 更圓潤的邊角 */
-        font-size: 0.9em; /* 字體大小 */
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2); /* 較柔和的陰影 */
+        padding: 8px 16px;
+        background-color: #ffdacf;
+        color: #333;
+        border: none;
+        border-radius: 20px;
+        font-size: 0.9em;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         transition: all 0.3s ease;
-        width: auto; /* 寬度自動 */
-        min-width: 120px; /* 最小寬度 */
-        display: flex; /* 使用 flexbox 對齊內容 */
+        width: auto;
+        min-width: 120px;
+        display: flex;
         align-items: center;
         justify-content: center;
-        gap: 6px; /* 圖標和文字間距 */
+        gap: 6px;
       }
 
       #updateCountdown:hover {
-          background-color: #ffc0a8; /* 亮色懸停效果 */
+          background-color: #ffc0a8;
           box-shadow: 0 3px 6px rgba(0,0,0,0.3);
       }
 
       body.dark-mode #updateCountdown {
-          background-color: #e8def8; /* 淺紫色背景 */
-          color: #1c1b1f; /* 深色文字 */
+          background-color: #e8def8;
+          color: #1c1b1f;
           box-shadow: 0 2px 4px rgba(0,0,0,0.3);
       }
 
       body.dark-mode #updateCountdown:hover {
-          background-color: #d0bcff; /* 黑暗模式懸停效果 */
+          background-color: #d0bcff;
           color: #1c1b1f;
           box-shadow: 0 3px 6px rgba(0,0,0,0.4);
       }
 
       #updateCountdown .material-icons {
-          font-size: 18px; /* 圖標大小 */
+          font-size: 18px;
           vertical-align: middle;
       }
 
@@ -779,8 +779,8 @@
           z-index: 1600;
           width: 56px;
           height: 56px;
-          background: #ffdacf; /* 亮色模式背景 */
-          color: #333; /* 亮色模式文字 */
+          background: #ffdacf;
+          color: #333;
           border: none;
           border-radius: 16px;
           cursor: pointer;
@@ -793,18 +793,18 @@
       }
 
       #settingsButton:hover {
-          background-color: #ffc0a8; /* 亮色模式懸停 */
+          background-color: #ffc0a8;
           box-shadow: 0 4px 8px rgba(0,0,0,0.3);
       }
 
       body.dark-mode #settingsButton {
-          background-color: #e8def8; /* 黑暗模式背景 (淺紫色) */
-          color: #1c1b1f; /* 黑暗模式文字 */
+          background-color: #e8def8;
+          color: #1c1b1f;
           box-shadow: 0 3px 5px rgba(0,0,0,0.3);
       }
 
       body.dark-mode #settingsButton:hover {
-          background-color: #d0bcff; /* 黑暗模式懸停 */
+          background-color: #d0bcff;
           color: #1c1b1f;
           box-shadow: 0 4px 8px rgba(0,0,0,0.4);
       }
@@ -1049,19 +1049,20 @@
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
-          background-color: #fff5f0;
-          padding: 25px;
-          border-radius: 10px;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          background-color: #fff;
+          padding: 24px;
+          border-radius: 16px;
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
           z-index: 1000;
           display: none;
           width: 80%;
-          max-width: 320px;
-          max-height: 80vh;
+          max-width: 360px;
+          max-height: 85vh;
           overflow-y: auto;
           scrollbar-width: none;
           -ms-overflow-style: none;
           text-align: left;
+          transition: background-color 0.3s ease, box-shadow 0.3s ease;
       }
 
       #routeModal::-webkit-scrollbar {
@@ -1069,43 +1070,59 @@
       }
 
       body.dark-mode #routeModal {
-          background-color: #333;
+          background-color: #424242;
           color: #ffffff;
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
       }
 
       #routeModal h3 {
-          margin-top: 40px; /* 調整標題上方間距 */
-          margin-bottom: 15px;
-          padding-right: 30px; /* Ensure space for close button */
+          margin-top: 0;
+          margin-bottom: 20px;
+          padding-right: 40px;
           color: #007BFF;
+          font-size: 1.3em;
+          word-break: break-word;
       }
 
       body.dark-mode #routeModal h3 {
           color: #90CAF9;
       }
 
-      #routeModal .bike-item { /* Added style for bike list items */
-          padding: 16px !important;
-          margin-bottom: 12px !important; /* Increased margin */
-          background-color: #fff2ec !important; /* Added background color */
-          border-radius: 8px !important;
-          box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important; /* Added box shadow */
+      #routeModal .bike-item {
+          padding: 16px;
+          margin-bottom: 12px;
+          background-color: #f5f5f5;
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
           display: flex;
           flex-direction: column;
           gap: 8px;
+          transition: background-color 0.3s ease, box-shadow 0.3s ease;
       }
+
+      body.dark-mode #routeModal .bike-item {
+          background-color: #5a5a5a;
+          color: #fff;
+          box-shadow: 0 2px 4px rgba(255,255,255,0.1);
+      }
+
       #routeModal .bike-item p {
-          margin: 0 !important;
+          margin: 0;
           font-size: 14px;
           display: flex;
           align-items: center;
           gap: 8px;
+          color: #333;
+      }
+
+      body.dark-mode #routeModal .bike-item p {
+          color: #fff;
       }
 
       #closeRouteModal {
           position: absolute;
-          top: 2vh;
-          right: 2vh;
+          top: 12px;
+          right: 12px;
           background: none;
           border: none;
           font-size: 24px;
@@ -1126,32 +1143,34 @@
       }
 
       body.dark-mode #closeRouteModal {
-          color: #fff;
+          color: #ccc;
       }
 
       body.dark-mode #closeRouteModal:hover {
           background-color: rgba(255, 255, 255, 0.1);
       }
 
-      /* 針對電輔車列表卡片在黑暗模式下調整背景與文字顏色 */
 body.dark-mode #routeModal .bike-item {
-    background-color: #444 !important; /* Dark mode background */
+    background-color: #444 !important;
     color: #fff !important;
-    box-shadow: 0 4px 8px rgba(255,255,255,0.1) !important; /* Dark mode shadow */
+    box-shadow: 0 4px 8px rgba(255,255,255,0.1) !important;
 }
 body.dark-mode #routeModal .bike-item p {
     color: #fff !important;
 }
 
-/* 新增 CSS 以置中電輔車列表卡片於彈窗中 */
 #routeModal ul {
     list-style: none;
     padding: 0;
-    list-style: disc inside; /* Added bullet points */
+    margin: 0;
 }
 #routeModal .bike-item {
-    margin-bottom: 12px !important; /* Adjusted margin for bottom space */
+    margin-bottom: 12px;
 }
+#routeModal .bike-item:last-child {
+    margin-bottom: 0;
+}
+
     </style>
   </head>
   <body>
@@ -1299,7 +1318,7 @@ body.dark-mode #routeModal .bike-item p {
       let defaultLatitude = regionCoordinates.kaohsiung.lat;
       let defaultLongitude = regionCoordinates.kaohsiung.lng;
       const overlay = document.querySelector('.overlay');
-      const modal = document.querySelector('.modal'); // This is permissionModal
+      const modal = document.querySelector('.modal');
       const modalText = document.getElementById('modalText');
       const modalButton = document.getElementById('modalButton');
       const resultsDiv = document.getElementById('results');
@@ -1682,8 +1701,8 @@ body.dark-mode #routeModal .bike-item p {
             const displayEmptySpaces = stationVehicleData?.empty_spaces !== undefined ? stationVehicleData.empty_spaces : unknownValue;
 
             const electricIconHtml = (displayAvailableE !== unknownValue && parseInt(displayAvailableE) > 0)
-                ? `<span class="material-symbols-outlined electric-icon show" title="${currentLang === "en" ? "Electric Bike Available" : "有電輔車"}" data-station-id="${info.id}" data-station-name="${info.name}">offline_bolt</span>` // Added data attributes and event listener
-                : `<span class="material-symbols-outlined electric-icon" title="${currentLang === "en" ? "Electric Bike Available" : "有電輔車"}" data-station-id="${info.id}" data-station-name="${info.name}">offline_bolt</span>`; // Added data attributes
+                ? `<span class="material-symbols-outlined electric-icon show" title="${currentLang === "en" ? "Electric Bike Available" : "有電輔車"}" data-station-id="${info.id}" data-station-name="${info.name}">offline_bolt</span>`
+                : `<span class="material-symbols-outlined electric-icon" title="${currentLang === "en" ? "Electric Bike Available" : "有電輔車"}" data-station-id="${info.id}" data-station-name="${info.name}">offline_bolt</span>`;
 
 
             const distance = calculateDistance(
@@ -1740,11 +1759,10 @@ body.dark-mode #routeModal .bike-item p {
                 }
             });
 
-            // Add event listener for the electric bike icon
             const electricIcon = card.querySelector('.electric-icon');
             if (electricIcon) {
                 electricIcon.addEventListener('click', (event) => {
-                    event.stopPropagation(); // Prevent card click event
+                    event.stopPropagation();
                     const stationId = event.target.dataset.stationId;
                     const stationName = event.target.dataset.stationName;
                     if (stationId) {
@@ -1947,11 +1965,11 @@ body.dark-mode #routeModal .bike-item p {
           } else {
               updateCardDistances();
               updateResultsOrder();
-          }
+                   }
       }
       function handleGeoUpdateError(error) {
           isFollowingUser = false;
-          updateLocateButtonTitle();
+                   updateLocateButtonTitle();
 
 
           if (isTrackingActive || error.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
@@ -2202,7 +2220,6 @@ body.dark-mode #routeModal .bike-item p {
                     if (electricIcon) {
                         if (availableE !== unknownValue && parseInt(availableE) > 0) {
                             electricIcon.classList.add('show');
-                            // No need to re-add listener here, it's added during card creation
                         } else {
                             electricIcon.classList.remove('show');
                         }
@@ -2291,13 +2308,10 @@ body.dark-mode #routeModal .bike-item p {
 
     const routeModalTitle = document.getElementById('routeModalTitle');
     if (routeModalTitle) {
-        // Keep the default title for now, it will be updated by getRoute or showElectricBikeDetailsModal
-        // routeModalTitle.textContent = currentLang === "en" ? "Route Information" : "路線資訊";
     }
 
-    // Add language strings for electric bike modal
     window.langStrings = {
-        ...window.langStrings, // Keep existing strings if any
+        ...window.langStrings,
         electricBikeDetailsTitle: {
             zh: "電輔車列表 - ",
             en: "Electric Bikes - "
@@ -3052,8 +3066,8 @@ body.dark-mode #routeModal .bike-item p {
                return;
           }
 
-          const apiKey = '7cb4eb19-e0f4-40a3-a5e0-f2c039366f32'; // Replace with your actual GraphHopper API key
-          const profile = 'foot'; // or 'bike'
+          const apiKey = '7cb4eb19-e0f4-40a3-a5e0-f2c039366f32';
+          const profile = 'foot';
           const locale = currentLang === "en" ? "en" : "zh-TW";
 
           const url = `https://graphhopper.com/api/1/route?profile=${profile}&locale=${locale}&key=${apiKey}&elevation=false&instructions=true&point=${startLat},${startLng}&point=${endLat},${endLng}`;
@@ -3090,13 +3104,68 @@ body.dark-mode #routeModal .bike-item p {
 
           const distanceKm = (routeData.distance / 1000).toFixed(2);
           const timeMinutes = Math.round(routeData.time / 60000);
-          html += `<p>${currentLang === "en" ? "Distance: " : "距離："} ${distanceKm} km</p>`;
-          html += `<p>${currentLang === "en" ? "Estimated Time: " : "預計時間："} ${timeMinutes} ${currentLang === "en" ? "minutes" : "分鐘"}</p>`;
+          html += `<p><span class="material-icons" style="font-size: 18px; vertical-align: middle;">directions_walk</span>${currentLang === "en" ? "Distance: " : "距離："} ${distanceKm} km</p>`;
+          html += `<p><span class="material-icons" style="font-size: 18px; vertical-align: middle;">timer</span>${currentLang === "en" ? "Estimated Time: " : "預計時間："} ${timeMinutes} ${currentLang === "en" ? "minutes" : "分鐘"}</p>`;
 
           if (routeData.instructions && routeData.instructions.length > 0) {
               html += `<h4>${currentLang === "en" ? "Instructions:" : "導航步驟："}</h4><ul>`;
               routeData.instructions.forEach(instruction => {
-                  html += `<li>${instruction.text} (${(instruction.distance / 1000).toFixed(2)} km, ${Math.round(instruction.time / 60000)} min)</li>`;
+
+                  let iconName = 'arrow_forward';
+
+                  switch (instruction.sign) {
+                      case -3:
+                          iconName = 'u_turn_left';
+                          break;
+                      case -2:
+                      case -1:
+                      case 6:
+                          iconName = 'turn_left';
+                          break;
+                      case 0:
+                          iconName = 'arrow_upward';
+                          break;
+                      case 1:
+                      case 2:
+                      case 7:
+                          iconName = 'turn_right';
+                          break;
+                      case 3:
+                          iconName = 'u_turn_right';
+                          break;
+                      case 4:
+                          iconName = 'directions_boat';
+                          break;
+                      case 5:
+                          iconName = 'settings_ethernet';
+                          break;
+                      case -7:
+                          iconName = 'roundabout_left';
+                          break;
+                      case 7:
+                          iconName = 'roundabout_right';
+                          break;
+                      case -8:
+                          iconName = 'exit_to_app';
+                          break;
+                      case 8:
+                          iconName = 'flag';
+                          break;
+                      case -9:
+                          iconName = 'location_on';
+                          break;
+                      default:
+                          iconName = 'arrow_forward';
+                  }
+
+
+                  html += `
+                      <li class="bike-item">
+                          <p><span class="material-icons" style="font-size: 18px; vertical-align: middle;">${iconName}</span>${instruction.text}</p>
+                          <p><span class="material-icons" style="font-size: 18px; vertical-align: middle;">straighten</span>${(instruction.distance / 1000).toFixed(2)} km</p>
+                          <p><span class="material-icons" style="font-size: 18px; vertical-align: middle;">schedule</span>${Math.round(instruction.time / 60000)} min</p>
+                      </li>
+                  `;
               });
               html += `</ul>`;
           } else {
@@ -3106,7 +3175,6 @@ body.dark-mode #routeModal .bike-item p {
           routeDetailsDiv.innerHTML = html;
       }
 
-      // New function to show electric bike details
       async function showElectricBikeDetailsModal(stationId, stationName) {
           if (!navigator.onLine) {
               showNotification(currentLang === "en" ? "Offline: Cannot get electric bike details." : "離線狀態：無法取得電輔車詳細資訊。");
@@ -3137,16 +3205,15 @@ body.dark-mode #routeModal .bike-item p {
               const data = await response.json();
 
               if (data.retCode === 1 && data.retVal && data.retVal.length > 0) {
-                  // Sort bikes by battery power descending
                   data.retVal.sort((a, b) => b.battery_power - a.battery_power);
 
                   let bikeListHtml = '<ul>';
                   data.retVal.forEach(bike => {
                       bikeListHtml += `
                           <li class="bike-item">
-                              <p><span class="material-icons">directions_bike</span>${window.langStrings.bikeNumberLabel[currentLang]}${bike.bike_no}</p>
-                              <p><span class="material-icons">location_on</span>${window.langStrings.pillarNumberLabel[currentLang]}${bike.pillar_no}</p>
-                              <p><span class="material-icons">battery_charging_full</span>${window.langStrings.batteryPowerLabel[currentLang]}${bike.battery_power}%</p>
+                              <p><span class="material-icons" style="font-size: 18px; vertical-align: middle;">directions_bike</span>${window.langStrings.bikeNumberLabel[currentLang]}${bike.bike_no}</p>
+                              <p><span class="material-icons" style="font-size: 18px; vertical-align: middle;">location_on</span>${window.langStrings.pillarNumberLabel[currentLang]}${bike.pillar_no}</p>
+                              <p><span class="material-icons" style="font-size: 18px; vertical-align: middle;">battery_charging_full</span>${window.langStrings.batteryPowerLabel[currentLang]}${bike.battery_power}%</p>
                           </li>
                       `;
                   });
