@@ -1170,9 +1170,6 @@ body.dark-mode #routeModal .bike-item p {
     padding: 0;
     margin: 0;
 }
-#routeModal .bike-item {
-    margin-bottom: 12px;
-}
 #routeModal .bike-item:last-child {
     margin-bottom: 0;
 }
@@ -2385,7 +2382,8 @@ body.dark-mode #routeModal .bike-item p {
               centralSettingsPanel.removeEventListener('animationend', handler);
             });
             settingsIcon.classList.add('rotate-left');
-            if (history.state && history.state.panelOpen) {
+            // Check if the current state is the settings panel state before going back
+            if (history.state && history.state.type === 'settings') {
               history.back();
             }
         } else {
@@ -2398,13 +2396,18 @@ body.dark-mode #routeModal .bike-item p {
                     routeModal.classList.remove('modal-close');
                     routeModal.removeEventListener('animationend', handler);
                 });
+                 // If route modal was open, go back first to clear its state
+                 if (history.state && (history.state.type === 'route' || history.state.type === 'electric')) {
+                     history.back();
+                 }
             }
 
             centralSettingsPanel.style.display = 'block';
             centralSettingsPanel.classList.remove('panel-close');
             centralSettingsPanel.classList.add('panel-open');
             overlay.classList.add('show'); // Show overlay
-            history.pushState({ panelOpen: true }, 'Settings', '#settings');
+            // Push state for settings panel
+            history.pushState({ modalOpen: true, type: 'settings' }, 'Settings', '#settings');
             settingsIcon.classList.add('rotate-right');
           }
       });
@@ -2424,51 +2427,66 @@ body.dark-mode #routeModal .bike-item p {
           settingsIcon.classList.remove('rotate-left');
         }, 1000);
 
-        if (history.state && history.state.panelOpen) {
+        // Remove state from history when closed by button
+        if (history.state && history.state.type === 'settings') {
           history.back();
         }
       });
 
       window.addEventListener('popstate', (event) => {
-        if (centralSettingsPanel.style.display === 'block') {
-          centralSettingsPanel.classList.remove('panel-open');
-          centralSettingsPanel.classList.add('panel-close');
-          overlay.classList.remove('show'); // Hide overlay
-          centralSettingsPanel.addEventListener('animationend', function handler() {
-            centralSettingsPanel.style.display = 'none';
-            centralSettingsPanel.classList.remove('panel-close');
-            centralSettingsPanel.removeEventListener('animationend', handler);
-          });
-        } else if (routeModal.style.display === 'block') { // Add check for route modal
-            routeModal.classList.remove('modal-open');
-            routeModal.classList.add('modal-close');
-            overlay.classList.remove('show'); // Hide overlay
-            routeModal.addEventListener('animationend', function handler() {
-                routeModal.style.display = 'none';
-                routeModal.classList.remove('modal-close');
-                routeModal.removeEventListener('animationend', handler);
-            });
+        // Check if the state indicates a modal or panel was open
+        const state = event.state;
+        if (state && state.modalOpen) {
+            // If the state indicates a modal/panel should be open, but it's not, do nothing (browser handled it)
+            // If the state indicates a modal/panel should be open, and it is, do nothing (browser handled it)
+        } else {
+            // If the state indicates no modal/panel should be open, close any that are open
+            if (centralSettingsPanel.style.display === 'block') {
+                centralSettingsPanel.classList.remove('panel-open');
+                centralSettingsPanel.classList.add('panel-close');
+                overlay.classList.remove('show'); // Hide overlay
+                settingsIcon.classList.add('rotate-left');
+                setTimeout(() => {
+                    settingsIcon.classList.remove('rotate-left');
+                }, 1000);
+                centralSettingsPanel.addEventListener('animationend', function handler() {
+                    centralSettingsPanel.style.display = 'none';
+                    centralSettingsPanel.classList.remove('panel-close');
+                    centralSettingsPanel.removeEventListener('animationend', handler);
+                });
+            }
+            if (routeModal.style.display === 'block') {
+                routeModal.classList.remove('modal-open');
+                routeModal.classList.add('modal-close');
+                overlay.classList.remove('show'); // Hide overlay
+                routeModal.addEventListener('animationend', function handler() {
+                    routeModal.style.display = 'none';
+                    routeModal.classList.remove('modal-close');
+                    routeModal.removeEventListener('animationend', handler);
+                });
+            }
+            // Add check for permissionModal if needed, but it doesn't use history state currently
         }
       });
 
       document.addEventListener('click', (e) => {
-	if (!centralSettingsPanel.contains(e.target) && e.target !== settingsButton) {
-		if (centralSettingsPanel.style.display === 'block') {
-			centralSettingsPanel.classList.remove('panel-open');
-			centralSettingsPanel.classList.add('panel-close');
-            overlay.classList.remove('show'); // Hide overlay
-			settingsIcon.classList.add('rotate-left');
-			setTimeout(() => {
-				settingsIcon.classList.remove('rotate-left');
-			}, 1000);
-			centralSettingsPanel.addEventListener('animationend', function handler() {
-				centralSettingsPanel.style.display = 'none';
-				centralSettingsPanel.classList.remove('panel-close');
-				centralSettingsPanel.removeEventListener('animationend', handler);
-			});
-			if (history.state && history.state.panelOpen) {
-				history.back();
-			}
+	// Close settings panel if clicking outside
+	if (centralSettingsPanel.style.display === 'block' && !centralSettingsPanel.contains(e.target) && e.target !== settingsButton) {
+		centralSettingsPanel.classList.remove('panel-open');
+		centralSettingsPanel.classList.add('panel-close');
+        overlay.classList.remove('show'); // Hide overlay
+		settingsIcon.classList.add('rotate-left');
+		setTimeout(() => {
+			settingsIcon.classList.remove('rotate-left');
+		}, 1000);
+		centralSettingsPanel.addEventListener('animationend', function handler() {
+			centralSettingsPanel.style.display = 'none';
+			centralSettingsPanel.classList.remove('panel-close');
+			centralSettingsPanel.removeEventListener('animationend', handler);
+		});
+		// Remove state from history when closed by clicking outside
+		if (history.state && history.state.type === 'settings') {
+			history.back();
 		}
 	}
 });
@@ -3092,6 +3110,7 @@ body.dark-mode #routeModal .bike-item p {
           }
       });
       overlay.addEventListener('click', () => {
+          // Close route modal if open
           if (routeModal.style.display === 'block') {
               routeModal.classList.remove('modal-open');
               routeModal.classList.add('modal-close');
@@ -3105,7 +3124,9 @@ body.dark-mode #routeModal .bike-item p {
               if (history.state && (history.state.type === 'route' || history.state.type === 'electric')) {
                   history.back();
               }
-          } else if (centralSettingsPanel.style.display === 'block') { // Add check for settings panel
+          }
+          // Close settings panel if open
+          else if (centralSettingsPanel.style.display === 'block') {
               centralSettingsPanel.classList.remove('panel-open');
               centralSettingsPanel.classList.add('panel-close');
               overlay.classList.remove('show'); // Hide overlay
@@ -3118,10 +3139,12 @@ body.dark-mode #routeModal .bike-item p {
                   centralSettingsPanel.classList.remove('panel-close');
                   centralSettingsPanel.removeEventListener('animationend', handler);
               });
-              if (history.state && history.state.panelOpen) {
+              // Remove state from history when closed by overlay
+              if (history.state && history.state.type === 'settings') {
                   history.back();
               }
           }
+          // Add check for permissionModal if needed, but it doesn't use history state currently
       });
 
 
