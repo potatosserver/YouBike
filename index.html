@@ -59,16 +59,17 @@
         position: fixed;
         top: 20px;
         right: 20px;
-        background-color: rgba(255, 193, 7, 0.9);
-        color: #000;
+        /* Material 3 style adjustments */
+        background-color: #e8def8; /* Light mode background */
+        color: #1c1b1f; /* Light mode text color */
         padding: 12px 20px;
-        border-radius: 8px;
+        border-radius: 20px; /* More rounded corners */
         font-size: 14px;
         z-index: 10001;
         opacity: 0;
         transform: translateY(-20px);
         transition: all 0.3s ease;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Softer shadow */
       }
 
       #locationNotification.show {
@@ -401,6 +402,12 @@
         background-color: #000;
         color: #000;
         border: 1px solid #444;
+      }
+      /* Dark mode for location notification */
+      body.dark-mode #locationNotification {
+          background-color: #d0bcff; /* Dark mode background */
+          color: #1c1b1f; /* Dark mode text color */
+          box-shadow: 0 4px 8px rgba(255,255,255,0.2); /* Dark mode shadow */
       }
       #map {
         position: fixed;

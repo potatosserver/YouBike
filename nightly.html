@@ -43,6 +43,7 @@
       #keyword,
       #mainContent,
       .modal,
+      #locationSwitchContainer,
       #settingsPanel,
       .settings-group,
       .setting-item {
@@ -56,76 +57,30 @@
 
       #locationNotification {
         position: fixed;
-        top: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        background-color: rgba(33, 33, 33, 0.95);
-        color: #ffffff;
-        padding: 0;
-        border-radius: 18px;
+        top: 20px;
+        right: 20px;
+        /* Material 3 style adjustments */
+        background-color: #e8def8; /* Light mode background */
+        color: #1c1b1f; /* Light mode text color */
+        padding: 12px 20px;
+        border-radius: 20px; /* More rounded corners */
         font-size: 14px;
         z-index: 10001;
         opacity: 0;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-        max-width: 60%;
-        text-align: center;
-        pointer-events: none;
-        backdrop-filter: blur(8px);
-        overflow: hidden;
-        white-space: nowrap;
-        width: 36px;
-        height: 36px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: width 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.2s ease, padding 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-        transform-origin: left;
-      }
-
-      #locationNotification span {
-        opacity: 0;
-        transition: opacity 0.2s ease;
-        display: inline-block;
-        margin: 0 10px;
-        text-align: left;
-        position: absolute;
-        left: 36px; /* 圓形通知寬度 */
-        white-space: nowrap;
-      }
-      
-      @keyframes marquee {
-        0% { transform: translateX(0); }
-        100% { transform: translateX(var(--marquee-distance)); }
+        transform: translateY(-20px);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Softer shadow */
       }
 
       #locationNotification.show {
         opacity: 1;
-      }
-
-      #locationNotification.show-content {
-        width: auto;
-        min-width: 120px;
-        max-width: min(60%, 300px);
-        padding: 0 16px 0 46px; /* 左側 padding 增加以配合 span 的絕對定位 */
-      }
-
-      #locationNotification.show-content span {
-        opacity: 1;
-        transition: opacity 0.2s ease 0.15s;
-      }
-
-      #locationNotification.marquee-active span {
-        animation: marquee 8s linear infinite;
-        animation-delay: 1s;
+        transform: translateY(0);
       }
 
       #locationNotification.hide {
         opacity: 0;
-        width: 36px;
-        padding: 0;
-        transition: width 0.3s cubic-bezier(0.4, 0.0, 0.2, 1), opacity 0.2s 0.15s, padding 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        transform: translateY(-20px);
       }
-
       .main-title {
         color: #007bff;
         text-align: center;
@@ -208,6 +163,39 @@
 
       #searchIcon:hover {
         color: #007BFF;
+      }
+
+      #searchContainer + #locationSwitchContainer {
+           margin-top: 6px;
+      }
+
+      #locationSwitchContainer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 8px 15px;
+        border-radius: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+      }
+
+      body.dark-mode #locationSwitchContainer {
+          background-color: rgba(30, 30, 30, 0.9);
+          box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+      }
+
+      #locationSwitchText {
+          color: #007BFF;
+          font-weight: 500;
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+          margin-left: 10px;
+      }
+
+      body.dark-mode #locationSwitchText {
+          color: #90CAF9;
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
       }
 
       #results {
@@ -414,6 +402,12 @@
         background-color: #000;
         color: #000;
         border: 1px solid #444;
+      }
+      /* Dark mode for location notification */
+      body.dark-mode #locationNotification {
+          background-color: #d0bcff; /* Dark mode background */
+          color: #1c1b1f; /* Dark mode text color */
+          box-shadow: 0 4px 8px rgba(255,255,255,0.2); /* Dark mode shadow */
       }
       #map {
         position: fixed;
@@ -658,15 +652,50 @@
       input:checked + .slider:before {
         transform: translateX(26px);
       }
-      @keyframes slideIn {
-        from { transform: translate(-50%, -60%) scale(0.8); opacity: 0; }
-        to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      @keyframes popUp {
+          0% { transform: translateX(100%) scale(0.5); opacity: 0; }
+          100% { transform: translateX(0) scale(1); opacity: 1; }
       }
-      @keyframes slideOut {
-        from { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        to { transform: translate(-50%, -60%) scale(0.8); opacity: 0; }
+      @keyframes popDown {
+          0% { transform: translateX(0) scale(1); opacity: 1; }
+          100% { transform: translateX(100%) scale(0.5); opacity: 0; }
+      }      #extraButtons {
+          position: fixed;
+          bottom: 120px;
+          right: 80px;
+          transform: translateX(150%);
+          transition: transform 0.5s ease, opacity 0.5s ease;
+          display: flex;
+          flex-direction: row;
+          gap: 10px;
+          z-index: 1000;
+          opacity: 0;
+          pointer-events: none;
+      }      #extraButtons.show {
+          transform: translateX(0);
+          opacity: 1;
+          pointer-events: auto;
+          animation: popUp 0.5s forwards;
       }
-      #settingsPanel {
+      #extraButtons.hiding {
+          animation: popDown 0.5s forwards;
+      }
+      #extraButtons a {
+          width: 50px;
+          height: 50px;
+          background-color: white;
+          color: black;
+          border: none;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          text-decoration: none;
+          transition: background-color 0.3s ease;
+      }
+      #extraButtons a:hover {
+          background-color: #f0f0f0;
+      }      #settingsPanel {
           position: fixed;
           bottom: 60px;
           right: 20px; /* Adjusted to be consistent with settingsButton */
@@ -915,6 +944,19 @@
           background-color: rgba(255, 255, 255, 0.1);
       }
 
+      @keyframes fadeIn {
+          from { opacity: 0; transform: translate(-50%, -48%); }
+          to { opacity: 1; transform: translate(-50%, -50%); }
+      }
+
+      @keyframes slideIn {
+        from { transform: translate(-50%, -60%) scale(0.8); opacity: 0; }
+        to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      }
+      @keyframes slideOut {
+        from { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        to { transform: translate(-50%, -60%) scale(0.8); opacity: 0; }
+      }
       #centralSettingsPanel {
         animation-duration: 0.3s;
         animation-fill-mode: forwards;
@@ -1146,7 +1188,7 @@ body.dark-mode #routeModal .bike-item p {
     <div id="mapControls">
       <h1 id="heading" class="main-title"></h1>
       </div>
-    <div id="locationNotification"><span></span></div>
+    <div id="locationNotification"></div>
     <div id="loadingOverlay">
       <div id="loadingContent">
         <h2 id="loadingText">載入中</h2>
@@ -1832,68 +1874,14 @@ body.dark-mode #routeModal .bike-item p {
         });
       }
       function showNotification(message) {
-    const notification = document.getElementById('locationNotification');
-    const notificationTextSpan = notification.querySelector('span');
-    
-    // 重設所有狀態
-    notification.classList.remove('show', 'show-content', 'hide', 'marquee-active');
-    notificationTextSpan.style.animationDuration = '';
-    notificationTextSpan.style.transform = '';
-    notificationTextSpan.textContent = message;
-    
-    // 第一步：顯示圓點
-    notification.classList.add('show');
-    
-    // 第二步：延遲後展開並顯示文字
-    setTimeout(() => {
-        notification.classList.add('show-content');
-        
-        // 檢查是否需要滾動文字
-        const textWidth = notificationTextSpan.scrollWidth;
-        const containerWidth = notification.clientWidth;
-        const padding = 32; // 左右 padding 總和
-        const contentWidth = containerWidth - padding;
-        
-        if (textWidth > contentWidth) {
-            // 計算需要的滾動時間 (假設每100像素需要2秒)
-            const scrollDistance = textWidth - contentWidth + padding;
-            const scrollDuration = Math.max(4, Math.ceil(scrollDistance / 50)) + 1; // 最少4秒，每50像素1秒，加1秒緩衝
-            
-            notification.style.setProperty('--marquee-distance', `-${scrollDistance}px`);
-            notificationTextSpan.style.animationDuration = `${scrollDuration}s`;
-            notification.classList.add('marquee-active');
-            
-            // 等待文字完整滾動後再關閉
-            setTimeout(() => {
-                notification.classList.remove('show', 'show-content', 'marquee-active');
-                notification.classList.add('hide');
-                
-                // 完全清除通知
-                notification.addEventListener('transitionend', function handler() {
-                    if (!notification.classList.contains('show')) {
-                        notificationTextSpan.textContent = '';
-                        notification.classList.remove('hide');
-                        notification.removeEventListener('transitionend', handler);
-                    }
-                });
-            }, (scrollDuration + 1) * 1000); // 加1秒以確保完整播放
-        } else {
-            // 如果不需要滾動，顯示3秒後關閉
-            setTimeout(() => {
-                notification.classList.remove('show', 'show-content');
-                notification.classList.add('hide');
-                
-                notification.addEventListener('transitionend', function handler() {
-                    if (!notification.classList.contains('show')) {
-                        notificationTextSpan.textContent = '';
-                        notification.classList.remove('hide');
-                        notification.removeEventListener('transitionend', handler);
-                    }
-                });
-            }, 3000);
-        }
-    }, 400);
-}
+
+          const notification = document.getElementById('locationNotification');
+          notification.textContent = message;
+                   notification.classList.add('show');
+          setTimeout(() => {
+            notification.classList.remove('show');
+          }, 5000);
+      }
 
       function calculateDistance(lat1, lon1, lat2, lon2) {
         const R = 6371;
@@ -2025,7 +2013,6 @@ body.dark-mode #routeModal .bike-item p {
                 setTimeout(() => {
                   notification.classList.remove('show', 'hide');
                 }, 300);
-
               }, 3000);
           }
       }
@@ -2043,14 +2030,13 @@ body.dark-mode #routeModal .bike-item p {
               }
               isTrackingActive = true;
               watchId = navigator.geolocation.watchPosition(
-                 
                   handleGeoUpdate,
                   handleGeoUpdateError,
                   { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
               );
           } else {
               showNotification(currentLang === "en" ? "Geolocation not supported." : "您的瀏覽器不支援地理位置功能。");
-                           stopTracking();
+              stopTracking();
               const centralLocationToggle = document.getElementById('centralLocationToggle');
               if (centralLocationToggle) {
                  centralLocationToggle.checked = false;
@@ -2067,6 +2053,7 @@ body.dark-mode #routeModal .bike-item p {
               watchId = null;
               isTrackingActive = false;
           }
+
       }
 
 
@@ -2263,6 +2250,10 @@ body.dark-mode #routeModal .bike-item p {
 
       function updateLanguageTexts() {
         document.title = currentLang === "en" ? "YouBike Site Search : A simple, beautiful site search engine" : "YouBike 站點搜尋 : 一個簡單、美觀、低流量的YouBike站點搜尋器";
+        const locationSwitchSpan = document.querySelector('#locationSwitchText');
+        if (locationSwitchSpan) {
+          locationSwitchSpan.textContent = currentLang === "en" ? "Use Location" : "使用定位";
+        }
         const heading = document.getElementById('heading');
                if (heading) {
             heading.textContent = currentLang === "en" ? "YouBike Station Search" : "YouBike  站點搜尋";
@@ -2322,7 +2313,12 @@ body.dark-mode #routeModal .bike-item p {
             options[i].text = regionNames[value][currentLang === "en" ? "en" : "zh"];
         }
 
-        const routeModalTitle = document.getElementById('routeModalTitle');
+        const regionSelectLabel = document.querySelector('label[for="centralRegionSelect"]');
+    if (regionSelectLabel) {
+        regionSelectLabel.textContent = currentLang === "en" ? "Region" : "地區選擇";
+    }
+
+    const routeModalTitle = document.getElementById('routeModalTitle');
     if (routeModalTitle) {
     }
 
@@ -2710,9 +2706,7 @@ body.dark-mode #routeModal .bike-item p {
 
             const isDarkMode = document.body.classList.contains('dark-mode');
             if (isDarkMode && tileLayer._container) {
-                if (tileLayer._container.style.filter !== 'none') { // Prevent applying filter multiple times
-                    tileLayer._container.style.filter = 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)';
-                }
+                tileLayer._container.style.filter = 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)';
                 const attribution = document.querySelector('.leaflet-control-attribution');
                 if (attribution) {
                     attribution.style.color = '#ccc';
@@ -2849,6 +2843,13 @@ body.dark-mode #routeModal .bike-item p {
         } catch (error) {
         }
       }
+      
+      document.addEventListener('click', (e) => {
+        const floatingCard = document.getElementById('floatingCard');
+        if (floatingCard && !e.target.closest('#floatingCard') && floatingCard.style.display === 'block') {
+          floatingCard.style.display = 'none';
+        }
+      });
 
 
       const mainContent = document.getElementById('mainContent');
@@ -2999,9 +3000,7 @@ body.dark-mode #routeModal .bike-item p {
         if (isDarkMode) {
           document.body.classList.add('dark-mode');
           if (tileLayer && tileLayer._container) {
-            if (tileLayer._container.style.filter !== 'none') { // Prevent applying filter multiple times
-                tileLayer._container.style.filter = 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)';
-            }
+            tileLayer._container.style.filter = 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)';
             const attribution = document.querySelector('.leaflet-control-attribution');
             if (attribution) {
                 attribution.style.color = '#ccc';
@@ -3389,9 +3388,11 @@ body.dark-mode #routeModal .bike-item p {
       // Add event listener to update data when the tab becomes visible
       document.addEventListener('visibilitychange', () => {
           if (document.visibilityState === 'visible') {
+              console.log('Tab became visible, updating data...'); // Optional: for debugging
               countdownTimer.update();
           }
       });
+
     </script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
