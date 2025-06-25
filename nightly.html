@@ -659,7 +659,14 @@
       @keyframes popDown {
           0% { transform: translateX(0) scale(1); opacity: 1; }
           100% { transform: translateX(100%) scale(0.5); opacity: 0; }
-      }      #extraButtons {
+      }
+      @keyframes shake {
+        10%, 90% { transform: translate3d(-1px, 0, 0); }
+        20%, 80% { transform: translate3d(2px, 0, 0); }
+        30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+        40%, 60% { transform: translate3d(4px, 0, 0); }
+      }
+      #extraButtons {
           position: fixed;
           bottom: 120px;
           right: 80px;
@@ -2547,79 +2554,7 @@ body.dark-mode #routeModal .bike-item p {
           settingsIcon.classList.add('rotate-right');
       }
 
-      window.addEventListener('load', async () => {
-        if (!navigator.onLine) {
-            const loadingContent = document.getElementById('loadingContent');
-            const isDarkMode = document.body.classList.contains('dark-mode');
-
-            // Clear existing content
-            loadingContent.innerHTML = '';
-
-            // Create an icon element
-            const offlineIcon = document.createElement('span');
-            offlineIcon.className = 'material-icons';
-            offlineIcon.textContent = 'wifi_off';
-            offlineIcon.style.fontSize = '80px';
-            offlineIcon.style.color = isDarkMode ? '#999' : '#888';
-            offlineIcon.style.marginBottom = '20px';
-
-            // Create the main text element
-            const loadingText = document.createElement('h2');
-            loadingText.textContent = '請連接網路後重試';
-            loadingText.style.fontSize = '1.8em';
-            loadingText.style.color = isDarkMode ? '#fff' : '#333';
-            loadingText.style.margin = '0';
-
-
-            // Create and style the retry button
-            const retryButton = document.createElement('button');
-            retryButton.textContent = '重整';
-            retryButton.style.cssText = `
-                padding: 12px 24px;
-                font-size: 1.1em;
-                font-weight: 500;
-                cursor: pointer;
-                margin-top: 30px;
-                border-radius: 28px;
-                border: none;
-                transition: background-color 0.3s, box-shadow 0.3s;
-            `;
-
-            if (isDarkMode) {
-                retryButton.style.backgroundColor = '#e8def8';
-                retryButton.style.color = '#1c1b1f';
-                retryButton.style.boxShadow = '0 3px 5px rgba(0,0,0,0.3)';
-            } else {
-                retryButton.style.backgroundColor = '#ffdacf';
-                retryButton.style.color = '#333';
-                retryButton.style.boxShadow = '0 3px 5px rgba(0,0,0,0.2)';
-            }
-            
-            retryButton.onmouseover = () => {
-                 if (isDarkMode) {
-                    retryButton.style.backgroundColor = '#d0bcff';
-                 } else {
-                    retryButton.style.backgroundColor = '#ffc0a8';
-                 }
-            };
-             retryButton.onmouseout = () => {
-                 if (isDarkMode) {
-                    retryButton.style.backgroundColor = '#e8def8';
-                 } else {
-                    retryButton.style.backgroundColor = '#ffdacf';
-                 }
-            };
-
-
-            retryButton.onclick = () => location.reload();
-            
-            loadingContent.appendChild(offlineIcon);
-            loadingContent.appendChild(loadingText);
-            loadingContent.appendChild(retryButton);
-            
-            return;
-        }
-
+      async function initializeApp() {
         // Only run loading animations if online
         simulateLoadingPercentage();
         showRandomNotice();
@@ -2657,21 +2592,151 @@ body.dark-mode #routeModal .bike-item p {
 
         } catch (error) {
           // Handle initialization errors
-          const loadingText = document.getElementById('loadingText');
-          const noticeBox = document.getElementById('noticeBox');
           const loadingContent = document.getElementById('loadingContent');
+          loadingContent.innerHTML = ''; // Clear existing content
+          const isDarkMode = document.body.classList.contains('dark-mode');
           
-          loadingText.textContent = `初始化失敗: ${error.message}`;
-          loadingText.style.color = 'red';
-          noticeBox.style.display = 'none';
+          const errorIcon = document.createElement('span');
+          errorIcon.className = 'material-icons';
+          errorIcon.textContent = 'error_outline';
+          errorIcon.style.fontSize = '80px';
+          errorIcon.style.color = 'red';
+          errorIcon.style.marginBottom = '20px';
+
+          const errorText = document.createElement('h2');
+          errorText.textContent = `初始化失敗: ${error.message}`;
+          errorText.style.color = 'red';
+          errorText.style.fontSize = '1.2em';
 
           const retryButton = document.createElement('button');
           retryButton.textContent = '重試';
-          retryButton.style.cssText = `padding: 10px 20px; font-size: 1.2em; cursor: pointer; margin-top: 20px; border-radius: 5px; border: 1px solid #ccc; background-color: #f0f0f0; color: #333;`;
-          retryButton.onclick = () => location.reload();
+          retryButton.style.cssText = `padding: 12px 24px; font-size: 1.1em; font-weight: 500; cursor: pointer; margin-top: 30px; border-radius: 28px; border: none;`;
+          if (isDarkMode) {
+              retryButton.style.backgroundColor = '#e8def8';
+              retryButton.style.color = '#1c1b1f';
+          } else {
+              retryButton.style.backgroundColor = '#ffdacf';
+              retryButton.style.color = '#333';
+          }
+          retryButton.onclick = attemptReconnect;
+          
+          loadingContent.appendChild(errorIcon);
+          loadingContent.appendChild(errorText);
           loadingContent.appendChild(retryButton);
         }
+      }
+
+      function showOfflineScreen() {
+          const loadingContent = document.getElementById('loadingContent');
+          const isDarkMode = document.body.classList.contains('dark-mode');
+
+          // Clear existing content
+          loadingContent.innerHTML = '';
+
+          // Create an icon element
+          const offlineIcon = document.createElement('span');
+          offlineIcon.className = 'material-icons';
+          offlineIcon.textContent = 'wifi_off';
+          offlineIcon.style.fontSize = '80px';
+          offlineIcon.style.color = isDarkMode ? '#999' : '#888';
+          offlineIcon.style.marginBottom = '20px';
+
+          // Create the main text element
+          const loadingText = document.createElement('h2');
+          loadingText.textContent = '請連接網路後重試';
+          loadingText.style.fontSize = '1.8em';
+          loadingText.style.color = isDarkMode ? '#fff' : '#333';
+          loadingText.style.margin = '0';
+
+          // Create and style the retry button
+          const retryButton = document.createElement('button');
+          retryButton.textContent = '重整';
+          retryButton.style.cssText = `
+              padding: 12px 24px;
+              font-size: 1.1em;
+              font-weight: 500;
+              cursor: pointer;
+              margin-top: 30px;
+              border-radius: 28px;
+              border: none;
+              transition: background-color 0.3s, box-shadow 0.3s;
+          `;
+
+          if (isDarkMode) {
+              retryButton.style.backgroundColor = '#e8def8';
+              retryButton.style.color = '#1c1b1f';
+              retryButton.style.boxShadow = '0 3px 5px rgba(0,0,0,0.3)';
+          } else {
+              retryButton.style.backgroundColor = '#ffdacf';
+              retryButton.style.color = '#333';
+              retryButton.style.boxShadow = '0 3px 5px rgba(0,0,0,0.2)';
+          }
+          
+          retryButton.onmouseover = () => {
+                if (isDarkMode) {
+                  retryButton.style.backgroundColor = '#d0bcff';
+                } else {
+                  retryButton.style.backgroundColor = '#ffc0a8';
+                }
+          };
+            retryButton.onmouseout = () => {
+                if (isDarkMode) {
+                  retryButton.style.backgroundColor = '#e8def8';
+                } else {
+                  retryButton.style.backgroundColor = '#ffdacf';
+                }
+          };
+
+          retryButton.onclick = attemptReconnect;
+          
+          loadingContent.appendChild(offlineIcon);
+          loadingContent.appendChild(loadingText);
+          loadingContent.appendChild(retryButton);
+      }
+
+      async function attemptReconnect() {
+          const loadingContent = document.getElementById('loadingContent');
+          const isDarkMode = document.body.classList.contains('dark-mode');
+          
+          // Show a testing connection message
+          loadingContent.innerHTML = `<h2 style="font-size: 1.8em; color: ${isDarkMode ? '#fff' : '#333'};">測試連線中...</h2>`;
+
+          try {
+              // Use a no-cache request to ensure we hit the network.
+              const response = await fetch("https://apis.youbike.com.tw/json/station-min-yb2.json", { cache: "no-store" });
+              if (!response.ok) {
+                  // This could happen if the API is down but there's internet.
+                  throw new Error('API 無法存取');
+              }
+              
+              // If fetch succeeds, we are online.
+              loadingContent.innerHTML = `<h2 id="loadingText" style="color: ${isDarkMode ? '#fff' : '#333'};">連線成功，重新載入中...</h2>`;
+              initializeApp();
+
+          } catch (error) {
+              // Fetch failed, still offline or another issue occurred.
+              showOfflineScreen(); // Re-render the offline screen
+              const loadingText = loadingContent.querySelector('h2');
+              const retryButton = loadingContent.querySelector('button');
+              if (loadingText) loadingText.textContent = '仍無法連線，請檢查網路';
+              if(retryButton) {
+                  retryButton.style.animation = 'shake 0.5s';
+                  setTimeout(() => {
+                      retryButton.style.animation = '';
+                  }, 500);
+              }
+          }
+      }
+
+      window.addEventListener('load', () => {
+        // Run after DOMContentLoaded to ensure dark mode is set
+        if (!navigator.onLine) {
+            showOfflineScreen();
+        } else {
+            initializeApp();
+        }
       });
+
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
           isFollowingUser = false;
@@ -3463,3 +3528,4 @@ body.dark-mode #routeModal .bike-item p {
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
   </body>
 </html>
+", remove the `window.addEventListener('load', ...)` listener and replace it with a new implementation. The new implementation should first check `navigator.onLine`. If offline, it should call a new function `showOfflineScreen()`. If online, it should call `initializeApp()`. The `showOfflineScreen()` function should create and display the offline UI, including a "重整" button that calls a new `attemptReconnect()` function. The `attemptReconnect()` function should test the network connection by fetching from the YouBike API. If the fetch is successful, it should clear the offline UI, show a "reloading" message, and then call `initializeApp()`. If the fetch fails, it should show feedback to the user that the connection is still offline. Also, `initializeApp()` should encapsulate the main application logic previously in the `load` event listen
