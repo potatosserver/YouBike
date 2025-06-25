@@ -2549,31 +2549,75 @@ body.dark-mode #routeModal .bike-item p {
 
       window.addEventListener('load', async () => {
         if (!navigator.onLine) {
-            const loadingText = document.getElementById('loadingText');
-            const noticeBox = document.getElementById('noticeBox');
             const loadingContent = document.getElementById('loadingContent');
+            const isDarkMode = document.body.classList.contains('dark-mode');
 
+            // Clear existing content
+            loadingContent.innerHTML = '';
+
+            // Create an icon element
+            const offlineIcon = document.createElement('span');
+            offlineIcon.className = 'material-icons';
+            offlineIcon.textContent = 'wifi_off';
+            offlineIcon.style.fontSize = '80px';
+            offlineIcon.style.color = isDarkMode ? '#999' : '#888';
+            offlineIcon.style.marginBottom = '20px';
+
+            // Create the main text element
+            const loadingText = document.createElement('h2');
             loadingText.textContent = '請連接網路後重試';
-            loadingText.style.fontSize = '2em';
-            noticeBox.style.display = 'none';
+            loadingText.style.fontSize = '1.8em';
+            loadingText.style.color = isDarkMode ? '#fff' : '#333';
+            loadingText.style.margin = '0';
 
+
+            // Create and style the retry button
             const retryButton = document.createElement('button');
-            retryButton.id = 'retryButton';
             retryButton.textContent = '重整';
             retryButton.style.cssText = `
-                padding: 10px 20px;
-                font-size: 1.2em;
+                padding: 12px 24px;
+                font-size: 1.1em;
+                font-weight: 500;
                 cursor: pointer;
-                margin-top: 20px;
-                border-radius: 5px;
-                border: 1px solid #ccc;
-                background-color: #f0f0f0;
-                color: #333;
+                margin-top: 30px;
+                border-radius: 28px;
+                border: none;
+                transition: background-color 0.3s, box-shadow 0.3s;
             `;
-            retryButton.onclick = () => location.reload();
 
+            if (isDarkMode) {
+                retryButton.style.backgroundColor = '#e8def8';
+                retryButton.style.color = '#1c1b1f';
+                retryButton.style.boxShadow = '0 3px 5px rgba(0,0,0,0.3)';
+            } else {
+                retryButton.style.backgroundColor = '#ffdacf';
+                retryButton.style.color = '#333';
+                retryButton.style.boxShadow = '0 3px 5px rgba(0,0,0,0.2)';
+            }
+            
+            retryButton.onmouseover = () => {
+                 if (isDarkMode) {
+                    retryButton.style.backgroundColor = '#d0bcff';
+                 } else {
+                    retryButton.style.backgroundColor = '#ffc0a8';
+                 }
+            };
+             retryButton.onmouseout = () => {
+                 if (isDarkMode) {
+                    retryButton.style.backgroundColor = '#e8def8';
+                 } else {
+                    retryButton.style.backgroundColor = '#ffdacf';
+                 }
+            };
+
+
+            retryButton.onclick = () => location.reload();
+            
+            loadingContent.appendChild(offlineIcon);
+            loadingContent.appendChild(loadingText);
             loadingContent.appendChild(retryButton);
-            return; 
+            
+            return;
         }
 
         // Only run loading animations if online
