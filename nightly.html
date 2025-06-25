@@ -1195,12 +1195,10 @@ body.dark-mode #routeModal .bike-item p {
         <div id="noticeBox" style="margin-top: 10px; margin-left: 20px; margin-right: 20px; background: #fff; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"></div>
         <!-- 新增離線提示與重整按鈕 -->
         <div id="offlineMessage" style="display:none; margin-top:40px;">
-          <div style="font-size:2em; color:#d32f2f; font-weight:bold; margin-bottom:24px; text-align:center;">
+          <div id="offlineBigText" style="font-size:2em; color:#d32f2f; font-weight:bold; margin-bottom:24px; text-align:center;">
             請連接網路後重試
           </div>
-          <button id="reloadBtn" style="font-size:1.2em; padding:12px 32px; background:#007bff; color:#fff; border:none; border-radius:8px; cursor:pointer;">
-            重新整理
-          </button>
+          <button id="reloadBtn" style="font-size:1.2em; padding:12px 32px; background:#007bff; color:#fff; border:none; border-radius:8px; cursor:pointer;">重整</button>
         </div>
       </div>
     </div>
@@ -1387,7 +1385,7 @@ body.dark-mode #routeModal .bike-item p {
       }
       let mainContentShown = false;
       function showMainContent() {
-        if (!mainContentShown) {
+        if (!mainContentShown && navigator.onLine) {
           const overlay = document.getElementById("loadingOverlay");
           const mainContent = document.getElementById("mainContent");
 
@@ -2541,6 +2539,10 @@ body.dark-mode #routeModal .bike-item p {
       }
 
       window.addEventListener('load', async () => {
+        if (!navigator.onLine) {
+          showOfflineMessage();
+          return;
+        }
         try {
           if (!youbikeDataCache || youbikeDataCache.length === 0) {
              if (navigator.onLine) {
