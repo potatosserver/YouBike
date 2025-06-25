@@ -1193,6 +1193,13 @@ body.dark-mode #routeModal .bike-item p {
       <div id="loadingContent">
         <h2 id="loadingText">載入中</h2>
         <div id="noticeBox" style="margin-top: 10px; margin-left: 20px; margin-right: 20px; background: #fff; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"></div>
+        <!-- 新增離線提示與重整按鈕 -->
+        <div id="offlineBox" style="display:none; margin-top: 30px; text-align: center;">
+          <div style="font-size: 1.2em; color: #d32f2f; margin-bottom: 16px;">
+            請連接網路後重試
+          </div>
+          <button id="reloadBtn" style="padding: 10px 24px; font-size: 1em; border-radius: 8px; background: #007bff; color: #fff; border: none; cursor: pointer;">重整</button>
+        </div>
       </div>
     </div>
     <div id="mainContent">
@@ -1583,12 +1590,6 @@ body.dark-mode #routeModal .bike-item p {
       }
 
       async function searchYouBike(showLoadingIndicator = true, shouldMoveMap = false) {
-        // 新增離線檢查，若無網路就顯示通知並中斷
-        if (!navigator.onLine) {
-          showNotification(currentLang === "en" ? "Please connect to the internet and try again" : "請連接網路後重試");
-          return;
-        }
-
         const keyword = keywordInput.value.trim().toLowerCase();
 
         try {
@@ -2887,21 +2888,6 @@ body.dark-mode #routeModal .bike-item p {
       document.addEventListener('touchend', onEnd);
       document.addEventListener('touchcancel', onEnd);
 
-      // 新增離線提示與重整按鈕
-  function updateOnlineStatus() {
-    const offlineNotice = document.getElementById('offlineNotice');
-    if (!navigator.onLine) {
-      offlineNotice.style.display = 'block';
-    } else {
-      offlineNotice.style.display = 'none';
-    }
-  }
-  window.addEventListener('online', updateOnlineStatus);
-  window.addEventListener('offline', updateOnlineStatus);
-  document.getElementById('reloadButton').addEventListener('click', () => {
-    location.reload();
-  });
-  updateOnlineStatus();
       function toggleTracking() {
           const centralLocationToggle = document.getElementById('centralLocationToggle');
           const isLocationServiceOn = centralLocationToggle.checked;
@@ -3390,14 +3376,7 @@ body.dark-mode #routeModal .bike-item p {
               countdownTimer.update();
           }
       });
-      // 新增離線提示橫幅
-      const offlineNoticeHtml = `
-        <div id="offlineNotice" style="display:none; position: fixed; bottom: 0; left: 0; right: 0; background: #ffc; text-align: center; padding: 10px; z-index: 2000;">
-          請連接網路後重試
-          <button id="reloadButton" style="margin-left: 10px;">重整</button>
-        </div>
-      `;
-      document.body.insertAdjacentHTML('beforeend', offlineNoticeHtml);
+
     </script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
