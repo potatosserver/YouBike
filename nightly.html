@@ -698,7 +698,7 @@
       }      #settingsPanel {
           position: fixed;
           bottom: 60px;
-          right: 20px;
+          right: 20px; /* Adjusted to be consistent with settingsButton */
           display: flex;
           flex-direction: row;
           gap: 10px;
@@ -1055,32 +1055,32 @@
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
-          background-color: #fff5f0;
+          background-color: #fff5f0; /* Changed to match settings panel */
           padding: 24px;
-          border-radius: 20px;
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-          z-index: 1001;
-          display: none;
+          border-radius: 20px; /* Changed to match settings panel */
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Changed to match settings panel */
+          z-index: 1001; /* Changed to 1001 */
+          display: none; /* Changed to none */
           width: 80%;
           max-width: 360px;
-          max-height: calc(100vh - 80px);
+          max-height: calc(100vh - 80px); /* Changed to match settings panel */
           overflow-y: auto;
           scrollbar-width: none;
           -ms-overflow-style: none;
           text-align: left;
           transition: background-color 0.3s ease, box-shadow 0.3s ease;
-          backdrop-filter: blur(10px);
-          animation-duration: 0.3s;
-          animation-fill-mode: forwards;
-          opacity: 0;
+          backdrop-filter: blur(10px); /* Added backdrop filter */
+          animation-duration: 0.3s; /* Added animation duration */
+          animation-fill-mode: forwards; /* Added animation fill mode */
+          opacity: 0; /* Added initial opacity */
       }
 
       #routeModal.modal-open {
-          animation-name: slideIn;
+          animation-name: slideIn; /* Use slideIn animation */
       }
 
       #routeModal.modal-close {
-          animation-name: slideOut;
+          animation-name: slideOut; /* Use slideOut animation */
       }
 
       #routeModal::-webkit-scrollbar {
@@ -1088,15 +1088,15 @@
       }
 
       body.dark-mode #routeModal {
-          background-color: rgba(30, 30, 30, 0.95);
+          background-color: rgba(30, 30, 30, 0.95); /* Changed to match settings panel */
           color: #ffffff;
-          box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+          box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1); /* Changed for dark mode consistency */
       }
 
       #routeModal h3 {
-          margin-top: 30px;
+          margin-top: 30px; /* Increased top margin */
           margin-bottom: 20px;
-          padding-right: 56px;
+          padding-right: 56px; /* Increased padding to make space for close button */
           color: #007BFF;
           font-size: 1.3em;
           word-break: break-word;
@@ -1109,7 +1109,7 @@
       #routeModal .bike-item {
           padding: 16px;
           margin-bottom: 12px;
-          background-color: #fff2ec;
+          background-color: #fff2ec; /* Changed to match station card */
           border-radius: 8px;
           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
           display: flex;
@@ -1119,7 +1119,7 @@
       }
 
       body.dark-mode #routeModal .bike-item {
-          background-color: #444;
+          background-color: #444; /* Changed to match dark mode station card */
           color: #fff;
           box-shadow: 0 2px 4px rgba(255,255,255,0.1);
       }
@@ -1193,13 +1193,6 @@ body.dark-mode #routeModal .bike-item p {
       <div id="loadingContent">
         <h2 id="loadingText">載入中</h2>
         <div id="noticeBox" style="margin-top: 10px; margin-left: 20px; margin-right: 20px; background: #fff; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"></div>
-        <!-- 新增離線提示與重整按鈕 -->
-        <div id="offlineMessage" style="display:none; margin-top:40px;">
-          <div id="offlineBigText" style="font-size:2em; color:#d32f2f; font-weight:bold; margin-bottom:24px; text-align:center;">
-            請連接網路後重試
-          </div>
-          <button id="reloadBtn" style="font-size:1.2em; padding:12px 32px; background:#007bff; color:#fff; border:none; border-radius:8px; cursor:pointer;">重整</button>
-        </div>
       </div>
     </div>
     <div id="mainContent">
@@ -1385,7 +1378,7 @@ body.dark-mode #routeModal .bike-item p {
       }
       let mainContentShown = false;
       function showMainContent() {
-        if (!mainContentShown && navigator.onLine) {
+        if (!mainContentShown) {
           const overlay = document.getElementById("loadingOverlay");
           const mainContent = document.getElementById("mainContent");
 
@@ -1397,7 +1390,7 @@ body.dark-mode #routeModal .bike-item p {
           mainContent.classList.add('fade-in');
           mainContent.style.overflowY = 'auto';
 
-          document.getElementById('updateCountdown').style.display = navigator.onLine ? "block" : "none";
+          document.getElementById('updateCountdown').style.display = navigator.onLine ? "flex" : "none";
 
           setTimeout(() => {
             overlay.style.display = "none";
@@ -1594,30 +1587,30 @@ body.dark-mode #routeModal .bike-item p {
 
         try {
           if (!youbikeDataCache || youbikeDataCache.length === 0) {
-             if (navigator.onLine) {
-                try {
-                    const youbikeUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
-                    const response = await fetch(youbikeUrl, {
-                      headers: {
-                        'accept': '*/*',
-                        'accept-language': 'zh-TW,zh;q=0.9',
-                      }
-                    });
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                    const fetchedData = await response.json();
-                    youbikeDataCache = Array.isArray(fetchedData)
-                      ? fetchedData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
-                      : [];
-                    await saveYoubikeDataToDB(youbikeDataCache);
-                } catch (error) {
-                    youbikeDataCache = await getYoubikeDataFromDB();
-                }
-             } else {
-                 youbikeDataCache = await getYoubikeDataFromDB();
-                 showNotification(currentLang === "en"
-                    ? "Offline mode: Using cached data"
-                    : "離線模式：使用快取資料");
-             }
+              if (!navigator.onLine) {
+                  showNotification(currentLang === "en" ? "You are offline and station data is not available." : "您已離線且無站點資料。");
+                  return;
+              }
+              try {
+                  const youbikeUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
+                  const response = await fetch(youbikeUrl, {
+                    headers: {
+                      'accept': '*/*',
+                      'accept-language': 'zh-TW,zh;q=0.9',
+                    }
+                  });
+                  if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                  const fetchedData = await response.json();
+                  youbikeDataCache = Array.isArray(fetchedData)
+                    ? fetchedData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
+                    : [];
+                  await saveYoubikeDataToDB(youbikeDataCache);
+              } catch (error) {
+                  youbikeDataCache = await getYoubikeDataFromDB();
+                   if (!youbikeDataCache || youbikeDataCache.length === 0) {
+                      throw new Error("無法從網路或快取載入資料。");
+                   }
+              }
           }
 
           allStations = [...youbikeDataCache];
@@ -2399,18 +2392,19 @@ body.dark-mode #routeModal .bike-item p {
         if (centralSettingsPanel.style.display === 'block') {
             centralSettingsPanel.classList.remove('panel-open');
             centralSettingsPanel.classList.add('panel-close');
-            overlay.classList.remove('show');
+            overlay.classList.remove('show'); // Hide overlay
             centralSettingsPanel.addEventListener('animationend', function handler() {
               centralSettingsPanel.style.display = 'none';
               centralSettingsPanel.classList.remove('panel-close');
               centralSettingsPanel.removeEventListener('animationend', handler);
-              clearUrlHash();
+              clearUrlHash(); // Clear hash after closing animation
             });
             settingsIcon.classList.add('rotate-left');
+            // Check if the current state is the settings panel state before going back
             if (history.state && history.state.type === 'settings') {
               history.back();
             } else {
-                clearUrlHash();
+                clearUrlHash(); // Clear hash if not using history.back()
             }
         } else {
             // Close route modal if open
@@ -2421,13 +2415,15 @@ body.dark-mode #routeModal .bike-item p {
                     routeModal.style.display = 'none';
                     routeModal.classList.remove('modal-close');
                     routeModal.removeEventListener('animationend', handler);
-                    clearUrlHash();
+                    clearUrlHash(); // Clear hash after closing animation
+                    // After route modal closes, open settings panel
                     openSettingsPanel();
                 });
+                 // If route modal was open, go back first to clear its state
                  if (history.state && (history.state.type === 'route' || history.state.type === 'electric')) {
                      history.back();
                  } else {
-                     clearUrlHash();
+                     clearUrlHash(); // Clear hash if not using history.back()
                      openSettingsPanel();
                  }
             }
@@ -2435,7 +2431,8 @@ body.dark-mode #routeModal .bike-item p {
             else if (permissionModal.style.display === 'block') {
                 permissionModal.style.display = 'none';
                 overlay.classList.remove('show');
-                clearUrlHash();
+                clearUrlHash(); // Clear hash after closing
+                // After permission modal closes, open settings panel
                 openSettingsPanel();
             }
             // If no other modal is open, open settings panel directly
@@ -2448,12 +2445,12 @@ body.dark-mode #routeModal .bike-item p {
       closeCentralSettings.addEventListener('click', () => {
         centralSettingsPanel.classList.remove('panel-open');
         centralSettingsPanel.classList.add('panel-close');
-        overlay.classList.remove('show');
+        overlay.classList.remove('show'); // Hide overlay
         centralSettingsPanel.addEventListener('animationend', function handler() {
           centralSettingsPanel.style.display = 'none';
           centralSettingsPanel.classList.remove('panel-close');
           centralSettingsPanel.removeEventListener('animationend', handler);
-          clearUrlHash();
+          clearUrlHash(); // Clear hash after closing animation
         });
 
         settingsIcon.classList.add('rotate-left');
@@ -2461,18 +2458,20 @@ body.dark-mode #routeModal .bike-item p {
           settingsIcon.classList.remove('rotate-left');
         }, 1000);
 
+        // Remove state from history when closed by button
         if (history.state && history.state.type === 'settings') {
           history.back();
         } else {
-            clearUrlHash();
+            clearUrlHash(); // Clear hash if not using history.back()
         }
       });
 
       window.addEventListener('popstate', (event) => {
+        // Close settings panel if open
         if (centralSettingsPanel.style.display === 'block') {
             centralSettingsPanel.classList.remove('panel-open');
             centralSettingsPanel.classList.add('panel-close');
-            overlay.classList.remove('show');
+            overlay.classList.remove('show'); // Hide overlay
             settingsIcon.classList.add('rotate-left');
             setTimeout(() => {
                 settingsIcon.classList.remove('rotate-left');
@@ -2481,32 +2480,39 @@ body.dark-mode #routeModal .bike-item p {
                 centralSettingsPanel.style.display = 'none';
                 centralSettingsPanel.classList.remove('panel-close');
                 centralSettingsPanel.removeEventListener('animationend', handler);
-                clearUrlHash();
+                clearUrlHash(); // Clear hash after closing animation
             });
         }
+        // Close route modal if open
         if (routeModal.style.display === 'block') {
             routeModal.classList.remove('modal-open');
             routeModal.classList.add('modal-close');
-            overlay.classList.remove('show');
+            overlay.classList.remove('show'); // Hide overlay
             routeModal.addEventListener('animationend', function handler() {
                 routeModal.style.display = 'none';
                 routeModal.classList.remove('modal-close');
                 routeModal.removeEventListener('animationend', handler);
-                clearUrlHash();
+                clearUrlHash(); // Clear hash after closing animation
             });
         }
+        // Close permission modal if open (it doesn't use history state, but should still close)
         if (permissionModal.style.display === 'block') {
             permissionModal.style.display = 'none';
             overlay.classList.remove('show');
-            clearUrlHash();
+            clearUrlHash(); // Clear hash after closing
         }
+        // Note: If the user navigates *forward* to a state that *should* have a modal open,
+        // this simple popstate listener won't automatically reopen it.
+        // The current implementation doesn't support forward navigation to modals anyway,
+        // so this simplified popstate handler should be sufficient for handling back navigation.
       });
 
       document.addEventListener('click', (e) => {
+	// Close settings panel if clicking outside
 	if (centralSettingsPanel.style.display === 'block' && !centralSettingsPanel.contains(e.target) && e.target !== settingsButton) {
 		centralSettingsPanel.classList.remove('panel-open');
 		centralSettingsPanel.classList.add('panel-close');
-        overlay.classList.remove('show');
+        overlay.classList.remove('show'); // Hide overlay
 		settingsIcon.classList.add('rotate-left');
 		setTimeout(() => {
 			settingsIcon.classList.remove('rotate-left');
@@ -2515,12 +2521,13 @@ body.dark-mode #routeModal .bike-item p {
 			centralSettingsPanel.style.display = 'none';
 			centralSettingsPanel.classList.remove('panel-close');
 			centralSettingsPanel.removeEventListener('animationend', handler);
-            clearUrlHash();
+            clearUrlHash(); // Clear hash after closing animation
 		});
+		// Remove state from history when closed by clicking outside
 		if (history.state && history.state.type === 'settings') {
 			history.back();
 		} else {
-            clearUrlHash();
+            clearUrlHash(); // Clear hash if not using history.back()
         }
 	}
 });
@@ -2529,72 +2536,95 @@ body.dark-mode #routeModal .bike-item p {
         event.stopPropagation();
       });
 
+      // Helper function to open the settings panel
       function openSettingsPanel() {
           centralSettingsPanel.style.display = 'block';
           centralSettingsPanel.classList.remove('panel-close');
           centralSettingsPanel.classList.add('panel-open');
-          overlay.classList.add('show');
+          overlay.classList.add('show'); // Show overlay
+          // Push state for settings panel
           history.pushState({ modalOpen: true, type: 'settings' }, 'Settings', '#settings');
           settingsIcon.classList.add('rotate-right');
       }
 
       window.addEventListener('load', async () => {
+        // ---- START OF MODIFICATION: Offline Check ----
         if (!navigator.onLine) {
-          showOfflineMessage();
-          return;
+            const loadingText = document.getElementById('loadingText');
+            const noticeBox = document.getElementById('noticeBox');
+            const loadingContent = document.getElementById('loadingContent');
+
+            loadingText.textContent = '請連接網路後重試';
+            loadingText.style.fontSize = '2em';
+            noticeBox.style.display = 'none';
+
+            const retryButton = document.createElement('button');
+            retryButton.id = 'retryButton';
+            retryButton.textContent = '重整';
+            retryButton.style.cssText = `
+                padding: 10px 20px;
+                font-size: 1.2em;
+                cursor: pointer;
+                margin-top: 20px;
+                border-radius: 5px;
+                border: 1px solid #ccc;
+                background-color: #f0f0f0;
+                color: #333;
+            `;
+            retryButton.onclick = () => location.reload();
+
+            loadingContent.appendChild(retryButton);
+            return; // Stop execution if offline
         }
+        // ---- END OF MODIFICATION ----
+
         try {
           if (!youbikeDataCache || youbikeDataCache.length === 0) {
-             if (navigator.onLine) {
-                try {
-                    const youbikeUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
-                    const response = await fetch(youbikeUrl, {
-                      headers: {
-                        'accept': '*/*',
-                        'accept-language': 'zh-TW,zh;q=0.9',
-                      }
-                    });
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                    const fetchedData = await response.json();
-                    youbikeDataCache = Array.isArray(fetchedData)
-                      ? fetchedData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
-                      : [];
-                    await saveYoubikeDataToDB(youbikeDataCache);
-                } catch (error) {
-                    youbikeDataCache = await getYoubikeDataFromDB();
+             try {
+                const youbikeUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
+                const response = await fetch(youbikeUrl, {
+                  headers: {
+                    'accept': '*/*',
+                    'accept-language': 'zh-TW,zh;q=0.9',
+                  }
+                });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const fetchedData = await response.json();
+                youbikeDataCache = Array.isArray(fetchedData)
+                  ? fetchedData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
+                  : [];
+                await saveYoubikeDataToDB(youbikeDataCache);
+            } catch (error) {
+                // Fallback to DB for resilience if online but API fails
+                youbikeDataCache = await getYoubikeDataFromDB();
+                if (!youbikeDataCache || youbikeDataCache.length === 0) {
+                    throw new Error("無法從網路或快取載入資料。");
                 }
-             } else {
-                 youbikeDataCache = await getYoubikeDataFromDB();
-                 showNotification(currentLang === "en"
-                    ? "Offline mode: Using cached data"
-                    : "離線模式：使用快取資料");
-             }
+            }
           }
           allStations = [...youbikeDataCache];
 
-          if (navigator.onLine) {
-              await initMap(allStations);
-          } else {
-              showNotification(currentLang === "en"
-                ? "Offline mode: Map features are limited"
-                : "離線模式：地圖功能受限");
-              await initMap([]);
-          }
-
+          await initMap(allStations);
           await getLocation();
-
 
           updateResultsOrder();
           showMainContent();
 
-
         } catch (error) {
-          showNotification(currentLang === "en"
-            ? "Error initializing app. Some features may be limited."
-            : "初始化應用程式時發生錯誤，部分功能可能受限。");
-          if (!mainContentShown) {
-               showMainContent();
-          }
+          // Handle initialization errors
+          const loadingText = document.getElementById('loadingText');
+          const noticeBox = document.getElementById('noticeBox');
+          const loadingContent = document.getElementById('loadingContent');
+          
+          loadingText.textContent = `初始化失敗: ${error.message}`;
+          loadingText.style.color = 'red';
+          noticeBox.style.display = 'none';
+
+          const retryButton = document.createElement('button');
+          retryButton.textContent = '重試';
+          retryButton.style.cssText = `padding: 10px 20px; font-size: 1.2em; cursor: pointer; margin-top: 20px; border-radius: 5px; border: 1px solid #ccc; background-color: #f0f0f0; color: #333;`;
+          retryButton.onclick = () => location.reload();
+          loadingContent.appendChild(retryButton);
         }
       });
       keywordInput.addEventListener('keypress', function (event) {
@@ -2661,6 +2691,13 @@ body.dark-mode #routeModal .bike-item p {
     });
 
     setInterval(() => {
+        if(!navigator.onLine) {
+            document.getElementById('updateCountdown').style.display = "none";
+            return;
+        }
+        if(document.getElementById('updateCountdown').style.display === "none") {
+            document.getElementById('updateCountdown').style.display = "flex";
+        }
         countdownTimer.remaining--;
         if (countdownTimer.remaining <= 0) {
             countdownTimer.update();
@@ -2671,15 +2708,6 @@ body.dark-mode #routeModal .bike-item p {
       async function initMap(stations) {
         if (leafletMap) {
           return;
-        }
-
-        if (!navigator.onLine) {
-          if (!window.offlineNotified) {
-            showNotification(currentLang === "en"
-              ? "Offline: Cannot get route information."
-              : "離線狀態：無法取得路線資訊");
-            window.offlineNotified = true;
-          }
         }
 
         leafletMap = L.map('map', {
@@ -2709,8 +2737,8 @@ body.dark-mode #routeModal .bike-item p {
             }
         } catch(err) {
             showNotification(currentLang === "en"
-                ? "Offline mode: Map tiles unavailable."
-                : "離線模式：地圖圖層無法載入。");
+                ? "Map tiles unavailable."
+                : "地圖圖層無法載入。");
         }
         markerClusterGroup = L.markerClusterGroup();
         if (leafletMap && markerClusterGroup) {
@@ -2779,7 +2807,7 @@ body.dark-mode #routeModal .bike-item p {
                       <p>YouBike 2.0: ${stationInfo.available_2_0 !== undefined ? stationInfo.available_2_0 : (currentLang === "en" ? 'Unknown' : '未知')}</p>
                       <p>YouBike 2.0E: ${stationInfo.available_e !== undefined ? stationInfo.available_e : (currentLang === "en" ? 'Unknown' : '未知')}</p>
                       <p>${currentLang === "en" ? "Available Slots: " : "可停空位數："} ${stationInfo.empty_spaces !== undefined ? stationInfo.empty_spaces : (currentLang === "en" ? 'Unknown' : '未知')}</p>
-                    ` : `<p>${currentLang === "en" ? "Offline mode: Real-time data unavailable" : "離線模式：無法取得即時資料"}</p>`}
+                    ` : `<p>${currentLang === "en" ? "Offline. Real-time data unavailable." : "離線中，即時資料無法取得。"}</p>`}
                   `;
 
                   marker.bindPopup(content).openPopup();
@@ -3150,30 +3178,33 @@ body.dark-mode #routeModal .bike-item p {
               overlay.classList.remove('show');
               routeModal.classList.remove('modal-close');
               routeModal.removeEventListener('animationend', handler);
-              clearUrlHash();
+              clearUrlHash(); // Clear hash after closing animation
           });
+          // Remove state from history when closed by button
           if (history.state && (history.state.type === 'route' || history.state.type === 'electric')) {
               history.back();
           } else {
-              clearUrlHash();
+              clearUrlHash(); // Clear hash if not using history.back()
           }
       });
       overlay.addEventListener('click', () => {
+          // Close route modal if open
           if (routeModal.style.display === 'block') {
               routeModal.classList.remove('modal-open');
               routeModal.classList.add('modal-close');
-              overlay.classList.remove('show');
+              overlay.classList.remove('show'); // Hide overlay
               routeModal.addEventListener('animationend', function handler() {
                   routeModal.style.display = 'none';
                   routeModal.classList.remove('modal-close');
                   routeModal.removeEventListener('animationend', handler);
-                  clearUrlHash();
+                  clearUrlHash(); // Clear hash after closing animation
               });
           }
+          // Close settings panel if open
           else if (centralSettingsPanel.style.display === 'block') {
               centralSettingsPanel.classList.remove('panel-open');
               centralSettingsPanel.classList.add('panel-close');
-              overlay.classList.remove('show');
+              overlay.classList.remove('show'); // Hide overlay
               settingsIcon.classList.add('rotate-left');
               setTimeout(() => {
                   settingsIcon.classList.remove('rotate-left');
@@ -3182,13 +3213,14 @@ body.dark-mode #routeModal .bike-item p {
                   centralSettingsPanel.style.display = 'none';
                   centralSettingsPanel.classList.remove('panel-close');
                   centralSettingsPanel.removeEventListener('animationend', handler);
-                  clearUrlHash();
+                  clearUrlHash(); // Clear hash after closing animation
               });
           }
+          // Close permission modal if open
           else if (permissionModal.style.display === 'block') {
               permissionModal.style.display = 'none';
               overlay.classList.remove('show');
-              clearUrlHash();
+              clearUrlHash(); // Clear hash after closing
           }
       });
 
@@ -3213,10 +3245,10 @@ body.dark-mode #routeModal .bike-item p {
           routeDetailsDiv.innerHTML = currentLang === "en" ? "Calculating route..." : "計算路線中...";
           routeModalTitle.textContent = currentLang === "en" ? "Route to " + stationName : "前往 " + stationName + " 的路線";
           routeModal.style.display = 'block';
-          routeModal.classList.remove('modal-close');
-          routeModal.classList.add('modal-open');
+          routeModal.classList.remove('modal-close'); // Ensure close animation class is removed
+          routeModal.classList.add('modal-open'); // Add open animation class
           overlay.classList.add('show');
-          history.pushState({ modalOpen: true, type: 'route' }, 'Route', '#route');
+          history.pushState({ modalOpen: true, type: 'route' }, 'Route', '#route'); // Push state for route modal
 
 
           try {
@@ -3329,7 +3361,7 @@ body.dark-mode #routeModal .bike-item p {
           routeModal.classList.remove('modal-close'); // Ensure close animation class is removed
           routeModal.classList.add('modal-open'); // Add open animation class
           overlay.classList.add('show');
-          history.pushState({ modalOpen: true, type: 'electric' }, 'Electric Bikes', '#electric');
+          history.pushState({ modalOpen: true, type: 'electric' }, 'Electric Bikes', '#electric'); // Push state for electric bike modal
 
 
           try {
@@ -3373,10 +3405,10 @@ body.dark-mode #routeModal .bike-item p {
           }
       }
 
-
+      // Add event listener to update data when the tab becomes visible
       document.addEventListener('visibilitychange', () => {
-          if (document.visibilityState === 'visible') {
-              console.log('Tab became visible, updating data...');
+          if (document.visibilityState === 'visible' && navigator.onLine) {
+              console.log('Tab became visible, updating data...'); // Optional: for debugging
               countdownTimer.update();
           }
       });
