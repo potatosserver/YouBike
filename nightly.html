@@ -2556,6 +2556,8 @@ body.dark-mode #routeModal .bike-item p {
 
       async function initializeApp() {
         // Only run loading animations if online
+        const loadingContent = document.getElementById('loadingContent');
+        loadingContent.innerHTML = `<h2 id="loadingText">載入中</h2><div id="noticeBox" style="margin-top: 10px; margin-left: 20px; margin-right: 20px; background: #fff; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"></div>`;
         simulateLoadingPercentage();
         showRandomNotice();
 
@@ -2711,7 +2713,7 @@ body.dark-mode #routeModal .bike-item p {
               
               // If fetch succeeds, we are online.
               loadingContent.innerHTML = `<h2 id="loadingText" style="color: ${isDarkMode ? '#fff' : '#333'};">連線成功，重新載入中...</h2>`;
-              initializeApp();
+              location.reload();
 
           } catch (error) {
               // Fetch failed, still offline or another issue occurred.
@@ -3528,4 +3530,3 @@ body.dark-mode #routeModal .bike-item p {
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
   </body>
 </html>
-", remove the `window.addEventListener('load', ...)` listener and replace it with a new implementation. The new implementation should first check `navigator.onLine`. If offline, it should call a new function `showOfflineScreen()`. If online, it should call `initializeApp()`. The `showOfflineScreen()` function should create and display the offline UI, including a "重整" button that calls a new `attemptReconnect()` function. The `attemptReconnect()` function should test the network connection by fetching from the YouBike API. If the fetch is successful, it should clear the offline UI, show a "reloading" message, and then call `initializeApp()`. If the fetch fails, it should show feedback to the user that the connection is still offline. Also, `initializeApp()` should encapsulate the main application logic previously in the `load` event listen
