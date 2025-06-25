@@ -1399,7 +1399,7 @@ body.dark-mode #routeModal .bike-item p {
           mainContentShown = true;
         }
       }
-      (function simulateLoadingPercentage() {
+      function simulateLoadingPercentage() {
         const loadingText = document.getElementById("loadingText");
         let lang = localStorage.getItem("lang") || "zh";
         let prefix = lang === "en" ? "Loading:" : "載入中：";
@@ -1420,8 +1420,8 @@ body.dark-mode #routeModal .bike-item p {
             clearInterval(loadingTextInterval);
           }
         }, 50);
-      })();
-      (function showRandomNotice(){
+      }
+      function showRandomNotice(){
         let lang = localStorage.getItem("lang") || "zh";
         const notices = lang === "en" ? [
               "❌Do not speed or ride in reverse",
@@ -1444,7 +1444,7 @@ body.dark-mode #routeModal .bike-item p {
         ];
         const randomIndex = Math.floor(Math.random() * notices.length);
         document.getElementById('noticeBox').textContent = notices[randomIndex];
-      })();
+      }
 
       let youbikeDataCache = null;
       let allStations = [];
@@ -2548,7 +2548,6 @@ body.dark-mode #routeModal .bike-item p {
       }
 
       window.addEventListener('load', async () => {
-        // ---- START OF MODIFICATION: Offline Check ----
         if (!navigator.onLine) {
             const loadingText = document.getElementById('loadingText');
             const noticeBox = document.getElementById('noticeBox');
@@ -2574,9 +2573,12 @@ body.dark-mode #routeModal .bike-item p {
             retryButton.onclick = () => location.reload();
 
             loadingContent.appendChild(retryButton);
-            return; // Stop execution if offline
+            return; 
         }
-        // ---- END OF MODIFICATION ----
+
+        // Only run loading animations if online
+        simulateLoadingPercentage();
+        showRandomNotice();
 
         try {
           if (!youbikeDataCache || youbikeDataCache.length === 0) {
@@ -2595,7 +2597,6 @@ body.dark-mode #routeModal .bike-item p {
                   : [];
                 await saveYoubikeDataToDB(youbikeDataCache);
             } catch (error) {
-                // Fallback to DB for resilience if online but API fails
                 youbikeDataCache = await getYoubikeDataFromDB();
                 if (!youbikeDataCache || youbikeDataCache.length === 0) {
                     throw new Error("無法從網路或快取載入資料。");
