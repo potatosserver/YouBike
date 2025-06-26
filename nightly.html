@@ -1590,6 +1590,9 @@ body.dark-mode #routeModal .bike-item p {
       }
 
       async function searchYouBike(showLoadingIndicator = true, shouldMoveMap = false) {
+        // Record current scroll position
+        const currentScrollTop = resultsDiv.scrollTop;
+
         const keyword = keywordInput.value.trim().toLowerCase();
 
         try {
@@ -1813,6 +1816,8 @@ body.dark-mode #routeModal .bike-item p {
         }
         // Reset the countdown timer after search completes
         countdownTimer.reset();
+        // Restore scroll position
+        resultsDiv.scrollTop = currentScrollTop;
       }
       async function queryVehicleData(stationIds) {
         if (stationIds.length > 60) {
@@ -2204,6 +2209,9 @@ body.dark-mode #routeModal .bike-item p {
         const stationElements = document.querySelectorAll('.station');
         if (!stationElements.length) return;
 
+        // Store current scroll position before updating
+        const currentScrollTop = resultsDiv.scrollTop;
+
         const currentData = {};
         stationElements.forEach(card => {
           const id = card.dataset.id;
@@ -2247,6 +2255,8 @@ body.dark-mode #routeModal .bike-item p {
 				if (emptyEl) emptyEl.textContent = newVehicleData?.empty_spaces !== undefined ? newVehicleData.empty_spaces :
 					(oldData?.empty_spaces !== unknownValue && oldData?.empty_spaces !== "Unknown" ? oldData.empty_spaces : unknownValue);
 			});
+            // Restore scroll position after updating vehicle data
+            resultsDiv.scrollTop = currentScrollTop;
 		})
 		.catch(error => {
 		 showNotification(currentLang === "en" ? "Failed to update real-time data." : "即時資料更新失敗。");
@@ -3530,3 +3540,4 @@ body.dark-mode #routeModal .bike-item p {
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
   </body>
 </html>
+<!DOCTYPE html>
