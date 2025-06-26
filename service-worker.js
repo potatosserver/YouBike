@@ -6,6 +6,8 @@ self.addEventListener('install', (event) => {
                 '/YouBike/index.html',
                 '/YouBike/main.js',
                 '/YouBike/manifest.json',
+                '/YouBike/icons/html.webp',
+                '/YouBike/icons/python.webp',
                 'https://unpkg.com/leaflet/dist/leaflet.css',
                 'https://unpkg.com/leaflet/dist/leaflet.js',
                 'https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js',
