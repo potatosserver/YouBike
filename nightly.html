@@ -1590,8 +1590,8 @@ body.dark-mode #routeModal .bike-item p {
       }
 
       async function searchYouBike(showLoadingIndicator = true, shouldMoveMap = false) {
-        // Record current scroll position
-        const currentScrollTop = resultsDiv.scrollTop;
+        // Record current scroll position of mainContent
+        const currentScrollTop = mainContent.scrollTop;
 
         const keyword = keywordInput.value.trim().toLowerCase();
 
@@ -1794,7 +1794,7 @@ body.dark-mode #routeModal .bike-item p {
 
             card.addEventListener("click", () => {
               const lat = parseFloat(info.coords[0]);
-              const lng = parseFloat(info.coords[1]);
+              const lng = parseFloat(info.lng); // Changed from info.coords[1] to info.lng to be consistent with original code
               if (!isNaN(lat) && !isNaN(lng) && leafletMap) {
                 isMapMovingDueToTracking = true;
                 leafletMap.setView([lat, lng], 18, { animate: true, duration: 1 });
@@ -1816,8 +1816,8 @@ body.dark-mode #routeModal .bike-item p {
         }
         // Reset the countdown timer after search completes
         countdownTimer.reset();
-        // Restore scroll position
-        resultsDiv.scrollTop = currentScrollTop;
+        // Restore scroll position to mainContent after updates
+        mainContent.scrollTop = currentScrollTop;
       }
       async function queryVehicleData(stationIds) {
         if (stationIds.length > 60) {
@@ -2209,8 +2209,8 @@ body.dark-mode #routeModal .bike-item p {
         const stationElements = document.querySelectorAll('.station');
         if (!stationElements.length) return;
 
-        // Store current scroll position before updating
-        const currentScrollTop = resultsDiv.scrollTop;
+        // Store current scroll position of mainContent before updating
+        const currentScrollTop = mainContent.scrollTop;
 
         const currentData = {};
         stationElements.forEach(card => {
@@ -2255,8 +2255,8 @@ body.dark-mode #routeModal .bike-item p {
 				if (emptyEl) emptyEl.textContent = newVehicleData?.empty_spaces !== undefined ? newVehicleData.empty_spaces :
 					(oldData?.empty_spaces !== unknownValue && oldData?.empty_spaces !== "Unknown" ? oldData.empty_spaces : unknownValue);
 			});
-            // Restore scroll position after updating vehicle data
-            resultsDiv.scrollTop = currentScrollTop;
+            // Restore scroll position to mainContent after updating vehicle data
+            mainContent.scrollTop = currentScrollTop;
 		})
 		.catch(error => {
 		 showNotification(currentLang === "en" ? "Failed to update real-time data." : "即時資料更新失敗。");
@@ -2800,8 +2800,12 @@ body.dark-mode #routeModal .bike-item p {
 
             const keyword = document.getElementById('keyword').value.trim();
             if (keyword === '') {
+                // If keyword is empty, perform a full search which re-renders all cards.
+                // Scroll position will be handled by searchYouBike.
                 searchYouBike(true, false);
             } else {
+                // If there's a keyword, only update vehicle data for visible cards.
+                // Scroll position will be handled by updateVehicleData.
                 await updateVehicleData();
             }
             this.reset();
@@ -3540,4 +3544,3 @@ body.dark-mode #routeModal .bike-item p {
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
   </body>
 </html>
-<!DOCTYPE html>
