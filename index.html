@@ -659,7 +659,14 @@
       @keyframes popDown {
           0% { transform: translateX(0) scale(1); opacity: 1; }
           100% { transform: translateX(100%) scale(0.5); opacity: 0; }
-      }      #extraButtons {
+      }
+      @keyframes shake {
+        10%, 90% { transform: translate3d(-1px, 0, 0); }
+        20%, 80% { transform: translate3d(2px, 0, 0); }
+        30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+        40%, 60% { transform: translate3d(4px, 0, 0); }
+      }
+      #extraButtons {
           position: fixed;
           bottom: 120px;
           right: 80px;
@@ -1390,7 +1397,7 @@ body.dark-mode #routeModal .bike-item p {
           mainContent.classList.add('fade-in');
           mainContent.style.overflowY = 'auto';
 
-          document.getElementById('updateCountdown').style.display = navigator.onLine ? "block" : "none";
+          document.getElementById('updateCountdown').style.display = navigator.onLine ? "flex" : "none";
 
           setTimeout(() => {
             overlay.style.display = "none";
@@ -1399,7 +1406,7 @@ body.dark-mode #routeModal .bike-item p {
           mainContentShown = true;
         }
       }
-      (function simulateLoadingPercentage() {
+      function simulateLoadingPercentage() {
         const loadingText = document.getElementById("loadingText");
         let lang = localStorage.getItem("lang") || "zh";
         let prefix = lang === "en" ? "Loading:" : "載入中：";
@@ -1420,8 +1427,8 @@ body.dark-mode #routeModal .bike-item p {
             clearInterval(loadingTextInterval);
           }
         }, 50);
-      })();
-      (function showRandomNotice(){
+      }
+      function showRandomNotice(){
         let lang = localStorage.getItem("lang") || "zh";
         const notices = lang === "en" ? [
               "❌Do not speed or ride in reverse",
@@ -1444,7 +1451,7 @@ body.dark-mode #routeModal .bike-item p {
         ];
         const randomIndex = Math.floor(Math.random() * notices.length);
         document.getElementById('noticeBox').textContent = notices[randomIndex];
-      })();
+      }
 
       let youbikeDataCache = null;
       let allStations = [];
@@ -1583,34 +1590,37 @@ body.dark-mode #routeModal .bike-item p {
       }
 
       async function searchYouBike(showLoadingIndicator = true, shouldMoveMap = false) {
+        // Record current scroll position of mainContent
+        const currentScrollTop = mainContent.scrollTop;
+
         const keyword = keywordInput.value.trim().toLowerCase();
 
         try {
           if (!youbikeDataCache || youbikeDataCache.length === 0) {
-             if (navigator.onLine) {
-                try {
-                    const youbikeUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
-                    const response = await fetch(youbikeUrl, {
-                      headers: {
-                        'accept': '*/*',
-                        'accept-language': 'zh-TW,zh;q=0.9',
-                      }
-                    });
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                    const fetchedData = await response.json();
-                    youbikeDataCache = Array.isArray(fetchedData)
-                      ? fetchedData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
-                      : [];
-                    await saveYoubikeDataToDB(youbikeDataCache);
-                } catch (error) {
-                    youbikeDataCache = await getYoubikeDataFromDB();
-                }
-             } else {
-                 youbikeDataCache = await getYoubikeDataFromDB();
-                 showNotification(currentLang === "en"
-                    ? "Offline mode: Using cached data"
-                    : "離線模式：使用快取資料");
-             }
+              if (!navigator.onLine) {
+                  showNotification(currentLang === "en" ? "You are offline and station data is not available." : "您已離線且無站點資料。");
+                  return;
+              }
+              try {
+                  const youbikeUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
+                  const response = await fetch(youbikeUrl, {
+                    headers: {
+                      'accept': '*/*',
+                      'accept-language': 'zh-TW,zh;q=0.9',
+                    }
+                  });
+                  if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                  const fetchedData = await response.json();
+                  youbikeDataCache = Array.isArray(fetchedData)
+                    ? fetchedData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
+                    : [];
+                  await saveYoubikeDataToDB(youbikeDataCache);
+              } catch (error) {
+                  youbikeDataCache = await getYoubikeDataFromDB();
+                   if (!youbikeDataCache || youbikeDataCache.length === 0) {
+                      throw new Error("無法從網路或快取載入資料。");
+                   }
+              }
           }
 
           allStations = [...youbikeDataCache];
@@ -1784,7 +1794,7 @@ body.dark-mode #routeModal .bike-item p {
 
             card.addEventListener("click", () => {
               const lat = parseFloat(info.coords[0]);
-              const lng = parseFloat(info.coords[1]);
+              const lng = parseFloat(info.lng); // Changed from info.coords[1] to info.lng to be consistent with original code
               if (!isNaN(lat) && !isNaN(lng) && leafletMap) {
                 isMapMovingDueToTracking = true;
                 leafletMap.setView([lat, lng], 18, { animate: true, duration: 1 });
@@ -1806,6 +1816,8 @@ body.dark-mode #routeModal .bike-item p {
         }
         // Reset the countdown timer after search completes
         countdownTimer.reset();
+        // Restore scroll position to mainContent after updates
+        mainContent.scrollTop = currentScrollTop;
       }
       async function queryVehicleData(stationIds) {
         if (stationIds.length > 60) {
@@ -2197,6 +2209,9 @@ body.dark-mode #routeModal .bike-item p {
         const stationElements = document.querySelectorAll('.station');
         if (!stationElements.length) return;
 
+        // Store current scroll position of mainContent before updating
+        const currentScrollTop = mainContent.scrollTop;
+
         const currentData = {};
         stationElements.forEach(card => {
           const id = card.dataset.id;
@@ -2240,6 +2255,8 @@ body.dark-mode #routeModal .bike-item p {
 				if (emptyEl) emptyEl.textContent = newVehicleData?.empty_spaces !== undefined ? newVehicleData.empty_spaces :
 					(oldData?.empty_spaces !== unknownValue && oldData?.empty_spaces !== "Unknown" ? oldData.empty_spaces : unknownValue);
 			});
+            // Restore scroll position to mainContent after updating vehicle data
+            mainContent.scrollTop = currentScrollTop;
 		})
 		.catch(error => {
 		 showNotification(currentLang === "en" ? "Failed to update real-time data." : "即時資料更新失敗。");
@@ -2547,61 +2564,191 @@ body.dark-mode #routeModal .bike-item p {
           settingsIcon.classList.add('rotate-right');
       }
 
-      window.addEventListener('load', async () => {
+      async function initializeApp() {
+        // Only run loading animations if online
+        const loadingContent = document.getElementById('loadingContent');
+        loadingContent.innerHTML = `<h2 id="loadingText">載入中</h2><div id="noticeBox" style="margin-top: 10px; margin-left: 20px; margin-right: 20px; background: #fff; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"></div>`;
+        simulateLoadingPercentage();
+        showRandomNotice();
+
         try {
           if (!youbikeDataCache || youbikeDataCache.length === 0) {
-             if (navigator.onLine) {
-                try {
-                    const youbikeUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
-                    const response = await fetch(youbikeUrl, {
-                      headers: {
-                        'accept': '*/*',
-                        'accept-language': 'zh-TW,zh;q=0.9',
-                      }
-                    });
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                    const fetchedData = await response.json();
-                    youbikeDataCache = Array.isArray(fetchedData)
-                      ? fetchedData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
-                      : [];
-                    await saveYoubikeDataToDB(youbikeDataCache);
-                } catch (error) {
-                    youbikeDataCache = await getYoubikeDataFromDB();
+             try {
+                const youbikeUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
+                const response = await fetch(youbikeUrl, {
+                  headers: {
+                    'accept': '*/*',
+                    'accept-language': 'zh-TW,zh;q=0.9',
+                  }
+                });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const fetchedData = await response.json();
+                youbikeDataCache = Array.isArray(fetchedData)
+                  ? fetchedData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
+                  : [];
+                await saveYoubikeDataToDB(youbikeDataCache);
+            } catch (error) {
+                youbikeDataCache = await getYoubikeDataFromDB();
+                if (!youbikeDataCache || youbikeDataCache.length === 0) {
+                    throw new Error("無法從網路或快取載入資料。");
                 }
-             } else {
-                 youbikeDataCache = await getYoubikeDataFromDB();
-                 showNotification(currentLang === "en"
-                    ? "Offline mode: Using cached data"
-                    : "離線模式：使用快取資料");
-             }
+            }
           }
           allStations = [...youbikeDataCache];
 
-          if (navigator.onLine) {
-              await initMap(allStations);
-          } else {
-              showNotification(currentLang === "en"
-                ? "Offline mode: Map features are limited"
-                : "離線模式：地圖功能受限");
-              await initMap([]);
-          }
-
+          await initMap(allStations);
           await getLocation();
-
 
           updateResultsOrder();
           showMainContent();
 
-
         } catch (error) {
-          showNotification(currentLang === "en"
-            ? "Error initializing app. Some features may be limited."
-            : "初始化應用程式時發生錯誤，部分功能可能受限。");
-          if (!mainContentShown) {
-               showMainContent();
+          // Handle initialization errors
+          const loadingContent = document.getElementById('loadingContent');
+          loadingContent.innerHTML = ''; // Clear existing content
+          const isDarkMode = document.body.classList.contains('dark-mode');
+          
+          const errorIcon = document.createElement('span');
+          errorIcon.className = 'material-icons';
+          errorIcon.textContent = 'error_outline';
+          errorIcon.style.fontSize = '80px';
+          errorIcon.style.color = 'red';
+          errorIcon.style.marginBottom = '20px';
+
+          const errorText = document.createElement('h2');
+          errorText.textContent = `初始化失敗: ${error.message}`;
+          errorText.style.color = 'red';
+          errorText.style.fontSize = '1.2em';
+
+          const retryButton = document.createElement('button');
+          retryButton.textContent = '重試';
+          retryButton.style.cssText = `padding: 12px 24px; font-size: 1.1em; font-weight: 500; cursor: pointer; margin-top: 30px; border-radius: 28px; border: none;`;
+          if (isDarkMode) {
+              retryButton.style.backgroundColor = '#e8def8';
+              retryButton.style.color = '#1c1b1f';
+          } else {
+              retryButton.style.backgroundColor = '#ffdacf';
+              retryButton.style.color = '#333';
           }
+          retryButton.onclick = attemptReconnect;
+          
+          loadingContent.appendChild(errorIcon);
+          loadingContent.appendChild(errorText);
+          loadingContent.appendChild(retryButton);
+        }
+      }
+
+      function showOfflineScreen() {
+          const loadingContent = document.getElementById('loadingContent');
+          const isDarkMode = document.body.classList.contains('dark-mode');
+
+          // Clear existing content
+          loadingContent.innerHTML = '';
+
+          // Create an icon element
+          const offlineIcon = document.createElement('span');
+          offlineIcon.className = 'material-icons';
+          offlineIcon.textContent = 'wifi_off';
+          offlineIcon.style.fontSize = '80px';
+          offlineIcon.style.color = isDarkMode ? '#999' : '#888';
+          offlineIcon.style.marginBottom = '20px';
+
+          // Create the main text element
+          const loadingText = document.createElement('h2');
+          loadingText.textContent = '請連接網路後重試';
+          loadingText.style.fontSize = '1.8em';
+          loadingText.style.color = isDarkMode ? '#fff' : '#333';
+          loadingText.style.margin = '0';
+
+          // Create and style the retry button
+          const retryButton = document.createElement('button');
+          retryButton.textContent = '重整';
+          retryButton.style.cssText = `
+              padding: 12px 24px;
+              font-size: 1.1em;
+              font-weight: 500;
+              cursor: pointer;
+              margin-top: 30px;
+              border-radius: 28px;
+              border: none;
+              transition: background-color 0.3s, box-shadow 0.3s;
+          `;
+
+          if (isDarkMode) {
+              retryButton.style.backgroundColor = '#e8def8';
+              retryButton.style.color = '#1c1b1f';
+              retryButton.style.boxShadow = '0 3px 5px rgba(0,0,0,0.3)';
+          } else {
+              retryButton.style.backgroundColor = '#ffdacf';
+              retryButton.style.color = '#333';
+              retryButton.style.boxShadow = '0 3px 5px rgba(0,0,0,0.2)';
+          }
+          
+          retryButton.onmouseover = () => {
+                if (isDarkMode) {
+                  retryButton.style.backgroundColor = '#d0bcff';
+                } else {
+                  retryButton.style.backgroundColor = '#ffc0a8';
+                }
+          };
+            retryButton.onmouseout = () => {
+                if (isDarkMode) {
+                  retryButton.style.backgroundColor = '#e8def8';
+                } else {
+                  retryButton.style.backgroundColor = '#ffdacf';
+                }
+          };
+
+          retryButton.onclick = attemptReconnect;
+          
+          loadingContent.appendChild(offlineIcon);
+          loadingContent.appendChild(loadingText);
+          loadingContent.appendChild(retryButton);
+      }
+
+      async function attemptReconnect() {
+          const loadingContent = document.getElementById('loadingContent');
+          const isDarkMode = document.body.classList.contains('dark-mode');
+          
+          // Show a testing connection message
+          loadingContent.innerHTML = `<h2 style="font-size: 1.8em; color: ${isDarkMode ? '#fff' : '#333'};">測試連線中...</h2>`;
+
+          try {
+              // Use a no-cache request to ensure we hit the network.
+              const response = await fetch("https://apis.youbike.com.tw/json/station-min-yb2.json", { cache: "no-store" });
+              if (!response.ok) {
+                  // This could happen if the API is down but there's internet.
+                  throw new Error('API 無法存取');
+              }
+              
+              // If fetch succeeds, we are online.
+              loadingContent.innerHTML = `<h2 id="loadingText" style="color: ${isDarkMode ? '#fff' : '#333'};">連線成功，重新載入中...</h2>`;
+              location.reload();
+
+          } catch (error) {
+              // Fetch failed, still offline or another issue occurred.
+              showOfflineScreen(); // Re-render the offline screen
+              const loadingText = loadingContent.querySelector('h2');
+              const retryButton = loadingContent.querySelector('button');
+              if (loadingText) loadingText.textContent = '仍無法連線，請檢查網路';
+              if(retryButton) {
+                  retryButton.style.animation = 'shake 0.5s';
+                  setTimeout(() => {
+                      retryButton.style.animation = '';
+                  }, 500);
+              }
+          }
+      }
+
+      window.addEventListener('load', () => {
+        // Run after DOMContentLoaded to ensure dark mode is set
+        if (!navigator.onLine) {
+            showOfflineScreen();
+        } else {
+            initializeApp();
         }
       });
+
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
           isFollowingUser = false;
@@ -2653,8 +2800,12 @@ body.dark-mode #routeModal .bike-item p {
 
             const keyword = document.getElementById('keyword').value.trim();
             if (keyword === '') {
+                // If keyword is empty, perform a full search which re-renders all cards.
+                // Scroll position will be handled by searchYouBike.
                 searchYouBike(true, false);
             } else {
+                // If there's a keyword, only update vehicle data for visible cards.
+                // Scroll position will be handled by updateVehicleData.
                 await updateVehicleData();
             }
             this.reset();
@@ -2666,6 +2817,13 @@ body.dark-mode #routeModal .bike-item p {
     });
 
     setInterval(() => {
+        if(!navigator.onLine) {
+            document.getElementById('updateCountdown').style.display = "none";
+            return;
+        }
+        if(document.getElementById('updateCountdown').style.display === "none") {
+            document.getElementById('updateCountdown').style.display = "flex";
+        }
         countdownTimer.remaining--;
         if (countdownTimer.remaining <= 0) {
             countdownTimer.update();
@@ -2676,15 +2834,6 @@ body.dark-mode #routeModal .bike-item p {
       async function initMap(stations) {
         if (leafletMap) {
           return;
-        }
-
-        if (!navigator.onLine) {
-          if (!window.offlineNotified) {
-            showNotification(currentLang === "en"
-              ? "Offline: Cannot get route information."
-              : "離線狀態：無法取得路線資訊");
-            window.offlineNotified = true;
-          }
         }
 
         leafletMap = L.map('map', {
@@ -2714,8 +2863,8 @@ body.dark-mode #routeModal .bike-item p {
             }
         } catch(err) {
             showNotification(currentLang === "en"
-                ? "Offline mode: Map tiles unavailable."
-                : "離線模式：地圖圖層無法載入。");
+                ? "Map tiles unavailable."
+                : "地圖圖層無法載入。");
         }
         markerClusterGroup = L.markerClusterGroup();
         if (leafletMap && markerClusterGroup) {
@@ -2784,7 +2933,7 @@ body.dark-mode #routeModal .bike-item p {
                       <p>YouBike 2.0: ${stationInfo.available_2_0 !== undefined ? stationInfo.available_2_0 : (currentLang === "en" ? 'Unknown' : '未知')}</p>
                       <p>YouBike 2.0E: ${stationInfo.available_e !== undefined ? stationInfo.available_e : (currentLang === "en" ? 'Unknown' : '未知')}</p>
                       <p>${currentLang === "en" ? "Available Slots: " : "可停空位數："} ${stationInfo.empty_spaces !== undefined ? stationInfo.empty_spaces : (currentLang === "en" ? 'Unknown' : '未知')}</p>
-                    ` : `<p>${currentLang === "en" ? "Offline mode: Real-time data unavailable" : "離線模式：無法取得即時資料"}</p>`}
+                    ` : `<p>${currentLang === "en" ? "Offline. Real-time data unavailable." : "離線中，即時資料無法取得。"}</p>`}
                   `;
 
                   marker.bindPopup(content).openPopup();
@@ -3382,12 +3531,9 @@ body.dark-mode #routeModal .bike-item p {
           }
       }
 
-      // Add event listener to update data when the window gets focus
-
-
       // Add event listener to update data when the tab becomes visible
       document.addEventListener('visibilitychange', () => {
-          if (document.visibilityState === 'visible') {
+          if (document.visibilityState === 'visible' && navigator.onLine) {
               console.log('Tab became visible, updating data...'); // Optional: for debugging
               countdownTimer.update();
           }
