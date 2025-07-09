@@ -31,7 +31,7 @@
 
 ## 使用方式
 
-1. 請前往 [[[potatosserver.github.io/YouBike](https://youbike.pages.dev/)](https://youbike.pages.dev/)](https://potatosserver.github.io/YouBike/) 或是從[Releases](https://github.com/potatosserver/YouBike/releases)下載APK安裝至Android手機即可使用本服務。
+1. 請前往 [youbike.pages.dev](https://youbike.pages.dev/)或是從[Releases](https://github.com/potatosserver/YouBike/releases)下載APK安裝至Android手機即可使用本服務。
 2. 在搜尋框輸入關鍵字查詢
 3. 可開啟定位啟用最近站點與距離計算。
 4. 可使用卡片右上角的星星釘選車站
