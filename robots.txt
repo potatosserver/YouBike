@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://potatosserver.github.io/YouBike/sitemap.xml
+Sitemap: https://youbike.pages.dev/sitemap.xml
