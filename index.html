@@ -1349,8 +1349,8 @@ body.dark-mode #routeModal .bike-item p {
           clearTextBtn.style.display = 'none';
           if (userLocation && leafletMap) {
             isMapMovingDueToTracking = true;
-            leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
-            setTimeout(() => { isMapMovingDueToTracking = false; }, 1000);
+            leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); // Changed duration
+            setTimeout(() => { isMapMovingDueToTracking = false; }, 600); // Changed timeout
           }
           searchYouBike();
           updateLocateButtonTitle();
@@ -1720,8 +1720,8 @@ body.dark-mode #routeModal .bike-item p {
               const lng = parseFloat(firstStation.lng);
               if (!isNaN(lat) && !isNaN(lng)) {
                   isMapMovingDueToTracking = true; // Set flag before moving map
-                  leafletMap.setView([lat, lng], leafletMap.getZoom() || 18, { animate: true, duration: 1 }); // Move map to station
-                  setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Reset flag after animation
+                  leafletMap.setView([lat, lng], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); // Changed duration
+                  setTimeout(() => { isMapMovingDueToTracking = false; }, 600); // Changed timeout
               }
           }
 
@@ -1853,8 +1853,8 @@ body.dark-mode #routeModal .bike-item p {
               const lng = parseFloat(card.dataset.lng); // Get longitude from data attribute
               if (!isNaN(lat) && !isNaN(lng) && leafletMap) {
                 isMapMovingDueToTracking = true; // Set flag
-                leafletMap.setView([lat, lng], 18, { animate: true, duration: 1 }); // Move map to station with animation
-                setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Reset flag after animation
+                leafletMap.setView([lat, lng], 18, { animate: true, duration: 0.5 }); // Changed duration
+                setTimeout(() => { isMapMovingDueToTracking = false; }, 600); // Changed timeout
               }
               isFollowingUser = false; // Stop following user when map is manually moved
               updateLocateButtonTitle(); // Update the locate button's title
@@ -2021,8 +2021,8 @@ body.dark-mode #routeModal .bike-item p {
               // Move map to initial user location
               if (leafletMap) {
                   isMapMovingDueToTracking = true; // Set flag
-                  leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
-                  setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Reset flag
+                  leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); // Changed duration
+                  setTimeout(() => { isMapMovingDueToTracking = false; }, 600); // Changed timeout
               }
 
               // Perform initial search with the real location
@@ -2048,8 +2048,8 @@ body.dark-mode #routeModal .bike-item p {
               // If moved significantly, re-center map if not manually moved
               if (leafletMap) {
                 isMapMovingDueToTracking = true; // Set flag
-                leafletMap.setView([newLocation.latitude, newLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 1 });
-                setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Reset flag
+                leafletMap.setView([newLocation.latitude, newLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 }); // Changed duration
+                setTimeout(() => { isMapMovingDueToTracking = false; }, 600); // Changed timeout
               }
             }
           }
@@ -2068,8 +2068,8 @@ body.dark-mode #routeModal .bike-item p {
           // If following user and map is not being manually moved, re-center the map
           if (isFollowingUser && leafletMap) {
             isMapMovingDueToTracking = true; // Set flag
-            leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 });
-            setTimeout(() => { isMapMovingDueToTracking = false; }, 500); // Reset flag
+            leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 }); // Changed duration
+            setTimeout(() => { isMapMovingDueToTracking = false; }, 600); // Changed timeout
           }
 
           // Trigger a data update if user moved significantly, or just update distances otherwise
@@ -2229,7 +2229,6 @@ body.dark-mode #routeModal .bike-item p {
                   locationSet = true;
                   isFollowingUser = false; // Not following if using default location
                   hasObtainedRealLocation = false; // Not a real obtained location
-
                   // If tracking was requested (toggle was on initially) but failed, still try to start watching for future updates
                   if (centralLocationToggle.checked) {
                       startTracking(); // Attempt to start tracking even if initial get failed (for future updates)
@@ -2281,8 +2280,8 @@ body.dark-mode #routeModal .bike-item p {
 
               // Set map view to user location, set flag before moving
               isMapMovingDueToTracking = true;
-              leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() ||  18, { animate: true }); // Set zoom to 18 if not already set
-              setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Reset flag after animation
+              leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() ||  18, { animate: true, duration: 0.5 }); // Changed duration
+              setTimeout(() => { isMapMovingDueToTracking = false; }, 600); // Changed timeout
           }
 
           if (locationSet) {
@@ -3267,8 +3266,8 @@ body.dark-mode #routeModal .bike-item p {
 
               if (leafletMap) {
                   isMapMovingDueToTracking = true; // Set flag
-                  leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
-                  setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Reset flag
+                  leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); // Changed duration
+                  setTimeout(() => { isMapMovingDueToTracking = false; }, 600); // Changed timeout
               }
               if (locationMarker) {
                   locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
@@ -3289,8 +3288,8 @@ body.dark-mode #routeModal .bike-item p {
               // Try to get immediate location and move map if available
               if (leafletMap && userLocation && hasObtainedRealLocation) {
                    isMapMovingDueToTracking = true; // Set flag
-                   leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
-                   setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Reset flag
+                   leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); // Changed duration
+                   setTimeout(() => { isMapMovingDueToTracking = false; }, 600); // Changed timeout
                } else if (leafletMap) {
                    // If userLocation is not yet set or not a real location, try to get current position once
                    // This handles cases where watchPosition might take a moment to fire the first time
@@ -3307,8 +3306,8 @@ body.dark-mode #routeModal .bike-item p {
                                const coords = regionCoordinates[selectedRegion];
                                userLocation = { latitude: coords.lat, longitude: coords.lng };
                                isMapMovingDueToTracking = true; // Set flag
-                               leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true });
-                               setTimeout(() => { isMapMovingDueToTracking = false; }, 1000); // Reset flag
+                               leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); // Changed duration
+                               setTimeout(() => { isMapMovingDueToTracking = false; }, 600); // Changed timeout
                                if (locationMarker) {
                                    locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
                                    if (pulsingMarker) pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
