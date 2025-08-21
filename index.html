@@ -1324,7 +1324,6 @@ body.dark-mode #routeModal .bike-item p {
       let isFollowingUser = false;
       let isTrackingActive = false;
       let watchId = null;
-      let isMapMovingDueToTracking = false; // Add this flag to control map movement
       let hasObtainedRealLocation = false;
 
       const regionCoordinates = {
@@ -1359,9 +1358,7 @@ body.dark-mode #routeModal .bike-item p {
           keywordInput.value = '';
           clearTextBtn.style.display = 'none';
           if (userLocation && leafletMap) {
-            isMapMovingDueToTracking = true;
             leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); // Changed duration
-            setTimeout(() => { isMapMovingDueToTracking = false; }, 600); // Changed timeout
           }
           searchYouBike();
           updateLocateButtonTitle();
@@ -3094,12 +3091,15 @@ body.dark-mode #routeModal .bike-item p {
         locateControl.addTo(leafletMap);
 
         // Event listener for map movement: if map is moved manually, stop following user
-        leafletMap.on('movestart', () => {
-          if (isTrackingActive && !isMapMovingDueToTracking && isFollowingUser) {
-            isFollowingUser = false;
+      // Event listener for map movement: if map is moved manually, stop following user
+        leafletMap.on('movestart', function(e) {
+            // e.originalEvent exists if the move was triggered by a user event (mouse, touch).
+            // If the user manually moves the map while in "following" mode, turn it off.
+            if (e.originalEvent && isFollowingUser) {
+            isFollowingUser = false; // Stop following the user
             showNotification(currentLang === "en" ? "Map manually moved, auto-following stopped." : "地圖被手動移動，已停止自動跟隨。");
-            updateLocateButtonTitle(); // Update the locate button's title
-          }
+            updateLocateButtonTitle(); // Update the UI of the locate button
+            }
         });
 
         try {
