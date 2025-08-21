@@ -1324,6 +1324,7 @@ body.dark-mode #routeModal .bike-item p {
       let isFollowingUser = false;
       let isTrackingActive = false;
       let watchId = null;
+      let isMapMovingDueToTracking = false; // Add this flag to control map movement
       let hasObtainedRealLocation = false;
 
       const regionCoordinates = {
@@ -1358,7 +1359,9 @@ body.dark-mode #routeModal .bike-item p {
           keywordInput.value = '';
           clearTextBtn.style.display = 'none';
           if (userLocation && leafletMap) {
+            isMapMovingDueToTracking = true;
             leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); // Changed duration
+            setTimeout(() => { isMapMovingDueToTracking = false; }, 600); // Changed timeout
           }
           searchYouBike();
           updateLocateButtonTitle();
@@ -3090,17 +3093,18 @@ body.dark-mode #routeModal .bike-item p {
         };
         locateControl.addTo(leafletMap);
 
-        // Event listener for map movement: if map is moved manually, stop following user
-      // Event listener for map movement: if map is moved manually, stop following user
-        leafletMap.on('movestart', function(e) {
-            // e.originalEvent exists if the move was triggered by a user event (mouse, touch).
-            // If the user manually moves the map while in "following" mode, turn it off.
-            if (e.originalEvent && isFollowingUser) {
-            isFollowingUser = false; // Stop following the user
-            showNotification(currentLang === "en" ? "Map manually moved, auto-following stopped." : "地圖被手動移動，已停止自動跟隨。");
-            updateLocateButtonTitle(); // Update the UI of the locate button
+        // 當使用者手動操作地圖時，停止自動跟隨
+        function disableFollowingOnManualInteraction() {
+            if (isFollowingUser) {
+                isFollowingUser = false;
+                showNotification(currentLang === "en" ? "Auto-following stopped." : "已停止自動跟隨。");
+                updateLocateButtonTitle();
             }
-        });
+        }
+
+        // 監聽使用者手動拖曳或縮放地圖的事件，一旦觸發就停止跟隨
+        leafletMap.on('dragstart', disableFollowingOnManualInteraction);
+        leafletMap.on('zoomstart', disableFollowingOnManualInteraction);
 
         try {
           const currentStations = Array.isArray(stations) ? stations : [];
