@@ -42,11 +42,9 @@
         -ms-user-select: none;
         user-select: none;
       }
-
       *, *::before, *::after {
         transition: var(--color-transition);
       }
-
       .station,
       .station h3,
       .station p,
@@ -60,34 +58,28 @@
       .setting-item {
         transition: var(--color-transition), transform 0.2s ease, box-shadow 0.2s ease;
       }
-
-      /* Add this rule to remove tap highlight on interactive elements */
       .station, #settingsButton, #closeCentralSettings, #closeRouteModal {
           -webkit-tap-highlight-color: transparent;
       }
-
       #locationNotification {
         position: fixed;
         top: 20px;
         right: 20px;
-        /* Material 3 style adjustments */
-        background-color: #e8def8; /* Light mode background */
-        color: #1c1b1f; /* Light mode text color */
+        background-color: #e8def8; 
+        color: #1c1b1f; 
         padding: 12px 20px;
-        border-radius: 20px; /* More rounded corners */
+        border-radius: 20px; 
         font-size: 14px;
         z-index: 10001;
         opacity: 0;
         transform: translateY(-20px);
         transition: all 0.3s ease;
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2); /* Softer shadow */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
       }
-
       #locationNotification.show {
         opacity: 1;
         transform: translateY(0);
       }
-
       #locationNotification.hide {
         opacity: 0;
         transform: translateY(-20px);
@@ -121,12 +113,10 @@
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         transition: box-shadow 0.3s ease;
       }
-
       body.dark-mode #searchContainer {
           background-color: #1e1e1e;
           box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
       }
-
       #keyword {
         padding: 0;
         width: calc(100% - 34px);
@@ -141,18 +131,15 @@
         background-color: transparent;
         color: #333;
       }
-
       body.dark-mode #keyword {
           color: #ffffff;
       }
-
       #keyword::placeholder {
         color: #888;
       }
       #keyword:focus {
         outline: none;
       }
-
       #searchIcon {
         position: static;
         margin-left: 10px;
@@ -167,19 +154,15 @@
         width: 24px;
         height: 24px;
       }
-
       body.dark-mode #searchIcon {
           color: #ccc;
       }
-
       #searchIcon:hover {
         color: #007BFF;
       }
-
       #searchContainer + #locationSwitchContainer {
            margin-top: 6px;
       }
-
       #locationSwitchContainer {
         display: flex;
         align-items: center;
@@ -191,24 +174,20 @@
         backdrop-filter: blur(5px);
         transition: all 0.3s ease;
       }
-
       body.dark-mode #locationSwitchContainer {
           background-color: rgba(30, 30, 30, 0.9);
           box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
       }
-
       #locationSwitchText {
           color: #007BFF;
           font-weight: 500;
           text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
           margin-left: 10px;
       }
-
       body.dark-mode #locationSwitchText {
           color: #90CAF9;
           text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
       }
-
       #results {
         margin-top: 20px;
         display: flex;
@@ -283,17 +262,14 @@
         outline: none;
         border-radius: 50%;
       }
-
       .navigate-button:hover {
         background-color: transparent;
         color: #0056b3;
       }
-
       body.dark-mode .navigate-button {
         color: #90CAF9;
         background-color: transparent;
       }
-
       body.dark-mode .navigate-button:hover {
         color: #64b5f6;
         background-color: rgba(255, 255, 255, 0.1);
@@ -367,7 +343,6 @@
       body.dark-mode #keyword::placeholder {
          color: #888;
       }
-
        body.dark-mode #searchContainer {
           background-color: #1e1e1e;
           box-shadow: 0 2px 4px rgba(255,255,255,0.1);
@@ -414,11 +389,10 @@
         color: #000;
         border: 1px solid #444;
       }
-      /* Dark mode for location notification */
       body.dark-mode #locationNotification {
-          background-color: #d0bcff; /* Dark mode background */
-          color: #1c1b1f; /* Dark mode text color */
-          box-shadow: 0 4px 8px rgba(255,255,255,0.2); /* Dark mode shadow */
+          background-color: #d0bcff; 
+          color: #1c1b1f; 
+          box-shadow: 0 4px 8px rgba(255,255,255,0.2); 
       }
       #map {
         position: fixed;
@@ -452,16 +426,13 @@
         touch-action: pan-y;
         -webkit-overflow-scrolling: touch;
       }
-
       #mainContent::-webkit-scrollbar {
         display: none;
       }
-
       body.dark-mode #mainContent {
         background: #222;
         box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
       }
-
       #dragHandle {
         position: sticky;
         top: 0;
@@ -475,7 +446,6 @@
         margin: 0 auto;
         padding: 0;
       }
-
       #dragHandle::before {
         content: '';
         width: 100px;
@@ -485,28 +455,23 @@
         box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         transition: background 0.3s ease, box-shadow 0.3s ease;
       }
-
       body.dark-mode #dragHandle::before {
         background: #888;
         box-shadow: 0 1px 3px rgba(255,255,255,0.1);
       }
-
       #dragHandle:hover::before {
         background: #888;
         box-shadow: 0 2px 5px rgba(0,0,0,0.3);
       }
-
       body.dark-mode #dragHandle:hover::before {
         background: #aaa;
         box-shadow: 0 2px 5px rgba(255,255,255,0.2);
       }
-
       @media (max-width: 768px) {
         #mainContent {
           width: 80%;
         }
       }
-
       @media (max-width: 480px) {
         #mainContent {
           width: 100%;
@@ -548,13 +513,11 @@
              align-items: center;
              justify-content: center;
          }
-
         button {
           width: 100%;
           border-radius: 0 0 5px 5px;
           display: block;
         }
-
         #results {
           gap: 10px;
         }
@@ -591,7 +554,6 @@
           opacity: 0;
         }
       }
-
       .pulsing-icon .pulse {
         width: 100%;
         height: 100%;
@@ -612,7 +574,6 @@
         z-index: 9998;
         transition: opacity 0.5s ease;
       }
-
       #loadingContent {
         display: flex;
         flex-direction: column;
@@ -716,7 +677,7 @@
       }      #settingsPanel {
           position: fixed;
           bottom: 60px;
-          right: 20px; /* Adjusted to be consistent with settingsButton */
+          right: 20px; 
           display: flex;
           flex-direction: row;
           gap: 10px;
@@ -731,27 +692,22 @@
           backdrop-filter: blur(10px);
           pointer-events: none;
       }
-
       #settingsPanel.show {
           animation: popUpSettings 0.2s forwards;
       }
-
       #settingsPanel.hiding {
           animation: popDownSettings 0.2s forwards;
       }
-
       #settingsPanel a,
       #settingsPanel button {
           transition: all 0.3s ease;
           box-shadow: 0 2px 5px rgba(0,0,0,0.1);
       }
-
       #settingsPanel a:hover,
       #settingsPanel button:hover {
           transform: translateY(-2px);
           box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
       }
-
       #updateCountdown {
         white-space: nowrap;
         position: fixed;
@@ -774,29 +730,24 @@
         justify-content: center;
         gap: 6px;
       }
-
       #updateCountdown:hover {
           background-color: #ffc0a8;
           box-shadow: 0 3px 6px rgba(0,0,0,0.3);
       }
-
       body.dark-mode #updateCountdown {
           background-color: #e8def8;
           color: #1c1b1f;
           box-shadow: 0 2px 4px rgba(0,0,0,0.3);
       }
-
       body.dark-mode #updateCountdown:hover {
           background-color: #d0bcff;
           color: #1c1b1f;
           box-shadow: 0 3px 6px rgba(0,0,0,0.4);
       }
-
       #updateCountdown .material-icons {
           font-size: 18px;
           vertical-align: middle;
       }
-
       #settingsButton {
           position: fixed;
           bottom: 60px;
@@ -816,25 +767,20 @@
           box-shadow: 0 3px 5px rgba(0,0,0,0.2);
           transition: background-color 0.3s ease, box-shadow 0.3s ease;
       }
-
       #settingsButton:hover {
           background-color: #ffc0a8;
           box-shadow: 0 4px 8px rgba(0,0,0,0.3);
       }
-
       body.dark-mode #settingsButton {
           background-color: #e8def8;
           color: #1c1b1f;
           box-shadow: 0 3px 5px rgba(0,0,0,0.3);
       }
-
       body.dark-mode #settingsButton:hover {
           background-color: #d0bcff;
           color: #1c1b1f;
           box-shadow: 0 4px 8px rgba(0,0,0,0.4);
       }
-
-
       #mapControls {
         position: fixed;
         top: 8px;
@@ -849,28 +795,23 @@
         gap: 4px;
         pointer-events: none;
       }
-
       #mapControls > * {
         pointer-events: auto;
       }
-
       #mapControls h1 {
         color: #007BFF;
         background-color: transparent;
         display: inline;
         padding: 0;
       }
-
       body.dark-mode #mapControls h1 {
         color: #90CAF9;
         text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
       }
-
       #mapControls, #mapControls * {
         z-index: 999 !important;
         pointer-events: none !important;
       }
-
       #centralSettingsPanel {
           display: none;
           position: fixed;
@@ -893,12 +834,10 @@
           animation-fill-mode: forwards;
           opacity: 0;
       }
-
       body.dark-mode #centralSettingsPanel {
           background: rgba(30, 30, 30, 0.95);
           transition: background-color 0.1s ease;
       }
-
       .settings-group {
           margin-bottom: 20px;
           padding: 15px;
@@ -908,13 +847,11 @@
           color: #333;
           transition: border-color 0.1s ease, color 0.2s ease;
       }
-
       body.dark-mode .settings-group {
           border-color: #fff;
           color: #fff;
           background: transparent;
       }
-
       .setting-item {
           display: flex;
           align-items: center;
@@ -926,11 +863,9 @@
           color: inherit;
           transition: background-color 0.2s ease, color 0.2s ease;
       }
-
       body.dark-mode .setting-item {
           background: #455a64;
       }
-
       #closeCentralSettings {
           position: absolute;
           top: 2vh;
@@ -949,24 +884,19 @@
           justify-content: center;
           transition: background-color 0.3s;
       }
-
       #closeCentralSettings:hover {
           background-color: rgba(0, 0, 0, 0.1);
       }
-
       body.dark-mode #closeCentralSettings {
           color: #fff;
       }
-
       body.dark-mode #closeCentralSettings:hover {
           background-color: rgba(255, 255, 255, 0.1);
       }
-
       @keyframes fadeIn {
           from { opacity: 0; transform: translate(-50%, -48%); }
           to { opacity: 1; transform: translate(-50%, -50%); }
       }
-
       @keyframes slideIn {
         from { transform: translate(-50%, -60%) scale(0.8); opacity: 0; }
         to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
@@ -991,31 +921,25 @@
           color: #fff;
           border: 1px solid #777;
       }
-
       body.dark-mode #centralRegionSelect option {
           background-color: #555;
           color: #fff;
       }
-
       #mainContent {
         opacity: 0;
         transition: opacity 0.5s ease-in-out;
       }
-
       #mainContent.fade-in {
         opacity: 1;
       }
-
       #loadingOverlay {
         opacity: 1;
         transition: opacity 0.5s ease-in-out;
       }
-
       #loadingOverlay.fade-out {
         opacity: 0;
         pointer-events: none;
       }
-
       .github-link {
         text-decoration: none;
         color: #007BFF;
@@ -1023,23 +947,18 @@
         align-items: center;
         gap: 10px;
       }
-
       body.dark-mode .github-link {
         color: #90CAF9;
       }
-
       .github-link span {
         flex: 1;
       }
-
       #settingsPanelTitle {
           color: #333;
       }
-
       body.dark-mode #settingsPanelTitle {
           color: #fff;
       }
-
       .rotate-right {
         transform: rotate(360deg);
         transition: transform 0.8s ease;
@@ -1056,7 +975,6 @@
         from { transform: rotate(0deg); }
         to { transform: rotate(180deg); }
       }
-
       .spin-update {
         animation: spin-180 0.5s ease forwards;
       }
@@ -1064,7 +982,6 @@
         margin: 4px 0;
         color: #666;
       }
-
       body.dark-mode .station p {
         color: #cccccc;
       }
@@ -1073,61 +990,54 @@
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
-          background-color: #fff5f0; /* Changed to match settings panel */
+          background-color: #fff5f0; 
           padding: 24px;
-          border-radius: 20px; /* Changed to match settings panel */
-          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Changed to match settings panel */
-          z-index: 1001; /* Changed to 1001 */
-          display: none; /* Changed to none */
+          border-radius: 20px; 
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); 
+          z-index: 1001; 
+          display: none; 
           width: 80%;
           max-width: 360px;
-          max-height: calc(100vh - 80px); /* Changed to match settings panel */
+          max-height: calc(100vh - 80px); 
           overflow-y: auto;
           scrollbar-width: none;
           -ms-overflow-style: none;
           text-align: left;
           transition: background-color 0.3s ease, box-shadow 0.3s ease;
-          backdrop-filter: blur(10px); /* Added backdrop filter */
-          animation-duration: 0.3s; /* Added animation duration */
-          animation-fill-mode: forwards; /* Added animation fill mode */
-          opacity: 0; /* Added initial opacity */
+          backdrop-filter: blur(10px); 
+          animation-duration: 0.3s; 
+          animation-fill-mode: forwards; 
+          opacity: 0; 
       }
-
       #routeModal.modal-open {
-          animation-name: slideIn; /* Use slideIn animation */
+          animation-name: slideIn; 
       }
-
       #routeModal.modal-close {
-          animation-name: slideOut; /* Use slideOut animation */
+          animation-name: slideOut; 
       }
-
       #routeModal::-webkit-scrollbar {
           display: none;
       }
-
       body.dark-mode #routeModal {
-          background-color: rgba(30, 30, 30, 0.95); /* Changed to match settings panel */
+          background-color: rgba(30, 30, 30, 0.95); 
           color: #ffffff;
-          box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1); /* Changed for dark mode consistency */
+          box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1); 
       }
-
       #routeModal h3 {
-          margin-top: 30px; /* Increased top margin */
+          margin-top: 30px; 
           margin-bottom: 20px;
-          padding-right: 56px; /* Increased padding to make space for close button */
+          padding-right: 56px; 
           color: #007BFF;
           font-size: 1.3em;
           word-break: break-word;
       }
-
       body.dark-mode #routeModal h3 {
           color: #90CAF9;
       }
-
       #routeModal .bike-item {
           padding: 16px;
           margin-bottom: 12px;
-          background-color: #fff2ec; /* Changed to match station card */
+          background-color: #fff2ec; 
           border-radius: 8px;
           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
           display: flex;
@@ -1135,13 +1045,11 @@
           gap: 8px;
           transition: background-color 0.3s ease, box-shadow 0.3s ease;
       }
-
       body.dark-mode #routeModal .bike-item {
-          background-color: #444; /* Changed to match dark mode station card */
+          background-color: #444; 
           color: #fff;
           box-shadow: 0 2px 4px rgba(255,255,255,0.1);
       }
-
       #routeModal .bike-item p {
           margin: 0;
           font-size: 14px;
@@ -1149,7 +1057,6 @@
           align-items: center;
           gap: 8px;
       }
-
       #closeRouteModal {
           position: absolute;
           top: 12px;
@@ -1168,19 +1075,15 @@
           justify-content: center;
           transition: background-color 0.3s;
       }
-
       #closeRouteModal:hover {
           background-color: rgba(0, 0, 0, 0.1);
       }
-
       body.dark-mode #closeRouteModal {
           color: #ccc;
       }
-
       body.dark-mode #closeRouteModal:hover {
           background-color: rgba(255, 255, 255, 0.1);
       }
-
 body.dark-mode #routeModal .bike-item {
     background-color: #444 !important;
     color: #fff !important;
@@ -1189,7 +1092,6 @@ body.dark-mode #routeModal .bike-item {
 body.dark-mode #routeModal .bike-item p {
     color: #fff !important;
 }
-
 #routeModal ul {
     list-style: none;
     padding: 0;
@@ -1198,7 +1100,6 @@ body.dark-mode #routeModal .bike-item p {
 #routeModal .bike-item:last-child {
     margin-bottom: 0;
 }
-
     </style>
   </head>
   <body>
@@ -1244,7 +1145,6 @@ body.dark-mode #routeModal .bike-item p {
     <div id="centralSettingsPanel">
       <button id="closeCentralSettings">×</button>
       <h2 id="settingsPanelTitle">系統設定</h2>
-
       <div class="settings-group">
               <h3>基本設定</h3>
               <div class="setting-item">
@@ -1299,7 +1199,6 @@ body.dark-mode #routeModal .bike-item p {
                   </label>
               </div>
           </div>
-
       <div class="settings-group">
           <h3>外部連結</h3>
           <div class="setting-item">
@@ -1324,9 +1223,8 @@ body.dark-mode #routeModal .bike-item p {
       let isFollowingUser = false;
       let isTrackingActive = false;
       let watchId = null;
-      let isMapMovingDueToTracking = false; // Add this flag to control map movement
+      let isMapMovingDueToTracking = false; 
       let hasObtainedRealLocation = false;
-
       const regionCoordinates = {
         taipei: { lat: 25.047924, lng: 121.517081 },
         newTaipei: { lat: 25.0215339197085, lng: 121.4568090197085 },
@@ -1360,40 +1258,32 @@ body.dark-mode #routeModal .bike-item p {
           clearTextBtn.style.display = 'none';
           if (userLocation && leafletMap) {
             isMapMovingDueToTracking = true;
-            leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); // Changed duration
-            setTimeout(() => { isMapMovingDueToTracking = false; }, 600); // Changed timeout
+            leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); 
+            setTimeout(() => { isMapMovingDueToTracking = false; }, 600); 
           }
           searchYouBike();
           updateLocateButtonTitle();
       });
       const maxResults = 100;
       const pinnedStations = new Set(JSON.parse(localStorage.getItem('pinnedStations') || '[]').map(id => String(id)));
-
       function togglePinStation(stationId, event) {
-        event.stopPropagation(); // Prevent card click event from firing
-
+        event.stopPropagation(); 
         const id = String(stationId);
-
         if (pinnedStations.has(id)) {
           pinnedStations.delete(id);
         } else {
           pinnedStations.add(id);
         }
-
         try {
           localStorage.setItem('pinnedStations', JSON.stringify([...pinnedStations]));
         } catch (e) {
-          // Handle quota exceeded error, etc.
-          // For now, silently fail or log to console
         }
-
         const pinButton = document.querySelector(`.pin-button[data-id="${id}"]`);
         if (pinButton) {
           const isPinned = pinnedStations.has(id);
           pinButton.classList.toggle('pinned', isPinned);
           pinButton.textContent = isPinned ? 'star' : 'star_outline';
         }
-
         updateResultsOrder();
       }
       let mainContentShown = false;
@@ -1401,23 +1291,15 @@ body.dark-mode #routeModal .bike-item p {
         if (!mainContentShown) {
           const overlay = document.getElementById("loadingOverlay");
           const mainContent = document.getElementById("mainContent");
-
-          overlay.classList.add('fade-out'); // Start fade out animation for overlay
-          mainContent.style.display = "block"; // Make mainContent visible before fading in
-
-          // Force a reflow to ensure the display change is applied before transition
+          overlay.classList.add('fade-out'); 
+          mainContent.style.display = "block"; 
           mainContent.offsetHeight;
-
-          mainContent.classList.add('fade-in'); // Start fade in animation for mainContent
-          mainContent.style.overflowY = 'auto'; // Enable scrolling after fade-in
-
-          // Show update countdown button only if online
+          mainContent.classList.add('fade-in'); 
+          mainContent.style.overflowY = 'auto'; 
           document.getElementById('updateCountdown').style.display = navigator.onLine ? "flex" : "none";
-
           setTimeout(() => {
-            overlay.style.display = "none"; // Hide overlay completely after fade out
-          }, 500); // Duration of fade-out animation
-
+            overlay.style.display = "none"; 
+          }, 500); 
           mainContentShown = true;
         }
       }
@@ -1426,23 +1308,22 @@ body.dark-mode #routeModal .bike-item p {
         let lang = localStorage.getItem("lang") || "zh";
         let prefix = lang === "en" ? "Loading:" : "載入中：";
         let progress = 0;
-        let lockedProgress = null; // To hold the progress at a fixed point
+        let lockedProgress = null; 
         let loadingTextInterval = setInterval(() => {
           if (!mainContentShown) {
-            if (progress < 85) { // Simulate up to 85%
+            if (progress < 85) { 
               progress++;
               loadingText.textContent = prefix + progress + "%";
             } else {
-              // Lock progress between 85% and 95% until main content is shown
               if (lockedProgress === null) {
-                lockedProgress = 85 + Math.floor(Math.random() * 11); // Random between 85 and 95
+                lockedProgress = 85 + Math.floor(Math.random() * 11); 
               }
               loadingText.textContent = prefix + lockedProgress + "%";
             }
           } else {
-            clearInterval(loadingTextInterval); // Stop when main content is shown
+            clearInterval(loadingTextInterval); 
           }
-        }, 50); // Update every 50ms
+        }, 50); 
       }
       function showRandomNotice(){
         let lang = localStorage.getItem("lang") || "zh";
@@ -1468,109 +1349,69 @@ body.dark-mode #routeModal .bike-item p {
         const randomIndex = Math.floor(Math.random() * notices.length);
         document.getElementById('noticeBox').textContent = notices[randomIndex];
       }
-
       let youbikeDataCache = null;
       let allStations = [];
-
-      /**
-       * Opens the IndexedDB database 'YouBikeDB' and creates object stores if necessary.
-       * @returns {Promise<IDBDatabase>} A promise that resolves with the opened database.
-       */
       function openYoubikeDB() {
         return new Promise((resolve, reject) => {
-          // Request persistent storage if available
           if (navigator.storage && navigator.storage.persist) {
             navigator.storage.persist().then(isPersisted => {
-              // console.log(`Persistent storage granted: ${isPersisted}`);
             });
           }
-
-          const request = indexedDB.open('YouBikeDB', 1); // Version 1
-
+          const request = indexedDB.open('YouBikeDB', 1); 
           request.onupgradeneeded = function(event) {
             const db = event.target.result;
-
             db.onerror = function(event) {
-              // console.error("Database error: " + event.target.errorCode);
             };
-
-            // Create object store for YouBike data if it doesn't exist
             if (!db.objectStoreNames.contains('youbikeData')) {
               const youbikeStore = db.createObjectStore('youbikeData', { keyPath: 'id' });
-              youbikeStore.createIndex('timestamp', 'timestamp'); // Index for timestamp
+              youbikeStore.createIndex('timestamp', 'timestamp'); 
             }
-
-            // Create object store for map tiles (if implemented)
             if (!db.objectStoreNames.contains('mapTiles')) {
               const tileStore = db.createObjectStore('mapTiles', { keyPath: 'url' });
               tileStore.createIndex('timestamp', 'timestamp');
             }
-
-            // Create object store for region data
             if (!db.objectStoreNames.contains('regionData')) {
               const regionStore = db.createObjectStore('regionData', { keyPath: 'region' });
               regionStore.createIndex('timestamp', 'timestamp');
             }
           };
-
           request.onsuccess = function(event) {
             const db = event.target.result;
-
             db.onerror = function(event) {
-              // console.error("Database error: " + event.target.errorCode);
             };
-
-            // Set up a daily backup of IndexedDB to localStorage
             setInterval(() => {
               backupData(db);
-            }, 24 * 60 * 60 * 1000); // Every 24 hours
+            }, 24 * 60 * 60 * 1000); 
             resolve(db);
           };
-
           request.onerror = function(event) {
             reject(event.target.error);
           };
         });
       }
-
-      /**
-       * Backs up IndexedDB data to localStorage.
-       * @param {IDBDatabase} db - The IndexedDB database instance.
-       */
       async function backupData(db) {
         try {
           const tx = db.transaction(['youbikeData', 'regionData'], 'readonly');
           const youbikeStore = tx.objectStore('youbikeData');
           const regionStore = tx.objectStore('regionData');
-
           const youbikeData = await getAllData(youbikeStore);
           const regionData = await getAllData(regionStore);
-
           try {
             localStorage.setItem('youbikeData_backup', JSON.stringify(youbikeData));
             localStorage.setItem('regionData_backup', JSON.stringify(regionData));
             localStorage.setItem('backup_timestamp', Date.now().toString());
-            // console.log('IndexedDB data backed up to localStorage.');
           } catch (e) {
-            // console.error('Failed to backup data to localStorage:', e);
           }
         } catch (error) {
-          // console.error('Error accessing IndexedDB for backup:', error);
         }
       }
-
-      /**
-       * Retrieves all data from an IndexedDB object store.
-       * @param {IDBObjectStore} store - The IndexedDB object store.
-       * @returns {Promise<Array>} A promise that resolves with an array of all data.
-       */
       function getAllData(store) {
         return new Promise((resolve, reject) => {
           const data = [];
           store.openCursor().onsuccess = function(event) {
             const cursor = event.target.result;
             if (cursor) {
-              data.push(cursor.value.value); // Assuming 'value' contains the actual data
+              data.push(cursor.value.value); 
               cursor.continue();
             } else {
               resolve(data);
@@ -1578,29 +1419,18 @@ body.dark-mode #routeModal .bike-item p {
           };
         });
       }
-
-      /**
-       * Saves YouBike station data to IndexedDB.
-       * @param {Array<Object>} dataArray - The array of YouBike station data.
-       * @returns {Promise<void>} A promise that resolves when data is saved.
-       */
       async function saveYoubikeDataToDB(dataArray) {
         const db = await openYoubikeDB();
         const tx = db.transaction('youbikeData', 'readwrite');
         const store = tx.objectStore('youbikeData');
-
-        // Clear existing data before adding new data
         await store.clear();
-
         for (const [idx, item] of dataArray.entries()) {
           await store.put({
-            id: idx, // Use index as key, or a unique station identifier if available
+            id: idx, 
             value: item,
             timestamp: Date.now()
           });
         }
-
-        // Also save the current region's default coordinates to regionData store
         const regionTx = db.transaction('regionData', 'readwrite');
         const regionStore = regionTx.objectStore('regionData');
         await regionStore.put({
@@ -1608,17 +1438,11 @@ body.dark-mode #routeModal .bike-item p {
           coordinates: regionCoordinates[defaultRegion],
           timestamp: Date.now()
         });
-
         return new Promise((resolve, reject) => {
           tx.oncomplete = resolve;
           tx.onerror = reject;
         });
       }
-
-      /**
-       * Retrieves YouBike station data from IndexedDB.
-       * @returns {Promise<Array<Object>>} A promise that resolves with the YouBike station data.
-       */
       function getYoubikeDataFromDB() {
         return openYoubikeDB().then(db => {
           return new Promise((resolve, reject) => {
@@ -1639,26 +1463,15 @@ body.dark-mode #routeModal .bike-item p {
           });
         });
       }
-
-      /**
-       * Searches for YouBike stations based on keyword and updates the display.
-       * @param {boolean} showLoadingIndicator - Whether to show a loading indicator.
-       * @param {boolean} shouldMoveMap - Whether the map should move to the first result.
-       */
       async function searchYouBike(showLoadingIndicator = true, shouldMoveMap = false) {
-        // Record current scroll position of mainContent
         const currentScrollTop = mainContent.scrollTop;
-
         const keyword = keywordInput.value.trim().toLowerCase();
-
         try {
           if (!youbikeDataCache || youbikeDataCache.length === 0) {
-              // If offline and no cache, inform user and return
               if (!navigator.onLine) {
                   showNotification(currentLang === "en" ? "You are offline and station data is not available." : "您已離線且無站點資料。");
                   return;
               }
-              // Attempt to fetch from network if no cache
               try {
                   const youbikeUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
                   const response = await fetch(youbikeUrl, {
@@ -1672,18 +1485,15 @@ body.dark-mode #routeModal .bike-item p {
                   youbikeDataCache = Array.isArray(fetchedData)
                     ? fetchedData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
                     : [];
-                  await saveYoubikeDataToDB(youbikeDataCache); // Save fetched data to IndexedDB
+                  await saveYoubikeDataToDB(youbikeDataCache); 
               } catch (error) {
-                  // If network fetch fails, try to load from IndexedDB cache
                   youbikeDataCache = await getYoubikeDataFromDB();
                    if (!youbikeDataCache || youbikeDataCache.length === 0) {
                       throw new Error("無法從網路或快取載入資料。");
                    }
               }
           }
-
-          allStations = [...youbikeDataCache]; // Keep a copy of all stations
-
+          allStations = [...youbikeDataCache]; 
           let youbikeResults = [...youbikeDataCache];
           if (keyword) {
             youbikeResults = youbikeResults.filter(station => {
@@ -1695,8 +1505,6 @@ body.dark-mode #routeModal .bike-item p {
                      stationNameEN.includes(keyword) || stationAddressEN.includes(keyword);
             });
           }
-
-          // Sort by distance if user location is available, otherwise by default coordinates
           youbikeResults = youbikeResults.sort((a, b) => {
             const distA = calculateDistance(
               userLocation ? userLocation.latitude : defaultLatitude,
@@ -1710,46 +1518,31 @@ body.dark-mode #routeModal .bike-item p {
             );
             return distA - distB;
           });
-
-          // Limit results shown to prevent performance issues
-          let limit = keyword ? 50 : 10; // Show more results if searching
-          // const displayedResults = youbikeResults.slice(0, maxResults);
-
+          let limit = keyword ? 50 : 10; 
           let usedStations;
-
-          // Separate pinned stations from results and prioritize them
           const pinnedFromResults = youbikeResults.filter(station => pinnedStations.has(String(station.station_no)));
           const unpinnedFromResults = youbikeResults.filter(station => !pinnedStations.has(String(station.station_no)));
-
           usedStations = [...pinnedFromResults, ...unpinnedFromResults].slice(0, limit);
-
-
-          // If shouldMoveMap is true and there are results, move the map to the first station
           if (shouldMoveMap && usedStations.length > 0 && leafletMap) {
               const firstStation = usedStations[0];
               const lat = parseFloat(firstStation.lat);
               const lng = parseFloat(firstStation.lng);
               if (!isNaN(lat) && !isNaN(lng)) {
-                  isMapMovingDueToTracking = true; // Set flag before moving map
-                  leafletMap.setView([lat, lng], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); // Changed duration
-                  setTimeout(() => { isMapMovingDueToTracking = false; }, 600); // Changed timeout
+                  isMapMovingDueToTracking = true; 
+                  leafletMap.setView([lat, lng], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); 
+                  setTimeout(() => { isMapMovingDueToTracking = false; }, 600); 
               }
           }
-
-
           const stationIdsToQuery = usedStations.map(station => station.station_no);
           let vehicleData = {};
           if (navigator.onLine && stationIdsToQuery.length > 0) {
               try {
-                  // Fetch vehicle real-time data for the displayed stations
                   vehicleData = await queryVehicleData(stationIdsToQuery);
               } catch (e) {
                   showNotification(currentLang === "en" ? "Failed to get real-time data." : "無法取得即時資料。");
               }
           }
-
-
-          resultsDiv.innerHTML = ''; // Clear previous results
+          resultsDiv.innerHTML = ''; 
           const unknownValue = currentLang === "en" ? "Unknown" : "未知";
           const addressLabel = currentLang === "en" ? "Address:" : "地址:";
           const slotsLabel = currentLang === "en" ? "Available Slots:" : "可停空位數:";
@@ -1757,8 +1550,6 @@ body.dark-mode #routeModal .bike-item p {
           const unknownAddress = currentLang === "en" ? "Unknown Address" : "未知地址";
           const distanceLabel = currentLang === "en" ? "Distance:" : "距離:";
           const navigateButtonText = currentLang === "en" ? "Navigate" : "導航";
-
-
           usedStations.forEach(site => {
             const info = {
               id: String(site.station_no),
@@ -1767,30 +1558,22 @@ body.dark-mode #routeModal .bike-item p {
               district: currentLang === "en" ? site.district_en : site.district_tw,
               address: currentLang === "en" ? site.address_en : site.address_tw
             };
-
             const isPinned = pinnedStations.has(String(info.id));
             const pinButtonHtml = `<span
               class="material-icons pin-button ${isPinned ? 'pinned' : ''}"
               data-id="${info.id}"
               onclick="togglePinStation('${info.id}', event)"
             >${isPinned ? 'star' : 'star_outline'}</span>`;
-
-
             const navigateButtonHtml = `<button class="navigate-button" data-lat="${info.coords[0]}" data-lng="${info.coords[1]}" data-name="${info.name}">
                 <span class="material-icons">navigation</span>
             </button>`;
-
-
             const stationVehicleData = vehicleData[info.id];
             const displayAvailable20 = stationVehicleData?.available_2_0 !== undefined ? stationVehicleData.available_2_0 : unknownValue;
             const displayAvailableE = stationVehicleData?.available_e !== undefined ? stationVehicleData.available_e : unknownValue;
             const displayEmptySpaces = stationVehicleData?.empty_spaces !== undefined ? stationVehicleData.empty_spaces : unknownValue;
-
             const electricIconHtml = (displayAvailableE !== unknownValue && parseInt(displayAvailableE) > 0)
                 ? `<span class="material-symbols-outlined electric-icon show" title="${currentLang === "en" ? "Electric Bike Available" : "有電輔車"}" data-station-id="${info.id}" data-station-name="${info.name}">offline_bolt</span>`
                 : `<span class="material-symbols-outlined electric-icon" title="${currentLang === "en" ? "Electric Bike Available" : "有電輔車"}" data-station-id="${info.id}" data-station-name="${info.name}">offline_bolt</span>`;
-
-
             const distance = calculateDistance(
               userLocation ? userLocation.latitude : defaultLatitude,
               userLocation ? userLocation.longitude : defaultLongitude,
@@ -1801,8 +1584,6 @@ body.dark-mode #routeModal .bike-item p {
                                              : distance.toFixed(2) + (currentLang === "en" ? " km" : " 公里");
             const isAtDefaultLocation = userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude;
             const distanceHTML = !isAtDefaultLocation ? `<p class="distance">${distanceLabel} ${displayDistance}</p>` : "";
-
-
             const cardContent = `
                       <div class="header">
                           <h3>${info.name || unknownStation}</h3>
@@ -1820,18 +1601,16 @@ body.dark-mode #routeModal .bike-item p {
                       <div class="footer">
                       </div>
                   `;
-
             let card = document.createElement('div');
             card.className = 'station';
             card.dataset.id = info.id;
-            card.dataset.lat = info.coords[0]; // Store latitude in data attribute
-            card.dataset.lng = info.coords[1]; // Store longitude in data attribute
+            card.dataset.lat = info.coords[0]; 
+            card.dataset.lng = info.coords[1]; 
             card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
             card.innerHTML = cardContent;
-
             const navigateButton = card.querySelector('.navigate-button');
             navigateButton.addEventListener('click', (event) => {
-                event.stopPropagation(); // Prevent card click from triggering map move
+                event.stopPropagation(); 
                 const button = event.currentTarget;
                 const stationLat = parseFloat(button.dataset.lat);
                 const stationLng = parseFloat(button.dataset.lng);
@@ -1844,11 +1623,10 @@ body.dark-mode #routeModal .bike-item p {
                         : "無法取得您的位置，無法規劃路線。");
                 }
             });
-
             const electricIcon = card.querySelector('.electric-icon');
             if (electricIcon) {
                 electricIcon.addEventListener('click', (event) => {
-                    event.stopPropagation(); // Prevent card click from triggering map move
+                    event.stopPropagation(); 
                     const stationId = event.target.dataset.stationId;
                     const stationName = event.target.dataset.stationName;
                     if (stationId) {
@@ -1856,53 +1634,38 @@ body.dark-mode #routeModal .bike-item p {
                     }
                 });
             }
-
-
-            // Add event listener to the station card for map movement
             card.addEventListener("click", () => {
-              const lat = parseFloat(card.dataset.lat); // Get latitude from data attribute
-              const lng = parseFloat(card.dataset.lng); // Get longitude from data attribute
+              const lat = parseFloat(card.dataset.lat); 
+              const lng = parseFloat(card.dataset.lng); 
               if (!isNaN(lat) && !isNaN(lng) && leafletMap) {
-                isMapMovingDueToTracking = true; // Set flag
-                leafletMap.setView([lat, lng], 18, { animate: true, duration: 0.5 }); // Changed duration
-                setTimeout(() => { isMapMovingDueToTracking = false; }, 600); // Changed timeout
+                isMapMovingDueToTracking = true; 
+                leafletMap.setView([lat, lng], 18, { animate: true, duration: 0.5 }); 
+                setTimeout(() => { isMapMovingDueToTracking = false; }, 600); 
               }
-              isFollowingUser = false; // Stop following user when map is manually moved
-              updateLocateButtonTitle(); // Update the locate button's title
+              isFollowingUser = false; 
+              updateLocateButtonTitle(); 
             });
-
             resultsDiv.appendChild(card);
           });
-
-          updateResultsOrder(); // Re-sort and append elements based on pinned status and distance
-
-          updateMapMarkers(); // Update map markers (e.g., highlighting visible stations)
-
+          updateResultsOrder(); 
+          updateMapMarkers(); 
         } catch (error) {
           resultsDiv.innerHTML = `發生錯誤: ${error.message}`;
         }
-        // Reset the countdown timer after search completes
         countdownTimer.reset();
-        // Restore scroll position to mainContent after updates
         mainContent.scrollTop = currentScrollTop;
       }
-      /**
-       * Queries real-time vehicle data for a list of station IDs.
-       * @param {Array<string>} stationIds - An array of station numbers.
-       * @returns {Promise<Object>} A promise that resolves with an object mapping station_no to its vehicle data.
-       */
       async function queryVehicleData(stationIds) {
-        // Limit the number of station IDs to query to prevent excessive API calls
-        if (stationIds.length > 60) { // Max 60 IDs per batch seems reasonable
+        if (stationIds.length > 60) { 
           stationIds = stationIds.slice(0, 60);
         }
-        const batchSize = 20; // Number of station IDs per API request
+        const batchSize = 20; 
         const allVehicleData = {};
         const headers = {
           'Accept': '*/*',
           'Content-Type': 'application/json',
-          'Origin': 'https://www.youbike.com.tw', // Required for some APIs to bypass CORS
-          'Referer': 'https://www.youbike.com.tw/' // Required for some APIs
+          'Origin': 'https://www.youbike.com.tw', 
+          'Referer': 'https://www.youbike.com.tw/' 
         };
         for (let i = 0; i < stationIds.length; i += batchSize) {
           const stationIdBatch = stationIds.slice(i, i + batchSize);
@@ -1915,11 +1678,8 @@ body.dark-mode #routeModal .bike-item p {
             });
             const result = await response.json();
             if (result.retCode === 1 && result.retVal && result.retVal.data) {
-
-              // Process and store the received data
               const dataArray = result.retVal.data;
               dataArray.forEach(item => {
-
                 allVehicleData[item.station_no] = {
                   available_2_0: item.available_spaces_detail ? item.available_spaces_detail.yb2 : 0,
                   available_e: item.available_spaces_detail ? item.available_spaces_detail.eyb : 0,
@@ -1927,29 +1687,19 @@ body.dark-mode #routeModal .bike-item p {
                 };
               });
             } else {
-              // console.warn('API returned an error or empty data for batch:', stationIdBatch, result);
             }
           } catch (e) {
-            // console.error('Error fetching vehicle data for batch:', stationIdBatch, e);
           }
         }
         return allVehicleData;
       }
-      /**
-       * Updates the order of station cards in the results display.
-       * Pinned stations are prioritized, then sorted by distance.
-       */
       function updateResultsOrder() {
         const cards = Array.from(document.querySelectorAll(".station"));
         cards.sort((a, b) => {
           const aPinned = pinnedStations.has(a.dataset.id);
           const bPinned = pinnedStations.has(b.dataset.id);
-
-          // Prioritize pinned stations
           if (aPinned && !bPinned) return -1;
           if (!aPinned && bPinned) return 1;
-
-          // If both are pinned or both are unpinned, sort by distance
           const distanceA = calculateDistance(
             userLocation ? userLocation.latitude : defaultLatitude,
             userLocation ? userLocation.longitude : defaultLongitude,
@@ -1964,87 +1714,53 @@ body.dark-mode #routeModal .bike-item p {
           );
           return distanceA - distanceB;
         });
-
-        // Re-append cards to update their order in the DOM
         cards.forEach(card => {
           resultsDiv.appendChild(card);
         });
       }
-      /**
-       * Displays a temporary notification message on the screen.
-       * @param {string} message - The message to display.
-       */
       function showNotification(message) {
           const notification = document.getElementById('locationNotification');
           notification.textContent = message;
-          notification.classList.add('show'); // Add 'show' class to fade in and slide up
-          // Automatically hide after 5 seconds
+          notification.classList.add('show'); 
           setTimeout(() => {
-            notification.classList.remove('show'); // Remove 'show' to fade out and slide down
+            notification.classList.remove('show'); 
           }, 5000);
       }
-
-      /**
-       * Calculates the distance between two geographical points using the Haversine formula.
-       * @param {number} lat1 - Latitude of the first point.
-       * @param {number} lon1 - Longitude of the first point.
-       * @param {number} lat2 - Latitude of the second point.
-       * @param {number} lon2 - Longitude of the second point.
-       * @returns {number} Distance in kilometers.
-       */
       function calculateDistance(lat1, lon1, lat2, lon2) {
-        const R = 6371; // Radius of Earth in kilometers
+        const R = 6371; 
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
         const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
                   Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
                   Math.sin(dLon / 2) * Math.sin(dLon / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c; // Distance in km
+        return R * c; 
       }
-
-
-      let lastKnownLocation = null; // Stores the last successfully obtained user location
-
-      /**
-       * Handles successful geolocation updates.
-       * @param {GeolocationPosition} position - The geolocation position object.
-       */
+      let lastKnownLocation = null; 
       function handleGeoUpdate(position) {
           const newLocation = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude
           };
-
-          // If this is the first real location obtained, update userLocation and map immediately
           if (!hasObtainedRealLocation) {
               hasObtainedRealLocation = true;
               userLocation = newLocation;
-
-              // Update marker position
               if (locationMarker) {
                   locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
               }
               if (pulsingMarker) {
                   pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
               }
-
-              // Move map to initial user location
               if (leafletMap) {
-                  isMapMovingDueToTracking = true; // Set flag
-                  leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); // Changed duration
-                  setTimeout(() => { isMapMovingDueToTracking = false; }, 600); // Changed timeout
+                  isMapMovingDueToTracking = true; 
+                  leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); 
+                  setTimeout(() => { isMapMovingDueToTracking = false; }, 600); 
               }
-
-              // Perform initial search with the real location
               searchYouBike(true, false);
-
-              isFollowingUser = true; // Start following user immediately
-              updateLocateButtonTitle(); // Update the locate button's title
-              return; // Exit as initial setup is done
+              isFollowingUser = true; 
+              updateLocateButtonTitle(); 
+              return; 
           }
-
-          // Check if the user has moved significantly (e.g., more than 500 meters)
           let movedSignificantly = false;
           if (lastKnownLocation) {
             const distance = calculateDistance(
@@ -2053,56 +1769,41 @@ body.dark-mode #routeModal .bike-item p {
               newLocation.latitude,
               newLocation.longitude
             );
-
-            if (distance * 1000 > 500) { // If moved more than 500 meters
+            if (distance * 1000 > 500) { 
               movedSignificantly = true;
-              // If moved significantly, re-center map if not manually moved
               if (leafletMap) {
-                isMapMovingDueToTracking = true; // Set flag
-                leafletMap.setView([newLocation.latitude, newLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 }); // Changed duration
-                setTimeout(() => { isMapMovingDueToTracking = false; }, 600); // Changed timeout
+                isMapMovingDueToTracking = true; 
+                leafletMap.setView([newLocation.latitude, newLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 }); 
+                setTimeout(() => { isMapMovingDueToTracking = false; }, 600); 
               }
             }
           }
-
-          lastKnownLocation = newLocation; // Update last known location
-          userLocation = newLocation; // Update global user location
-
-          // Update marker positions
+          lastKnownLocation = newLocation; 
+          userLocation = newLocation; 
           if (locationMarker) {
             locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
           }
           if (pulsingMarker) {
             pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
           }
-
-          // If following user and map is not being manually moved, re-center the map
           if (isFollowingUser && leafletMap) {
-            isMapMovingDueToTracking = true; // Set flag
-            leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 }); // Changed duration
-            setTimeout(() => { isMapMovingDueToTracking = false; }, 600); // Changed timeout
+            isMapMovingDueToTracking = true; 
+            leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 }); 
+            setTimeout(() => { isMapMovingDueToTracking = false; }, 600); 
           }
-
-          // Trigger a data update if user moved significantly, or just update distances otherwise
           if (movedSignificantly) {
               const updateButton = document.getElementById('updateCountdown');
               if (updateButton) {
-                countdownTimer.update(); // Trigger full data update
+                countdownTimer.update(); 
               }
           } else {
-              updateCardDistances(); // Only update distances on cards
-              updateResultsOrder(); // Re-sort cards based on new distances
+              updateCardDistances(); 
+              updateResultsOrder(); 
                    }
       }
-      /**
-       * Handles geolocation errors.
-       * @param {GeolocationPositionError} error - The geolocation error object.
-       */
       function handleGeoUpdateError(error) {
-          isFollowingUser = false; // Stop following user on error
-                   updateLocateButtonTitle(); // Update the locate button's title
-
-          // Only show notification if actively tracking or location is unavailable
+          isFollowingUser = false; 
+                   updateLocateButtonTitle(); 
           if (isTrackingActive || error.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
               let errorMessage = currentLang === "en"
                 ? "Unable to update location, continuing with last known position"
@@ -2111,9 +1812,7 @@ body.dark-mode #routeModal .bike-item p {
                   errorMessage = currentLang === "en"
                     ? "Location services unavailable, stopping tracking."
                     : "定位服務無法使用，已停止追蹤。";
-                  stopTracking(); // Stop tracking if services are unavailable
-
-                  // If we haven't obtained a real location yet, ensure hasObtainedRealLocation is false
+                  stopTracking(); 
                   if (!hasObtainedRealLocation) {
                       hasObtainedRealLocation = false;
                   }
@@ -2122,34 +1821,24 @@ body.dark-mode #routeModal .bike-item p {
                     ? "Location update timed out."
                     : "定位更新逾時。";
               }
-
-              // Show notification to the user
               const notification = document.getElementById('locationNotification');
               notification.textContent = errorMessage;
               notification.classList.add('show');
-
-              // Hide notification after a delay
               setTimeout(() => {
-                notification.classList.add('hide'); // Start fade-out animation
+                notification.classList.add('hide'); 
                 setTimeout(() => {
-                  notification.classList.remove('show', 'hide'); // Remove classes after animation
-                }, 300); // Match hide animation duration
-              }, 3000); // Display for 3 seconds
+                  notification.classList.remove('show', 'hide'); 
+                }, 300); 
+              }, 3000); 
           }
       }
-
-      /**
-       * Starts tracking the user's geolocation.
-       */
       function startTracking() {
           const centralLocationToggle = document.getElementById('centralLocationToggle');
           if (!centralLocationToggle.checked) {
-                           stopTracking(); // If toggle is off, ensure tracking is stopped
+                           stopTracking(); 
               return;
           }
-
           if (navigator.geolocation) {
-                           // Clear any existing watch to prevent multiple trackers
                   if (watchId !== null) {
                   navigator.geolocation.clearWatch(watchId);
               }
@@ -2157,48 +1846,32 @@ body.dark-mode #routeModal .bike-item p {
               watchId = navigator.geolocation.watchPosition(
                   handleGeoUpdate,
                   handleGeoUpdateError,
-                  { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 } // High accuracy, 10s timeout, no cache
+                  { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 } 
               );
-              // console.log("Geolocation tracking started.");
           } else {
               showNotification(currentLang === "en" ? "Geolocation not supported." : "您的瀏覽器不支援地理位置功能。");
-              stopTracking(); // Stop tracking if not supported
+              stopTracking(); 
               const centralLocationToggle = document.getElementById('centralLocationToggle');
               if (centralLocationToggle) {
-                 centralLocationToggle.checked = false; // Turn off toggle
-                 localStorage.setItem("useLocation", "false"); // Persist setting
+                 centralLocationToggle.checked = false; 
+                 localStorage.setItem("useLocation", "false"); 
               }
-
-              hasObtainedRealLocation = false; // Reset if geolocation is not supported
+              hasObtainedRealLocation = false; 
           }
       }
-
-      /**
-       * Stops tracking the user's geolocation.
-       */
       function stopTracking() {
           if (watchId !== null) {
               navigator.geolocation.clearWatch(watchId);
               watchId = null;
               isTrackingActive = false;
-              // console.log("Geolocation tracking stopped.");
           }
-
       }
-
-      /**
-       * Gets the user's current location or uses a default region.
-       * Initializes map markers for user location.
-       */
       async function getLocation() {
           const centralLocationToggle = document.getElementById('centralLocationToggle');
           const isLocationServiceOn = centralLocationToggle?.checked;
-          let locationSet = false; // Flag to indicate if userLocation has been set
-
-          // If location service is enabled
+          let locationSet = false; 
           if (isLocationServiceOn) {
               try {
-                  // Attempt to get current position
                   const position = await new Promise((resolve, reject) => {
                                            navigator.geolocation.getCurrentPosition(resolve, reject, {
                                                    enableHighAccuracy: true,
@@ -2211,69 +1884,54 @@ body.dark-mode #routeModal .bike-item p {
                       longitude: position.coords.longitude
                   };
                   locationSet = true;
-                                   isFollowingUser = true; // Start following user by default when location is obtained
-                  hasObtainedRealLocation = true; // Confirm we got a real location
-                  startTracking(); // Start continuous tracking
-                  // console.log("User real location obtained:", userLocation);
-
+                                   isFollowingUser = true; 
+                  hasObtainedRealLocation = true; 
+                  startTracking(); 
               } catch (e) {
-                  // console.error("Error getting user location:", e);
                   let shouldDisableToggle = false;
-                  // If permission denied or position unavailable, disable the toggle and show notification
                   if (e.code === GeolocationPositionError.PERMISSION_DENIED || e.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
                        showNotification(currentLang === "en"
                         ? "Location permission denied or unavailable. Using default region."
                         : "位置權限被拒絕或無法使用。使用預設地區。");
                        shouldDisableToggle = true;
-                       centralLocationToggle.checked = false; // Turn off the toggle
-                       localStorage.setItem("useLocation", "false"); // Persist the setting
+                       centralLocationToggle.checked = false; 
+                       localStorage.setItem("useLocation", "false"); 
                   } else {
                       showNotification(currentLang === "en"
                         ? "Failed to get location. Using default region."
                         : "無法取得位置。使用預設地區。");
                   }
-
-                  // Fallback to default region coordinates
                   const selectedRegion = document.getElementById('centralRegionSelect').value;
                   const coords = regionCoordinates[selectedRegion];
                   userLocation = { latitude: coords.lat, longitude: coords.lng };
                   locationSet = true;
-                  isFollowingUser = false; // Not following if using default location
-                  hasObtainedRealLocation = false; // Not a real obtained location
-                  // If tracking was requested (toggle was on initially) but failed, still try to start watching for future updates
+                  isFollowingUser = false; 
+                  hasObtainedRealLocation = false; 
                   if (centralLocationToggle.checked) {
-                      startTracking(); // Attempt to start tracking even if initial get failed (for future updates)
+                      startTracking(); 
                   } else {
                       stopTracking();
                   }
               }
-
           } else {
-              stopTracking(); // Ensure tracking is stopped if location service is off
-                                                     // Use default region coordinates if location service is off
+              stopTracking(); 
               const selectedRegion = document.getElementById('centralRegionSelect').value;
               const coords = regionCoordinates[selectedRegion];
               userLocation = { latitude: coords.lat, longitude: coords.lng };
               locationSet = true;
-              isFollowingUser = false; // Not following if using default location
-              hasObtainedRealLocation = false; // Not a real obtained location
-              // console.log("Using default location:", userLocation);
+              isFollowingUser = false; 
+              hasObtainedRealLocation = false; 
           }
-
-          // If userLocation is set, add/update map markers and set map view
           if (locationSet && leafletMap) {
               if (!locationMarker) {
-                  // Create a main marker for user location
                   locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
                       radius: 10,
-                      fillColor: '#2196F3', // Blue color
+                      fillColor: '#2196F3', 
                       fillOpacity: 0.8,
-                      color: '#ffffff', // White border
+                      color: '#ffffff', 
                       weight: 3,
-                      pane: 'markerPane' // Render on a specific pane for z-index control
+                      pane: 'markerPane' 
                   }).addTo(leafletMap);
-
-                  // Create a pulsing effect marker
                   const pulsingIcon = L.divIcon({
                       className: 'pulsing-icon',
                       html: '<div class="pulse"></div>',
@@ -2281,38 +1939,27 @@ body.dark-mode #routeModal .bike-item p {
                   });
                   pulsingMarker = L.marker([userLocation.latitude, userLocation.longitude], {
                       icon: pulsingIcon,
-                      pane: 'markerPane' // Same pane as main marker
+                      pane: 'markerPane' 
                   }).addTo(leafletMap);
               } else {
-                  // Update existing marker positions
                   locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
                   if (pulsingMarker) pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
               }
-
-              // Set map view to user location, set flag before moving
               isMapMovingDueToTracking = true;
-              leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() ||  18, { animate: true, duration: 0.5 }); // Changed duration
-              setTimeout(() => { isMapMovingDueToTracking = false; }, 600); // Changed timeout
+              leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() ||  18, { animate: true, duration: 0.5 }); 
+              setTimeout(() => { isMapMovingDueToTracking = false; }, 600); 
           }
-
           if (locationSet) {
-              await searchYouBike(true, false); // Perform initial search
-
-              // Update results and show main content after location is set
+              await searchYouBike(true, false); 
               updateResultsOrder();
-              showMainContent(); // Show the main content once map and data are ready
-
+              showMainContent(); 
           } else {
               showNotification(currentLang === "en" ? "Could not determine location. Please check settings." : "無法確定位置，請檢查設定。");
               if (!mainContentShown) {
-                   showMainContent(); // Show main content even if location isn't perfect
+                   showMainContent(); 
               }
           }
       }
-
-      /**
-       * Updates the displayed distances on station cards based on the current user location.
-       */
       function updateCardDistances() {
                const cards = document.querySelectorAll('.station');
         cards.forEach(card => {
@@ -2325,11 +1972,9 @@ body.dark-mode #routeModal .bike-item p {
           );
           const distanceEl = card.querySelector('.distance');
           if (distanceEl) {
-
-            // Hide distance if using default location
             const isAtDefaultLocation = userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude;
             if (isAtDefaultLocation) {
-              distanceEl.textContent = ""; // Clear content if using default
+              distanceEl.textContent = ""; 
             } else {
               const distanceLabel = currentLang === "en" ? "Distance:" : "距離：";
               const unit = newDistance < 1 ? (currentLang === "en" ? " m" : " 公尺") : (currentLang === "en" ? " km" : " 公里");
@@ -2339,24 +1984,14 @@ body.dark-mode #routeModal .bike-item p {
           }
         });
       }
-
-      /**
-       * Updates the real-time vehicle data displayed on station cards.
-       * Fetches new data and updates the relevant spans.
-       */
       function updateVehicleData() {
-	// Prevent rapid updates if called too frequently
 	if (window.lastVehicleDataUpdate && Date.now() - window.lastVehicleDataUpdate < 10000) {
 		return;
 	}
-	window.lastVehicleDataUpdate = Date.now(); // Update timestamp of last update
+	window.lastVehicleDataUpdate = Date.now(); 
         const stationElements = document.querySelectorAll('.station');
-        if (!stationElements.length) return; // Exit if no station cards are displayed
-
-        // Store current scroll position of mainContent before updating
+        if (!stationElements.length) return; 
         const currentScrollTop = mainContent.scrollTop;
-
-        // Collect current data to use as fallback if new data fetch fails for a station
         const currentData = {};
         stationElements.forEach(card => {
           const id = card.dataset.id;
@@ -2366,29 +2001,23 @@ body.dark-mode #routeModal .bike-item p {
             empty_spaces: card.querySelector('.vehicle_empty').textContent
           };
         });
-
         const stationIds = Array.from(stationElements).map(el => el.dataset.id);
-
 	queryVehicleData(stationIds)
 		.then(vehicleData => {
 			stationElements.forEach(card => {
 				const id = card.dataset.id;
 				const newVehicleData = vehicleData[id];
 				const oldData = currentData[id];
-			  
 				const yb2El = card.querySelector('.vehicle_yb2');
 										const ybeEl = card.querySelector('.vehicle_ybe');
 				const emptyEl = card.querySelector('.vehicle_empty');
 				const unknownValue = currentLang === "en" ? "Unknown" : "未知";
-  
 				if (yb2El) yb2El.textContent = newVehicleData?.available_2_0 !== undefined ? newVehicleData.available_2_0 : 
-					(oldData?.available_2_0 !== unknownValue && oldData?.available_2_0 !== "Unknown" ? oldData.available_2_0 : unknownValue); // Fallback to old data if new is undefined
+					(oldData?.available_2_0 !== unknownValue && oldData?.available_2_0 !== "Unknown" ? oldData.available_2_0 : unknownValue); 
 				if (ybeEl) {
                     const availableE = newVehicleData?.available_e !== undefined ? newVehicleData.available_e :
                     (oldData?.available_e !== unknownValue && oldData?.available_e !== "Unknown" ? oldData.available_e : unknownValue);
                     ybeEl.textContent = availableE;
-
-                    // Toggle electric icon visibility based on available electric bikes
                     const electricIcon = card.querySelector('.electric-icon');
                     if (electricIcon) {
                         if (availableE !== unknownValue && parseInt(availableE) > 0) {
@@ -2399,21 +2028,15 @@ body.dark-mode #routeModal .bike-item p {
                     }
                 }
 				if (emptyEl) emptyEl.textContent = newVehicleData?.empty_spaces !== undefined ? newVehicleData.empty_spaces :
-					(oldData?.empty_spaces !== unknownValue && oldData?.empty_spaces !== "Unknown" ? oldData.empty_spaces : unknownValue); // Fallback to old data if new is undefined
+					(oldData?.empty_spaces !== unknownValue && oldData?.empty_spaces !== "Unknown" ? oldData.empty_spaces : unknownValue); 
 			});
-            // Restore scroll position to mainContent after updating vehicle data
             mainContent.scrollTop = currentScrollTop;
 		})
 		.catch(error => {
 		 showNotification(currentLang === "en" ? "Failed to update real-time data." : "即時資料更新失敗。");
 		});
       }
-
       let currentLang = localStorage.getItem("lang") || "zh";
-
-      /**
-       * Updates all language-dependent texts on the page.
-       */
       function updateLanguageTexts() {
         document.title = currentLang === "en" ? "YouBike Site Search : A simple, beautiful site search engine" : "YouBike 站點搜尋 : 一個簡單、美觀、低流量的YouBike站點搜尋器";
         const locationSwitchSpan = document.querySelector('#locationSwitchText');
@@ -2431,7 +2054,6 @@ body.dark-mode #routeModal .bike-item p {
                const updateCountdownBtn = document.getElementById('updateCountdownText');
         if (updateCountdownBtn) {
           updateCountdownBtn.textContent = currentLang === "en" ? "60 sec update" : "60秒後更新";
-          // Adjust button width based on text length for better aesthetics
           updateCountdownBtn.parentElement.style.setProperty('--button-width', currentLang === "en" ? "145px" : "125px");
         }
         const settingsPanelTitle = document.getElementById('settingsPanelTitle');
@@ -2455,8 +2077,6 @@ body.dark-mode #routeModal .bike-item p {
         if (langLabel) {
           langLabel.textContent = currentLang === "en" ? "Chinese/English" : "中文/English";
         }
-
-        // Update region select options
         const regionNames = {
             taipei: { en: "Taipei City", zh: "台北市" },
             newTaipei: { en: "New Taipei City", zh: "新北市" },
@@ -2472,29 +2092,21 @@ body.dark-mode #routeModal .bike-item p {
             pingtung: { en: "Pingtung County", zh: "屏東縣" },
             taitung: { en: "Taitung County", zh: "臺東縣" }
         };
-
         const select = document.getElementById('centralRegionSelect');
         const options = select.options;
-
         for (let i = 0; i < options.length; i++) {
             const value = options[i].value;
             options[i].text = regionNames[value][currentLang === "en" ? "en" : "zh"];
         }
-
         const regionSelectLabel = document.querySelector('label[for="centralRegionSelect"]');
     if (regionSelectLabel) {
         regionSelectLabel.textContent = currentLang === "en" ? "Region" : "地區選擇";
     }
-
     const routeModalTitle = document.getElementById('routeModalTitle');
     if (routeModalTitle) {
-        // This is handled dynamically when the modal opens based on station name.
-        // No static text update here.
     }
-
-    // Update global language strings for modals
     window.langStrings = {
-        ...window.langStrings, // Keep existing langStrings
+        ...window.langStrings, 
         electricBikeDetailsTitle: {
             zh: "電輔車列表 - ",
             en: "Electric Bikes - "
@@ -2524,66 +2136,52 @@ body.dark-mode #routeModal .bike-item p {
             en: "Getting electric bike data..."
         }
     };
-
-
-    // Update navigate button text if it includes static text (current version uses icons only)
     document.querySelectorAll('.navigate-button').forEach(button => {
-        // Remove any existing text nodes that might be there from previous language updates
         button.childNodes.forEach(node => {
             if (node.nodeType === Node.TEXT_NODE) {
                 node.remove();
             }
         });
-        // Ensure the material icon is present
         if (!button.querySelector('.material-icons')) {
              const iconSpan = document.createElement('span');
              iconSpan.className = 'material-icons';
-             iconSpan.textContent = 'navigation'; // Set the icon content
+             iconSpan.textContent = 'navigation'; 
              button.appendChild(iconSpan);
         }
     });
       }
-      updateLanguageTexts(); // Initial call to set texts on load
-
+      updateLanguageTexts(); 
       const settingsButton = document.getElementById('settingsButton');
       const centralSettingsPanel = document.getElementById('centralSettingsPanel');
       const closeCentralSettings = document.getElementById('closeCentralSettings');
       const settingsIcon = settingsButton.querySelector('.material-icons');
-
-      // Function to clear the URL hash
       function clearUrlHash() {
           if (history.pushState) {
               history.pushState('', document.title, window.location.pathname + window.location.search);
           } else {
-              // Fallback for older browsers
               window.location.hash = '';
           }
       }
-
       settingsButton.addEventListener('click', (event) => {
-        event.stopPropagation(); // Stop propagation to prevent document click listener from closing immediately
-        settingsIcon.classList.remove('rotate-right', 'rotate-left'); // Reset rotation classes
+        event.stopPropagation(); 
+        settingsIcon.classList.remove('rotate-right', 'rotate-left'); 
         if (centralSettingsPanel.style.display === 'block') {
-            // Panel is open, close it
             centralSettingsPanel.classList.remove('panel-open');
             centralSettingsPanel.classList.add('panel-close');
-            overlay.classList.remove('show'); // Hide overlay
+            overlay.classList.remove('show'); 
             centralSettingsPanel.addEventListener('animationend', function handler() {
               centralSettingsPanel.style.display = 'none';
-              centralSettingsPanel.classList.remove('panel-close'); // Clean up animation class
+              centralSettingsPanel.classList.remove('panel-close'); 
               centralSettingsPanel.removeEventListener('animationend', handler);
-              clearUrlHash(); // Clear hash after closing animation
+              clearUrlHash(); 
             });
-            settingsIcon.classList.add('rotate-left'); // Animate icon rotation
-            // Check if the current state is the settings panel state before going back
+            settingsIcon.classList.add('rotate-left'); 
             if (history.state && history.state.type === 'settings') {
-              history.back(); // Use history.back() to manage browser history
+              history.back(); 
             } else {
-                clearUrlHash(); // Clear hash if not using history.back()
+                clearUrlHash(); 
             }
         } else {
-            // Panel is closed, open it
-            // Close route modal if open
             if (routeModal.style.display === 'block') {
                 routeModal.classList.remove('modal-open');
                 routeModal.classList.add('modal-close');
@@ -2591,63 +2189,52 @@ body.dark-mode #routeModal .bike-item p {
                     routeModal.style.display = 'none';
                     routeModal.classList.remove('modal-close');
                     routeModal.removeEventListener('animationend', handler);
-                    clearUrlHash(); // Clear hash after closing animation
-                    // After route modal closes, open settings panel
+                    clearUrlHash(); 
                     openSettingsPanel();
                 });
-                 // If route modal was open, go back first to clear its state
                  if (history.state && (history.state.type === 'route' || history.state.type === 'electric')) {
                      history.back();
                  } else {
-                     clearUrlHash(); // Clear hash if not using history.back()
+                     clearUrlHash(); 
                      openSettingsPanel();
                  }
             }
-            // Close permission modal if open
             else if (permissionModal.style.display === 'block') {
                 permissionModal.style.display = 'none';
                 overlay.classList.remove('show');
-                clearUrlHash(); // Clear hash after closing
-                // After permission modal closes, open settings panel
+                clearUrlHash(); 
                 openSettingsPanel();
             }
-            // If no other modal is open, open settings panel directly
             else {
                 openSettingsPanel();
             }
           }
       });
-
       closeCentralSettings.addEventListener('click', () => {
         centralSettingsPanel.classList.remove('panel-open');
         centralSettingsPanel.classList.add('panel-close');
-        overlay.classList.remove('show'); // Hide overlay
+        overlay.classList.remove('show'); 
         centralSettingsPanel.addEventListener('animationend', function handler() {
           centralSettingsPanel.style.display = 'none';
           centralSettingsPanel.classList.remove('panel-close');
           centralSettingsPanel.removeEventListener('animationend', handler);
-          clearUrlHash(); // Clear hash after closing animation
+          clearUrlHash(); 
         });
-
         settingsIcon.classList.add('rotate-left');
         setTimeout(() => {
           settingsIcon.classList.remove('rotate-left');
         }, 1000);
-
-        // Remove state from history when closed by button
         if (history.state && history.state.type === 'settings') {
           history.back();
         } else {
-            clearUrlHash(); // Clear hash if not using history.back()
+            clearUrlHash(); 
         }
       });
-
       window.addEventListener('popstate', (event) => {
-        // Close settings panel if open
         if (centralSettingsPanel.style.display === 'block') {
             centralSettingsPanel.classList.remove('panel-open');
             centralSettingsPanel.classList.add('panel-close');
-            overlay.classList.remove('show'); // Hide overlay
+            overlay.classList.remove('show'); 
             settingsIcon.classList.add('rotate-left');
             setTimeout(() => {
                 settingsIcon.classList.remove('rotate-left');
@@ -2656,39 +2243,31 @@ body.dark-mode #routeModal .bike-item p {
                 centralSettingsPanel.style.display = 'none';
                 centralSettingsPanel.classList.remove('panel-close');
                 centralSettingsPanel.removeEventListener('animationend', handler);
-                clearUrlHash(); // Clear hash after closing animation
+                clearUrlHash(); 
             });
         }
-        // Close route modal if open
         if (routeModal.style.display === 'block') {
             routeModal.classList.remove('modal-open');
             routeModal.classList.add('modal-close');
-            overlay.classList.remove('show'); // Hide overlay
+            overlay.classList.remove('show'); 
             routeModal.addEventListener('animationend', function handler() {
                 routeModal.style.display = 'none';
                 routeModal.classList.remove('modal-close');
                 routeModal.removeEventListener('animationend', handler);
-                clearUrlHash(); // Clear hash after closing animation
+                clearUrlHash(); 
             });
         }
-        // Close permission modal if open (it doesn't use history state, but should still close)
         if (permissionModal.style.display === 'block') {
             permissionModal.style.display = 'none';
             overlay.classList.remove('show');
-            clearUrlHash(); // Clear hash after closing
+            clearUrlHash(); 
         }
-        // Note: If the user navigates *forward* to a state that *should* have a modal open,
-        // this simple popstate listener won't automatically reopen it.
-        // The current implementation doesn't support forward navigation to modals anyway,
-        // so this simplified popstate handler should be sufficient for handling back navigation.
       });
-
       document.addEventListener('click', (e) => {
-	// Close settings panel if clicking outside
 	if (centralSettingsPanel.style.display === 'block' && !centralSettingsPanel.contains(e.target) && e.target !== settingsButton) {
 		centralSettingsPanel.classList.remove('panel-open');
 		centralSettingsPanel.classList.add('panel-close');
-        overlay.classList.remove('show'); // Hide overlay
+        overlay.classList.remove('show'); 
 		settingsIcon.classList.add('rotate-left');
 		setTimeout(() => {
 			settingsIcon.classList.remove('rotate-left');
@@ -2697,43 +2276,31 @@ body.dark-mode #routeModal .bike-item p {
 			centralSettingsPanel.style.display = 'none';
 			centralSettingsPanel.classList.remove('panel-close');
 			centralSettingsPanel.removeEventListener('animationend', handler);
-            clearUrlHash(); // Clear hash after closing animation
+            clearUrlHash(); 
 		});
-		// Remove state from history when closed by clicking outside
 		if (history.state && history.state.type === 'settings') {
 			history.back();
 		} else {
-            clearUrlHash(); // Clear hash if not using history.back()
+            clearUrlHash(); 
         }
 	}
 });
-      
       centralSettingsPanel.addEventListener('click', (event) => {
-        event.stopPropagation(); // Prevent clicks inside the panel from closing it via document listener
+        event.stopPropagation(); 
       });
-
-      // Helper function to open the settings panel
       function openSettingsPanel() {
           centralSettingsPanel.style.display = 'block';
           centralSettingsPanel.classList.remove('panel-close');
           centralSettingsPanel.classList.add('panel-open');
-          overlay.classList.add('show'); // Show overlay
-          // Push state for settings panel
+          overlay.classList.add('show'); 
           history.pushState({ modalOpen: true, type: 'settings' }, 'Settings', '#settings');
-          settingsIcon.classList.add('rotate-right'); // Animate icon rotation
+          settingsIcon.classList.add('rotate-right'); 
       }
-
-      /**
-       * Initializes the application: fetches data, initializes map, and gets user location.
-       */
       async function initializeApp() {
-        // Only run loading animations if online
         const loadingContent = document.getElementById('loadingContent');
-        // Reset loading content to initial state
         loadingContent.innerHTML = `<h2 id="loadingText">載入中</h2><div id="noticeBox" style="margin-top: 10px; margin-left: 20px; margin-right: 20px; background: #fff; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"></div>`;
         simulateLoadingPercentage();
         showRandomNotice();
-
         try {
           if (!youbikeDataCache || youbikeDataCache.length === 0) {
              try {
@@ -2751,42 +2318,31 @@ body.dark-mode #routeModal .bike-item p {
                   : [];
                 await saveYoubikeDataToDB(youbikeDataCache);
             } catch (error) {
-                // If network fetch fails, try to load from IndexedDB cache
                 youbikeDataCache = await getYoubikeDataFromDB();
                 if (!youbikeDataCache || youbikeDataCache.length === 0) {
                     throw new Error("無法從網路或快取載入資料。");
                 }
             }
           }
-          allStations = [...youbikeDataCache]; // Keep a copy of all stations
-
-          await initMap(allStations); // Initialize the Leaflet map and add station markers
-          await getLocation(); // Get user location and update map/data based on it
-
-          updateResultsOrder(); // Ensure initial results are correctly ordered
-          showMainContent(); // Reveal the main application content
-
+          allStations = [...youbikeDataCache]; 
+          await initMap(allStations); 
+          await getLocation(); 
+          updateResultsOrder(); 
+          showMainContent(); 
         } catch (error) {
-          // Handle initialization errors, e.g., network issues or data loading failures
           const loadingContent = document.getElementById('loadingContent');
-          loadingContent.innerHTML = ''; // Clear existing content
+          loadingContent.innerHTML = ''; 
           const isDarkMode = document.body.classList.contains('dark-mode');
-          
-          // Display an error icon
           const errorIcon = document.createElement('span');
           errorIcon.className = 'material-icons';
           errorIcon.textContent = 'error_outline';
           errorIcon.style.fontSize = '80px';
           errorIcon.style.color = 'red';
           errorIcon.style.marginBottom = '20px';
-
-          // Display an error message
           const errorText = document.createElement('h2');
           errorText.textContent = `初始化失敗: ${error.message}`;
           errorText.style.color = 'red';
           errorText.style.fontSize = '1.2em';
-
-          // Add a retry button
           const retryButton = document.createElement('button');
           retryButton.textContent = '重試';
           retryButton.style.cssText = `padding: 12px 24px; font-size: 1.1em; font-weight: 500; cursor: pointer; margin-top: 30px; border-radius: 28px; border: none;`;
@@ -2798,39 +2354,26 @@ body.dark-mode #routeModal .bike-item p {
               retryButton.style.color = '#333';
           }
           retryButton.onclick = attemptReconnect;
-          
           loadingContent.appendChild(errorIcon);
           loadingContent.appendChild(errorText);
           loadingContent.appendChild(retryButton);
         }
       }
-
-      /**
-       * Displays an offline screen with a retry button.
-       */
       function showOfflineScreen() {
           const loadingContent = document.getElementById('loadingContent');
           const isDarkMode = document.body.classList.contains('dark-mode');
-
-          // Clear existing content
           loadingContent.innerHTML = '';
-
-          // Create an icon element
           const offlineIcon = document.createElement('span');
           offlineIcon.className = 'material-icons';
           offlineIcon.textContent = 'wifi_off';
           offlineIcon.style.fontSize = '80px';
           offlineIcon.style.color = isDarkMode ? '#999' : '#888';
           offlineIcon.style.marginBottom = '20px';
-
-          // Create the main text element
           const loadingText = document.createElement('h2');
           loadingText.textContent = '請連接網路後重試';
           loadingText.style.fontSize = '1.8em';
           loadingText.style.color = isDarkMode ? '#fff' : '#333';
           loadingText.style.margin = '0';
-
-          // Create and style the retry button
           const retryButton = document.createElement('button');
           retryButton.textContent = '重整';
           retryButton.style.cssText = `
@@ -2843,7 +2386,6 @@ body.dark-mode #routeModal .bike-item p {
               border: none;
               transition: background-color 0.3s, box-shadow 0.3s;
           `;
-
           if (isDarkMode) {
               retryButton.style.backgroundColor = '#e8def8';
               retryButton.style.color = '#1c1b1f';
@@ -2853,8 +2395,6 @@ body.dark-mode #routeModal .bike-item p {
               retryButton.style.color = '#333';
               retryButton.style.boxShadow = '0 3px 5px rgba(0,0,0,0.2)';
           }
-          
-          // Add hover effects for the retry button
           retryButton.onmouseover = () => {
                 if (isDarkMode) {
                   retryButton.style.backgroundColor = '#d0bcff';
@@ -2869,193 +2409,137 @@ body.dark-mode #routeModal .bike-item p {
                   retryButton.style.backgroundColor = '#ffdacf';
                 }
           };
-
           retryButton.onclick = attemptReconnect;
-          
           loadingContent.appendChild(offlineIcon);
           loadingContent.appendChild(loadingText);
           loadingContent.appendChild(retryButton);
       }
-
-      /**
-       * Attempts to reconnect to the network.
-       */
       async function attemptReconnect() {
           const loadingContent = document.getElementById('loadingContent');
           const isDarkMode = document.body.classList.contains('dark-mode');
-          
-          // Show a testing connection message
           loadingContent.innerHTML = `<h2 style="font-size: 1.8em; color: ${isDarkMode ? '#fff' : '#333'};">測試連線中...</h2>`;
-
           try {
-              // Use a no-cache request to ensure we hit the network.
               const response = await fetch("https://apis.youbike.com.tw/json/station-min-yb2.json", { cache: "no-store" });
               if (!response.ok) {
-                  // This could happen if the API is down but there's internet.
                   throw new Error('API 無法存取');
               }
-              
-              // If fetch succeeds, we are online.
               loadingContent.innerHTML = `<h2 id="loadingText" style="color: ${isDarkMode ? '#fff' : '#333'};">連線成功，重新載入中...</h2>`;
-              location.reload(); // Reload the page to restart the app
-
+              location.reload(); 
           } catch (error) {
-              // Fetch failed, still offline or another issue occurred.
-              showOfflineScreen(); // Re-render the offline screen
+              showOfflineScreen(); 
               const loadingText = loadingContent.querySelector('h2');
               const retryButton = loadingContent.querySelector('button');
               if (loadingText) loadingText.textContent = '仍無法連線，請檢查網路';
               if(retryButton) {
-                  retryButton.style.animation = 'shake 0.5s'; // Add shake animation on repeated failure
+                  retryButton.style.animation = 'shake 0.5s'; 
                   setTimeout(() => {
-                      retryButton.style.animation = ''; // Remove animation after it plays
+                      retryButton.style.animation = ''; 
                   }, 500);
               }
           }
       }
-
       window.addEventListener('load', () => {
-        // Run after DOMContentLoaded to ensure dark mode is set
         if (!navigator.onLine) {
             showOfflineScreen();
         } else {
             initializeApp();
         }
       });
-
       keywordInput.addEventListener('keypress', function (event) {
         if (event.key === 'Enter') {
-          isFollowingUser = false; // Stop following user when searching
-          updateLocateButtonTitle(); // Update the locate button's title
-          searchYouBike(true, true); // Perform search and move map to first result
+          isFollowingUser = false; 
+          updateLocateButtonTitle(); 
+          searchYouBike(true, true); 
         }
       });
-
-
             window.addEventListener('scroll', () => {
         if (settingsPanel.classList.contains('show')) {
-            settingsPanel.classList.add('hiding'); // Start hiding animation
-
+            settingsPanel.classList.add('hiding'); 
             setTimeout(() => {
-                settingsPanel.classList.remove('show', 'hiding'); // Remove classes after animation
-            }, 300); // Match animation duration
+                settingsPanel.classList.remove('show', 'hiding'); 
+            }, 300); 
         }
     });
     const searchIcon = document.getElementById('searchIcon');
     searchIcon.addEventListener('click', () => {
-      isFollowingUser = false; // Stop following user when searching
-      updateLocateButtonTitle(); // Update the locate button's title
-      searchYouBike(true, true); // Perform search and move map to first result
+      isFollowingUser = false; 
+      updateLocateButtonTitle(); 
+      searchYouBike(true, true); 
     });
-    /**
-     * Manages the countdown timer for data updates.
-     */
     let countdownTimer = {
-        remaining: 60, // Initial countdown in seconds
-        updateButton: document.getElementById('updateCountdown'), // The button element
-        /**
-         * Updates the text displayed on the countdown button.
-         */
+        remaining: 60, 
+        updateButton: document.getElementById('updateCountdown'), 
         updateDisplay: function() {
             const text = currentLang === "en"
                 ? `${this.remaining} sec update`
                 : `${this.remaining}秒後更新`;
             document.getElementById('updateCountdownText').textContent = text;
         },
-        /**
-         * Resets the countdown timer to its initial value.
-         */
         reset: function() {
             const icon = this.updateButton.querySelector('.material-icons');
-            icon.classList.add('spin-update'); // Add spin animation
+            icon.classList.add('spin-update'); 
             setTimeout(() => {
-                icon.classList.remove('spin-update'); // Remove spin after animation
+                icon.classList.remove('spin-update'); 
             }, 500);
             this.remaining = 60;
             this.updateDisplay();
         },
-        /**
-         * Triggers a data update and resets the timer.
-         */
         update: async function() {
             const icon = this.updateButton.querySelector('.material-icons');
-            icon.classList.add('spin-update'); // Add spin animation
+            icon.classList.add('spin-update'); 
             setTimeout(() => {
-                icon.classList.remove('spin-update'); // Remove spin after animation
+                icon.classList.remove('spin-update'); 
             }, 500);
-
             const keyword = document.getElementById('keyword').value.trim();
             if (keyword === '') {
-                // If keyword is empty, perform a full search which re-renders all cards.
-                // Scroll position will be handled by searchYouBike.
                 searchYouBike(true, false);
             } else {
-                // If there's a keyword, only update vehicle data for visible cards.
-                // Scroll position will be handled by updateVehicleData.
                 await updateVehicleData();
             }
-            this.reset(); // Reset the countdown after update
+            this.reset(); 
         }
     };
-
-    // Add event listener for manual update
     countdownTimer.updateButton.addEventListener('click', () => {
         countdownTimer.update();
     });
-
-    // Set up interval for automatic countdown
     setInterval(() => {
         if(!navigator.onLine) {
-            document.getElementById('updateCountdown').style.display = "none"; // Hide if offline
+            document.getElementById('updateCountdown').style.display = "none"; 
             return;
         }
         if(document.getElementById('updateCountdown').style.display === "none") {
-            document.getElementById('updateCountdown').style.display = "flex"; // Show if online again
+            document.getElementById('updateCountdown').style.display = "flex"; 
         }
         countdownTimer.remaining--;
         if (countdownTimer.remaining <= 0) {
-            countdownTimer.update(); // Trigger update when countdown reaches zero
+            countdownTimer.update(); 
         }
-        countdownTimer.updateDisplay(); // Update display every second
+        countdownTimer.updateDisplay(); 
     }, 1000);
-
-      /**
-       * Initializes the Leaflet map and adds station markers.
-       * @param {Array<Object>} stations - An array of YouBike station data.
-       */
       async function initMap(stations) {
         if (leafletMap) {
-          // Map already initialized, do nothing
           return;
         }
-
-        // Initialize map with a default view
         leafletMap = L.map('map', {
           dragging: true,
-          tap: true, // Enable tap on mobile
+          tap: true, 
           touchZoom: true,
           doubleClickZoom: true,
           scrollWheelZoom: true,
-          zoomControl: true // Show zoom controls
-        }).setView([defaultLatitude, defaultLongitude], 18); // Default zoom level
-
-        // Ensure popups are above other map elements
+          zoomControl: true 
+        }).setView([defaultLatitude, defaultLongitude], 18); 
         leafletMap.getPanes().popupPane.style.zIndex = "9999";
-
         try {
-            // Add OpenStreetMap tile layer
             tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(leafletMap);
-
-            // Apply dark mode filter to map tiles if dark mode is active
             const isDarkMode = document.body.classList.contains('dark-mode');
             if (isDarkMode && tileLayer._container) {
                 tileLayer._container.style.filter = 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)';
                 const attribution = document.querySelector('.leaflet-control-attribution');
                 if (attribution) {
-                    attribution.style.color = '#ccc'; // Adjust attribution text color for dark mode
+                    attribution.style.color = '#ccc'; 
                 }
             }
         } catch(err) {
@@ -3063,13 +2547,10 @@ body.dark-mode #routeModal .bike-item p {
                 ? "Map tiles unavailable."
                 : "地圖圖層無法載入。");
         }
-        // Initialize marker cluster group for better performance with many markers
         markerClusterGroup = L.markerClusterGroup();
         if (leafletMap && markerClusterGroup) {
           leafletMap.addLayer(markerClusterGroup);
         }
-
-        // Custom locate control button
         let locateControl = L.control({ position: 'topleft' });
         locateControl.onAdd = function(map) {
             let btn = L.DomUtil.create('button', 'leaflet-bar leaflet-control leaflet-control-custom');
@@ -3082,18 +2563,16 @@ body.dark-mode #routeModal .bike-item p {
             btn.style.justifyContent = 'center';
             btn.style.padding = '0';
             btn.style.cursor = 'pointer';
-            btn.title = currentLang === "en" ? "Go to my location" : "定位到我目前位置"; // Initial title
+            btn.title = currentLang === "en" ? "Go to my location" : "定位到我目前位置"; 
             L.DomEvent.on(btn, 'click', function(e) {
-                L.DomEvent.stopPropagation(e); // Prevent map click event
-                L.DomEvent.preventDefault(e); // Prevent default button behavior
-                toggleTracking(); // Toggle location tracking
-                updateLocateButtonTitle(); // Update the button's title and color
+                L.DomEvent.stopPropagation(e); 
+                L.DomEvent.preventDefault(e); 
+                toggleTracking(); 
+                updateLocateButtonTitle(); 
             });
             return btn;
         };
         locateControl.addTo(leafletMap);
-
-        // 當使用者手動操作地圖時，停止自動跟隨
         function disableFollowingOnManualInteraction() {
             if (isFollowingUser) {
                 isFollowingUser = false;
@@ -3101,37 +2580,25 @@ body.dark-mode #routeModal .bike-item p {
                 updateLocateButtonTitle();
             }
         }
-
-        // 監聽使用者手動拖曳或縮放地圖的事件，一旦觸發就停止跟隨
         leafletMap.on('dragstart', disableFollowingOnManualInteraction);
         leafletMap.on('zoomstart', disableFollowingOnManualInteraction);
-
         try {
           const currentStations = Array.isArray(stations) ? stations : [];
-
-          // Clear existing markers if any
           if (markerClusterGroup) {
             markerClusterGroup.clearLayers();
           }
-
-          // Add markers for each station
           currentStations.forEach(station => {
             const lat = parseFloat(station.lat);
             const lng = parseFloat(station.lng);
-
             if (!isNaN(lat) && !isNaN(lng)) {
               const marker = L.marker([lat, lng]);
-
-              // Add a click listener to each marker to show a popup with detailed info
               marker.on('click', async () => {
                 try {
                   let stationInfo = {};
-                  // Only fetch real-time data if online
                   if (navigator.onLine) {
                     const vehicleData = await queryVehicleData([station.station_no]);
                     stationInfo = vehicleData[station.station_no] || {};
                   }
-
                   const content = `
                     <h4>${currentLang === "en" ? station.name_en : station.name_tw}</h4>
                     <p>${currentLang === "en" ? "Address: " : "地址："} ${currentLang === "en" ? station.address_en : station.address_tw}</p>
@@ -3141,39 +2608,28 @@ body.dark-mode #routeModal .bike-item p {
                       <p>${currentLang === "en" ? "Available Slots: " : "可停空位數："} ${stationInfo.empty_spaces !== undefined ? stationInfo.empty_spaces : (currentLang === "en" ? 'Unknown' : '未知')}</p>
                     ` : `<p>${currentLang === "en" ? "Offline. Real-time data unavailable." : "離線中，即時資料無法取得。"}</p>`}
                   `;
-
                   marker.bindPopup(content).openPopup();
-                  isFollowingUser = false; // Stop following user when clicking a marker
-                  updateLocateButtonTitle(); // Update the locate button's title
+                  isFollowingUser = false; 
+                  updateLocateButtonTitle(); 
                 } catch (error) {
                   showNotification(currentLang === "en" ? "Failed to get station information." : "無法取得站點資訊。");
                 }
               });
-
-              // Add marker to the cluster group
               markerClusterGroup.addLayer(marker);
             }
           });
-          // Add the cluster group to the map (if it hasn't been added already)
           if (leafletMap && markerClusterGroup) {
              leafletMap.addLayer(markerClusterGroup);
           }
-
         } catch (error) {
           showNotification(currentLang === "en" ? "Failed to initialize map." : "初始化地圖失敗。");
         }
       }
-
-      /**
-       * Updates the colors/icons of map markers based on whether they are displayed in the results list.
-       */
       function updateMapMarkers() {
         if (!markerClusterGroup || !leafletMap) {
           return;
         }
-
         try {
-          // Reset all markers to default blue icon
           markerClusterGroup.eachLayer(marker => {
             marker.setIcon(L.icon({
               iconUrl: 'https://unpkg.com/leaflet/dist/images/marker-icon.png',
@@ -3181,17 +2637,13 @@ body.dark-mode #routeModal .bike-item p {
               iconAnchor: [12, 41]
             }));
           });
-
-          // Highlight markers that correspond to currently displayed station cards in red
           const stationCards = document.querySelectorAll('.station');
           stationCards.forEach(card => {
             const lat = parseFloat(card.dataset.lat);
             const lng = parseFloat(card.dataset.lng);
-
             if (markerClusterGroup && typeof markerClusterGroup.eachLayer === 'function') {
               markerClusterGroup.eachLayer(marker => {
                 const markerLatLng = marker.getLatLng();
-                // Check if marker's lat/lng matches a card's lat/lng (with a small tolerance for float comparison)
                 if (Math.abs(markerLatLng.lat - lat) < 1e-6 && Math.abs(markerLatLng.lng - lng) < 1e-6) {
                   marker.setIcon(L.icon({
                     iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
@@ -3203,86 +2655,69 @@ body.dark-mode #routeModal .bike-item p {
             }
           });
         } catch (error) {
-          // console.error("Error updating map markers:", error);
         }
       }
-      
       document.addEventListener('click', (e) => {
         const floatingCard = document.getElementById('floatingCard');
         if (floatingCard && !e.target.closest('#floatingCard') && floatingCard.style.display === 'block') {
           floatingCard.style.display = 'none';
         }
       });
-
-
       const mainContent = document.getElementById('mainContent');
       const dragHandle = document.getElementById('dragHandle');
       let startY = 0;
       let startHeight = 0;
       let isDragging = false;
-
       function onStart(e) {
         const touch = e.touches ? e.touches[0] : e;
         startY = touch.clientY;
         startHeight = mainContent.offsetHeight;
         isDragging = true;
-        e.preventDefault(); // Prevent default touch behavior (e.g., scrolling)
-        mainContent.style.transition = 'none'; // Disable transition during drag
-        document.body.style.cursor = 'ns-resize'; // Change cursor
-        mainContent.style.overflowY = 'hidden'; // Hide scrollbar during drag
+        e.preventDefault(); 
+        mainContent.style.transition = 'none'; 
+        document.body.style.cursor = 'ns-resize'; 
+        mainContent.style.overflowY = 'hidden'; 
       }
-
       function onMove(e) {
         if (!isDragging) return;
         const touch = e.touches ? e.touches[0] : e;
         const currentY = touch.clientY;
         const deltaY = startY - currentY;
         const newHeight = Math.min(
-          Math.max(startHeight + deltaY, 200), // Min height 200px
-          window.innerHeight * 0.85 // Max height 85% of viewport
+          Math.max(startHeight + deltaY, 200), 
+          window.innerHeight * 0.85 
         );
         mainContent.style.height = `${newHeight}px`;
       }
-
       function onEnd() {
         isDragging = false;
-        mainContent.style.transition = 'height 0.2s ease'; // Re-enable transition after drag
-        document.body.style.cursor = ''; // Reset cursor
-        mainContent.style.overflowY = 'auto'; // Re-enable scrollbar
+        mainContent.style.transition = 'height 0.2s ease'; 
+        document.body.style.cursor = ''; 
+        mainContent.style.overflowY = 'auto'; 
       }
-
       dragHandle.addEventListener('mousedown', onStart);
       document.addEventListener('mousemove', onMove);
       document.addEventListener('mouseup', onEnd);
-
-      dragHandle.addEventListener('touchstart', onStart, { passive: false }); // Use { passive: false } to allow preventDefault
-      document.addEventListener('touchmove', onMove, { passive: true }); // Use { passive: true } for smoother scrolling when not dragging handle
+      dragHandle.addEventListener('touchstart', onStart, { passive: false }); 
+      document.addEventListener('touchmove', onMove, { passive: true }); 
       document.addEventListener('touchend', onEnd);
-      document.addEventListener('touchcancel', onEnd); // Handle touch cancel (e.g., multi-touch gestures)
-
-      /**
-       * Toggles geolocation tracking and updates map/UI accordingly.
-       */
+      document.addEventListener('touchcancel', onEnd); 
       function toggleTracking() {
           const centralLocationToggle = document.getElementById('centralLocationToggle');
           const isLocationServiceOn = centralLocationToggle.checked;
           const locateButton = document.getElementById('locateButton');
-
           if (!isLocationServiceOn) {
               showNotification(currentLang === "en" ? "Location service is off (using default region)." : "位置服務已關閉 (使用預設地區)。");
-              isFollowingUser = false; // Cannot follow if location service is off
-              stopTracking(); // Stop active tracking
-              hasObtainedRealLocation = false; // Reset real location flag
-
-              // Fallback to default region coordinates
+              isFollowingUser = false; 
+              stopTracking(); 
+              hasObtainedRealLocation = false; 
               const selectedRegion = document.getElementById('centralRegionSelect').value;
               const coords = regionCoordinates[selectedRegion];
               userLocation = { latitude: coords.lat, longitude: coords.lng };
-
               if (leafletMap) {
-                  isMapMovingDueToTracking = true; // Set flag
-                  leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); // Changed duration
-                  setTimeout(() => { isMapMovingDueToTracking = false; }, 600); // Changed timeout
+                  isMapMovingDueToTracking = true; 
+                  leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); 
+                  setTimeout(() => { isMapMovingDueToTracking = false; }, 600); 
               }
               if (locationMarker) {
                   locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
@@ -3290,39 +2725,30 @@ body.dark-mode #routeModal .bike-item p {
               if (pulsingMarker) {
                   pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
               }
-              updateCardDistances(); // Update distances with default location
-              updateVehicleData(); // Refresh vehicle data
-              updateResultsOrder(); // Re-sort results
+              updateCardDistances(); 
+              updateVehicleData(); 
+              updateResultsOrder(); 
           } else {
-              isFollowingUser = true; // Start following user
-
+              isFollowingUser = true; 
               showNotification(currentLang === "en" ? "Location tracking enabled." : "已開啟位置追蹤功能。");
-
-              startTracking(); // Start continuous tracking
-
-              // Try to get immediate location and move map if available
+              startTracking(); 
               if (leafletMap && userLocation && hasObtainedRealLocation) {
-                   isMapMovingDueToTracking = true; // Set flag
-                   leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); // Changed duration
-                   setTimeout(() => { isMapMovingDueToTracking = false; }, 600); // Changed timeout
+                   isMapMovingDueToTracking = true; 
+                   leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); 
+                   setTimeout(() => { isMapMovingDueToTracking = false; }, 600); 
                } else if (leafletMap) {
-                   // If userLocation is not yet set or not a real location, try to get current position once
-                   // This handles cases where watchPosition might take a moment to fire the first time
                    navigator.geolocation.getCurrentPosition(
                        (position) => {
-                           // This position will be handled by handleGeoUpdate, no need to set userLocation here again
                        },
                        (error) => {
-                           // If immediate current position fails, set default location and notify
                            showNotification(currentLang === "en" ? "Failed to get immediate location." : "無法立即取得目前位置。");
-
                            if (!hasObtainedRealLocation && leafletMap) {
                                const selectedRegion = document.getElementById('centralRegionSelect').value;
                                const coords = regionCoordinates[selectedRegion];
                                userLocation = { latitude: coords.lat, longitude: coords.lng };
-                               isMapMovingDueToTracking = true; // Set flag
-                               leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); // Changed duration
-                               setTimeout(() => { isMapMovingDueToTracking = false; }, 600); // Changed timeout
+                               isMapMovingDueToTracking = true; 
+                               leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); 
+                               setTimeout(() => { isMapMovingDueToTracking = false; }, 600); 
                                if (locationMarker) {
                                    locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
                                    if (pulsingMarker) pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
@@ -3336,38 +2762,31 @@ body.dark-mode #routeModal .bike-item p {
                    );
                }
           }
-          updateLocateButtonTitle(); // Update the locate button's title and color
+          updateLocateButtonTitle(); 
       }
-      /**
-       * Updates the title and color of the locate button based on tracking status.
-       */
       function updateLocateButtonTitle() {
           const locateButton = document.getElementById('locateButton');
           if (locateButton) {
               const centralLocationToggle = document.getElementById('centralLocationToggle');
-              const isLocationServiceOn = centralLocationToggle?.checked; // Check if toggle exists and is checked
-
+              const isLocationServiceOn = centralLocationToggle?.checked; 
               if (!isLocationServiceOn) {
                   locateButton.title = currentLang === "en" ? "Location service off (using default region)" : "定位服務已關閉 (使用預設地區)";
-                  locateButton.style.color = '#666'; // Grey color when off
+                  locateButton.style.color = '#666'; 
               } else if (isFollowingUser) {
                   locateButton.title = currentLang === "en" ? "Following your location" : "正在跟隨您的位置";
-                  locateButton.style.color = '#007BFF'; // Blue color when following
+                  locateButton.style.color = '#007BFF'; 
               } else {
                   locateButton.title = currentLang === "en" ? "Go to my location" : "定位到我目前位置";
-                  locateButton.style.color = '#333'; // Default color when not following but service is on
+                  locateButton.style.color = '#333'; 
               }
           }
       }
-
       document.addEventListener('DOMContentLoaded', () => {
         const centralSettingsPanel = document.getElementById('centralSettingsPanel');
         const centralDarkModeToggle = document.getElementById('centralDarkModeToggle');
         const centralLangToggle = document.getElementById('centralLangToggle');
         const centralLocationToggle = document.getElementById('centralLocationToggle');
         const centralRegionSelect = document.getElementById('centralRegionSelect');
-
-        // Apply dark mode based on localStorage
         const isDarkMode = localStorage.getItem("dark_mode") === "true";
         if (isDarkMode) {
           document.body.classList.add('dark-mode');
@@ -3380,19 +2799,13 @@ body.dark-mode #routeModal .bike-item p {
           }
         }
         centralDarkModeToggle.checked = isDarkMode;
-
-        // Apply language based on localStorage
         currentLang = localStorage.getItem("lang") || "zh";
-        centralLangToggle.checked = currentLang === "en"; // Check if English is selected
-        updateLanguageTexts(); // Update all text based on current language
-
-        // Initialize location service toggle state
+        centralLangToggle.checked = currentLang === "en"; 
+        updateLanguageTexts(); 
         if (localStorage.getItem("useLocation") === null) {
-          localStorage.setItem("useLocation", "true"); // Default to true if not set
+          localStorage.setItem("useLocation", "true"); 
         }
         centralLocationToggle.checked = localStorage.getItem("useLocation") === "true";
-
-        // Initialize default region based on localStorage or fallback
         const savedRegion = localStorage.getItem('selectedRegion') || 'kaohsiung';
         defaultRegion = savedRegion;
         defaultLatitude = regionCoordinates[savedRegion].lat;
@@ -3400,17 +2813,11 @@ body.dark-mode #routeModal .bike-item p {
         if (centralRegionSelect) {
           centralRegionSelect.value = savedRegion;
         }
-
-
-        // Event listener for Dark Mode toggle
         centralDarkModeToggle.addEventListener('change', () => {
           const isDark = centralDarkModeToggle.checked;
-          // Use requestAnimationFrame for smoother visual updates
           requestAnimationFrame(() => {
             document.body.classList.toggle('dark-mode', isDark);
             localStorage.setItem("dark_mode", isDark.toString());
-
-            // Apply/remove dark mode filter to map tiles
             if (leafletMap && tileLayer && tileLayer._container) {
                 if (isDark) {
                     tileLayer._container.style.filter = 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)';
@@ -3418,8 +2825,6 @@ body.dark-mode #routeModal .bike-item p {
                     tileLayer._container.style.filter = 'none';
                 }
             }
-
-            // Adjust attribution text color for map
             const attribution = document.querySelector('.leaflet-control-attribution');
             if (attribution) {
                 if (isDark) {
@@ -3428,58 +2833,38 @@ body.dark-mode #routeModal .bike-item p {
                     attribution.style.color = '#333';
                 }
             }
-
-
           });
         });
-
-        // Event listener for Language toggle
         centralLangToggle.addEventListener('change', async () => {
-
-          currentLang = currentLang === "en" ? "zh" : "en"; // Toggle language
+          currentLang = currentLang === "en" ? "zh" : "en"; 
           localStorage.setItem("lang", currentLang);
-          updateLanguageTexts(); // Update all text based on new language
-
-          // Re-search and update data for the new language
-          await searchYouBike(false, false); // Don't show loading, don't move map
-          // Force update of vehicle data and card distances after language change
+          updateLanguageTexts(); 
+          await searchYouBike(false, false); 
           await updateVehicleData();
           updateCardDistances();
           updateResultsOrder();
         });
-
-        // Event listener for Location Service toggle
         centralLocationToggle.addEventListener('change', async function() {
           const isChecked = this.checked;
-          localStorage.setItem("useLocation", isChecked); // Save setting
-
-          // Reset last vehicle data update to force a full update after location change
+          localStorage.setItem("useLocation", isChecked); 
           window.lastVehicleDataUpdate = 0;
-          hasObtainedRealLocation = false; // Reset real location flag
-
-          await getLocation(); // Re-evaluate location and update UI
+          hasObtainedRealLocation = false; 
+          await getLocation(); 
         });
-
-        // Event listener for Region Select
         centralRegionSelect.addEventListener('change', async function() {
           const selectedRegion = this.value;
           defaultRegion = selectedRegion;
-          localStorage.setItem('selectedRegion', selectedRegion); // Save selected region
-
+          localStorage.setItem('selectedRegion', selectedRegion); 
           const coords = regionCoordinates[selectedRegion];
           defaultLatitude = coords.lat;
           defaultLongitude = coords.lng;
-
-          // If location service is off, immediately update based on new default region
           const centralLocationToggle = document.getElementById('centralLocationToggle');
           if (!centralLocationToggle.checked) {
-              window.lastVehicleDataUpdate = 0; // Force update
-              hasObtainedRealLocation = false; // Reset real location flag
-              await getLocation(); // Re-evaluate location and update UI
+              window.lastVehicleDataUpdate = 0; 
+              hasObtainedRealLocation = false; 
+              await getLocation(); 
           }
         });
-
-        // Auto-select nearest region on first load if geolocation is available
         if (localStorage.getItem('selectedRegion') === null && navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 position => {
@@ -3487,17 +2872,13 @@ body.dark-mode #routeModal .bike-item p {
                     defaultRegion = nearestRegion;
                     defaultLatitude = regionCoordinates[nearestRegion].lat;
                     defaultLongitude = regionCoordinates[nearestRegion].lng;
-                    
-                    localStorage.setItem('selectedRegion', nearestRegion); // Save the detected nearest region
+                    localStorage.setItem('selectedRegion', nearestRegion); 
                     const centralRegionSelect = document.getElementById('centralRegionSelect');
                     if (centralRegionSelect) {
-                      centralRegionSelect.value = nearestRegion; // Update dropdown
+                      centralRegionSelect.value = nearestRegion; 
                     }
-
-                    // No need to call getLocation() here, as it's called by initializeApp later
                 },
                 error => {
-                  // If geolocation fails, set default to Kaohsiung (or last saved)
                   const savedRegion = localStorage.getItem('selectedRegion') || 'kaohsiung';
                   defaultRegion = savedRegion;
                   defaultLatitude = regionCoordinates[savedRegion].lat;
@@ -3506,22 +2887,13 @@ body.dark-mode #routeModal .bike-item p {
                   if (centralRegionSelect) {
                     centralRegionSelect.value = savedRegion;
                   }
-
                 }
             );
         }
       });
-
-      /**
-       * Finds the closest YouBike region based on given coordinates.
-       * @param {number} lat - Latitude.
-       * @param {number} lng - Longitude.
-       * @returns {string} The name of the nearest region.
-       */
       function findNearestRegion(lat, lng) {
-          let nearestRegion = 'kaohsiung'; // Default to Kaohsiung
+          let nearestRegion = 'kaohsiung'; 
           let minDistance = Infinity;
-
           for (const [region, coords] of Object.entries(regionCoordinates)) {
               const distance = calculateDistance(lat, lng, coords.lat, coords.lng);
               if (distance < minDistance) {
@@ -3529,15 +2901,12 @@ body.dark-mode #routeModal .bike-item p {
                   nearestRegion = region;
               }
           }
-
           return nearestRegion;
       }
-
       const routeModal = document.getElementById('routeModal');
       const routeDetailsDiv = document.getElementById('routeDetails');
       const closeRouteModalButton = document.getElementById('closeRouteModal');
       const routeModalTitle = document.getElementById('routeModalTitle');
-
       closeRouteModalButton.addEventListener('click', () => {
           routeModal.classList.remove('modal-open');
           routeModal.classList.add('modal-close');
@@ -3546,34 +2915,30 @@ body.dark-mode #routeModal .bike-item p {
               overlay.classList.remove('show');
               routeModal.classList.remove('modal-close');
               routeModal.removeEventListener('animationend', handler);
-              clearUrlHash(); // Clear hash after closing animation
+              clearUrlHash(); 
           });
-          // Remove state from history when closed by button
           if (history.state && (history.state.type === 'route' || history.state.type === 'electric')) {
               history.back();
           } else {
-              clearUrlHash(); // Clear hash if not using history.back()
+              clearUrlHash(); 
           }
       });
-      // Close modals when clicking on the overlay
       overlay.addEventListener('click', () => {
-          // Close route modal if open
           if (routeModal.style.display === 'block') {
               routeModal.classList.remove('modal-open');
               routeModal.classList.add('modal-close');
-              overlay.classList.remove('show'); // Hide overlay
+              overlay.classList.remove('show'); 
               routeModal.addEventListener('animationend', function handler() {
                   routeModal.style.display = 'none';
                   routeModal.classList.remove('modal-close');
                   routeModal.removeEventListener('animationend', handler);
-                  clearUrlHash(); // Clear hash after closing animation
+                  clearUrlHash(); 
               });
           }
-          // Close settings panel if open
           else if (centralSettingsPanel.style.display === 'block') {
               centralSettingsPanel.classList.remove('panel-open');
               centralSettingsPanel.classList.add('panel-close');
-              overlay.classList.remove('show'); // Hide overlay
+              overlay.classList.remove('show'); 
               settingsIcon.classList.add('rotate-left');
               setTimeout(() => {
                   settingsIcon.classList.remove('rotate-left');
@@ -3582,26 +2947,15 @@ body.dark-mode #routeModal .bike-item p {
                   centralSettingsPanel.style.display = 'none';
                   centralSettingsPanel.classList.remove('panel-close');
                   centralSettingsPanel.removeEventListener('animationend', handler);
-                  clearUrlHash(); // Clear hash after closing animation
+                  clearUrlHash(); 
               });
           }
-          // Close permission modal if open
           else if (permissionModal.style.display === 'block') {
               permissionModal.style.display = 'none';
               overlay.classList.remove('show');
-              clearUrlHash(); // Clear hash after closing
+              clearUrlHash(); 
           }
       });
-
-
-      /**
-       * Fetches and displays a route from user's current location to a destination.
-       * @param {number} startLat - Starting latitude.
-       * @param {number} startLng - Starting longitude.
-       * @param {number} endLat - Destination latitude.
-       * @param {number} endLng - Destination longitude.
-       * @param {string} stationName - Name of the destination station.
-       */
       async function getRoute(startLat, startLng, endLat, endLng, stationName) {
           if (!navigator.onLine) {
               showNotification(currentLang === "en" ? "Offline: Cannot get route information." : "離線狀態：無法取得路線資訊");
@@ -3611,24 +2965,17 @@ body.dark-mode #routeModal .bike-item p {
                showNotification(currentLang === "en" ? "Your location is not available." : "無法取得您的位置。");
                return;
           }
-
-          const apiKey = '7cb4eb19-e0f4-40a3-a5e0-f2c039366f32'; // GraphHopper API Key
-          const profile = 'foot'; // Walking profile
-          const locale = currentLang === "en" ? "en" : "zh-TW"; // Language for instructions
-
-          // Construct the GraphHopper API URL
+          const apiKey = '7cb4eb19-e0f4-40a3-a5e0-f2c039366f32'; 
+          const profile = 'foot'; 
+          const locale = currentLang === "en" ? "en" : "zh-TW"; 
           const url = `https://graphhopper.com/api/1/route?profile=${profile}&locale=${locale}&key=${apiKey}&elevation=false&instructions=true&point=${startLat},${startLng}&point=${endLat},${endLng}`;
-
-          // Display loading message in the modal
           routeDetailsDiv.innerHTML = currentLang === "en" ? "Calculating route..." : "計算路線中...";
           routeModalTitle.textContent = currentLang === "en" ? "Route to " + stationName : "前往 " + stationName + " 的路線";
           routeModal.style.display = 'block';
-          routeModal.classList.remove('modal-close'); // Ensure close animation class is removed
-          routeModal.classList.add('modal-open'); // Add open animation class
+          routeModal.classList.remove('modal-close'); 
+          routeModal.classList.add('modal-open'); 
           overlay.classList.add('show');
-          history.pushState({ modalOpen: true, type: 'route' }, 'Route', '#route'); // Push state for route modal
-
-
+          history.pushState({ modalOpen: true, type: 'route' }, 'Route', '#route'); 
           try {
               const response = await fetch(url);
               if (!response.ok) {
@@ -3636,84 +2983,70 @@ body.dark-mode #routeModal .bike-item p {
                   throw new Error(`API error: ${response.status} - ${errorData.message || response.statusText}`);
               }
               const data = await response.json();
-
               if (data.paths && data.paths.length > 0) {
-                  displayRouteDetails(data.paths[0], stationName); // Display the first route found
+                  displayRouteDetails(data.paths[0], stationName); 
               } else {
                   routeDetailsDiv.innerHTML = currentLang === "en" ? "No route found." : "找不到路線。";
               }
-
           } catch (error) {
               console.error("Error fetching route:", error);
               routeDetailsDiv.innerHTML = `${currentLang === "en" ? "Failed to get route: " : "取得路線失敗："} ${error.message}`;
           }
       }
-
-      /**
-       * Displays the detailed route instructions in the modal.
-       * @param {Object} routeData - The route path data from GraphHopper API.
-       * @param {string} stationName - The name of the destination station.
-       */
       function displayRouteDetails(routeData, stationName) {
           let html = `<h4>${currentLang === "en" ? "Route to " : "前往 "}${stationName}</h4>`;
-
           const distanceKm = (routeData.distance / 1000).toFixed(2);
-          const timeMinutes = Math.round(routeData.time / 60000); // Convert milliseconds to minutes
+          const timeMinutes = Math.round(routeData.time / 60000); 
           html += `<p><span class="material-icons" style="font-size: 18px; vertical-align: middle;">directions_walk</span>${currentLang === "en" ? "Distance: " : "距離："} ${distanceKm} km</p>`;
           html += `<p><span class="material-icons" style="font-size: 18px; vertical-align: middle;">timer</span>${currentLang === "en" ? "Estimated Time: " : "預計時間："} ${timeMinutes} ${currentLang === "en" ? "minutes" : "分鐘"}</p>`;
-
           if (routeData.instructions && routeData.instructions.length > 0) {
               html += `<h4>${currentLang === "en" ? "Instructions:" : "導航步驟："}</h4><ul>`;
               routeData.instructions.forEach(instruction => {
-                  // Determine appropriate Material Icon based on instruction sign
-                  let iconName = 'arrow_forward'; // Default icon
-
+                  let iconName = 'arrow_forward'; 
                   switch (instruction.sign) {
-                      case -3: // U-turn left
+                      case -3: 
                           iconName = 'u_turn_left';
                           break;
-                      case -2: // Keep left
-                      case -1: // Turn left
-                      case 6:  // Turn sharply left
+                      case -2: 
+                      case -1: 
+                      case 6:  
                           iconName = 'turn_left';
                           break;
-                      case 0: // Continue straight
+                      case 0: 
                           iconName = 'arrow_upward';
                           break;
-                      case 1: // Turn slightly right
-                      case 2: // Turn right
-                      case 7: // Turn sharply right
+                      case 1: 
+                      case 2: 
+                      case 7: 
                           iconName = 'turn_right';
                           break;
-                      case 3: // U-turn right
+                      case 3: 
                           iconName = 'u_turn_right';
                           break;
-                      case 4: // Finish
+                      case 4: 
                           iconName = 'flag';
                           break;
-                      case 5: // Ferry, etc. (might be 'settings_ethernet' for a general 'other' sign)
+                      case 5: 
                           iconName = 'settings_ethernet';
                           break;
-                      case -7: // Roundabout left
+                      case -7: 
                           iconName = 'roundabout_left';
                           break;
-                      case 7: // Roundabout right (re-used for right roundabout)
+                      case 7: 
                           iconName = 'roundabout_right';
                           break;
-                      case -8: // Leave roundabout (exit)
+                      case -8: 
                           iconName = 'exit_to_app';
                           break;
-                      case 8: // Arrive
-                          iconName = 'flag'; // Or 'location_on'
+                      case 8: 
+                          iconName = 'flag'; 
                           break;
-                      case -9: // Location target
+                      case -9: 
                           iconName = 'location_on';
                           break;
                       default:
                           iconName = 'arrow_forward';
                   }
-
-
                   html += `
                       <li class="bike-item">
                           <p><span class="material-icons" style="font-size: 18px; vertical-align: middle;">${iconName}</span>${instruction.text}</p>
@@ -3726,52 +3059,36 @@ body.dark-mode #routeModal .bike-item p {
           } else {
               html += `<p>${currentLang === "en" ? "No detailed instructions available." : "無詳細導航步驟。"}</p>`;
           }
-
           routeDetailsDiv.innerHTML = html;
       }
-
-      /**
-       * Shows a modal with detailed information about electric bikes at a specific station.
-       * @param {string} stationId - The ID of the station.
-       * @param {string} stationName - The name of the station.
-       */
       async function showElectricBikeDetailsModal(stationId, stationName) {
           if (!navigator.onLine) {
               showNotification(currentLang === "en" ? "Offline: Cannot get electric bike details." : "離線狀態：無法取得電輔車詳細資訊。");
               return;
           }
-
           const bikeListUrl = `https://apis.youbike.com.tw/api/front/bike/lists?station_no=${stationId}`;
-
           routeModalTitle.textContent = window.langStrings.electricBikeDetailsTitle[currentLang] + stationName;
           routeDetailsDiv.innerHTML = window.langStrings.gettingBikeData[currentLang];
           routeModal.style.display = 'block';
-          routeModal.classList.remove('modal-close'); // Ensure close animation class is removed
-          routeModal.classList.add('modal-open'); // Add open animation class
+          routeModal.classList.remove('modal-close'); 
+          routeModal.classList.add('modal-open'); 
           overlay.classList.add('show');
-          history.pushState({ modalOpen: true, type: 'electric' }, 'Electric Bikes', '#electric'); // Push state for electric bike modal
-
-
+          history.pushState({ modalOpen: true, type: 'electric' }, 'Electric Bikes', '#electric'); 
           try {
               const response = await fetch(bikeListUrl, {
                   headers: {
                       'Accept': '*/*',
                       'Accept-Language': 'zh-TW,zh;q=0.9',
-                      'Origin': 'https://www.youbike.com.tw', // Important for CORS
-                      'Referer': 'https://www.youbike.com.tw/' // Important for CORS
+                      'Origin': 'https://www.youbike.com.tw', 
+                      'Referer': 'https://www.youbike.com.tw/' 
                   }
               });
-
               if (!response.ok) {
                   throw new Error(`HTTP error! status: ${response.status}`);
               }
-
               const data = await response.json();
-
               if (data.retCode === 1 && data.retVal && data.retVal.length > 0) {
-                  // Sort electric bikes by battery power in descending order
                   data.retVal.sort((a, b) => b.battery_power - a.battery_power);
-
                   let bikeListHtml = '<ul>';
                   data.retVal.forEach(bike => {
                       bikeListHtml += `
@@ -3787,26 +3104,19 @@ body.dark-mode #routeModal .bike-item p {
               } else {
                   routeDetailsDiv.innerHTML = `<p>${window.langStrings.noElectricBikes[currentLang]}</p>`;
               }
-
           } catch (error) {
               console.error("Error fetching electric bike data:", error);
               routeDetailsDiv.innerHTML = `<p>${window.langStrings.failedToGetBikeData[currentLang]}</p>`;
           }
       }
-
-      // Add event listener to update data when the tab becomes visible
       document.addEventListener('visibilitychange', () => {
           if (document.visibilityState === 'visible' && navigator.onLine) {
-              console.log('Tab became visible, updating data...'); // Optional: for debugging
-              countdownTimer.update(); // Trigger a data update
+              console.log('Tab became visible, updating data...'); 
+              countdownTimer.update(); 
           }
       });
-
     </script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
   </body>
 </html>
-
-
-
