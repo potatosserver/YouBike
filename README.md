@@ -31,6 +31,7 @@
 
 ## 使用方式
 
+[操作教學](https://youbike.pages.dev/guide)
 1. 請前往 [youbike.pages.dev](https://youbike.pages.dev/)或是從[Releases](https://github.com/potatosserver/YouBike/releases)下載APK安裝至Android手機即可使用本服務。
 2. 在搜尋框輸入關鍵字查詢
 3. 可開啟定位啟用最近站點與距離計算。
