@@ -1,0 +1,3233 @@
+
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta name="google-site-verification" content="9o55RpXAKN7kR9cYHHvHkWuktV3JVcCYF5mt9XZULCY" />
+    <meta name="google-site-verification" content="ahdkishmook7wgZXJ6JVA43nNO5SSccNOlvmB575Od4" />    
+    <meta charset="UTF-8" />
+    <meta name="author" content="卓稟鈞(AndrewCho)">
+    <meta name="description" content="一個專為 YouBike 設計的簡單、美觀且低流量站點搜尋器，提供快速查詢站點資訊功能，滿足即時需求，適合所有用戶使用。">
+    <meta name="keywords" content="YouBike, youBike, YouBike2.0, youBike2.0, ubike, ibike, obike, kbike, 微笑單車，公共自行車, 腳踏車，YouBike站點搜尋, 站點搜尋, YouBike 資訊, YouBike據點，ubike據點 ，附近站點, 附近YouBike站點, 全台YouBike, 台北YouBike, 新北YouBike, 桃園YouBike, 新竹YouBike, 苗栗YouBike, 臺中YouBike, 嘉義YouBike , 臺南YouBike, 高雄YouBike, 屏東YouBike, 臺東YouBike , YouBike即時資訊, 定位功能, Github, github.io" />
+    <meta property="og:site_name" content="YouBike 站點搜尋" />
+	  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>YouBike 站點搜尋 : 一個簡單、美觀、低流量的YouBike站點搜尋器</title>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "YouBike 站點搜尋",
+      "alternateName": ["YouBike 站點搜尋", "YouBike Site Search"],
+      "url": "https://youbike.pages.dev/"
+    }
+    </script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/x-icon" href="/icons/icon.ico" />
+    <!-- Leaflet & MarkerCluster CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
+    <!-- MapLibre GL CSS -->
+    <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=offline_bolt" />
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+        margin: 0;
+        background: #f4f4f4;
+        color: #333;
+        transition: background 0.5s ease, color 0.5s ease;
+        padding-top: 20px;
+        --map-filter: none;
+        --map-transition: filter 0.3s ease;
+        --color-transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+      *, *::before, *::after {
+        transition: var(--color-transition);
+      }
+      .station,
+      .station h3,
+      .station p,
+      #searchContainer,
+      #keyword,
+      #mainContent,
+      .modal,
+      #locationSwitchContainer,
+      #settingsPanel,
+      .settings-group,
+      .setting-item {
+        transition: var(--color-transition), transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .station, #settingsButton, #closeCentralSettings, #closeRouteModal {
+          -webkit-tap-highlight-color: transparent;
+      }
+      #locationNotification {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #e8def8; 
+        color: #1c1b1f; 
+        padding: 12px 20px;
+        border-radius: 20px; 
+        font-size: 14px;
+        z-index: 10001;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
+      }
+      #locationNotification.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      #locationNotification.hide {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      .main-title {
+        color: #007bff;
+        text-align: center;
+        margin-bottom: 8px;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        padding: 4px;
+        background-color: rgba(255, 255, 255, 0.8);
+        border-radius: 8px;
+        display: inline-block;
+        font-size: 1.4em;
+      }
+      body.dark-mode .main-title {
+        color: #90CAF9;
+      }
+      #searchContainer {
+        display: flex;
+        align-items: center;
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 500px;
+        width: calc(100% - 40px);
+        position: relative;
+        padding: 8px 16px;
+        box-sizing: border-box;
+        background-color: #ffe8d6;
+        border-radius: 28px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: box-shadow 0.3s ease;
+      }
+      body.dark-mode #searchContainer {
+          background-color: #1e1e1e;
+          box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+      }
+      #keyword {
+        padding: 0;
+        width: calc(100% - 34px);
+        border: none;
+        border-radius: 0;
+        margin: 0;
+        font-size: 16px;
+        box-shadow: none;
+        word-wrap: break-word;
+        overflow-wrap: break-wrap;
+        display: block;
+        background-color: transparent;
+        color: #333;
+      }
+      body.dark-mode #keyword {
+          color: #ffffff;
+      }
+      #keyword::placeholder {
+        color: #888;
+      }
+      #keyword:focus {
+        outline: none;
+      }
+      #searchIcon {
+        position: static;
+        margin-left: 10px;
+        font-size: 24px;
+        cursor: pointer;
+        color: #555;
+        transition: color 0.3s ease;
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+      }
+      body.dark-mode #searchIcon {
+          color: #ccc;
+      }
+      #searchIcon:hover {
+        color: #007BFF;
+      }
+      #searchContainer + #locationSwitchContainer {
+           margin-top: 6px;
+      }
+      #locationSwitchContainer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 8px 15px;
+        border-radius: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(5px);
+        transition: all 0.3s ease;
+      }
+      body.dark-mode #locationSwitchContainer {
+          background-color: rgba(30, 30, 30, 0.9);
+          box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+      }
+      #locationSwitchText {
+          color: #007BFF;
+          font-weight: 500;
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+          margin-left: 10px;
+      }
+      body.dark-mode #locationSwitchText {
+          color: #90CAF9;
+          text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+      }
+      #results {
+        margin-top: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        padding: 0 20px;
+      }
+      .station {
+        background-color: #fff2ec;
+        border: 1px solid #e0e0e0;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        width: calc(33% - 20px);
+        min-width: 250px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        cursor: pointer;
+        position: relative;
+      }
+      .station:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+      }
+      .station .header {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          margin-bottom: 10px;
+          gap: 10px;
+      }
+      .station h3 {
+        margin: 0;
+        color: #007BFF;
+        font-size: 1.2em;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        flex-grow: 1;
+      }
+      .station .icon-group {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          flex-shrink: 0;
+          padding-top: 0;
+      }
+      .station .pin-button {
+        font-size: 24px;
+        cursor: pointer;
+        color: #007BFF;
+        transition: color 0.2s ease;
+        user-select: none;
+      }
+      .station .pin-button.pinned {
+          color: #FFD700;
+      }
+      .navigate-button {
+        background: none;
+        border: none;
+        padding: 0;
+        font-size: 24px;
+        color: #007BFF;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color 0.3s ease, background-color 0.3s ease;
+        -webkit-tap-highlight-color: transparent;
+        outline: none;
+        border-radius: 50%;
+      }
+      .navigate-button:hover {
+        background-color: transparent;
+        color: #0056b3;
+      }
+      body.dark-mode .navigate-button {
+        color: #90CAF9;
+        background-color: transparent;
+      }
+      body.dark-mode .navigate-button:hover {
+        color: #64b5f6;
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+      .station .electric-icon {
+          font-size: 24px;
+          color: #4CAF50;
+          display: none;
+          cursor: pointer;
+      }
+      .station .electric-icon.show {
+          display: block;
+      }
+      .overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 999;
+        display: none;
+      }
+      .overlay.show {
+        display: block;
+      }
+      .modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        text-align: center;
+        display: none;
+      }
+      .modal.show {
+        display: block;
+      }
+      .modal button {
+        margin: 10px auto;
+        display: block;
+        padding: 10px 20px;
+        background-color: #007BFF;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+      }
+      .modal button:hover {
+        background-color: #0056b3;
+      }
+      body.dark-mode {
+        background: #333;
+        color: #ffffff;
+        transition: background 0.5s ease, color 0.5s ease;
+      }
+      body.dark-mode h1 {
+        color: #90CAF9;
+      }
+      body.dark-mode #keyword {
+        background-color: transparent;
+        color: #ffffff;
+        border-color: #90caf9;
+      }
+      body.dark-mode #keyword::placeholder {
+         color: #888;
+      }
+       body.dark-mode #searchContainer {
+          background-color: #1e1e1e;
+          box-shadow: 0 2px 4px rgba(255,255,255,0.1);
+      }
+       body.dark-mode #searchIcon {
+          color: #ccc;
+      }
+      body.dark-mode #searchIcon:hover {
+        color: #ffffff;
+      }
+      body.dark-mode button {
+        background-color: #90caf9;
+        color: #121212;
+      }
+      body.dark-mode button:hover {
+        background-color: #64b5f6;
+      }
+      body.dark-mode .station {
+        background-color: #444;
+        border-color: #555;
+        color: #ffffff;
+      }
+      body.dark-mode .station h3 {
+        color: #90CAF9;
+      }
+      body.dark-mode .station p {
+        color: #cccccc;
+      }
+      body.dark-mode .modal {
+        background-color: #333;
+        color: #ffffff;
+      }
+      body.dark-mode .overlay {
+        background-color: rgba(0, 0, 0, 0.8);
+      }
+      body.dark-mode #loadingOverlay {
+        background-color: rgba(51, 51, 51, 1);
+      }
+      body.dark-mode #loadingText {
+        color: #ffffff;
+      }
+      body.dark-mode #noticeBox {
+        background-color: #000;
+        color: #000;
+        border: 1px solid #444;
+      }
+      body.dark-mode #locationNotification {
+          background-color: #d0bcff; 
+          color: #1c1b1f; 
+          box-shadow: 0 4px 8px rgba(255,255,255,0.2); 
+      }
+      #map {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 1;
+        touch-action: none;
+      }
+      #mainContent {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #fff5f0;
+        height: 40vh;
+        min-height: 200px;
+        max-height: 85vh;
+        z-index: 2;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        padding-top: 0;
+        width: 85%;
+        max-width: 1000px;
+        margin: 0 auto;
+        left: 50%;
+        transform: translateX(-50%);
+        touch-action: pan-y;
+        -webkit-overflow-scrolling: touch;
+      }
+      #mainContent::-webkit-scrollbar {
+        display: none;
+      }
+      body.dark-mode #mainContent {
+        background: #222;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+      }
+      #dragHandle {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        height: 24px;
+        width: 100px;
+        cursor: ns-resize;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 0 auto;
+        padding: 0;
+      }
+      #dragHandle::before {
+        content: '';
+        width: 100px;
+        height: 6px;
+        background: #a0a0a0;
+        border-radius: 3px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        transition: background 0.3s ease, box-shadow 0.3s ease;
+      }
+      body.dark-mode #dragHandle::before {
+        background: #888;
+        box-shadow: 0 1px 3px rgba(255,255,255,0.1);
+      }
+      #dragHandle:hover::before {
+        background: #888;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      }
+      body.dark-mode #dragHandle:hover::before {
+        background: #aaa;
+        box-shadow: 0 2px 5px rgba(255,255,255,0.2);
+      }
+      @media (max-width: 768px) {
+        #mainContent {
+          width: 80%;
+        }
+      }
+      @media (max-width: 480px) {
+        #mainContent {
+          width: 100%;
+          padding: 0;
+          max-width: none;
+        }
+        #results {
+          padding: 0 16px;
+        }
+        .station {
+          margin: 10px 0;
+          width: calc(100% - 32px);
+          border-radius: 10px;
+        }
+      }      @media (max-width: 768px) {
+        .station {
+          width: calc(50% - 20px);
+        }
+        #searchContainer {
+            padding: 8px 12px;
+        }
+        #keyword {
+          width: calc(100% - 34px);
+          margin-right: 0;
+          margin-bottom: 0;
+          border-radius: 28px;
+          display: block;
+          padding: 0 12px;
+        }
+         #searchIcon {
+             position: static;
+             margin-left: 10px;
+             margin-top: 0;
+             align-self: auto;
+             font-size: 24px;
+             width: 24px;
+             height: 24px;
+             display: inline-flex;
+             align-items: center;
+             justify-content: center;
+         }
+        button {
+          width: 100%;
+          border-radius: 0 0 5px 5px;
+          display: block;
+        }
+        #results {
+          gap: 10px;
+        }
+        .station {
+          margin-bottom: 10px;
+        }
+      }
+      @media (max-width: 480px) {
+        .station {
+          width: 100%;
+        }
+        #searchContainer {
+             padding: 10px;
+         }
+         #keyword {
+             width: calc(100% - 34px);
+             padding: 0 10px;
+         }
+         #results {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+    .station {
+        margin-left: 8px;
+        margin-right: 8px;
+    }
+      }      @keyframes pulse {
+        0% {
+          transform: scale(0.8);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(2.0);
+          opacity: 0;
+        }
+      }
+      .pulsing-icon .pulse {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-color: #2196F3;
+        animation: pulse 2s infinite ease-out;
+      }
+      #loadingOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 1);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9998;
+        transition: opacity 0.5s ease;
+      }
+      #loadingContent {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      #loadingText {
+        font-size: 1.5em;
+        color: #007BFF;
+        text-align: center;
+      }
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 24px;
+      }
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 18px;
+        width: 18px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+      }
+      input:checked + .slider {
+        background-color: #007BFF;
+      }
+      input:checked + .slider:before {
+        transform: translateX(26px);
+      }
+      @keyframes popUp {
+          0% { transform: translateX(100%) scale(0.5); opacity: 0; }
+          100% { transform: translateX(0) scale(1); opacity: 1; }
+      }
+      @keyframes popDown {
+          0% { transform: translateX(0) scale(1); opacity: 1; }
+          100% { transform: translateX(100%) scale(0.5); opacity: 0; }
+      }
+      @keyframes shake {
+        10%, 90% { transform: translate3d(-1px, 0, 0); }
+        20%, 80% { transform: translate3d(2px, 0, 0); }
+        30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+        40%, 60% { transform: translate3d(4px, 0, 0); }
+      }
+      #extraButtons {
+          position: fixed;
+          bottom: 120px;
+          right: 80px;
+          transform: translateX(150%);
+          transition: transform 0.5s ease, opacity 0.5s ease;
+          display: flex;
+          flex-direction: row;
+          gap: 10px;
+          z-index: 1000;
+          opacity: 0;
+          pointer-events: none;
+      }      #extraButtons.show {
+          transform: translateX(0);
+          opacity: 1;
+          pointer-events: auto;
+          animation: popUp 0.5s forwards;
+      }
+      #extraButtons.hiding {
+          animation: popDown 0.5s forwards;
+      }
+      #extraButtons a {
+          width: 50px;
+          height: 50px;
+          background-color: white;
+          color: black;
+          border: none;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          text-decoration: none;
+          transition: background-color 0.3s ease;
+      }
+      #extraButtons a:hover {
+          background-color: #f0f0f0;
+      }      #settingsPanel {
+          position: fixed;
+          bottom: 60px;
+          right: 20px; 
+          display: flex;
+          flex-direction: row;
+          gap: 10px;
+          z-index: 1200;
+          transform: translateX(100%) scale(0.5);
+          opacity: 0;
+          transition: all 0.2s ease;
+          background: rgba(255, 255, 255, 0.9);
+          padding: 10px;
+          border-radius: 30px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          backdrop-filter: blur(10px);
+          pointer-events: none;
+      }
+      #settingsPanel.show {
+          animation: popUpSettings 0.2s forwards;
+      }
+      #settingsPanel.hiding {
+          animation: popDownSettings 0.2s forwards;
+      }
+      #settingsPanel a,
+      #settingsPanel button {
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+      #settingsPanel a:hover,
+      #settingsPanel button:hover {
+          transform: translateY(-2px);
+          box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
+      }
+      #updateCountdown {
+        white-space: nowrap;
+        position: fixed;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        padding: 8px 16px;
+        background-color: #ffdacf;
+        color: #333;
+        border: none;
+        border-radius: 20px;
+        font-size: 0.9em;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+        width: auto;
+        min-width: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+      #updateCountdown:hover {
+          background-color: #ffc0a8;
+          box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+      }
+      body.dark-mode #updateCountdown {
+          background-color: #e8def8;
+          color: #1c1b1f;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      }
+      body.dark-mode #updateCountdown:hover {
+          background-color: #d0bcff;
+          color: #1c1b1f;
+          box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+      }
+      #updateCountdown .material-icons {
+          font-size: 18px;
+          vertical-align: middle;
+      }
+      #settingsButton {
+          position: fixed;
+          bottom: 60px;
+          right: 20px;
+          z-index: 1600;
+          width: 56px;
+          height: 56px;
+          background: #ffdacf;
+          color: #333;
+          border: none;
+          border-radius: 16px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 28px;
+          box-shadow: 0 3px 5px rgba(0,0,0,0.2);
+          transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      }
+      #settingsButton:hover {
+          background-color: #ffc0a8;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      }
+      body.dark-mode #settingsButton {
+          background-color: #e8def8;
+          color: #1c1b1f;
+          box-shadow: 0 3px 5px rgba(0,0,0,0.3);
+      }
+      body.dark-mode #settingsButton:hover {
+          background-color: #d0bcff;
+          color: #1c1b1f;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+      }
+      #mapControls {
+        position: fixed;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 999 !important;
+        width: 90%;
+        max-width: 800px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        pointer-events: none;
+      }
+      #mapControls > * {
+        pointer-events: auto;
+      }
+      #mapControls h1 {
+        color: #007BFF;
+        background-color: transparent;
+        display: inline;
+        padding: 0;
+      }
+      body.dark-mode #mapControls h1 {
+        color: #90CAF9;
+        text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+      }
+      #mapControls, #mapControls * {
+        z-index: 999 !important;
+        pointer-events: none !important;
+      }
+      #centralSettingsPanel {
+          display: none;
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 80%;
+          max-width: 320px;
+          background: #fff5f0;
+          border-radius: 20px;
+          padding: 25px;
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+          z-index: 1500;
+          backdrop-filter: blur(10px);
+          max-height: calc(100vh - 80px);
+          overflow-y: scroll;
+          scrollbar-width: none;
+          transition: background-color 0.1s ease;
+          animation-duration: 0.3s;
+          animation-fill-mode: forwards;
+          opacity: 0;
+      }
+      body.dark-mode #centralSettingsPanel {
+          background: rgba(30, 30, 30, 0.95);
+          transition: background-color 0.1s ease;
+      }
+      .settings-group {
+          margin-bottom: 20px;
+          padding: 15px;
+          background: #fff2ec;
+          border: 1px solid #000;
+          border-radius: 10px;
+          color: #333;
+          transition: border-color 0.1s ease, color 0.2s ease;
+      }
+      body.dark-mode .settings-group {
+          border-color: #fff;
+          color: #fff;
+          background: transparent;
+      }
+      .setting-item {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 15px;
+          padding: 10px;
+          background: #ffe8d6;
+          border-radius: 8px;
+          color: inherit;
+          transition: background-color 0.2s ease, color 0.2s ease;
+      }
+      body.dark-mode .setting-item {
+          background: #455a64;
+      }
+      #closeCentralSettings {
+          position: absolute;
+          top: 2vh;
+          right: 2vh;
+          background: none;
+          border: none;
+          font-size: 24px;
+          cursor: pointer;
+          color: #666;
+          padding: 8px;
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background-color 0.3s;
+      }
+      #closeCentralSettings:hover {
+          background-color: rgba(0, 0, 0, 0.1);
+      }
+      body.dark-mode #closeCentralSettings {
+          color: #fff;
+      }
+      body.dark-mode #closeCentralSettings:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+      }
+      @keyframes fadeIn {
+          from { opacity: 0; transform: translate(-50%, -48%); }
+          to { opacity: 1; transform: translate(-50%, -50%); }
+      }
+      @keyframes slideIn {
+        from { transform: translate(-50%, -60%) scale(0.8); opacity: 0; }
+        to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+      }
+      @keyframes slideOut {
+        from { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        to { transform: translate(-50%, -60%) scale(0.8); opacity: 0; }
+      }
+      #centralSettingsPanel {
+        animation-duration: 0.3s;
+        animation-fill-mode: forwards;
+        opacity: 0;
+      }
+      #centralSettingsPanel.panel-open {
+        animation-name: slideIn;
+      }
+      #centralSettingsPanel.panel-close {
+        animation-name: slideOut;
+      }
+      body.dark-mode #centralRegionSelect {
+          background-color: #555;
+          color: #fff;
+          border: 1px solid #777;
+      }
+      body.dark-mode #centralRegionSelect option {
+          background-color: #555;
+          color: #fff;
+      }
+      #mainContent {
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+      }
+      #mainContent.fade-in {
+        opacity: 1;
+      }
+      #loadingOverlay {
+        opacity: 1;
+        transition: opacity 0.5s ease-in-out;
+      }
+      #loadingOverlay.fade-out {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .github-link {
+        text-decoration: none;
+        color: #007BFF;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      body.dark-mode .github-link {
+        color: #90CAF9;
+      }
+      .github-link span {
+        flex: 1;
+      }
+      #settingsPanelTitle {
+          color: #333;
+      }
+      body.dark-mode #settingsPanelTitle {
+          color: #fff;
+      }
+      .rotate-right {
+        transform: rotate(360deg);
+        transition: transform 0.8s ease;
+        backface-visibility: hidden;
+        will-change: transform;
+      }
+      .rotate-left {
+        transform: rotate(-360deg);
+        transition: transform 0.8s ease;
+        backface-visibility: hidden;
+        will-change: transform;
+      }
+      @keyframes spin-180 {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(180deg); }
+      }
+      .spin-update {
+        animation: spin-180 0.5s ease forwards;
+      }
+      .station p {
+        margin: 4px 0;
+        color: #666;
+      }
+      body.dark-mode .station p {
+        color: #cccccc;
+      }
+      #routeModal {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background-color: #fff5f0; 
+          padding: 24px;
+          border-radius: 20px; 
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); 
+          z-index: 1001; 
+          display: none; 
+          width: 80%;
+          max-width: 360px;
+          max-height: calc(100vh - 80px); 
+          overflow-y: auto;
+          scrollbar-width: none;
+          -ms-overflow-style: none;
+          text-align: left;
+          transition: background-color 0.3s ease, box-shadow 0.3s ease;
+          backdrop-filter: blur(10px); 
+          animation-duration: 0.3s; 
+          animation-fill-mode: forwards; 
+          opacity: 0; 
+      }
+      #routeModal.modal-open {
+          animation-name: slideIn; 
+      }
+      #routeModal.modal-close {
+          animation-name: slideOut; 
+      }
+      #routeModal::-webkit-scrollbar {
+          display: none;
+      }
+      body.dark-mode #routeModal {
+          background-color: rgba(30, 30, 30, 0.95); 
+          color: #ffffff;
+          box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1); 
+      }
+      #routeModal h3 {
+          margin-top: 30px; 
+          margin-bottom: 20px;
+          padding-right: 56px; 
+          color: #007BFF;
+          font-size: 1.3em;
+          word-break: break-word;
+      }
+      body.dark-mode #routeModal h3 {
+          color: #90CAF9;
+      }
+      #routeModal .bike-item {
+          padding: 16px;
+          margin-bottom: 12px;
+          background-color: #fff2ec; 
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      }
+      body.dark-mode #routeModal .bike-item {
+          background-color: #444; 
+          color: #fff;
+          box-shadow: 0 2px 4px rgba(255,255,255,0.1);
+      }
+      #routeModal .bike-item p {
+          margin: 0;
+          font-size: 14px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+      }
+      #closeRouteModal {
+          position: absolute;
+          top: 12px;
+          right: 12px;
+          background: none;
+          border: none;
+          font-size: 24px;
+          cursor: pointer;
+          color: #666;
+          padding: 8px;
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background-color 0.3s;
+      }
+      #closeRouteModal:hover {
+          background-color: rgba(0, 0, 0, 0.1);
+      }
+      body.dark-mode #closeRouteModal {
+          color: #ccc;
+      }
+      body.dark-mode #closeRouteModal:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+      }
+      body.dark-mode #routeModal .bike-item {
+          background-color: #444 !important;
+          color: #fff !important;
+          box-shadow: 0 4px 8px rgba(255,255,255,0.1) !important;
+      }
+      body.dark-mode #routeModal .bike-item p {
+          color: #fff !important;
+      }
+      #routeModal ul {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+      }
+      #routeModal .bike-item:last-child {
+          margin-bottom: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div id="mapControls">
+      <h1 id="heading" class="main-title"></h1>
+      </div>
+    <div id="locationNotification"></div>
+    <div id="loadingOverlay">
+      <div id="loadingContent">
+        <h2 id="loadingText">載入中</h2>
+        <div id="noticeBox" style="margin-top: 10px; margin-left: 20px; margin-right: 20px; background: #fff; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"></div>
+      </div>
+    </div>
+    <div id="mainContent">
+      <div id="dragHandle"></div>
+      <div id="searchContainer">
+        <input type="text" id="keyword" placeholder="請輸入站點名稱、地址" value="" onfocus="this.placeholder=''" onblur="this.placeholder='請輸入站點名稱、地址'" />
+        <span id="searchIcon" class="material-icons" title="搜尋">search</span>
+        <span id="clearTextBtn" class="material-icons" title="清除" style="display:none; margin-left:10px; cursor:pointer;">close</span>
+      </div>
+      <div id="results"></div>
+      </div>
+      <div class="overlay"></div>
+      <div class="modal" id="permissionModal">
+        <p id="modalText"></p>
+        <button id="modalButton">確定</button>
+      </div>
+      <div class="modal" id="routeModal">
+          <button id="closeRouteModal">×</button>
+          <h3 id="routeModalTitle">路線資訊</h3>
+          <div id="routeDetails">
+          </div>
+      </div>
+    <button id="settingsButton" title="設定">
+        <span class="material-icons">settings</span>
+    </button>
+    </div>
+    <button id="updateCountdown" style="display:none;">
+      <span class="material-icons">autorenew</span>
+      <span id="updateCountdownText">60秒後更新</span>
+    </button>
+    <div id="centralSettingsPanel">
+      <button id="closeCentralSettings">×</button>
+      <h2 id="settingsPanelTitle">系統設定</h2>
+      <div class="settings-group">
+              <h3>基本設定</h3>
+              <div class="setting-item">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                      <span class="material-icons">location_on</span>
+                      <label for="centralRegionSelect" id="regionSelectLabel">地區選擇</label>
+                  </div>
+                  <select id="centralRegionSelect" style="padding: 5px; border-radius: 5px;">
+                      <option value="taipei">台北市</option>
+                      <option value="newTaipei">新北市</option>
+                      <option value="taoyuan">桃園市</option>
+                      <option value="hsinchuCounty">新竹縣</option>
+                      <option value="hsinchuCity">新竹市</option>
+                      <option value="sciencePark">新竹科學園區</option>
+                      <option value="miaoli">苗栗縣</option>
+                      <option value="taichung">台中市</option>
+                      <option value="chiayi">嘉義市</option>
+                      <option value="tainan">臺南市</option>
+                      <option value="kaohsiung" selected>高雄市</option>
+                      <option value="pingtung">屏東縣</option>
+                      <option value="taitung">臺東縣</option>
+                  </select>
+              </div>
+              <div class="setting-item">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                      <span class="material-icons">my_location</span>
+                      <label for="centralLocationToggle">位置服務</label>
+                  </div>
+                  <label class="switch">
+                      <input type="checkbox" id="centralLocationToggle">
+                      <span class="slider"></span>
+                  </label>
+              </div>
+              <div class="setting-item">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                      <span class="material-icons">dark_mode</span>
+                      <label for="centralDarkModeToggle">深色模式</label>
+                  </div>
+                  <label class="switch">
+                      <input type="checkbox" id="centralDarkModeToggle">
+                      <span class="slider"></span>
+                  </label>
+              </div>
+              <div class="setting-item">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                      <span class="material-icons">language</span>
+                      <label for="centralLangToggle">中文/English</label>
+                  </div>
+                  <label class="switch">
+                      <input type="checkbox" id="centralLangToggle">
+                      <span class="slider"></span>
+                  </label>
+              </div>
+              <!-- ** 新增的地圖模式切換器 ** -->
+              <div class="setting-item">
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                      <span class="material-icons">map</span>
+                      <label for="centralMapModeToggle">向量/點陣地圖</label>
+                  </div>
+                  <label class="switch">
+                      <input type="checkbox" id="centralMapModeToggle">
+                      <span class="slider"></span>
+                  </label>
+              </div>
+          </div>
+      <div class="settings-group">
+          <h3>外部連結</h3>
+          <div class="setting-item">
+              <a href="https://github.com/potatosserver/YouBike" target="_blank" class="github-link">
+                  <img src="https://potatosserver.github.io/YouBike/icons/html.webp" alt="GitHub Repository" style="width:30px; height:30px;">
+                  <span>YouBike Repository</span>
+              </a>
+          </div>
+          <div class="setting-item">
+              <a href="https://github.com/potatosserver/YouBike_Python" target="_blank" class="github-link">
+                  <img src="https://potatosserver.github.io/YouBike/icons/python.webp" alt="GitHub Repository" style="width:30px; height:30px;">
+                  <span>YouBike Python Repository</span>
+              </a>
+          </div>
+      </div>
+    </div>
+    
+    <!-- Leaflet & MarkerCluster JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+    <!-- MapLibre GL JS & Leaflet Plugin -->
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+    <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.21/leaflet-maplibre-gl.js"></script>
+
+    <script>
+      let leafletMap, markerClusterGroup, rasterTileLayer, maplibreGLLayer;
+      let userLocation = null;
+      let locationMarker = null;
+      let pulsingMarker = null;
+      let isFollowingUser = false;
+      let isTrackingActive = false;
+      let watchId = null;
+      let isMapMovingDueToTracking = false; 
+      let hasObtainedRealLocation = false;
+
+      // ** 新增：向量地圖樣式 URL **
+      const styleUrls = {
+        liberty: 'https://tiles.openfreemap.org/styles/liberty',
+      };
+      
+      const regionCoordinates = {
+        taipei: { lat: 25.047924, lng: 121.517081 },
+        newTaipei: { lat: 25.0215339197085, lng: 121.4568090197085 },
+        taoyuan: { lat: 24.953671, lng: 121.225783 },
+        hsinchuCounty: { lat: 24.826917615712, lng: 121.01290295049 },
+        hsinchuCity: { lat: 24.801815, lng: 120.971459 },
+        sciencePark: { lat: 24.781830, lng: 121.005074 },
+        miaoli: { lat: 24.5648599, lng: 120.8185503 },
+        taichung: { lat: 24.154712, lng: 120.664265 },
+        chiayi: { lat: 23.4797837, lng: 120.4397206 },
+        tainan: { lat: 22.99230083082, lng: 120.18509419659 },
+        kaohsiung: { lat: 22.631442, lng: 120.301890 },
+        pingtung: { lat: 22.683036253664, lng: 120.48790854724 },
+        taitung: { lat: 22.755711056126138, lng: 121.15035332587574 }
+      };
+      let defaultRegion = 'kaohsiung';
+      let defaultLatitude = regionCoordinates.kaohsiung.lat;
+      let defaultLongitude = regionCoordinates.kaohsiung.lng;
+      const overlay = document.querySelector('.overlay');
+      const modal = document.querySelector('.modal');
+      const modalText = document.getElementById('modalText');
+      const modalButton = document.getElementById('modalButton');
+      const resultsDiv = document.getElementById('results');
+      const keywordInput = document.getElementById('keyword');
+      const clearTextBtn = document.getElementById('clearTextBtn');
+      keywordInput.addEventListener('input', () => {
+          clearTextBtn.style.display = keywordInput.value.trim() ? 'inline-flex' : 'none';
+      });
+      clearTextBtn.addEventListener('click', () => {
+          keywordInput.value = '';
+          clearTextBtn.style.display = 'none';
+          if (userLocation && leafletMap) {
+            isMapMovingDueToTracking = true;
+            leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); 
+            setTimeout(() => { isMapMovingDueToTracking = false; }, 600); 
+          }
+          searchYouBike();
+          updateLocateButtonTitle();
+      });
+      const maxResults = 100;
+      const pinnedStations = new Set(JSON.parse(localStorage.getItem('pinnedStations') || '[]').map(id => String(id)));
+      function togglePinStation(stationId, event) {
+        event.stopPropagation(); 
+        const id = String(stationId);
+        if (pinnedStations.has(id)) {
+          pinnedStations.delete(id);
+        } else {
+          pinnedStations.add(id);
+        }
+        try {
+          localStorage.setItem('pinnedStations', JSON.stringify([...pinnedStations]));
+        } catch (e) {
+        }
+        const pinButton = document.querySelector(`.pin-button[data-id="${id}"]`);
+        if (pinButton) {
+          const isPinned = pinnedStations.has(id);
+          pinButton.classList.toggle('pinned', isPinned);
+          pinButton.textContent = isPinned ? 'star' : 'star_outline';
+        }
+        updateResultsOrder();
+      }
+      let mainContentShown = false;
+      function showMainContent() {
+        if (!mainContentShown) {
+          const overlay = document.getElementById("loadingOverlay");
+          const mainContent = document.getElementById("mainContent");
+          overlay.classList.add('fade-out'); 
+          mainContent.style.display = "block"; 
+          mainContent.offsetHeight;
+          mainContent.classList.add('fade-in'); 
+          mainContent.style.overflowY = 'auto'; 
+          document.getElementById('updateCountdown').style.display = navigator.onLine ? "flex" : "none";
+          setTimeout(() => {
+            overlay.style.display = "none"; 
+          }, 500); 
+          mainContentShown = true;
+        }
+      }
+      function simulateLoadingPercentage() {
+        const loadingText = document.getElementById("loadingText");
+        let lang = localStorage.getItem("lang") || "zh";
+        let prefix = lang === "en" ? "Loading:" : "載入中：";
+        let progress = 0;
+        let lockedProgress = null; 
+        let loadingTextInterval = setInterval(() => {
+          if (!mainContentShown) {
+            if (progress < 85) { 
+              progress++;
+              loadingText.textContent = prefix + progress + "%";
+            } else {
+              if (lockedProgress === null) {
+                lockedProgress = 85 + Math.floor(Math.random() * 11); 
+              }
+              loadingText.textContent = prefix + lockedProgress + "%";
+            }
+          } else {
+            clearInterval(loadingTextInterval); 
+          }
+        }, 50); 
+      }
+      function showRandomNotice(){
+        let lang = localStorage.getItem("lang") || "zh";
+        const notices = lang === "en" ? [
+              "❌Do not speed or ride in reverse",
+              "❌Do not change lanes arbitrarily on sidewalks",
+              "❌Do not use your phone while riding",
+              "❌Avoid harsh braking while riding",
+              "✔️Remember to adjust the seat to a proper height",
+              "✔️Ensure that both front and rear lights are working",
+              "✔️Remember to get bicycle accident insurance",
+              "✔️Take your belongings from the basket"
+        ] : [
+              "❌勿超速或逆向騎乘",
+              "❌勿隨意變換車道在行人道上騎乘",
+              "❌勿在車輛行駛中使用手機",
+              "❌騎乘中勿緊急煞車",
+              "✔️記得調整座墊至適宜高度",
+              "✔️確認前後車燈功能正常",
+              "✔️記得投保公共自行車傷害險",
+              "✔️記得帶走置物籃內的隨身物品"
+        ];
+        const randomIndex = Math.floor(Math.random() * notices.length);
+        document.getElementById('noticeBox').textContent = notices[randomIndex];
+      }
+      let youbikeDataCache = null;
+      let allStations = [];
+      function openYoubikeDB() {
+        return new Promise((resolve, reject) => {
+          if (navigator.storage && navigator.storage.persist) {
+            navigator.storage.persist().then(isPersisted => {
+            });
+          }
+          const request = indexedDB.open('YouBikeDB', 1); 
+          request.onupgradeneeded = function(event) {
+            const db = event.target.result;
+            db.onerror = function(event) {
+            };
+            if (!db.objectStoreNames.contains('youbikeData')) {
+              const youbikeStore = db.createObjectStore('youbikeData', { keyPath: 'id' });
+              youbikeStore.createIndex('timestamp', 'timestamp'); 
+            }
+            if (!db.objectStoreNames.contains('mapTiles')) {
+              const tileStore = db.createObjectStore('mapTiles', { keyPath: 'url' });
+              tileStore.createIndex('timestamp', 'timestamp');
+            }
+            if (!db.objectStoreNames.contains('regionData')) {
+              const regionStore = db.createObjectStore('regionData', { keyPath: 'region' });
+              regionStore.createIndex('timestamp', 'timestamp');
+            }
+          };
+          request.onsuccess = function(event) {
+            const db = event.target.result;
+            db.onerror = function(event) {
+            };
+            setInterval(() => {
+              backupData(db);
+            }, 24 * 60 * 60 * 1000); 
+            resolve(db);
+          };
+          request.onerror = function(event) {
+            reject(event.target.error);
+          };
+        });
+      }
+      async function backupData(db) {
+        try {
+          const tx = db.transaction(['youbikeData', 'regionData'], 'readonly');
+          const youbikeStore = tx.objectStore('youbikeData');
+          const regionStore = tx.objectStore('regionData');
+          const youbikeData = await getAllData(youbikeStore);
+          const regionData = await getAllData(regionStore);
+          try {
+            localStorage.setItem('youbikeData_backup', JSON.stringify(youbikeData));
+            localStorage.setItem('regionData_backup', JSON.stringify(regionData));
+            localStorage.setItem('backup_timestamp', Date.now().toString());
+          } catch (e) {
+          }
+        } catch (error) {
+        }
+      }
+      function getAllData(store) {
+        return new Promise((resolve, reject) => {
+          const data = [];
+          store.openCursor().onsuccess = function(event) {
+            const cursor = event.target.result;
+            if (cursor) {
+              data.push(cursor.value.value); 
+              cursor.continue();
+            } else {
+              resolve(data);
+            }
+          };
+        });
+      }
+      async function saveYoubikeDataToDB(dataArray) {
+        const db = await openYoubikeDB();
+        const tx = db.transaction('youbikeData', 'readwrite');
+        const store = tx.objectStore('youbikeData');
+        await store.clear();
+        for (const [idx, item] of dataArray.entries()) {
+          await store.put({
+            id: idx, 
+            value: item,
+            timestamp: Date.now()
+          });
+        }
+        const regionTx = db.transaction('regionData', 'readwrite');
+        const regionStore = regionTx.objectStore('regionData');
+        await regionStore.put({
+          region: defaultRegion,
+          coordinates: regionCoordinates[defaultRegion],
+          timestamp: Date.now()
+        });
+        return new Promise((resolve, reject) => {
+          tx.oncomplete = resolve;
+          tx.onerror = reject;
+        });
+      }
+      function getYoubikeDataFromDB() {
+        return openYoubikeDB().then(db => {
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction('youbikeData', 'readonly');
+            const store = tx.objectStore('youbikeData');
+            const data = [];
+            const req = store.openCursor();
+            req.onsuccess = function(event) {
+              const cursor = event.target.result;
+              if (cursor) {
+                data.push(cursor.value.value);
+                cursor.continue();
+              } else {
+                resolve(data);
+              }
+            };
+            req.onerror = (e) => reject(e.target.error);
+          });
+        });
+      }
+      async function searchYouBike(showLoadingIndicator = true, shouldMoveMap = false) {
+        const currentScrollTop = mainContent.scrollTop;
+        const keyword = keywordInput.value.trim().toLowerCase();
+        try {
+          if (!youbikeDataCache || youbikeDataCache.length === 0) {
+              if (!navigator.onLine) {
+                  showNotification(currentLang === "en" ? "You are offline and station data is not available." : "您已離線且無站點資料。");
+                  return;
+              }
+              try {
+                  const youbikeUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
+                  const response = await fetch(youbikeUrl, {
+                    headers: {
+                      'accept': '*/*',
+                      'accept-language': 'zh-TW,zh;q=0.9',
+                    }
+                  });
+                  if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                  const fetchedData = await response.json();
+                  youbikeDataCache = Array.isArray(fetchedData)
+                    ? fetchedData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
+                    : [];
+                  await saveYoubikeDataToDB(youbikeDataCache); 
+              } catch (error) {
+                  youbikeDataCache = await getYoubikeDataFromDB();
+                   if (!youbikeDataCache || youbikeDataCache.length === 0) {
+                      throw new Error("無法從網路或快取載入資料。");
+                   }
+              }
+          }
+          allStations = [...youbikeDataCache]; 
+          let youbikeResults = [...youbikeDataCache];
+          if (keyword) {
+            youbikeResults = youbikeResults.filter(station => {
+              const stationNameTW = station.name_tw ? station.name_tw.toLowerCase() : '';
+              const stationAddressTW = station.address_tw ? station.address_tw.toLowerCase() : '';
+              const stationNameEN = station.name_en ? station.name_en.toLowerCase() : '';
+              const stationAddressEN = station.address_en ? station.address_en.toLowerCase() : '';
+              return stationNameTW.includes(keyword) || stationAddressTW.includes(keyword) ||
+                     stationNameEN.includes(keyword) || stationAddressEN.includes(keyword);
+            });
+          }
+          youbikeResults = youbikeResults.sort((a, b) => {
+            const distA = calculateDistance(
+              userLocation ? userLocation.latitude : defaultLatitude,
+              userLocation ? userLocation.longitude : defaultLongitude,
+              a.lat, a.lng
+            );
+            const distB = calculateDistance(
+              userLocation ? userLocation.latitude : defaultLatitude,
+              userLocation ? userLocation.longitude : defaultLongitude,
+              b.lat, b.lng
+            );
+            return distA - distB;
+          });
+          let limit = keyword ? 50 : 10; 
+          let usedStations;
+          const pinnedFromResults = youbikeResults.filter(station => pinnedStations.has(String(station.station_no)));
+          const unpinnedFromResults = youbikeResults.filter(station => !pinnedStations.has(String(station.station_no)));
+          usedStations = [...pinnedFromResults, ...unpinnedFromResults].slice(0, limit);
+          if (shouldMoveMap && usedStations.length > 0 && leafletMap) {
+              const firstStation = usedStations[0];
+              const lat = parseFloat(firstStation.lat);
+              const lng = parseFloat(firstStation.lng);
+              if (!isNaN(lat) && !isNaN(lng)) {
+                  isMapMovingDueToTracking = true; 
+                  leafletMap.setView([lat, lng], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); 
+                  setTimeout(() => { isMapMovingDueToTracking = false; }, 600); 
+              }
+          }
+          const stationIdsToQuery = usedStations.map(station => station.station_no);
+          let vehicleData = {};
+          if (navigator.onLine && stationIdsToQuery.length > 0) {
+              try {
+                  vehicleData = await queryVehicleData(stationIdsToQuery);
+              } catch (e) {
+                  showNotification(currentLang === "en" ? "Failed to get real-time data." : "無法取得即時資料。");
+              }
+          }
+          resultsDiv.innerHTML = ''; 
+          const unknownValue = currentLang === "en" ? "Unknown" : "未知";
+          const addressLabel = currentLang === "en" ? "Address:" : "地址:";
+          const slotsLabel = currentLang === "en" ? "Available Slots:" : "可停空位數:";
+          const unknownStation = currentLang === "en" ? "Unknown Station" : "未知站點";
+          const unknownAddress = currentLang === "en" ? "Unknown Address" : "未知地址";
+          const distanceLabel = currentLang === "en" ? "Distance:" : "距離:";
+          const navigateButtonText = currentLang === "en" ? "Navigate" : "導航";
+          usedStations.forEach(site => {
+            const info = {
+              id: String(site.station_no),
+              name: currentLang === "en" ? site.name_en : site.name_tw,
+              coords: [site.lat, site.lng],
+              district: currentLang === "en" ? site.district_en : site.district_tw,
+              address: currentLang === "en" ? site.address_en : site.address_tw
+            };
+            const isPinned = pinnedStations.has(String(info.id));
+            const pinButtonHtml = `<span
+              class="material-icons pin-button ${isPinned ? 'pinned' : ''}"
+              data-id="${info.id}"
+              onclick="togglePinStation('${info.id}', event)"
+            >${isPinned ? 'star' : 'star_outline'}</span>`;
+            const navigateButtonHtml = `<button class="navigate-button" data-lat="${info.coords[0]}" data-lng="${info.coords[1]}" data-name="${info.name}">
+                <span class="material-icons">navigation</span>
+            </button>`;
+            const stationVehicleData = vehicleData[info.id];
+            const displayAvailable20 = stationVehicleData?.available_2_0 !== undefined ? stationVehicleData.available_2_0 : unknownValue;
+            const displayAvailableE = stationVehicleData?.available_e !== undefined ? stationVehicleData.available_e : unknownValue;
+            const displayEmptySpaces = stationVehicleData?.empty_spaces !== undefined ? stationVehicleData.empty_spaces : unknownValue;
+            const electricIconHtml = (displayAvailableE !== unknownValue && parseInt(displayAvailableE) > 0)
+                ? `<span class="material-symbols-outlined electric-icon show" title="${currentLang === "en" ? "Electric Bike Available" : "有電輔車"}" data-station-id="${info.id}" data-station-name="${info.name}">offline_bolt</span>`
+                : `<span class="material-symbols-outlined electric-icon" title="${currentLang === "en" ? "Electric Bike Available" : "有電輔車"}" data-station-id="${info.id}" data-station-name="${info.name}">offline_bolt</span>`;
+            const distance = calculateDistance(
+              userLocation ? userLocation.latitude : defaultLatitude,
+              userLocation ? userLocation.longitude : defaultLongitude,
+              info.coords[0],
+              info.coords[1]
+            );
+            const displayDistance = distance < 1 ? Math.round(distance * 1000) + (currentLang === "en" ? " m" : " 公尺")
+                                             : distance.toFixed(2) + (currentLang === "en" ? " km" : " 公里");
+            const isAtDefaultLocation = userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude;
+            const distanceHTML = !isAtDefaultLocation ? `<p class="distance">${distanceLabel} ${displayDistance}</p>` : "";
+            const cardContent = `
+                      <div class="header">
+                          <h3>${info.name || unknownStation}</h3>
+                          <div class="icon-group">
+                              ${electricIconHtml}
+                              ${pinButtonHtml}
+                              ${navigateButtonHtml}
+                          </div>
+                      </div>
+                      ${distanceHTML}
+                      <p>${addressLabel} ${info.address || unknownAddress}</p>
+                      <p>YouBike 2.0: <span class="vehicle_yb2">${displayAvailable20}</span></p>
+                      <p>YouBike 2.0E: <span class="vehicle_ybe">${displayAvailableE}</span></p>
+                      <p>${slotsLabel} <span class="vehicle_empty">${displayEmptySpaces}</span></p>
+                      <div class="footer">
+                      </div>
+                  `;
+            let card = document.createElement('div');
+            card.className = 'station';
+            card.dataset.id = info.id;
+            card.dataset.lat = info.coords[0]; 
+            card.dataset.lng = info.coords[1]; 
+            card.style.width = window.innerWidth < 768 ? (window.innerWidth < 480 ? "100%" : "calc(50% - 10px)") : "calc(33% - 14px)";
+            card.innerHTML = cardContent;
+            const navigateButton = card.querySelector('.navigate-button');
+            navigateButton.addEventListener('click', (event) => {
+                event.stopPropagation(); 
+                const button = event.currentTarget;
+                const stationLat = parseFloat(button.dataset.lat);
+                const stationLng = parseFloat(button.dataset.lng);
+                const stationName = button.dataset.name;
+                if (userLocation && !isNaN(stationLat) && !isNaN(stationLng)) {
+                    getRoute(userLocation.latitude, userLocation.longitude, stationLat, stationLng, stationName);
+                } else {
+                    showNotification(currentLang === "en"
+                        ? "Your location is not available for navigation."
+                        : "無法取得您的位置，無法規劃路線。");
+                }
+            });
+            const electricIcon = card.querySelector('.electric-icon');
+            if (electricIcon) {
+                electricIcon.addEventListener('click', (event) => {
+                    event.stopPropagation(); 
+                    const stationId = event.target.dataset.stationId;
+                    const stationName = event.target.dataset.stationName;
+                    if (stationId) {
+                        showElectricBikeDetailsModal(stationId, stationName);
+                    }
+                });
+            }
+            card.addEventListener("click", () => {
+              const lat = parseFloat(card.dataset.lat); 
+              const lng = parseFloat(card.dataset.lng); 
+              if (!isNaN(lat) && !isNaN(lng) && leafletMap) {
+                isMapMovingDueToTracking = true; 
+                leafletMap.setView([lat, lng], 18, { animate: true, duration: 0.5 }); 
+                setTimeout(() => { isMapMovingDueToTracking = false; }, 600); 
+              }
+              isFollowingUser = false; 
+              updateLocateButtonTitle(); 
+            });
+            resultsDiv.appendChild(card);
+          });
+          updateResultsOrder(); 
+          updateMapMarkers(); 
+        } catch (error) {
+          resultsDiv.innerHTML = `發生錯誤: ${error.message}`;
+        }
+        countdownTimer.reset();
+        mainContent.scrollTop = currentScrollTop;
+      }
+      async function queryVehicleData(stationIds) {
+        if (stationIds.length > 60) { 
+          stationIds = stationIds.slice(0, 60);
+        }
+        const batchSize = 20; 
+        const allVehicleData = {};
+        const headers = {
+          'Accept': '*/*',
+          'Content-Type': 'application/json',
+          'Origin': 'https://www.youbike.com.tw', 
+          'Referer': 'https://www.youbike.com.tw/' 
+        };
+        for (let i = 0; i < stationIds.length; i += batchSize) {
+          const stationIdBatch = stationIds.slice(i, i + batchSize);
+          const body = JSON.stringify({ station_no: stationIdBatch });
+          try {
+            const response = await fetch('https://apis.youbike.com.tw/tw2/parkingInfo', {
+              method: 'POST',
+              headers,
+              body
+            });
+            const result = await response.json();
+            if (result.retCode === 1 && result.retVal && result.retVal.data) {
+              const dataArray = result.retVal.data;
+              dataArray.forEach(item => {
+                allVehicleData[item.station_no] = {
+                  available_2_0: item.available_spaces_detail ? item.available_spaces_detail.yb2 : 0,
+                  available_e: item.available_spaces_detail ? item.available_spaces_detail.eyb : 0,
+                  empty_spaces: item.empty_spaces || 0
+                };
+              });
+            } else {
+            }
+          } catch (e) {
+          }
+        }
+        return allVehicleData;
+      }
+      function updateResultsOrder() {
+        const cards = Array.from(document.querySelectorAll(".station"));
+        cards.sort((a, b) => {
+          const aPinned = pinnedStations.has(a.dataset.id);
+          const bPinned = pinnedStations.has(b.dataset.id);
+          if (aPinned && !bPinned) return -1;
+          if (!aPinned && bPinned) return 1;
+          const distanceA = calculateDistance(
+            userLocation ? userLocation.latitude : defaultLatitude,
+            userLocation ? userLocation.longitude : defaultLongitude,
+            parseFloat(a.dataset.lat),
+            parseFloat(a.dataset.lng)
+          );
+          const distanceB = calculateDistance(
+            userLocation ? userLocation.latitude : defaultLatitude,
+            userLocation ? userLocation.longitude : defaultLongitude,
+            parseFloat(b.dataset.lat),
+            parseFloat(b.dataset.lng)
+          );
+          return distanceA - distanceB;
+        });
+        cards.forEach(card => {
+          resultsDiv.appendChild(card);
+        });
+      }
+      function showNotification(message) {
+          const notification = document.getElementById('locationNotification');
+          notification.textContent = message;
+          notification.classList.add('show'); 
+          setTimeout(() => {
+            notification.classList.remove('show'); 
+          }, 5000);
+      }
+      function calculateDistance(lat1, lon1, lat2, lon2) {
+        const R = 6371; 
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLon = (lon2 - lon1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                  Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c; 
+      }
+      let lastKnownLocation = null; 
+      function handleGeoUpdate(position) {
+          const newLocation = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          };
+          if (!hasObtainedRealLocation) {
+              hasObtainedRealLocation = true;
+              userLocation = newLocation;
+              if (locationMarker) {
+                  locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+              }
+              if (pulsingMarker) {
+                  pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+              }
+              if (leafletMap) {
+                  isMapMovingDueToTracking = true; 
+                  leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); 
+                  setTimeout(() => { isMapMovingDueToTracking = false; }, 600); 
+              }
+              searchYouBike(true, false);
+              isFollowingUser = true; 
+              updateLocateButtonTitle(); 
+              return; 
+          }
+          let movedSignificantly = false;
+          if (lastKnownLocation) {
+            const distance = calculateDistance(
+              lastKnownLocation.latitude,
+              lastKnownLocation.longitude,
+              newLocation.latitude,
+              newLocation.longitude
+            );
+            if (distance * 1000 > 500) { 
+              movedSignificantly = true;
+              if (leafletMap) {
+                isMapMovingDueToTracking = true; 
+                leafletMap.setView([newLocation.latitude, newLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 }); 
+                setTimeout(() => { isMapMovingDueToTracking = false; }, 600); 
+              }
+            }
+          }
+          lastKnownLocation = newLocation; 
+          userLocation = newLocation; 
+          if (locationMarker) {
+            locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+          }
+          if (pulsingMarker) {
+            pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+          }
+          if (isFollowingUser && leafletMap) {
+            isMapMovingDueToTracking = true; 
+            leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom(), { animate: true, duration: 0.5 }); 
+            setTimeout(() => { isMapMovingDueToTracking = false; }, 600); 
+          }
+          if (movedSignificantly) {
+              const updateButton = document.getElementById('updateCountdown');
+              if (updateButton) {
+                countdownTimer.update(); 
+              }
+          } else {
+              updateCardDistances(); 
+              updateResultsOrder(); 
+                   }
+      }
+      function handleGeoUpdateError(error) {
+          isFollowingUser = false; 
+                   updateLocateButtonTitle(); 
+          if (isTrackingActive || error.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
+              let errorMessage = currentLang === "en"
+                ? "Unable to update location, continuing with last known position"
+                : "無法更新位置，將繼續使用上次的定位";
+              if (error.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
+                  errorMessage = currentLang === "en"
+                    ? "Location services unavailable, stopping tracking."
+                    : "定位服務無法使用，已停止追蹤。";
+                  stopTracking(); 
+                  if (!hasObtainedRealLocation) {
+                      hasObtainedRealLocation = false;
+                  }
+              } else if (error.code === GeolocationPositionError.TIMEOUT) {
+                   errorMessage = currentLang === "en"
+                    ? "Location update timed out."
+                    : "定位更新逾時。";
+              }
+              const notification = document.getElementById('locationNotification');
+              notification.textContent = errorMessage;
+              notification.classList.add('show');
+              setTimeout(() => {
+                notification.classList.add('hide'); 
+                setTimeout(() => {
+                  notification.classList.remove('show', 'hide'); 
+                }, 300); 
+              }, 3000); 
+          }
+      }
+      function startTracking() {
+          const centralLocationToggle = document.getElementById('centralLocationToggle');
+          if (!centralLocationToggle.checked) {
+                           stopTracking(); 
+              return;
+          }
+          if (navigator.geolocation) {
+                  if (watchId !== null) {
+                  navigator.geolocation.clearWatch(watchId);
+              }
+              isTrackingActive = true;
+              watchId = navigator.geolocation.watchPosition(
+                  handleGeoUpdate,
+                  handleGeoUpdateError,
+                  { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 } 
+              );
+          } else {
+              showNotification(currentLang === "en" ? "Geolocation not supported." : "您的瀏覽器不支援地理位置功能。");
+              stopTracking(); 
+              const centralLocationToggle = document.getElementById('centralLocationToggle');
+              if (centralLocationToggle) {
+                 centralLocationToggle.checked = false; 
+                 localStorage.setItem("useLocation", "false"); 
+              }
+              hasObtainedRealLocation = false; 
+          }
+      }
+      function stopTracking() {
+          if (watchId !== null) {
+              navigator.geolocation.clearWatch(watchId);
+              watchId = null;
+              isTrackingActive = false;
+          }
+      }
+      async function getLocation() {
+          const centralLocationToggle = document.getElementById('centralLocationToggle');
+          const isLocationServiceOn = centralLocationToggle?.checked;
+          let locationSet = false; 
+          if (isLocationServiceOn) {
+              try {
+                  const position = await new Promise((resolve, reject) => {
+                                           navigator.geolocation.getCurrentPosition(resolve, reject, {
+                                                   enableHighAccuracy: true,
+                          timeout: 10000,
+                          maximumAge: 0
+                      });
+                  });
+                  userLocation = {
+                      latitude: position.coords.latitude,
+                      longitude: position.coords.longitude
+                  };
+                  locationSet = true;
+                                   isFollowingUser = true; 
+                  hasObtainedRealLocation = true; 
+                  startTracking(); 
+              } catch (e) {
+                  let shouldDisableToggle = false;
+                  if (e.code === GeolocationPositionError.PERMISSION_DENIED || e.code === GeolocationPositionError.POSITION_UNAVAILABLE) {
+                       showNotification(currentLang === "en"
+                        ? "Location permission denied or unavailable. Using default region."
+                        : "位置權限被拒絕或無法使用。使用預設地區。");
+                       shouldDisableToggle = true;
+                       centralLocationToggle.checked = false; 
+                       localStorage.setItem("useLocation", "false"); 
+                  } else {
+                      showNotification(currentLang === "en"
+                        ? "Failed to get location. Using default region."
+                        : "無法取得位置。使用預設地區。");
+                  }
+                  const selectedRegion = document.getElementById('centralRegionSelect').value;
+                  const coords = regionCoordinates[selectedRegion];
+                  userLocation = { latitude: coords.lat, longitude: coords.lng };
+                  locationSet = true;
+                  isFollowingUser = false; 
+                  hasObtainedRealLocation = false; 
+                  if (centralLocationToggle.checked) {
+                      startTracking(); 
+                  } else {
+                      stopTracking();
+                  }
+              }
+          } else {
+              stopTracking(); 
+              const selectedRegion = document.getElementById('centralRegionSelect').value;
+              const coords = regionCoordinates[selectedRegion];
+              userLocation = { latitude: coords.lat, longitude: coords.lng };
+              locationSet = true;
+              isFollowingUser = false; 
+              hasObtainedRealLocation = false; 
+          }
+          if (locationSet && leafletMap) {
+              if (!locationMarker) {
+                  locationMarker = L.circleMarker([userLocation.latitude, userLocation.longitude], {
+                      radius: 10,
+                      fillColor: '#2196F3', 
+                      fillOpacity: 0.8,
+                      color: '#ffffff', 
+                      weight: 3,
+                      pane: 'markerPane' 
+                  }).addTo(leafletMap);
+                  const pulsingIcon = L.divIcon({
+                      className: 'pulsing-icon',
+                      html: '<div class="pulse"></div>',
+                      iconSize: [20, 20]
+                  });
+                  pulsingMarker = L.marker([userLocation.latitude, userLocation.longitude], {
+                      icon: pulsingIcon,
+                      pane: 'markerPane' 
+                  }).addTo(leafletMap);
+              } else {
+                  locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+                  if (pulsingMarker) pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+              }
+              isMapMovingDueToTracking = true;
+              leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() ||  18, { animate: true, duration: 0.5 }); 
+              setTimeout(() => { isMapMovingDueToTracking = false; }, 600); 
+          }
+          if (locationSet) {
+              await searchYouBike(true, false); 
+              updateResultsOrder();
+              showMainContent(); 
+          } else {
+              showNotification(currentLang === "en" ? "Could not determine location. Please check settings." : "無法確定位置，請檢查設定。");
+              if (!mainContentShown) {
+                   showMainContent(); 
+              }
+          }
+      }
+      function updateCardDistances() {
+               const cards = document.querySelectorAll('.station');
+        cards.forEach(card => {
+          const lat = parseFloat(card.dataset.lat);
+          const lng = parseFloat(card.dataset.lng);
+          const newDistance = calculateDistance(
+            userLocation ? userLocation.latitude : defaultLatitude,
+            userLocation ? userLocation.longitude : defaultLongitude,
+            lat, lng
+          );
+          const distanceEl = card.querySelector('.distance');
+          if (distanceEl) {
+            const isAtDefaultLocation = userLocation && userLocation.latitude === defaultLatitude && userLocation.longitude === defaultLongitude;
+            if (isAtDefaultLocation) {
+              distanceEl.textContent = ""; 
+            } else {
+              const distanceLabel = currentLang === "en" ? "Distance:" : "距離：";
+              const unit = newDistance < 1 ? (currentLang === "en" ? " m" : " 公尺") : (currentLang === "en" ? " km" : " 公里");
+              const displayDistance = newDistance < 1 ? Math.round(newDistance * 1000) : newDistance.toFixed(2);
+              distanceEl.textContent = distanceLabel + " " + displayDistance + unit;
+            }
+          }
+        });
+      }
+      function updateVehicleData() {
+	if (window.lastVehicleDataUpdate && Date.now() - window.lastVehicleDataUpdate < 10000) {
+		return;
+	}
+	window.lastVehicleDataUpdate = Date.now(); 
+        const stationElements = document.querySelectorAll('.station');
+        if (!stationElements.length) return; 
+        const currentScrollTop = mainContent.scrollTop;
+        const currentData = {};
+        stationElements.forEach(card => {
+          const id = card.dataset.id;
+                   currentData[id] = {
+            available_2_0: card.querySelector('.vehicle_yb2').textContent,
+            available_e: card.querySelector('.vehicle_ybe').textContent,
+            empty_spaces: card.querySelector('.vehicle_empty').textContent
+          };
+        });
+        const stationIds = Array.from(stationElements).map(el => el.dataset.id);
+	queryVehicleData(stationIds)
+		.then(vehicleData => {
+			stationElements.forEach(card => {
+				const id = card.dataset.id;
+				const newVehicleData = vehicleData[id];
+				const oldData = currentData[id];
+				const yb2El = card.querySelector('.vehicle_yb2');
+										const ybeEl = card.querySelector('.vehicle_ybe');
+				const emptyEl = card.querySelector('.vehicle_empty');
+				const unknownValue = currentLang === "en" ? "Unknown" : "未知";
+				if (yb2El) yb2El.textContent = newVehicleData?.available_2_0 !== undefined ? newVehicleData.available_2_0 : 
+					(oldData?.available_2_0 !== unknownValue && oldData?.available_2_0 !== "Unknown" ? oldData.available_2_0 : unknownValue); 
+				if (ybeEl) {
+                    const availableE = newVehicleData?.available_e !== undefined ? newVehicleData.available_e :
+                    (oldData?.available_e !== unknownValue && oldData?.available_e !== "Unknown" ? oldData.available_e : unknownValue);
+                    ybeEl.textContent = availableE;
+                    const electricIcon = card.querySelector('.electric-icon');
+                    if (electricIcon) {
+                        if (availableE !== unknownValue && parseInt(availableE) > 0) {
+                            electricIcon.classList.add('show');
+                        } else {
+                            electricIcon.classList.remove('show');
+                        }
+                    }
+                }
+				if (emptyEl) emptyEl.textContent = newVehicleData?.empty_spaces !== undefined ? newVehicleData.empty_spaces :
+					(oldData?.empty_spaces !== unknownValue && oldData?.empty_spaces !== "Unknown" ? oldData.empty_spaces : unknownValue); 
+			});
+            mainContent.scrollTop = currentScrollTop;
+		})
+		.catch(error => {
+		 showNotification(currentLang === "en" ? "Failed to update real-time data." : "即時資料更新失敗。");
+		});
+      }
+      let currentLang = localStorage.getItem("lang") || "zh";
+      function updateLanguageTexts() {
+        document.title = currentLang === "en" ? "YouBike Site Search : A simple, beautiful site search engine" : "YouBike 站點搜尋 : 一個簡單、美觀、低流量的YouBike站點搜尋器";
+        const locationSwitchSpan = document.querySelector('#locationSwitchText');
+        if (locationSwitchSpan) {
+          locationSwitchSpan.textContent = currentLang === "en" ? "Use Location" : "使用定位";
+        }
+        const heading = document.getElementById('heading');
+               if (heading) {
+            heading.textContent = currentLang === "en" ? "YouBike Station Search" : "YouBike  站點搜尋";
+        }
+               const keywordInput = document.getElementById('keyword');
+        if (keywordInput) {
+          keywordInput.placeholder = currentLang === "en" ? "Please enter station name or address" : "請輸入站點名稱、地址";
+        }
+               const updateCountdownBtn = document.getElementById('updateCountdownText');
+        if (updateCountdownBtn) {
+          updateCountdownBtn.textContent = currentLang === "en" ? "60 sec update" : "60秒後更新";
+          updateCountdownBtn.parentElement.style.setProperty('--button-width', currentLang === "en" ? "145px" : "125px");
+        }
+        const settingsPanelTitle = document.getElementById('settingsPanelTitle');
+        if (settingsPanelTitle) {
+          settingsPanelTitle.textContent = currentLang === "en" ? "System Settings" : "系統設定";
+        }
+        const settingGroups = document.querySelectorAll('#centralSettingsPanel .settings-group h3');
+        if (settingGroups.length >= 2) {
+          settingGroups[0].textContent = currentLang === "en" ? "Basic Settings" : "基本設定";
+          settingGroups[1].textContent = currentLang === "en" ? "GitHub Repositories" : "GitHub 儲存庫";
+        }
+        const locationLabel = document.querySelector('#centralSettingsPanel .setting-item label[for="centralLocationToggle"]');
+        if (locationLabel) {
+          locationLabel.textContent = currentLang === "en" ? "Location Service" : "位置服務";
+        }
+        const darkModeLabel = document.querySelector('#centralSettingsPanel .setting-item label[for="centralDarkModeToggle"]');
+        if (darkModeLabel) {
+          darkModeLabel.textContent = currentLang === "en" ? "Dark Mode" : "深色模式";
+        }
+        const langLabel = document.querySelector('#centralSettingsPanel .setting-item label[for="centralLangToggle"]');
+        if (langLabel) {
+          langLabel.textContent = currentLang === "en" ? "Chinese/English" : "中文/English";
+        }
+        // ** 新增：地圖模式標籤翻譯 **
+        const mapModeLabel = document.querySelector('#centralSettingsPanel .setting-item label[for="centralMapModeToggle"]');
+        if (mapModeLabel) {
+          mapModeLabel.textContent = currentLang === "en" ? "Vector/Raster Map" : "向量/點陣地圖";
+        }
+        const regionNames = {
+            taipei: { en: "Taipei City", zh: "台北市" },
+            newTaipei: { en: "New Taipei City", zh: "新北市" },
+            taoyuan: { en: "Taoyuan City", zh: "桃園市" },
+            hsinchuCounty: { en: "Hsinchu County", zh: "新竹縣" },
+            hsinchuCity: { en: "Hsinchu City", zh: "新竹市" },
+            sciencePark: { en: "Hsinchu Science Park", zh: "新竹科學園區" },
+            miaoli: { en: "Miaoli County", zh: "苗栗縣" },
+            taichung: { en: "Taichung City", zh: "台中市" },
+            chiayi: { en: "Chiayi City", zh: "嘉義市" },
+            tainan: { en: "Tainan City", zh: "臺南市" },
+            kaohsiung: { en: "Kaohsiung City", zh: "高雄市" },
+            pingtung: { en: "Pingtung County", zh: "屏東縣" },
+            taitung: { en: "Taitung County", zh: "臺東縣" }
+        };
+        const select = document.getElementById('centralRegionSelect');
+        const options = select.options;
+        for (let i = 0; i < options.length; i++) {
+            const value = options[i].value;
+            options[i].text = regionNames[value][currentLang === "en" ? "en" : "zh"];
+        }
+        const regionSelectLabel = document.querySelector('label[for="centralRegionSelect"]');
+        if (regionSelectLabel) {
+            regionSelectLabel.textContent = currentLang === "en" ? "Region" : "地區選擇";
+        }
+        const routeModalTitle = document.getElementById('routeModalTitle');
+        if (routeModalTitle) {
+        }
+        window.langStrings = {
+            ...window.langStrings, 
+            electricBikeDetailsTitle: {
+                zh: "電輔車列表 - ",
+                en: "Electric Bikes - "
+            },
+            bikeNumberLabel: {
+                zh: "車輛編號：",
+                en: "Bike No.: "
+            },
+            pillarNumberLabel: {
+                zh: "停車柱編號：",
+                en: "Pillar No.: "
+            },
+            batteryPowerLabel: {
+                zh: "電量：",
+                en: "Battery: "
+            },
+            noElectricBikes: {
+                zh: "此站點目前沒有可用的電輔車。",
+                en: "No electric bikes available at this station."
+            },
+            failedToGetBikeData: {
+                zh: "無法取得電輔車資料。",
+                en: "Failed to get electric bike data."
+            },
+            gettingBikeData: {
+                zh: "取得電輔車資料中...",
+                en: "Getting electric bike data..."
+            }
+        };
+        document.querySelectorAll('.navigate-button').forEach(button => {
+            button.childNodes.forEach(node => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    node.remove();
+                }
+            });
+            if (!button.querySelector('.material-icons')) {
+                 const iconSpan = document.createElement('span');
+                 iconSpan.className = 'material-icons';
+                 iconSpan.textContent = 'navigation'; 
+                 button.appendChild(iconSpan);
+            }
+        });
+      }
+      updateLanguageTexts(); 
+      const settingsButton = document.getElementById('settingsButton');
+      const centralSettingsPanel = document.getElementById('centralSettingsPanel');
+      const closeCentralSettings = document.getElementById('closeCentralSettings');
+      const settingsIcon = settingsButton.querySelector('.material-icons');
+      function clearUrlHash() {
+          if (history.pushState) {
+              history.pushState('', document.title, window.location.pathname + window.location.search);
+          } else {
+              window.location.hash = '';
+          }
+      }
+      settingsButton.addEventListener('click', (event) => {
+        event.stopPropagation(); 
+        settingsIcon.classList.remove('rotate-right', 'rotate-left'); 
+        if (centralSettingsPanel.style.display === 'block') {
+            centralSettingsPanel.classList.remove('panel-open');
+            centralSettingsPanel.classList.add('panel-close');
+            overlay.classList.remove('show'); 
+            centralSettingsPanel.addEventListener('animationend', function handler() {
+              centralSettingsPanel.style.display = 'none';
+              centralSettingsPanel.classList.remove('panel-close'); 
+              centralSettingsPanel.removeEventListener('animationend', handler);
+              clearUrlHash(); 
+            });
+            settingsIcon.classList.add('rotate-left'); 
+            if (history.state && history.state.type === 'settings') {
+              history.back(); 
+            } else {
+                clearUrlHash(); 
+            }
+        } else {
+            if (routeModal.style.display === 'block') {
+                routeModal.classList.remove('modal-open');
+                routeModal.classList.add('modal-close');
+                routeModal.addEventListener('animationend', function handler() {
+                    routeModal.style.display = 'none';
+                    routeModal.classList.remove('modal-close');
+                    routeModal.removeEventListener('animationend', handler);
+                    clearUrlHash(); 
+                    openSettingsPanel();
+                });
+                 if (history.state && (history.state.type === 'route' || history.state.type === 'electric')) {
+                     history.back();
+                 } else {
+                     clearUrlHash(); 
+                     openSettingsPanel();
+                 }
+            }
+            else if (permissionModal.style.display === 'block') {
+                permissionModal.style.display = 'none';
+                overlay.classList.remove('show');
+                clearUrlHash(); 
+                openSettingsPanel();
+            }
+            else {
+                openSettingsPanel();
+            }
+          }
+      });
+      closeCentralSettings.addEventListener('click', () => {
+        centralSettingsPanel.classList.remove('panel-open');
+        centralSettingsPanel.classList.add('panel-close');
+        overlay.classList.remove('show'); 
+        centralSettingsPanel.addEventListener('animationend', function handler() {
+          centralSettingsPanel.style.display = 'none';
+          centralSettingsPanel.classList.remove('panel-close');
+          centralSettingsPanel.removeEventListener('animationend', handler);
+          clearUrlHash(); 
+        });
+        settingsIcon.classList.add('rotate-left');
+        setTimeout(() => {
+          settingsIcon.classList.remove('rotate-left');
+        }, 1000);
+        if (history.state && history.state.type === 'settings') {
+          history.back();
+        } else {
+            clearUrlHash(); 
+        }
+      });
+      window.addEventListener('popstate', (event) => {
+        if (centralSettingsPanel.style.display === 'block') {
+            centralSettingsPanel.classList.remove('panel-open');
+            centralSettingsPanel.classList.add('panel-close');
+            overlay.classList.remove('show'); 
+            settingsIcon.classList.add('rotate-left');
+            setTimeout(() => {
+                settingsIcon.classList.remove('rotate-left');
+            }, 1000);
+            centralSettingsPanel.addEventListener('animationend', function handler() {
+                centralSettingsPanel.style.display = 'none';
+                centralSettingsPanel.classList.remove('panel-close');
+                centralSettingsPanel.removeEventListener('animationend', handler);
+                clearUrlHash(); 
+            });
+        }
+        if (routeModal.style.display === 'block') {
+            routeModal.classList.remove('modal-open');
+            routeModal.classList.add('modal-close');
+            overlay.classList.remove('show'); 
+            routeModal.addEventListener('animationend', function handler() {
+                routeModal.style.display = 'none';
+                routeModal.classList.remove('modal-close');
+                routeModal.removeEventListener('animationend', handler);
+                clearUrlHash(); 
+            });
+        }
+        if (permissionModal.style.display === 'block') {
+            permissionModal.style.display = 'none';
+            overlay.classList.remove('show');
+            clearUrlHash(); 
+        }
+      });
+      document.addEventListener('click', (e) => {
+        if (centralSettingsPanel.style.display === 'block' && !centralSettingsPanel.contains(e.target) && e.target !== settingsButton) {
+            centralSettingsPanel.classList.remove('panel-open');
+            centralSettingsPanel.classList.add('panel-close');
+            overlay.classList.remove('show'); 
+            settingsIcon.classList.add('rotate-left');
+            setTimeout(() => {
+                settingsIcon.classList.remove('rotate-left');
+            }, 1000);
+            centralSettingsPanel.addEventListener('animationend', function handler() {
+                centralSettingsPanel.style.display = 'none';
+                centralSettingsPanel.classList.remove('panel-close');
+                centralSettingsPanel.removeEventListener('animationend', handler);
+                clearUrlHash(); 
+            });
+            if (history.state && history.state.type === 'settings') {
+                history.back();
+            } else {
+                clearUrlHash(); 
+            }
+        }
+      });
+      centralSettingsPanel.addEventListener('click', (event) => {
+        event.stopPropagation(); 
+      });
+      function openSettingsPanel() {
+          centralSettingsPanel.style.display = 'block';
+          centralSettingsPanel.classList.remove('panel-close');
+          centralSettingsPanel.classList.add('panel-open');
+          overlay.classList.add('show'); 
+          history.pushState({ modalOpen: true, type: 'settings' }, 'Settings', '#settings');
+          settingsIcon.classList.add('rotate-right'); 
+      }
+      async function initializeApp() {
+        const loadingContent = document.getElementById('loadingContent');
+        loadingContent.innerHTML = `<h2 id="loadingText">載入中</h2><div id="noticeBox" style="margin-top: 10px; margin-left: 20px; margin-right: 20px; background: #fff; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"></div>`;
+        simulateLoadingPercentage();
+        showRandomNotice();
+        try {
+          if (!youbikeDataCache || youbikeDataCache.length === 0) {
+             try {
+                const youbikeUrl = "https://apis.youbike.com.tw/json/station-min-yb2.json";
+                const response = await fetch(youbikeUrl, {
+                  headers: {
+                    'accept': '*/*',
+                    'accept-language': 'zh-TW,zh;q=0.9',
+                  }
+                });
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const fetchedData = await response.json();
+                youbikeDataCache = Array.isArray(fetchedData)
+                  ? fetchedData.map(item => ({ ...item, lat: parseFloat(item.lat), lng: parseFloat(item.lng) }))
+                  : [];
+                await saveYoubikeDataToDB(youbikeDataCache);
+            } catch (error) {
+                youbikeDataCache = await getYoubikeDataFromDB();
+                if (!youbikeDataCache || youbikeDataCache.length === 0) {
+                    throw new Error("無法從網路或快取載入資料。");
+                }
+            }
+          }
+          allStations = [...youbikeDataCache]; 
+          await initMap(allStations); 
+          await getLocation(); 
+          updateResultsOrder(); 
+          showMainContent(); 
+        } catch (error) {
+          const loadingContent = document.getElementById('loadingContent');
+          loadingContent.innerHTML = ''; 
+          const isDarkMode = document.body.classList.contains('dark-mode');
+          const errorIcon = document.createElement('span');
+          errorIcon.className = 'material-icons';
+          errorIcon.textContent = 'error_outline';
+          errorIcon.style.fontSize = '80px';
+          errorIcon.style.color = 'red';
+          errorIcon.style.marginBottom = '20px';
+          const errorText = document.createElement('h2');
+          errorText.textContent = `初始化失敗: ${error.message}`;
+          errorText.style.color = 'red';
+          errorText.style.fontSize = '1.2em';
+          const retryButton = document.createElement('button');
+          retryButton.textContent = '重試';
+          retryButton.style.cssText = `padding: 12px 24px; font-size: 1.1em; font-weight: 500; cursor: pointer; margin-top: 30px; border-radius: 28px; border: none;`;
+          if (isDarkMode) {
+              retryButton.style.backgroundColor = '#e8def8';
+              retryButton.style.color = '#1c1b1f';
+          } else {
+              retryButton.style.backgroundColor = '#ffdacf';
+              retryButton.style.color = '#333';
+          }
+          retryButton.onclick = attemptReconnect;
+          loadingContent.appendChild(errorIcon);
+          loadingContent.appendChild(errorText);
+          loadingContent.appendChild(retryButton);
+        }
+      }
+      function showOfflineScreen() {
+          const loadingContent = document.getElementById('loadingContent');
+          const isDarkMode = document.body.classList.contains('dark-mode');
+          loadingContent.innerHTML = '';
+          const offlineIcon = document.createElement('span');
+          offlineIcon.className = 'material-icons';
+          offlineIcon.textContent = 'wifi_off';
+          offlineIcon.style.fontSize = '80px';
+          offlineIcon.style.color = isDarkMode ? '#999' : '#888';
+          offlineIcon.style.marginBottom = '20px';
+          const loadingText = document.createElement('h2');
+          loadingText.textContent = '請連接網路後重試';
+          loadingText.style.fontSize = '1.8em';
+          loadingText.style.color = isDarkMode ? '#fff' : '#333';
+          loadingText.style.margin = '0';
+          const retryButton = document.createElement('button');
+          retryButton.textContent = '重整';
+          retryButton.style.cssText = `
+              padding: 12px 24px;
+              font-size: 1.1em;
+              font-weight: 500;
+              cursor: pointer;
+              margin-top: 30px;
+              border-radius: 28px;
+              border: none;
+              transition: background-color 0.3s, box-shadow 0.3s;
+          `;
+          if (isDarkMode) {
+              retryButton.style.backgroundColor = '#e8def8';
+              retryButton.style.color = '#1c1b1f';
+              retryButton.style.boxShadow = '0 3px 5px rgba(0,0,0,0.3)';
+          } else {
+              retryButton.style.backgroundColor = '#ffdacf';
+              retryButton.style.color = '#333';
+              retryButton.style.boxShadow = '0 3px 5px rgba(0,0,0,0.2)';
+          }
+          retryButton.onmouseover = () => {
+                if (isDarkMode) {
+                  retryButton.style.backgroundColor = '#d0bcff';
+                } else {
+                  retryButton.style.backgroundColor = '#ffc0a8';
+                }
+          };
+            retryButton.onmouseout = () => {
+                if (isDarkMode) {
+                  retryButton.style.backgroundColor = '#e8def8';
+                } else {
+                  retryButton.style.backgroundColor = '#ffdacf';
+                }
+          };
+          retryButton.onclick = attemptReconnect;
+          loadingContent.appendChild(offlineIcon);
+          loadingContent.appendChild(loadingText);
+          loadingContent.appendChild(retryButton);
+      }
+      async function attemptReconnect() {
+          const loadingContent = document.getElementById('loadingContent');
+          const isDarkMode = document.body.classList.contains('dark-mode');
+          loadingContent.innerHTML = `<h2 style="font-size: 1.8em; color: ${isDarkMode ? '#fff' : '#333'};">測試連線中...</h2>`;
+          try {
+              const response = await fetch("https://apis.youbike.com.tw/json/station-min-yb2.json", { cache: "no-store" });
+              if (!response.ok) {
+                  throw new Error('API 無法存取');
+              }
+              loadingContent.innerHTML = `<h2 id="loadingText" style="color: ${isDarkMode ? '#fff' : '#333'};">連線成功，重新載入中...</h2>`;
+              location.reload(); 
+          } catch (error) {
+              showOfflineScreen(); 
+              const loadingText = loadingContent.querySelector('h2');
+              const retryButton = loadingContent.querySelector('button');
+              if (loadingText) loadingText.textContent = '仍無法連線，請檢查網路';
+              if(retryButton) {
+                  retryButton.style.animation = 'shake 0.5s'; 
+                  setTimeout(() => {
+                      retryButton.style.animation = ''; 
+                  }, 500);
+              }
+          }
+      }
+      window.addEventListener('load', () => {
+        if (!navigator.onLine) {
+            showOfflineScreen();
+        } else {
+            initializeApp();
+        }
+      });
+      keywordInput.addEventListener('keypress', function (event) {
+        if (event.key === 'Enter') {
+          isFollowingUser = false; 
+          updateLocateButtonTitle(); 
+          searchYouBike(true, true); 
+        }
+      });
+            window.addEventListener('scroll', () => {
+        if (settingsPanel.classList.contains('show')) {
+            settingsPanel.classList.add('hiding'); 
+            setTimeout(() => {
+                settingsPanel.classList.remove('show', 'hiding'); 
+            }, 300); 
+        }
+    });
+    const searchIcon = document.getElementById('searchIcon');
+    searchIcon.addEventListener('click', () => {
+      isFollowingUser = false; 
+      updateLocateButtonTitle(); 
+      searchYouBike(true, true); 
+    });
+    let countdownTimer = {
+        remaining: 60, 
+        updateButton: document.getElementById('updateCountdown'), 
+        updateDisplay: function() {
+            const text = currentLang === "en"
+                ? `${this.remaining} sec update`
+                : `${this.remaining}秒後更新`;
+            document.getElementById('updateCountdownText').textContent = text;
+        },
+        reset: function() {
+            const icon = this.updateButton.querySelector('.material-icons');
+            icon.classList.add('spin-update'); 
+            setTimeout(() => {
+                icon.classList.remove('spin-update'); 
+            }, 500);
+            this.remaining = 60;
+            this.updateDisplay();
+        },
+        update: async function() {
+            const icon = this.updateButton.querySelector('.material-icons');
+            icon.classList.add('spin-update'); 
+            setTimeout(() => {
+                icon.classList.remove('spin-update'); 
+            }, 500);
+            const keyword = document.getElementById('keyword').value.trim();
+            if (keyword === '') {
+                searchYouBike(true, false);
+            } else {
+                await updateVehicleData();
+            }
+            this.reset(); 
+        }
+    };
+    countdownTimer.updateButton.addEventListener('click', () => {
+        countdownTimer.update();
+    });
+    setInterval(() => {
+        if(!navigator.onLine) {
+            document.getElementById('updateCountdown').style.display = "none"; 
+            return;
+        }
+        if(document.getElementById('updateCountdown').style.display === "none") {
+            document.getElementById('updateCountdown').style.display = "flex"; 
+        }
+        countdownTimer.remaining--;
+        if (countdownTimer.remaining <= 0) {
+            countdownTimer.update(); 
+        }
+        countdownTimer.updateDisplay(); 
+    }, 1000);
+
+      // ** 新增：切換並本地化向量樣式的函式 **
+      async function createLocalizedVectorLayer(styleUrl) {
+          try {
+            const response = await fetch(styleUrl);
+            const style = await response.json();
+
+            for (const layer of style.layers) {
+              if (layer.layout && layer.layout['text-field']) {
+                layer.layout['text-field'] = [
+                  'coalesce',
+                  ['get', 'name:zh-Hant'],
+                  ['get', 'name:zh'],
+                  ['get', 'name:en'],
+                  ['get', 'name']
+                ];
+              }
+            }
+            
+            return L.maplibreGL({
+              style: style,
+              maplibreGLOptions: {
+                crossOrigin: 'anonymous'
+              }
+            });
+          } catch (error) {
+            console.error("無法載入或處理向量地圖樣式:", error);
+            showNotification(currentLang === "en" ? "Failed to load vector map style." : "載入向量地圖樣式失敗。");
+            return null;
+          }
+      }
+
+      // ** 新增：切換地圖模式的函式 **
+      async function switchMapMode(mode) {
+        if (!leafletMap) return;
+
+        // 移除現有圖層
+        if (rasterTileLayer && leafletMap.hasLayer(rasterTileLayer)) {
+            leafletMap.removeLayer(rasterTileLayer);
+        }
+        if (maplibreGLLayer && leafletMap.hasLayer(maplibreGLLayer)) {
+            leafletMap.removeLayer(maplibreGLLayer);
+        }
+
+        if (mode === 'vector') {
+            if (!maplibreGLLayer) {
+                maplibreGLLayer = await createLocalizedVectorLayer(styleUrls.liberty);
+            }
+            if (maplibreGLLayer) {
+                maplibreGLLayer.addTo(leafletMap);
+            }
+        } else { // 'raster'
+            if (!rasterTileLayer) {
+                 rasterTileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                });
+            }
+            rasterTileLayer.addTo(leafletMap);
+        }
+        applyDarkModeToMap(); // 切換後立即套用深色模式
+      }
+
+      // ** 新增：將深色模式套用到目前地圖圖層的函式 **
+      function applyDarkModeToMap() {
+        const isDarkMode = document.body.classList.contains('dark-mode');
+        const filterStyle = isDarkMode ? 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)' : 'none';
+        
+        const applyFilter = (layer) => {
+            if (layer && layer.getContainer()) {
+                layer.getContainer().style.filter = filterStyle;
+            }
+        };
+
+        if (rasterTileLayer && leafletMap.hasLayer(rasterTileLayer)) {
+            applyFilter(rasterTileLayer);
+        }
+        if (maplibreGLLayer && leafletMap.hasLayer(maplibreGLLayer)) {
+            applyFilter(maplibreGLLayer);
+        }
+
+        const attribution = document.querySelector('.leaflet-control-attribution');
+        if (attribution) {
+            attribution.style.color = isDarkMode ? '#ccc' : '#333';
+        }
+      }
+
+      async function initMap(stations) {
+        if (leafletMap) {
+          return;
+        }
+        leafletMap = L.map('map', {
+          dragging: true,
+          tap: true, 
+          touchZoom: true,
+          doubleClickZoom: true,
+          scrollWheelZoom: true,
+          zoomControl: true 
+        }).setView([defaultLatitude, defaultLongitude], 18); 
+        leafletMap.getPanes().popupPane.style.zIndex = "9999";
+
+        // ** 修改：根據儲存的設定初始化地圖 **
+        const savedMapMode = localStorage.getItem('map_mode') || 'vector'; // 預設為 vector
+        await switchMapMode(savedMapMode);
+
+        markerClusterGroup = L.markerClusterGroup();
+        if (leafletMap && markerClusterGroup) {
+          leafletMap.addLayer(markerClusterGroup);
+        }
+        let locateControl = L.control({ position: 'topleft' });
+        locateControl.onAdd = function(map) {
+            let btn = L.DomUtil.create('button', 'leaflet-bar leaflet-control leaflet-control-custom');
+            btn.id = 'locateButton';
+            btn.innerHTML = '<i class="material-icons" style="font-size:18px; line-height:30px;">my_location</i>';
+            btn.style.width = '30px';
+            btn.style.height = '30px';
+            btn.style.display = 'flex';
+            btn.style.alignItems = 'center';
+            btn.style.justifyContent = 'center';
+            btn.style.padding = '0';
+            btn.style.cursor = 'pointer';
+            btn.title = currentLang === "en" ? "Go to my location" : "定位到我目前位置"; 
+            L.DomEvent.on(btn, 'click', function(e) {
+                L.DomEvent.stopPropagation(e); 
+                L.DomEvent.preventDefault(e); 
+                toggleTracking(); 
+                updateLocateButtonTitle(); 
+            });
+            return btn;
+        };
+        locateControl.addTo(leafletMap);
+        function disableFollowingOnManualInteraction() {
+            if (isFollowingUser) {
+                isFollowingUser = false;
+                showNotification(currentLang === "en" ? "Auto-following stopped." : "已停止自動跟隨。");
+                updateLocateButtonTitle();
+            }
+        }
+        leafletMap.on('dragstart', disableFollowingOnManualInteraction);
+        leafletMap.on('zoomstart', disableFollowingOnManualInteraction);
+        try {
+          const currentStations = Array.isArray(stations) ? stations : [];
+          if (markerClusterGroup) {
+            markerClusterGroup.clearLayers();
+          }
+          currentStations.forEach(station => {
+            const lat = parseFloat(station.lat);
+            const lng = parseFloat(station.lng);
+            if (!isNaN(lat) && !isNaN(lng)) {
+              const marker = L.marker([lat, lng]);
+              marker.on('click', async () => {
+                try {
+                  let stationInfo = {};
+                  if (navigator.onLine) {
+                    const vehicleData = await queryVehicleData([station.station_no]);
+                    stationInfo = vehicleData[station.station_no] || {};
+                  }
+                  const content = `
+                    <h4>${currentLang === "en" ? station.name_en : station.name_tw}</h4>
+                    <p>${currentLang === "en" ? "Address: " : "地址："} ${currentLang === "en" ? station.address_en : station.address_tw}</p>
+                    ${navigator.onLine ? `
+                      <p>YouBike 2.0: ${stationInfo.available_2_0 !== undefined ? stationInfo.available_2_0 : (currentLang === "en" ? 'Unknown' : '未知')}</p>
+                      <p>YouBike 2.0E: ${stationInfo.available_e !== undefined ? stationInfo.available_e : (currentLang === "en" ? 'Unknown' : '未知')}</p>
+                      <p>${currentLang === "en" ? "Available Slots: " : "可停空位數："} ${stationInfo.empty_spaces !== undefined ? stationInfo.empty_spaces : (currentLang === "en" ? 'Unknown' : '未知')}</p>
+                    ` : `<p>${currentLang === "en" ? "Offline. Real-time data unavailable." : "離線中，即時資料無法取得。"}</p>`}
+                  `;
+                  marker.bindPopup(content).openPopup();
+                  isFollowingUser = false; 
+                  updateLocateButtonTitle(); 
+                } catch (error) {
+                  showNotification(currentLang === "en" ? "Failed to get station information." : "無法取得站點資訊。");
+                }
+              });
+              markerClusterGroup.addLayer(marker);
+            }
+          });
+          if (leafletMap && markerClusterGroup) {
+             leafletMap.addLayer(markerClusterGroup);
+          }
+        } catch (error) {
+          showNotification(currentLang === "en" ? "Failed to initialize map." : "初始化地圖失敗。");
+        }
+      }
+      function updateMapMarkers() {
+        if (!markerClusterGroup || !leafletMap) {
+          return;
+        }
+        try {
+          markerClusterGroup.eachLayer(marker => {
+            marker.setIcon(L.icon({
+              iconUrl: 'https://unpkg.com/leaflet/dist/images/marker-icon.png',
+              iconSize: [25, 41],
+              iconAnchor: [12, 41]
+            }));
+          });
+          const stationCards = document.querySelectorAll('.station');
+          stationCards.forEach(card => {
+            const lat = parseFloat(card.dataset.lat);
+            const lng = parseFloat(card.dataset.lng);
+            if (markerClusterGroup && typeof markerClusterGroup.eachLayer === 'function') {
+              markerClusterGroup.eachLayer(marker => {
+                const markerLatLng = marker.getLatLng();
+                if (Math.abs(markerLatLng.lat - lat) < 1e-6 && Math.abs(markerLatLng.lng - lng) < 1e-6) {
+                  marker.setIcon(L.icon({
+                    iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41]
+                  }));
+                }
+              });
+            }
+          });
+        } catch (error) {
+        }
+      }
+      document.addEventListener('click', (e) => {
+        const floatingCard = document.getElementById('floatingCard');
+        if (floatingCard && !e.target.closest('#floatingCard') && floatingCard.style.display === 'block') {
+          floatingCard.style.display = 'none';
+        }
+      });
+      const mainContent = document.getElementById('mainContent');
+      const dragHandle = document.getElementById('dragHandle');
+      let startY = 0;
+      let startHeight = 0;
+      let isDragging = false;
+      function onStart(e) {
+        const touch = e.touches ? e.touches[0] : e;
+        startY = touch.clientY;
+        startHeight = mainContent.offsetHeight;
+        isDragging = true;
+        e.preventDefault(); 
+        mainContent.style.transition = 'none'; 
+        document.body.style.cursor = 'ns-resize'; 
+        mainContent.style.overflowY = 'hidden'; 
+      }
+      function onMove(e) {
+        if (!isDragging) return;
+        const touch = e.touches ? e.touches[0] : e;
+        const currentY = touch.clientY;
+        const deltaY = startY - currentY;
+        const newHeight = Math.min(
+          Math.max(startHeight + deltaY, 200), 
+          window.innerHeight * 0.85 
+        );
+        mainContent.style.height = `${newHeight}px`;
+      }
+      function onEnd() {
+        isDragging = false;
+        mainContent.style.transition = 'height 0.2s ease'; 
+        document.body.style.cursor = ''; 
+        mainContent.style.overflowY = 'auto'; 
+      }
+      dragHandle.addEventListener('mousedown', onStart);
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onEnd);
+      dragHandle.addEventListener('touchstart', onStart, { passive: false }); 
+      document.addEventListener('touchmove', onMove, { passive: true }); 
+      document.addEventListener('touchend', onEnd);
+      document.addEventListener('touchcancel', onEnd); 
+      function toggleTracking() {
+          const centralLocationToggle = document.getElementById('centralLocationToggle');
+          const isLocationServiceOn = centralLocationToggle.checked;
+          const locateButton = document.getElementById('locateButton');
+          if (!isLocationServiceOn) {
+              showNotification(currentLang === "en" ? "Location service is off (using default region)." : "位置服務已關閉 (使用預設地區)。");
+              isFollowingUser = false; 
+              stopTracking(); 
+              hasObtainedRealLocation = false; 
+              const selectedRegion = document.getElementById('centralRegionSelect').value;
+              const coords = regionCoordinates[selectedRegion];
+              userLocation = { latitude: coords.lat, longitude: coords.lng };
+              if (leafletMap) {
+                  isMapMovingDueToTracking = true; 
+                  leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); 
+                  setTimeout(() => { isMapMovingDueToTracking = false; }, 600); 
+              }
+              if (locationMarker) {
+                  locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+              }
+              if (pulsingMarker) {
+                  pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+              }
+              updateCardDistances(); 
+              updateVehicleData(); 
+              updateResultsOrder(); 
+          } else {
+              isFollowingUser = true; 
+              showNotification(currentLang === "en" ? "Location tracking enabled." : "已開啟位置追蹤功能。");
+              startTracking(); 
+              if (leafletMap && userLocation && hasObtainedRealLocation) {
+                   isMapMovingDueToTracking = true; 
+                   leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); 
+                   setTimeout(() => { isMapMovingDueToTracking = false; }, 600); 
+               } else if (leafletMap) {
+                   navigator.geolocation.getCurrentPosition(
+                       (position) => {
+                       },
+                       (error) => {
+                           showNotification(currentLang === "en" ? "Failed to get immediate location." : "無法立即取得目前位置。");
+                           if (!hasObtainedRealLocation && leafletMap) {
+                               const selectedRegion = document.getElementById('centralRegionSelect').value;
+                               const coords = regionCoordinates[selectedRegion];
+                               userLocation = { latitude: coords.lat, longitude: coords.lng };
+                               isMapMovingDueToTracking = true; 
+                               leafletMap.setView([userLocation.latitude, userLocation.longitude], leafletMap.getZoom() || 18, { animate: true, duration: 0.5 }); 
+                               setTimeout(() => { isMapMovingDueToTracking = false; }, 600); 
+                               if (locationMarker) {
+                                   locationMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+                                   if (pulsingMarker) pulsingMarker.setLatLng([userLocation.latitude, userLocation.longitude]);
+                               }
+                               updateCardDistances();
+                               updateVehicleData();
+                               updateResultsOrder();
+                           }
+                       },
+                       { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                   );
+               }
+          }
+          updateLocateButtonTitle(); 
+      }
+      function updateLocateButtonTitle() {
+          const locateButton = document.getElementById('locateButton');
+          if (locateButton) {
+              const centralLocationToggle = document.getElementById('centralLocationToggle');
+              const isLocationServiceOn = centralLocationToggle?.checked; 
+              if (!isLocationServiceOn) {
+                  locateButton.title = currentLang === "en" ? "Location service off (using default region)" : "定位服務已關閉 (使用預設地區)";
+                  locateButton.style.color = '#666'; 
+              } else if (isFollowingUser) {
+                  locateButton.title = currentLang === "en" ? "Following your location" : "正在跟隨您的位置";
+                  locateButton.style.color = '#007BFF'; 
+              } else {
+                  locateButton.title = currentLang === "en" ? "Go to my location" : "定位到我目前位置";
+                  locateButton.style.color = '#333'; 
+              }
+          }
+      }
+      document.addEventListener('DOMContentLoaded', () => {
+        const centralSettingsPanel = document.getElementById('centralSettingsPanel');
+        const centralDarkModeToggle = document.getElementById('centralDarkModeToggle');
+        const centralLangToggle = document.getElementById('centralLangToggle');
+        const centralLocationToggle = document.getElementById('centralLocationToggle');
+        const centralRegionSelect = document.getElementById('centralRegionSelect');
+        const centralMapModeToggle = document.getElementById('centralMapModeToggle');
+
+        // Dark Mode
+        const isDarkMode = localStorage.getItem("dark_mode") === "true";
+        if (isDarkMode) {
+          document.body.classList.add('dark-mode');
+        }
+        centralDarkModeToggle.checked = isDarkMode;
+        
+        // Language
+        currentLang = localStorage.getItem("lang") || "zh";
+        centralLangToggle.checked = currentLang === "en"; 
+        updateLanguageTexts(); 
+
+        // Location Service
+        if (localStorage.getItem("useLocation") === null) {
+          localStorage.setItem("useLocation", "true"); 
+        }
+        centralLocationToggle.checked = localStorage.getItem("useLocation") === "true";
+
+        // Map Mode
+        const savedMapMode = localStorage.getItem('map_mode') || 'vector';
+        centralMapModeToggle.checked = savedMapMode === 'vector';
+
+        // Region
+        const savedRegion = localStorage.getItem('selectedRegion') || 'kaohsiung';
+        defaultRegion = savedRegion;
+        defaultLatitude = regionCoordinates[savedRegion].lat;
+        defaultLongitude = regionCoordinates[savedRegion].lng;
+        if (centralRegionSelect) {
+          centralRegionSelect.value = savedRegion;
+        }
+
+        // Event Listeners
+        centralDarkModeToggle.addEventListener('change', () => {
+          const isDark = centralDarkModeToggle.checked;
+          requestAnimationFrame(() => {
+            document.body.classList.toggle('dark-mode', isDark);
+            localStorage.setItem("dark_mode", isDark.toString());
+            applyDarkModeToMap(); // ** 更新：使用新函式 **
+          });
+        });
+
+        centralLangToggle.addEventListener('change', async () => {
+          currentLang = currentLang === "en" ? "zh" : "en"; 
+          localStorage.setItem("lang", currentLang);
+          updateLanguageTexts(); 
+          await searchYouBike(false, false); 
+          await updateVehicleData();
+          updateCardDistances();
+          updateResultsOrder();
+        });
+
+        centralLocationToggle.addEventListener('change', async function() {
+          const isChecked = this.checked;
+          localStorage.setItem("useLocation", isChecked); 
+          window.lastVehicleDataUpdate = 0;
+          hasObtainedRealLocation = false; 
+          await getLocation(); 
+        });
+
+        centralRegionSelect.addEventListener('change', async function() {
+          const selectedRegion = this.value;
+          defaultRegion = selectedRegion;
+          localStorage.setItem('selectedRegion', selectedRegion); 
+          const coords = regionCoordinates[selectedRegion];
+          defaultLatitude = coords.lat;
+          defaultLongitude = coords.lng;
+          const centralLocationToggle = document.getElementById('centralLocationToggle');
+          if (!centralLocationToggle.checked) {
+              window.lastVehicleDataUpdate = 0; 
+              hasObtainedRealLocation = false; 
+              await getLocation(); 
+          }
+        });
+
+        // ** 新增：地圖模式切換事件 **
+        centralMapModeToggle.addEventListener('change', async function() {
+            const newMode = this.checked ? 'vector' : 'raster';
+            localStorage.setItem('map_mode', newMode);
+            await switchMapMode(newMode);
+        });
+
+        if (localStorage.getItem('selectedRegion') === null && navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                    const nearestRegion = findNearestRegion(position.coords.latitude, position.coords.longitude);
+                    defaultRegion = nearestRegion;
+                    defaultLatitude = regionCoordinates[nearestRegion].lat;
+                    defaultLongitude = regionCoordinates[nearestRegion].lng;
+                    localStorage.setItem('selectedRegion', nearestRegion); 
+                    const centralRegionSelect = document.getElementById('centralRegionSelect');
+                    if (centralRegionSelect) {
+                      centralRegionSelect.value = nearestRegion; 
+                    }
+                },
+                error => {
+                  const savedRegion = localStorage.getItem('selectedRegion') || 'kaohsiung';
+                  defaultRegion = savedRegion;
+                  defaultLatitude = regionCoordinates[savedRegion].lat;
+                  defaultLongitude = regionCoordinates[savedRegion].lng;
+                  const centralRegionSelect = document.getElementById('centralRegionSelect');
+                  if (centralRegionSelect) {
+                    centralRegionSelect.value = savedRegion;
+                  }
+                }
+            );
+        }
+      });
+      function findNearestRegion(lat, lng) {
+          let nearestRegion = 'kaohsiung'; 
+          let minDistance = Infinity;
+          for (const [region, coords] of Object.entries(regionCoordinates)) {
+              const distance = calculateDistance(lat, lng, coords.lat, coords.lng);
+              if (distance < minDistance) {
+                  minDistance = distance;
+                  nearestRegion = region;
+              }
+          }
+          return nearestRegion;
+      }
+      const routeModal = document.getElementById('routeModal');
+      const routeDetailsDiv = document.getElementById('routeDetails');
+      const closeRouteModalButton = document.getElementById('closeRouteModal');
+      const routeModalTitle = document.getElementById('routeModalTitle');
+      closeRouteModalButton.addEventListener('click', () => {
+          routeModal.classList.remove('modal-open');
+          routeModal.classList.add('modal-close');
+          routeModal.addEventListener('animationend', function handler() {
+              routeModal.style.display = 'none';
+              overlay.classList.remove('show');
+              routeModal.classList.remove('modal-close');
+              routeModal.removeEventListener('animationend', handler);
+              clearUrlHash(); 
+          });
+          if (history.state && (history.state.type === 'route' || history.state.type === 'electric')) {
+              history.back();
+          } else {
+              clearUrlHash(); 
+          }
+      });
+      overlay.addEventListener('click', () => {
+          if (routeModal.style.display === 'block') {
+              routeModal.classList.remove('modal-open');
+              routeModal.classList.add('modal-close');
+              overlay.classList.remove('show'); 
+              routeModal.addEventListener('animationend', function handler() {
+                  routeModal.style.display = 'none';
+                  routeModal.classList.remove('modal-close');
+                  routeModal.removeEventListener('animationend', handler);
+                  clearUrlHash(); 
+              });
+          }
+          else if (centralSettingsPanel.style.display === 'block') {
+              centralSettingsPanel.classList.remove('panel-open');
+              centralSettingsPanel.classList.add('panel-close');
+              overlay.classList.remove('show'); 
+              settingsIcon.classList.add('rotate-left');
+              setTimeout(() => {
+                  settingsIcon.classList.remove('rotate-left');
+              }, 1000);
+              centralSettingsPanel.addEventListener('animationend', function handler() {
+                  centralSettingsPanel.style.display = 'none';
+                  centralSettingsPanel.classList.remove('panel-close');
+                  centralSettingsPanel.removeEventListener('animationend', handler);
+                  clearUrlHash(); 
+              });
+          }
+          else if (permissionModal.style.display === 'block') {
+              permissionModal.style.display = 'none';
+              overlay.classList.remove('show');
+              clearUrlHash(); 
+          }
+      });
+      async function getRoute(startLat, startLng, endLat, endLng, stationName) {
+          if (!navigator.onLine) {
+              showNotification(currentLang === "en" ? "Offline: Cannot get route information." : "離線狀態：無法取得路線資訊");
+              return;
+          }
+          if (!userLocation) {
+               showNotification(currentLang === "en" ? "Your location is not available." : "無法取得您的位置。");
+               return;
+          }
+          const apiKey = '7cb4eb19-e0f4-40a3-a5e0-f2c039366f32'; 
+          const profile = 'foot'; 
+          const locale = currentLang === "en" ? "en" : "zh-TW"; 
+          const url = `https://graphhopper.com/api/1/route?profile=${profile}&locale=${locale}&key=${apiKey}&elevation=false&instructions=true&point=${startLat},${startLng}&point=${endLat},${endLng}`;
+          routeDetailsDiv.innerHTML = currentLang === "en" ? "Calculating route..." : "計算路線中...";
+          routeModalTitle.textContent = currentLang === "en" ? "Route to " + stationName : "前往 " + stationName + " 的路線";
+          routeModal.style.display = 'block';
+          routeModal.classList.remove('modal-close'); 
+          routeModal.classList.add('modal-open'); 
+          overlay.classList.add('show');
+          history.pushState({ modalOpen: true, type: 'route' }, 'Route', '#route'); 
+          try {
+              const response = await fetch(url);
+              if (!response.ok) {
+                  const errorData = await response.json();
+                  throw new Error(`API error: ${response.status} - ${errorData.message || response.statusText}`);
+              }
+              const data = await response.json();
+              if (data.paths && data.paths.length > 0) {
+                  displayRouteDetails(data.paths[0], stationName); 
+              } else {
+                  routeDetailsDiv.innerHTML = currentLang === "en" ? "No route found." : "找不到路線。";
+              }
+          } catch (error) {
+              console.error("Error fetching route:", error);
+              routeDetailsDiv.innerHTML = `${currentLang === "en" ? "Failed to get route: " : "取得路線失敗："} ${error.message}`;
+          }
+      }
+      function displayRouteDetails(routeData, stationName) {
+          let html = `<h4>${currentLang === "en" ? "Route to " : "前往 "}${stationName}</h4>`;
+          const distanceKm = (routeData.distance / 1000).toFixed(2);
+          const timeMinutes = Math.round(routeData.time / 60000); 
+          html += `<p><span class="material-icons" style="font-size: 18px; vertical-align: middle;">directions_walk</span>${currentLang === "en" ? "Distance: " : "距離："} ${distanceKm} km</p>`;
+          html += `<p><span class="material-icons" style="font-size: 18px; vertical-align: middle;">timer</span>${currentLang === "en" ? "Estimated Time: " : "預計時間："} ${timeMinutes} ${currentLang === "en" ? "minutes" : "分鐘"}</p>`;
+          if (routeData.instructions && routeData.instructions.length > 0) {
+              html += `<h4>${currentLang === "en" ? "Instructions:" : "導航步驟："}</h4><ul>`;
+              routeData.instructions.forEach(instruction => {
+                  let iconName = 'arrow_forward'; 
+                  switch (instruction.sign) {
+                      case -3: 
+                          iconName = 'u_turn_left';
+                          break;
+                      case -2: 
+                      case -1: 
+                      case 6:  
+                          iconName = 'turn_left';
+                          break;
+                      case 0: 
+                          iconName = 'arrow_upward';
+                          break;
+                      case 1: 
+                      case 2: 
+                      case 7: 
+                          iconName = 'turn_right';
+                          break;
+                      case 3: 
+                          iconName = 'u_turn_right';
+                          break;
+                      case 4: 
+                          iconName = 'flag';
+                          break;
+                      case 5: 
+                          iconName = 'settings_ethernet';
+                          break;
+                      case -7: 
+                          iconName = 'roundabout_left';
+                          break;
+                      case 7: 
+                          iconName = 'roundabout_right';
+                          break;
+                      case -8: 
+                          iconName = 'exit_to_app';
+                          break;
+                      case 8: 
+                          iconName = 'flag'; 
+                          break;
+                      case -9: 
+                          iconName = 'location_on';
+                          break;
+                      default:
+                          iconName = 'arrow_forward';
+                  }
+                  html += `
+                      <li class="bike-item">
+                          <p><span class="material-icons" style="font-size: 18px; vertical-align: middle;">${iconName}</span>${instruction.text}</p>
+                          <p><span class="material-icons" style="font-size: 18px; vertical-align: middle;">straighten</span>${(instruction.distance / 1000).toFixed(2)} km</p>
+                          <p><span class="material-icons" style="font-size: 18px; vertical-align: middle;">schedule</span>${Math.round(instruction.time / 60000)} min</p>
+                      </li>
+                  `;
+              });
+              html += `</ul>`;
+          } else {
+              html += `<p>${currentLang === "en" ? "No detailed instructions available." : "無詳細導航步驟。"}</p>`;
+          }
+          routeDetailsDiv.innerHTML = html;
+      }
+      async function showElectricBikeDetailsModal(stationId, stationName) {
+          if (!navigator.onLine) {
+              showNotification(currentLang === "en" ? "Offline: Cannot get electric bike details." : "離線狀態：無法取得電輔車詳細資訊。");
+              return;
+          }
+          const bikeListUrl = `https://apis.youbike.com.tw/api/front/bike/lists?station_no=${stationId}`;
+          routeModalTitle.textContent = window.langStrings.electricBikeDetailsTitle[currentLang] + stationName;
+          routeDetailsDiv.innerHTML = window.langStrings.gettingBikeData[currentLang];
+          routeModal.style.display = 'block';
+          routeModal.classList.remove('modal-close'); 
+          routeModal.classList.add('modal-open'); 
+          overlay.classList.add('show');
+          history.pushState({ modalOpen: true, type: 'electric' }, 'Electric Bikes', '#electric'); 
+          try {
+              const response = await fetch(bikeListUrl, {
+                  headers: {
+                      'Accept': '*/*',
+                      'Accept-Language': 'zh-TW,zh;q=0.9',
+                      'Origin': 'https://www.youbike.com.tw', 
+                      'Referer': 'https://www.youbike.com.tw/' 
+                  }
+              });
+              if (!response.ok) {
+                  throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              const data = await response.json();
+              if (data.retCode === 1 && data.retVal && data.retVal.length > 0) {
+                  data.retVal.sort((a, b) => b.battery_power - a.battery_power);
+                  let bikeListHtml = '<ul>';
+                  data.retVal.forEach(bike => {
+                      bikeListHtml += `
+                          <li class="bike-item">
+                              <p><span class="material-icons" style="font-size: 18px; vertical-align: middle;">directions_bike</span>${window.langStrings.bikeNumberLabel[currentLang]}${bike.bike_no}</p>
+                              <p><span class="material-icons" style="font-size: 18px; vertical-align: middle;">location_on</span>${window.langStrings.pillarNumberLabel[currentLang]}${bike.pillar_no}</p>
+                              <p><span class="material-icons" style="font-size: 18px; vertical-align: middle;">battery_charging_full</span>${window.langStrings.batteryPowerLabel[currentLang]}${bike.battery_power}%</p>
+                          </li>
+                      `;
+                  });
+                  bikeListHtml += '</ul>';
+                  routeDetailsDiv.innerHTML = bikeListHtml;
+              } else {
+                  routeDetailsDiv.innerHTML = `<p>${window.langStrings.noElectricBikes[currentLang]}</p>`;
+              }
+          } catch (error) {
+              console.error("Error fetching electric bike data:", error);
+              routeDetailsDiv.innerHTML = `<p>${window.langStrings.failedToGetBikeData[currentLang]}</p>`;
+          }
+      }
+      document.addEventListener('visibilitychange', () => {
+          if (document.visibilityState === 'visible' && navigator.onLine) {
+              console.log('Tab became visible, updating data...'); 
+              countdownTimer.update(); 
+          }
+      });
+    </script>
+  </body>
+</html>
