@@ -23,11 +23,10 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="manifest" href="/manifest.json" />
     <link rel="icon" type="image/x-icon" href="/icons/icon.ico" />
-    <!-- Leaflet & MarkerCluster CSS -->
+    <!-- Leaflet & MapLibre GL JS Assets -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
-    <!-- MapLibre GL CSS -->
     <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=offline_bolt" />
     <style>
@@ -920,12 +919,14 @@
       #centralSettingsPanel.panel-close {
         animation-name: slideOut;
       }
-      body.dark-mode #centralRegionSelect {
+      body.dark-mode #centralRegionSelect,
+      body.dark-mode #centralMapStyleSelect {
           background-color: #555;
           color: #fff;
           border: 1px solid #777;
       }
-      body.dark-mode #centralRegionSelect option {
+      body.dark-mode #centralRegionSelect option,
+      body.dark-mode #centralMapStyleSelect option {
           background-color: #555;
           color: #fff;
       }
@@ -1150,96 +1151,98 @@
       <button id="closeCentralSettings">×</button>
       <h2 id="settingsPanelTitle">系統設定</h2>
       <div class="settings-group">
-              <h3>基本設定</h3>
-              <div class="setting-item">
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                      <span class="material-icons">location_on</span>
-                      <label for="centralRegionSelect" id="regionSelectLabel">地區選擇</label>
-                  </div>
-                  <select id="centralRegionSelect" style="padding: 5px; border-radius: 5px;">
-                      <option value="taipei">台北市</option>
-                      <option value="newTaipei">新北市</option>
-                      <option value="taoyuan">桃園市</option>
-                      <option value="hsinchuCounty">新竹縣</option>
-                      <option value="hsinchuCity">新竹市</option>
-                      <option value="sciencePark">新竹科學園區</option>
-                      <option value="miaoli">苗栗縣</option>
-                      <option value="taichung">台中市</option>
-                      <option value="chiayi">嘉義市</option>
-                      <option value="tainan">臺南市</option>
-                      <option value="kaohsiung" selected>高雄市</option>
-                      <option value="pingtung">屏東縣</option>
-                      <option value="taitung">臺東縣</option>
-                  </select>
-              </div>
-              <div class="setting-item">
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                      <span class="material-icons">my_location</span>
-                      <label for="centralLocationToggle">位置服務</label>
-                  </div>
-                  <label class="switch">
-                      <input type="checkbox" id="centralLocationToggle">
-                      <span class="slider"></span>
-                  </label>
-              </div>
-              <div class="setting-item">
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                      <span class="material-icons">dark_mode</span>
-                      <label for="centralDarkModeToggle">深色模式</label>
-                  </div>
-                  <label class="switch">
-                      <input type="checkbox" id="centralDarkModeToggle">
-                      <span class="slider"></span>
-                  </label>
-              </div>
-              <div class="setting-item">
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                      <span class="material-icons">language</span>
-                      <label for="centralLangToggle">中文/English</label>
-                  </div>
-                  <label class="switch">
-                      <input type="checkbox" id="centralLangToggle">
-                      <span class="slider"></span>
-                  </label>
-              </div>
-              <!-- ** 新增的地圖模式切換器 ** -->
-              <div class="setting-item">
-                  <div style="display: flex; align-items: center; gap: 8px;">
-                      <span class="material-icons">map</span>
-                      <label for="centralMapModeToggle">向量/點陣地圖</label>
-                  </div>
-                  <label class="switch">
-                      <input type="checkbox" id="centralMapModeToggle">
-                      <span class="slider"></span>
-                  </label>
-              </div>
+        <h3>基本設定</h3>
+        <div class="setting-item">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="material-icons">location_on</span>
+            <label for="centralRegionSelect" id="regionSelectLabel">地區選擇</label>
           </div>
+          <select id="centralRegionSelect" style="padding: 5px; border-radius: 5px;">
+            <option value="taipei">台北市</option>
+            <option value="newTaipei">新北市</option>
+            <option value="taoyuan">桃園市</option>
+            <option value="hsinchuCounty">新竹縣</option>
+            <option value="hsinchuCity">新竹市</option>
+            <option value="sciencePark">新竹科學園區</option>
+            <option value="miaoli">苗栗縣</option>
+            <option value="taichung">台中市</option>
+            <option value="chiayi">嘉義市</option>
+            <option value="tainan">臺南市</option>
+            <option value="kaohsiung" selected>高雄市</option>
+            <option value="pingtung">屏東縣</option>
+            <option value="taitung">臺東縣</option>
+          </select>
+        </div>
+        <div class="setting-item">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="material-icons">my_location</span>
+            <label for="centralLocationToggle">位置服務</label>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="centralLocationToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="setting-item">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="material-icons">dark_mode</span>
+            <label for="centralDarkModeToggle">深色模式</label>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="centralDarkModeToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+        <div class="setting-item">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="material-icons">language</span>
+            <label for="centralLangToggle">中文/English</label>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="centralLangToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
       <div class="settings-group">
-          <h3>外部連結</h3>
+          <h3>地圖設定</h3>
           <div class="setting-item">
-              <a href="https://github.com/potatosserver/YouBike" target="_blank" class="github-link">
-                  <img src="https://potatosserver.github.io/YouBike/icons/html.webp" alt="GitHub Repository" style="width:30px; height:30px;">
-                  <span>YouBike Repository</span>
-              </a>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                  <span class="material-icons">map</span>
+                  <label for="centralMapStyleSelect">地圖樣式</label>
+              </div>
+              <select id="centralMapStyleSelect" style="padding: 5px; border-radius: 5px;">
+                  <option value="liberty">向量 (Liberty)</option>
+                  <option value="positron">向量 (Positron)</option>
+                  <option value="osm">點陣 (OSM)</option>
+              </select>
           </div>
-          <div class="setting-item">
-              <a href="https://github.com/potatosserver/YouBike_Python" target="_blank" class="github-link">
-                  <img src="https://potatosserver.github.io/YouBike/icons/python.webp" alt="GitHub Repository" style="width:30px; height:30px;">
-                  <span>YouBike Python Repository</span>
-              </a>
-          </div>
+      </div>
+      <div class="settings-group">
+        <h3>外部連結</h3>
+        <div class="setting-item">
+          <a href="https://github.com/potatosserver/YouBike" target="_blank" class="github-link">
+            <img src="https://potatosserver.github.io/YouBike/icons/html.webp" alt="GitHub Repository" style="width:30px; height:30px;">
+            <span>YouBike Repository</span>
+          </a>
+        </div>
+        <div class="setting-item">
+          <a href="https://github.com/potatosserver/YouBike_Python" target="_blank" class="github-link">
+            <img src="https://potatosserver.github.io/YouBike/icons/python.webp" alt="GitHub Repository" style="width:30px; height:30px;">
+            <span>YouBike Python Repository</span>
+          </a>
+        </div>
       </div>
     </div>
     
-    <!-- Leaflet & MarkerCluster JS -->
+    <!-- Leaflet & MapLibre GL JS Scripts -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-    <!-- MapLibre GL JS & Leaflet Plugin -->
     <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
     <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.21/leaflet-maplibre-gl.js"></script>
 
     <script>
-      let leafletMap, markerClusterGroup, rasterTileLayer, maplibreGLLayer;
+      let leafletMap, markerClusterGroup, osmTileLayer, maplibreGLLayer;
       let userLocation = null;
       let locationMarker = null;
       let pulsingMarker = null;
@@ -1248,12 +1251,6 @@
       let watchId = null;
       let isMapMovingDueToTracking = false; 
       let hasObtainedRealLocation = false;
-
-      // ** 新增：向量地圖樣式 URL **
-      const styleUrls = {
-        liberty: 'https://tiles.openfreemap.org/styles/liberty',
-      };
-      
       const regionCoordinates = {
         taipei: { lat: 25.047924, lng: 121.517081 },
         newTaipei: { lat: 25.0215339197085, lng: 121.4568090197085 },
@@ -1269,6 +1266,12 @@
         pingtung: { lat: 22.683036253664, lng: 120.48790854724 },
         taitung: { lat: 22.755711056126138, lng: 121.15035332587574 }
       };
+
+      const mapStyleUrls = {
+        liberty: 'https://tiles.openfreemap.org/styles/liberty',
+        positron: 'https://tiles.openfreemap.org/styles/positron',
+      };
+
       let defaultRegion = 'kaohsiung';
       let defaultLatitude = regionCoordinates.kaohsiung.lat;
       let defaultLongitude = regionCoordinates.kaohsiung.lng;
@@ -2092,7 +2095,8 @@
         const settingGroups = document.querySelectorAll('#centralSettingsPanel .settings-group h3');
         if (settingGroups.length >= 2) {
           settingGroups[0].textContent = currentLang === "en" ? "Basic Settings" : "基本設定";
-          settingGroups[1].textContent = currentLang === "en" ? "GitHub Repositories" : "GitHub 儲存庫";
+          settingGroups[1].textContent = currentLang === "en" ? "Map Settings" : "地圖設定";
+          settingGroups[2].textContent = currentLang === "en" ? "GitHub Repositories" : "GitHub 儲存庫";
         }
         const locationLabel = document.querySelector('#centralSettingsPanel .setting-item label[for="centralLocationToggle"]');
         if (locationLabel) {
@@ -2106,10 +2110,9 @@
         if (langLabel) {
           langLabel.textContent = currentLang === "en" ? "Chinese/English" : "中文/English";
         }
-        // ** 新增：地圖模式標籤翻譯 **
-        const mapModeLabel = document.querySelector('#centralSettingsPanel .setting-item label[for="centralMapModeToggle"]');
-        if (mapModeLabel) {
-          mapModeLabel.textContent = currentLang === "en" ? "Vector/Raster Map" : "向量/點陣地圖";
+        const mapStyleLabel = document.querySelector('label[for="centralMapStyleSelect"]');
+        if (mapStyleLabel) {
+            mapStyleLabel.textContent = currentLang === "en" ? "Map Style" : "地圖樣式";
         }
         const regionNames = {
             taipei: { en: "Taipei City", zh: "台北市" },
@@ -2298,27 +2301,27 @@
         }
       });
       document.addEventListener('click', (e) => {
-        if (centralSettingsPanel.style.display === 'block' && !centralSettingsPanel.contains(e.target) && e.target !== settingsButton) {
-            centralSettingsPanel.classList.remove('panel-open');
-            centralSettingsPanel.classList.add('panel-close');
-            overlay.classList.remove('show'); 
-            settingsIcon.classList.add('rotate-left');
-            setTimeout(() => {
-                settingsIcon.classList.remove('rotate-left');
-            }, 1000);
-            centralSettingsPanel.addEventListener('animationend', function handler() {
-                centralSettingsPanel.style.display = 'none';
-                centralSettingsPanel.classList.remove('panel-close');
-                centralSettingsPanel.removeEventListener('animationend', handler);
-                clearUrlHash(); 
-            });
-            if (history.state && history.state.type === 'settings') {
-                history.back();
-            } else {
-                clearUrlHash(); 
-            }
+	if (centralSettingsPanel.style.display === 'block' && !centralSettingsPanel.contains(e.target) && e.target !== settingsButton) {
+		centralSettingsPanel.classList.remove('panel-open');
+		centralSettingsPanel.classList.add('panel-close');
+        overlay.classList.remove('show'); 
+		settingsIcon.classList.add('rotate-left');
+		setTimeout(() => {
+			settingsIcon.classList.remove('rotate-left');
+		}, 1000);
+		centralSettingsPanel.addEventListener('animationend', function handler() {
+			centralSettingsPanel.style.display = 'none';
+			centralSettingsPanel.classList.remove('panel-close');
+			centralSettingsPanel.removeEventListener('animationend', handler);
+            clearUrlHash(); 
+		});
+		if (history.state && history.state.type === 'settings') {
+			history.back();
+		} else {
+            clearUrlHash(); 
         }
-      });
+	}
+});
       centralSettingsPanel.addEventListener('click', (event) => {
         event.stopPropagation(); 
       });
@@ -2551,114 +2554,96 @@
         countdownTimer.updateDisplay(); 
     }, 1000);
 
-      // ** 新增：切換並本地化向量樣式的函式 **
-      async function createLocalizedVectorLayer(styleUrl) {
-          try {
-            const response = await fetch(styleUrl);
-            const style = await response.json();
+    // --- Map Switching and Initialization Logic ---
 
-            for (const layer of style.layers) {
-              if (layer.layout && layer.layout['text-field']) {
+    // Fetches and modifies a vector style to prioritize Chinese fonts.
+    async function getChineseVectorStyle(styleUrl) {
+        const response = await fetch(styleUrl);
+        const style = await response.json();
+        for (const layer of style.layers) {
+            if (layer.layout && layer.layout['text-field']) {
                 layer.layout['text-field'] = [
-                  'coalesce',
-                  ['get', 'name:zh-Hant'],
-                  ['get', 'name:zh'],
-                  ['get', 'name:en'],
-                  ['get', 'name']
+                    'coalesce',
+                    ['get', 'name:zh-Hant'],
+                    ['get', 'name:zh'],
+                    ['get', 'name:en'],
+                    ['get', 'name']
                 ];
-              }
             }
-            
-            return L.maplibreGL({
-              style: style,
-              maplibreGLOptions: {
-                crossOrigin: 'anonymous'
-              }
-            });
-          } catch (error) {
-            console.error("無法載入或處理向量地圖樣式:", error);
-            showNotification(currentLang === "en" ? "Failed to load vector map style." : "載入向量地圖樣式失敗。");
-            return null;
-          }
-      }
-
-      // ** 新增：切換地圖模式的函式 **
-      async function switchMapMode(mode) {
-        if (!leafletMap) return;
-
-        // 移除現有圖層
-        if (rasterTileLayer && leafletMap.hasLayer(rasterTileLayer)) {
-            leafletMap.removeLayer(rasterTileLayer);
         }
-        if (maplibreGLLayer && leafletMap.hasLayer(maplibreGLLayer)) {
-            leafletMap.removeLayer(maplibreGLLayer);
-        }
+        return style;
+    }
 
-        if (mode === 'vector') {
-            if (!maplibreGLLayer) {
-                maplibreGLLayer = await createLocalizedVectorLayer(styleUrls.liberty);
+    // Applies a new map layer (vector or raster) to the map.
+    function switchMapLayer(styleKey) {
+        return new Promise(async (resolve, reject) => {
+            // Remove existing layers
+            if (osmTileLayer) leafletMap.removeLayer(osmTileLayer);
+            if (maplibreGLLayer) leafletMap.removeLayer(maplibreGLLayer);
+            osmTileLayer = null;
+            maplibreGLLayer = null;
+
+            const isDarkMode = document.body.classList.contains('dark-mode');
+
+            try {
+                if (styleKey === 'osm') {
+                    // Create and add raster layer
+                    osmTileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        maxZoom: 19,
+                        attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                    }).addTo(leafletMap);
+
+                    if (isDarkMode && osmTileLayer._container) {
+                        osmTileLayer._container.style.filter = 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)';
+                    }
+                    resolve(); // Raster layer is ready immediately
+                } else {
+                    // Create and add vector layer
+                    const styleUrl = mapStyleUrls[styleKey];
+                    const style = await getChineseVectorStyle(styleUrl);
+                    
+                    maplibreGLLayer = L.maplibreGL({
+                        style: style,
+                        maplibreGLOptions: { crossOrigin: 'anonymous' }
+                    }).addTo(leafletMap);
+                    
+                    // IMPORTANT: Resolve the promise only when the map style is fully loaded.
+                    maplibreGLLayer.getMaplibreMap().once('load', () => {
+                         // A short delay to ensure rendering is complete after load event.
+                        setTimeout(resolve, 50);
+                    });
+                }
+                localStorage.setItem('mapStyle', styleKey);
+            } catch (err) {
+                showNotification(currentLang === "en" ? "Map tiles unavailable." : "地圖圖層無法載入。");
+                reject(err);
             }
-            if (maplibreGLLayer) {
-                maplibreGLLayer.addTo(leafletMap);
-            }
-        } else { // 'raster'
-            if (!rasterTileLayer) {
-                 rasterTileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                });
-            }
-            rasterTileLayer.addTo(leafletMap);
-        }
-        applyDarkModeToMap(); // 切換後立即套用深色模式
-      }
+        });
+    }
 
-      // ** 新增：將深色模式套用到目前地圖圖層的函式 **
-      function applyDarkModeToMap() {
-        const isDarkMode = document.body.classList.contains('dark-mode');
-        const filterStyle = isDarkMode ? 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)' : 'none';
-        
-        const applyFilter = (layer) => {
-            if (layer && layer.getContainer()) {
-                layer.getContainer().style.filter = filterStyle;
-            }
-        };
 
-        if (rasterTileLayer && leafletMap.hasLayer(rasterTileLayer)) {
-            applyFilter(rasterTileLayer);
-        }
-        if (maplibreGLLayer && leafletMap.hasLayer(maplibreGLLayer)) {
-            applyFilter(maplibreGLLayer);
-        }
+    // Initializes the map instance and loads the initial tile layer.
+    async function initMap(stations) {
+        if (leafletMap) return;
 
-        const attribution = document.querySelector('.leaflet-control-attribution');
-        if (attribution) {
-            attribution.style.color = isDarkMode ? '#ccc' : '#333';
-        }
-      }
-
-      async function initMap(stations) {
-        if (leafletMap) {
-          return;
-        }
         leafletMap = L.map('map', {
-          dragging: true,
-          tap: true, 
-          touchZoom: true,
-          doubleClickZoom: true,
-          scrollWheelZoom: true,
-          zoomControl: true 
-        }).setView([defaultLatitude, defaultLongitude], 18); 
+            dragging: true,
+            tap: true,
+            touchZoom: true,
+            doubleClickZoom: true,
+            scrollWheelZoom: true,
+            zoomControl: true
+        }).setView([defaultLatitude, defaultLongitude], 18);
         leafletMap.getPanes().popupPane.style.zIndex = "9999";
 
-        // ** 修改：根據儲存的設定初始化地圖 **
-        const savedMapMode = localStorage.getItem('map_mode') || 'vector'; // 預設為 vector
-        await switchMapMode(savedMapMode);
-
+        // This is the key change: await the layer loading before proceeding.
+        const mapStyle = localStorage.getItem('mapStyle') || 'liberty'; // Default to vector
+        await switchMapLayer(mapStyle);
+        
+        // Now that the map layer is confirmed to be loaded, add controls and markers.
         markerClusterGroup = L.markerClusterGroup();
-        if (leafletMap && markerClusterGroup) {
-          leafletMap.addLayer(markerClusterGroup);
-        }
+        leafletMap.addLayer(markerClusterGroup);
+
         let locateControl = L.control({ position: 'topleft' });
         locateControl.onAdd = function(map) {
             let btn = L.DomUtil.create('button', 'leaflet-bar leaflet-control leaflet-control-custom');
@@ -2671,16 +2656,17 @@
             btn.style.justifyContent = 'center';
             btn.style.padding = '0';
             btn.style.cursor = 'pointer';
-            btn.title = currentLang === "en" ? "Go to my location" : "定位到我目前位置"; 
+            btn.title = currentLang === "en" ? "Go to my location" : "定位到我目前位置";
             L.DomEvent.on(btn, 'click', function(e) {
-                L.DomEvent.stopPropagation(e); 
-                L.DomEvent.preventDefault(e); 
-                toggleTracking(); 
-                updateLocateButtonTitle(); 
+                L.DomEvent.stopPropagation(e);
+                L.DomEvent.preventDefault(e);
+                toggleTracking();
+                updateLocateButtonTitle();
             });
             return btn;
         };
         locateControl.addTo(leafletMap);
+
         function disableFollowingOnManualInteraction() {
             if (isFollowingUser) {
                 isFollowingUser = false;
@@ -2690,49 +2676,47 @@
         }
         leafletMap.on('dragstart', disableFollowingOnManualInteraction);
         leafletMap.on('zoomstart', disableFollowingOnManualInteraction);
+
         try {
-          const currentStations = Array.isArray(stations) ? stations : [];
-          if (markerClusterGroup) {
+            const currentStations = Array.isArray(stations) ? stations : [];
             markerClusterGroup.clearLayers();
-          }
-          currentStations.forEach(station => {
-            const lat = parseFloat(station.lat);
-            const lng = parseFloat(station.lng);
-            if (!isNaN(lat) && !isNaN(lng)) {
-              const marker = L.marker([lat, lng]);
-              marker.on('click', async () => {
-                try {
-                  let stationInfo = {};
-                  if (navigator.onLine) {
-                    const vehicleData = await queryVehicleData([station.station_no]);
-                    stationInfo = vehicleData[station.station_no] || {};
-                  }
-                  const content = `
-                    <h4>${currentLang === "en" ? station.name_en : station.name_tw}</h4>
-                    <p>${currentLang === "en" ? "Address: " : "地址："} ${currentLang === "en" ? station.address_en : station.address_tw}</p>
-                    ${navigator.onLine ? `
-                      <p>YouBike 2.0: ${stationInfo.available_2_0 !== undefined ? stationInfo.available_2_0 : (currentLang === "en" ? 'Unknown' : '未知')}</p>
-                      <p>YouBike 2.0E: ${stationInfo.available_e !== undefined ? stationInfo.available_e : (currentLang === "en" ? 'Unknown' : '未知')}</p>
-                      <p>${currentLang === "en" ? "Available Slots: " : "可停空位數："} ${stationInfo.empty_spaces !== undefined ? stationInfo.empty_spaces : (currentLang === "en" ? 'Unknown' : '未知')}</p>
-                    ` : `<p>${currentLang === "en" ? "Offline. Real-time data unavailable." : "離線中，即時資料無法取得。"}</p>`}
-                  `;
-                  marker.bindPopup(content).openPopup();
-                  isFollowingUser = false; 
-                  updateLocateButtonTitle(); 
-                } catch (error) {
-                  showNotification(currentLang === "en" ? "Failed to get station information." : "無法取得站點資訊。");
+            currentStations.forEach(station => {
+                const lat = parseFloat(station.lat);
+                const lng = parseFloat(station.lng);
+                if (!isNaN(lat) && !isNaN(lng)) {
+                    const marker = L.marker([lat, lng]);
+                    marker.on('click', async () => {
+                        try {
+                            let stationInfo = {};
+                            if (navigator.onLine) {
+                                const vehicleData = await queryVehicleData([station.station_no]);
+                                stationInfo = vehicleData[station.station_no] || {};
+                            }
+                            const content = `
+                                <h4>${currentLang === "en" ? station.name_en : station.name_tw}</h4>
+                                <p>${currentLang === "en" ? "Address: " : "地址："} ${currentLang === "en" ? station.address_en : station.address_tw}</p>
+                                ${navigator.onLine ? `
+                                <p>YouBike 2.0: ${stationInfo.available_2_0 !== undefined ? stationInfo.available_2_0 : (currentLang === "en" ? 'Unknown' : '未知')}</p>
+                                <p>YouBike 2.0E: ${stationInfo.available_e !== undefined ? stationInfo.available_e : (currentLang === "en" ? 'Unknown' : '未知')}</p>
+                                <p>${currentLang === "en" ? "Available Slots: " : "可停空位數："} ${stationInfo.empty_spaces !== undefined ? stationInfo.empty_spaces : (currentLang === "en" ? 'Unknown' : '未知')}</p>
+                                ` : `<p>${currentLang === "en" ? "Offline. Real-time data unavailable." : "離線中，即時資料無法取得。"}</p>`}
+                            `;
+                            marker.bindPopup(content).openPopup();
+                            isFollowingUser = false;
+                            updateLocateButtonTitle();
+                        } catch (error) {
+                            showNotification(currentLang === "en" ? "Failed to get station information." : "無法取得站點資訊。");
+                        }
+                    });
+                    markerClusterGroup.addLayer(marker);
                 }
-              });
-              markerClusterGroup.addLayer(marker);
-            }
-          });
-          if (leafletMap && markerClusterGroup) {
-             leafletMap.addLayer(markerClusterGroup);
-          }
+            });
+            leafletMap.addLayer(markerClusterGroup);
         } catch (error) {
-          showNotification(currentLang === "en" ? "Failed to initialize map." : "初始化地圖失敗。");
+            showNotification(currentLang === "en" ? "Failed to initialize map." : "初始化地圖失敗。");
         }
-      }
+    }
+
       function updateMapMarkers() {
         if (!markerClusterGroup || !leafletMap) {
           return;
@@ -2895,31 +2879,22 @@
         const centralLangToggle = document.getElementById('centralLangToggle');
         const centralLocationToggle = document.getElementById('centralLocationToggle');
         const centralRegionSelect = document.getElementById('centralRegionSelect');
-        const centralMapModeToggle = document.getElementById('centralMapModeToggle');
+        const centralMapStyleSelect = document.getElementById('centralMapStyleSelect');
 
-        // Dark Mode
         const isDarkMode = localStorage.getItem("dark_mode") === "true";
-        if (isDarkMode) {
-          document.body.classList.add('dark-mode');
-        }
+        if (isDarkMode) document.body.classList.add('dark-mode');
+        
         centralDarkModeToggle.checked = isDarkMode;
         
-        // Language
         currentLang = localStorage.getItem("lang") || "zh";
         centralLangToggle.checked = currentLang === "en"; 
         updateLanguageTexts(); 
 
-        // Location Service
         if (localStorage.getItem("useLocation") === null) {
           localStorage.setItem("useLocation", "true"); 
         }
         centralLocationToggle.checked = localStorage.getItem("useLocation") === "true";
-
-        // Map Mode
-        const savedMapMode = localStorage.getItem('map_mode') || 'vector';
-        centralMapModeToggle.checked = savedMapMode === 'vector';
-
-        // Region
+        
         const savedRegion = localStorage.getItem('selectedRegion') || 'kaohsiung';
         defaultRegion = savedRegion;
         defaultLatitude = regionCoordinates[savedRegion].lat;
@@ -2928,13 +2903,24 @@
           centralRegionSelect.value = savedRegion;
         }
 
-        // Event Listeners
+        const savedMapStyle = localStorage.getItem('mapStyle') || 'liberty';
+        if(centralMapStyleSelect) {
+            centralMapStyleSelect.value = savedMapStyle;
+        }
+
+        centralMapStyleSelect.addEventListener('change', function() {
+            switchMapLayer(this.value);
+        });
+
         centralDarkModeToggle.addEventListener('change', () => {
           const isDark = centralDarkModeToggle.checked;
           requestAnimationFrame(() => {
             document.body.classList.toggle('dark-mode', isDark);
             localStorage.setItem("dark_mode", isDark.toString());
-            applyDarkModeToMap(); // ** 更新：使用新函式 **
+            // Only apply filter to OSM raster layer
+            if (osmTileLayer && osmTileLayer._container) {
+                osmTileLayer._container.style.filter = isDark ? 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)' : 'none';
+            }
           });
         });
 
@@ -2969,13 +2955,6 @@
               hasObtainedRealLocation = false; 
               await getLocation(); 
           }
-        });
-
-        // ** 新增：地圖模式切換事件 **
-        centralMapModeToggle.addEventListener('change', async function() {
-            const newMode = this.checked ? 'vector' : 'raster';
-            localStorage.setItem('map_mode', newMode);
-            await switchMapMode(newMode);
         });
 
         if (localStorage.getItem('selectedRegion') === null && navigator.geolocation) {
