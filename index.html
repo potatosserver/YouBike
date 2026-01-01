@@ -1,3 +1,14 @@
+這是一個常見的響應式設計問題。問題出在於 JavaScript 中的拖曳功能（`dragHandle`）和初始化功能（`showMainContent`）會將 `height`（高度）和 `display`（顯示模式）直接寫入元素的 HTML `style` 屬性中（Inline Styles）。
+
+當您將手機從橫向（Landscape）轉回直向（Portrait）時，這些寫在 HTML 上的 Inline Styles 優先權會高於 CSS 的設定，導致版面維持在橫向的設定（例如 `display: flex` 或固定的 `height`），進而造成跑版。
+
+我已經在程式碼末端添加了一個 `resize` 監聽器，當螢幕旋轉或改變大小時，會自動清除這些 Inline Styles，讓 CSS 重新接管版面配置。
+
+以下是修復後的完整程式碼：
+
+```html
+--- START OF FILE index (11).html ---
+
 
 <!DOCTYPE html>
 <html lang="zh-TW">
@@ -3301,7 +3312,6 @@
               routeDetailsDiv.innerHTML = `<p>${window.langStrings.failedToGetBikeData[currentLang]}</p>`;
           }
       }
-
       document.addEventListener('visibilitychange', () => {
           if (document.visibilityState === 'visible' && navigator.onLine) {
               console.log('Tab became visible, updating data...'); 
@@ -3309,18 +3319,18 @@
           }
       });
 
-      // --- 修復：監聽螢幕旋轉/縮放，解決跑版與地圖灰畫面 ---
+      // 監聽螢幕旋轉或大小改變事件，清除 JS 設置的 inline styles
+      // 解決從橫向轉回直向時版面錯亂的問題
       window.addEventListener('resize', () => {
-          // 1. 如果切換到橫向模式，清除左側區塊的 inline 高度 (移除拖曳留下的固定高度)
-          // 這樣 CSS 的 height: 100% !important 才能正確生效，且轉回直向時會重置為 CSS 預設值 (40vh)
-          if (window.matchMedia("(orientation: landscape)").matches) {
-              const mainContent = document.getElementById('mainContent');
-              if (mainContent) mainContent.style.height = ''; 
+          const mainContent = document.getElementById('mainContent');
+          if (mainContent) {
+              // 清除高度、變形和顯示屬性，讓 CSS Media Queries 接管
+              mainContent.style.height = '';
+              mainContent.style.transform = '';
+              mainContent.style.display = ''; 
           }
-
-          // 2. 通知地圖重新計算容器大小 (解決旋轉後地圖只顯示一半或變灰的問題)
+          // 重新計算地圖大小，避免地圖顯示不完整
           if (leafletMap) {
-              // 延遲一下確保畫面旋轉渲染完畢
               setTimeout(() => {
                   leafletMap.invalidateSize();
               }, 300);
@@ -3331,3 +3341,4 @@
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
   </body>
 </html>
+```
