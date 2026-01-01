@@ -3301,10 +3301,29 @@
               routeDetailsDiv.innerHTML = `<p>${window.langStrings.failedToGetBikeData[currentLang]}</p>`;
           }
       }
+
       document.addEventListener('visibilitychange', () => {
           if (document.visibilityState === 'visible' && navigator.onLine) {
               console.log('Tab became visible, updating data...'); 
               countdownTimer.update(); 
+          }
+      });
+
+      // --- 修復：監聽螢幕旋轉/縮放，解決跑版與地圖灰畫面 ---
+      window.addEventListener('resize', () => {
+          // 1. 如果切換到橫向模式，清除左側區塊的 inline 高度 (移除拖曳留下的固定高度)
+          // 這樣 CSS 的 height: 100% !important 才能正確生效，且轉回直向時會重置為 CSS 預設值 (40vh)
+          if (window.matchMedia("(orientation: landscape)").matches) {
+              const mainContent = document.getElementById('mainContent');
+              if (mainContent) mainContent.style.height = ''; 
+          }
+
+          // 2. 通知地圖重新計算容器大小 (解決旋轉後地圖只顯示一半或變灰的問題)
+          if (leafletMap) {
+              // 延遲一下確保畫面旋轉渲染完畢
+              setTimeout(() => {
+                  leafletMap.invalidateSize();
+              }, 300);
           }
       });
     </script>
