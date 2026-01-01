@@ -1,15 +1,3 @@
-這是一個常見的響應式設計問題。問題出在於 JavaScript 中的拖曳功能（`dragHandle`）和初始化功能（`showMainContent`）會將 `height`（高度）和 `display`（顯示模式）直接寫入元素的 HTML `style` 屬性中（Inline Styles）。
-
-當您將手機從橫向（Landscape）轉回直向（Portrait）時，這些寫在 HTML 上的 Inline Styles 優先權會高於 CSS 的設定，導致版面維持在橫向的設定（例如 `display: flex` 或固定的 `height`），進而造成跑版。
-
-我已經在程式碼末端添加了一個 `resize` 監聽器，當螢幕旋轉或改變大小時，會自動清除這些 Inline Styles，讓 CSS 重新接管版面配置。
-
-以下是修復後的完整程式碼：
-
-```html
---- START OF FILE index (11).html ---
-
-
 <!DOCTYPE html>
 <html lang="zh-TW">
   <head>
@@ -3341,4 +3329,3 @@
     <script src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
   </body>
 </html>
-```
