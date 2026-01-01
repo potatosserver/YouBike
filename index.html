@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-TW">
   <head>
@@ -8,7 +9,7 @@
     <meta name="description" content="一個專為 YouBike 設計的簡單、美觀且低流量站點搜尋器，提供快速查詢站點資訊功能，滿足即時需求，適合所有用戶使用。">
     <meta name="keywords" content="YouBike, youBike, YouBike2.0, youBike2.0, ubike, ibike, obike, kbike, 微笑單車，公共自行車, 腳踏車，YouBike站點搜尋, 站點搜尋, YouBike 資訊, YouBike據點，ubike據點 ，附近站點, 附近YouBike站點, 全台YouBike, 台北YouBike, 新北YouBike, 桃園YouBike, 新竹YouBike, 苗栗YouBike, 臺中YouBike, 嘉義YouBike , 臺南YouBike, 高雄YouBike, 屏東YouBike, 臺東YouBike , YouBike即時資訊, 定位功能, Github, github.io" />
     <meta property="og:site_name" content="YouBike 站點搜尋" />
-	  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>YouBike 站點搜尋 : 一個簡單、美觀、低流量的YouBike站點搜尋器</title>
     <script type="application/ld+json">
     {
@@ -25,15 +26,25 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster/dist/MarkerCluster.Default.css" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=offline_bolt" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
+      :root {
+          --app-padding: 12px;
+          --app-gap: 12px;
+          --sidebar-width: 340px;
+      }
+      
       body {
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
         margin: 0;
         background: #f4f4f4;
         color: #333;
         transition: background 0.5s ease, color 0.5s ease;
-        padding-top: 20px;
+        height: 100dvh;
+        width: 100vw;
+        overflow: hidden; /* 防止整個 Body 捲動 */
+        display: flex;
+        flex-direction: column;
         --map-filter: none;
         --map-transition: filter 0.3s ease;
         --color-transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
@@ -44,7 +55,215 @@
       }
       *, *::before, *::after {
         transition: var(--color-transition);
+        box-sizing: border-box; 
       }
+
+      #app-container {
+          width: 100%;
+          height: 100%;
+          display: block; 
+      }
+
+      /* 左側列表區塊 (預設手機直向樣式) */
+      #mainContent {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #fff5f0;
+        height: 40vh;
+        min-height: 200px;
+        max-height: 85vh;
+        z-index: 20; 
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        padding-top: 0;
+        width: 85%;
+        max-width: 1000px;
+        margin: 0 auto;
+        left: 50%;
+        transform: translateX(-50%);
+        touch-action: pan-y;
+        -webkit-overflow-scrolling: touch;
+        overflow-y: auto;
+        transition: height 0.2s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+      }
+      #mainContent::-webkit-scrollbar {
+        display: none;
+      }
+      body.dark-mode #mainContent {
+        background: #222;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+      }
+
+      #map-wrapper {
+          width: 100%;
+          height: 100%;
+          position: relative; 
+      }
+
+      #map {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 1;
+        touch-action: none;
+      }
+
+      #mapControls {
+        position: fixed;
+        top: 8px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 999 !important;
+        width: 90%;
+        max-width: 800px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+        pointer-events: none;
+      }
+      #mapControls > * {
+        pointer-events: auto;
+      }
+
+      #updateCountdown {
+        white-space: nowrap;
+        position: fixed;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        padding: 8px 16px;
+        background-color: #ffdacf;
+        color: #333;
+        border: none;
+        border-radius: 20px;
+        font-size: 0.9em;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+        width: auto;
+        min-width: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+
+      /* =========================================
+         橫向模式 (Landscape Mode) - 修復與優化
+         ========================================= */
+      @media (orientation: landscape) {
+          #app-container {
+              display: flex;
+              flex-direction: row;
+              padding: var(--app-padding);
+              gap: var(--app-gap);
+              box-sizing: border-box;
+              overflow: hidden; 
+          }
+
+          #mainContent {
+              position: relative !important; 
+              width: 320px !important; /* 保持左側區塊寬度固定 */
+              height: 100% !important;
+              max-height: 100% !important;
+              min-height: 0 !important;
+              top: auto; left: auto; right: auto; bottom: auto;
+              transform: none !important;
+              margin: 0;
+              border-radius: 24px;
+              box-shadow: 2px 0 15px rgba(0,0,0,0.1);
+              z-index: 100;
+              display: flex;
+              flex-direction: column;
+              padding-bottom: 0;
+              
+              /* 關鍵修復：封鎖容器本身的水平捲動 */
+              overflow-x: hidden !important; 
+              overflow-y: hidden !important; /* 內部滾動由 #results 接手 */
+              padding: 0 !important;
+
+          }
+          
+          /* 列表內容區塊 */
+          #results {
+              flex: 1;
+              overflow-y: auto; /* 只允許垂直滾動 */
+              overflow-x: hidden !important; /* 強制禁止水平滾動 */
+              
+              /* 關鍵修復：左右 padding 歸零，讓卷軸貼齊邊緣 */
+              padding: 10px 0; 
+              margin-top: 10px;
+              width: 100%;
+              scrollbar-width: thin;
+              align-content: flex-start; 
+
+          }
+
+          /* 隱藏拖曳手把 - 強制隱藏 */
+          #dragHandle {
+              display: none !important;
+          }
+
+          /* 搜尋欄調整 - 寬度設為 100% 減去左右邊距 */
+          #searchContainer {
+              margin-top: 20px;
+              width: calc(100% - 24px); 
+              margin-left: auto;
+              margin-right: auto;
+          }
+
+          #map-wrapper {
+              flex: 1;
+              height: 100%;
+              border-radius: 24px;
+              overflow: hidden; 
+              position: relative;
+              box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+              z-index: 1;
+          }
+
+          #map {
+              position: absolute !important;
+              width: 100% !important;
+              height: 100% !important;
+              top: 0; left: 0;
+              border-radius: 0; 
+          }
+
+          #mapControls {
+              position: absolute;
+              top: 20px;
+              left: 50%;
+              transform: translateX(-50%);
+              width: auto;
+              max-width: 90%;
+          }
+
+          #updateCountdown {
+              position: absolute;
+              bottom: 20px;
+              left: 50%;
+              transform: translateX(-50%);
+          }
+
+          /* 卡片樣式微調 */
+          .station {
+              /* 
+                 計算方式：100% 減去左右各 12px (共24px) 
+                 並使用 margin auto 置中，這樣卡片會寬一點，且不會貼死邊緣
+              */
+              width: calc(100% - 24px) !important;
+              margin: 0 auto 12px auto !important; /* 上 右 下 左 */
+          }
+      }
+
       .station,
       .station h3,
       .station p,
@@ -394,45 +613,7 @@
           color: #1c1b1f; 
           box-shadow: 0 4px 8px rgba(255,255,255,0.2); 
       }
-      #map {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        z-index: 1;
-        touch-action: none;
-      }
-      #mainContent {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: #fff5f0;
-        height: 40vh;
-        min-height: 200px;
-        max-height: 85vh;
-        z-index: 2;
-        border-top-left-radius: 20px;
-        border-top-right-radius: 20px;
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-        padding: 20px;
-        padding-top: 0;
-        width: 85%;
-        max-width: 1000px;
-        margin: 0 auto;
-        left: 50%;
-        transform: translateX(-50%);
-        touch-action: pan-y;
-        -webkit-overflow-scrolling: touch;
-      }
-      #mainContent::-webkit-scrollbar {
-        display: none;
-      }
-      body.dark-mode #mainContent {
-        background: #222;
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
-      }
+      
       #dragHandle {
         position: sticky;
         top: 0;
@@ -467,6 +648,7 @@
         background: #aaa;
         box-shadow: 0 2px 5px rgba(255,255,255,0.2);
       }
+      
       @media (max-width: 768px) {
         #mainContent {
           width: 80%;
@@ -486,7 +668,8 @@
           width: calc(100% - 32px);
           border-radius: 10px;
         }
-      }      @media (max-width: 768px) {
+      }      
+      @media (max-width: 768px) {
         .station {
           width: calc(50% - 20px);
         }
@@ -708,28 +891,6 @@
           transform: translateY(-2px);
           box-shadow: 4px 4px 10px rgba(0,0,0,0.2);
       }
-      #updateCountdown {
-        white-space: nowrap;
-        position: fixed;
-        bottom: 10px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 1000;
-        padding: 8px 16px;
-        background-color: #ffdacf;
-        color: #333;
-        border: none;
-        border-radius: 20px;
-        font-size: 0.9em;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        transition: all 0.3s ease;
-        width: auto;
-        min-width: 120px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-      }
       #updateCountdown:hover {
           background-color: #ffc0a8;
           box-shadow: 0 3px 6px rgba(0,0,0,0.3);
@@ -781,23 +942,8 @@
           color: #1c1b1f;
           box-shadow: 0 4px 8px rgba(0,0,0,0.4);
       }
-      #mapControls {
-        position: fixed;
-        top: 8px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 999 !important;
-        width: 90%;
-        max-width: 800px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-        pointer-events: none;
-      }
-      #mapControls > * {
-        pointer-events: auto;
-      }
+
+      /* Map Controls Text */
       #mapControls h1 {
         color: #007BFF;
         background-color: transparent;
@@ -946,12 +1092,18 @@
         display: flex;
         align-items: center;
         gap: 10px;
+        overflow: hidden;
       }
       body.dark-mode .github-link {
         color: #90CAF9;
       }
       .github-link span {
         flex: 1;
+      }
+      .github-link svg {
+          flex-shrink: 0;
+          width: 30px;
+          height: 30px;
       }
       #settingsPanelTitle {
           color: #333;
@@ -1084,29 +1236,25 @@
       body.dark-mode #closeRouteModal:hover {
           background-color: rgba(255, 255, 255, 0.1);
       }
-body.dark-mode #routeModal .bike-item {
-    background-color: #444 !important;
-    color: #fff !important;
-    box-shadow: 0 4px 8px rgba(255,255,255,0.1) !important;
-}
-body.dark-mode #routeModal .bike-item p {
-    color: #fff !important;
-}
-#routeModal ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-#routeModal .bike-item:last-child {
-    margin-bottom: 0;
-}
+      body.dark-mode #routeModal .bike-item {
+          background-color: #444 !important;
+          color: #fff !important;
+          box-shadow: 0 4px 8px rgba(255,255,255,0.1) !important;
+      }
+      body.dark-mode #routeModal .bike-item p {
+          color: #fff !important;
+      }
+      #routeModal ul {
+          list-style: none;
+          padding: 0;
+          margin: 0;
+      }
+      #routeModal .bike-item:last-child {
+          margin-bottom: 0;
+      }
     </style>
   </head>
   <body>
-    <div id="map"></div>
-    <div id="mapControls">
-      <h1 id="heading" class="main-title"></h1>
-      </div>
     <div id="locationNotification"></div>
     <div id="loadingOverlay">
       <div id="loadingContent">
@@ -1114,34 +1262,48 @@ body.dark-mode #routeModal .bike-item p {
         <div id="noticeBox" style="margin-top: 10px; margin-left: 20px; margin-right: 20px; background: #fff; padding: 10px; border: 1px solid #ccc; border-radius: 5px;"></div>
       </div>
     </div>
-    <div id="mainContent">
-      <div id="dragHandle"></div>
-      <div id="searchContainer">
-        <input type="text" id="keyword" placeholder="請輸入站點名稱、地址" value="" onfocus="this.placeholder=''" onblur="this.placeholder='請輸入站點名稱、地址'" />
-        <span id="searchIcon" class="material-icons" title="搜尋">search</span>
-        <span id="clearTextBtn" class="material-icons" title="清除" style="display:none; margin-left:10px; cursor:pointer;">close</span>
-      </div>
-      <div id="results"></div>
-      </div>
-      <div class="overlay"></div>
-      <div class="modal" id="permissionModal">
-        <p id="modalText"></p>
-        <button id="modalButton">確定</button>
-      </div>
-      <div class="modal" id="routeModal">
-          <button id="closeRouteModal">×</button>
-          <h3 id="routeModalTitle">路線資訊</h3>
-          <div id="routeDetails">
-          </div>
-      </div>
+
+    <!-- 主要應用程式容器，使用 Flexbox 佈局 -->
+    <div id="app-container">
+        <!-- 側邊欄/下方列表 -->
+        <div id="mainContent">
+            <div id="dragHandle"></div>
+            <div id="searchContainer">
+                <input type="text" id="keyword" placeholder="請輸入站點名稱、地址" value="" onfocus="this.placeholder=''" onblur="this.placeholder='請輸入站點名稱、地址'" />
+                <span id="searchIcon" class="material-icons" title="搜尋">search</span>
+                <span id="clearTextBtn" class="material-icons" title="清除" style="display:none; margin-left:10px; cursor:pointer;">close</span>
+            </div>
+            <div id="results"></div>
+        </div>
+
+        <!-- 地圖包裹器 -->
+        <div id="map-wrapper">
+            <div id="map"></div>
+            <div id="mapControls">
+                <h1 id="heading" class="main-title"></h1>
+            </div>
+            <button id="updateCountdown" style="display:none;">
+                <span class="material-icons">autorenew</span>
+                <span id="updateCountdownText">60秒後更新</span>
+            </button>
+        </div>
+    </div>
+    
+    <div class="overlay"></div>
+    <div class="modal" id="permissionModal">
+      <p id="modalText"></p>
+      <button id="modalButton">確定</button>
+    </div>
+    <div class="modal" id="routeModal">
+        <button id="closeRouteModal">×</button>
+        <h3 id="routeModalTitle">路線資訊</h3>
+        <div id="routeDetails">
+        </div>
+    </div>
     <button id="settingsButton" title="設定">
         <span class="material-icons">settings</span>
     </button>
-    </div>
-    <button id="updateCountdown" style="display:none;">
-  <span class="material-icons">autorenew</span>
-  <span id="updateCountdownText">60秒後更新</span>
-</button>
+    
     <div id="centralSettingsPanel">
       <button id="closeCentralSettings">×</button>
       <h2 id="settingsPanelTitle">系統設定</h2>
@@ -1203,13 +1365,39 @@ body.dark-mode #routeModal .bike-item p {
           <h3>外部連結</h3>
           <div class="setting-item">
               <a href="https://github.com/potatosserver/YouBike" target="_blank" class="github-link">
-                  <img src="https://potatosserver.github.io/YouBike/icons/html.webp" alt="GitHub Repository" style="width:30px; height:30px;">
+                  <svg width="800px" height="800px" viewBox="-52.5 0 361 361" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid" class="github-icon-svg">
+                    <g>
+                        <path d="M255.554813,70.7657143 L232.31367,331.125451 L127.843868,360.087912 L23.6617143,331.166242 L0.445186813,70.7657143 L255.554813,70.7657143 L255.554813,70.7657143 Z" fill="#E44D26"></path>
+                        <path d="M128,337.950242 L212.416703,314.546637 L232.277802,92.0573187 L128,92.0573187 L128,337.950242 L128,337.950242 Z" fill="#F16529"></path>
+                        <path d="M82.8202198,155.932132 L128,155.932132 L128,123.994725 L47.917011,123.994725 L48.6814945,132.562989 L56.530989,220.572835 L128,220.572835 L128,188.636132 L85.7389011,188.636132 L82.8202198,155.932132 L82.8202198,155.932132 Z" fill="#EBEBEB"></path>
+                        <path d="M90.0177582,236.54189 L57.957978,236.54189 L62.4323516,286.687648 L127.853011,304.848879 L128,304.808088 L128,271.580132 L127.860044,271.617407 L92.2915165,262.013187 L90.0177582,236.54189 L90.0177582,236.54189 Z" fill="#EBEBEB"></path>
+                        <path d="M24.1807473,0 L40.4107253,0 L40.4107253,16.0351648 L55.2573187,16.0351648 L55.2573187,0 L71.488,0 L71.488,48.5584176 L55.258022,48.5584176 L55.258022,32.2981978 L40.4114286,32.2981978 L40.4114286,48.5584176 L24.1814505,48.5584176 L24.1814505,0 L24.1807473,0 L24.1807473,0 Z" fill="#000000"></path>
+                        <path d="M92.8309451,16.1026813 L78.5427692,16.1026813 L78.5427692,0 L123.356835,0 L123.356835,16.1026813 L109.06233,16.1026813 L109.06233,48.5584176 L92.8316484,48.5584176 L92.8316484,16.1026813 L92.8309451,16.1026813 L92.8309451,16.1026813 Z" fill="#000000"></path>
+                        <path d="M130.469275,0 L147.392703,0 L157.802901,17.061978 L168.202549,0 L185.132308,0 L185.132308,48.5584176 L168.969143,48.5584176 L168.969143,24.4901978 L157.802901,41.7554286 L157.523692,41.7554286 L146.349714,24.4901978 L146.349714,48.5584176 L130.469275,48.5584176 L130.469275,0 L130.469275,0 Z" fill="#000000"></path>
+                        <path d="M193.20967,0 L209.444571,0 L209.444571,32.5077802 L232.268659,32.5077802 L232.268659,48.5584176 L193.20967,48.5584176 L193.20967,0 L193.20967,0 Z" fill="#000000"></path>
+                        <path d="M127.889582,220.572835 L167.216527,220.572835 L163.509451,261.992791 L127.889582,271.606857 L127.889582,304.833407 L193.362286,286.687648 L193.842637,281.291956 L201.347516,197.212132 L202.126769,188.636132 L127.889582,188.636132 L127.889582,220.572835 L127.889582,220.572835 Z" fill="#FFFFFF"></path>
+                        <path d="M127.889582,155.854066 L127.889582,155.932132 L205.032791,155.932132 L205.673495,148.753582 L207.128615,132.562989 L207.892396,123.994725 L127.889582,123.994725 L127.889582,155.854066 L127.889582,155.854066 Z" fill="#FFFFFF"></path>
+                    </g>
+                  </svg>
                   <span>YouBike Repository</span>
               </a>
           </div>
           <div class="setting-item">
               <a href="https://github.com/potatosserver/YouBike_Python" target="_blank" class="github-link">
-                  <img src="https://potatosserver.github.io/YouBike/icons/python.webp" alt="GitHub Repository" style="width:30px; height:30px;">
+                  <svg width="800px" height="800px" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" class="github-icon-svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M13.0164 2C10.8193 2 9.03825 3.72453 9.03825 5.85185V8.51852H15.9235V9.25926H5.97814C3.78107 9.25926 2 10.9838 2 13.1111L2 18.8889C2 21.0162 3.78107 22.7407 5.97814 22.7407H8.27322V19.4815C8.27322 17.3542 10.0543 15.6296 12.2514 15.6296H19.5956C21.4547 15.6296 22.9617 14.1704 22.9617 12.3704V5.85185C22.9617 3.72453 21.1807 2 18.9836 2H13.0164ZM12.0984 6.74074C12.8589 6.74074 13.4754 6.14378 13.4754 5.40741C13.4754 4.67103 12.8589 4.07407 12.0984 4.07407C11.3378 4.07407 10.7213 4.67103 10.7213 5.40741C10.7213 6.14378 11.3378 6.74074 12.0984 6.74074Z" fill="url(#paint0_linear_87_8204)"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M18.9834 30C21.1805 30 22.9616 28.2755 22.9616 26.1482V23.4815L16.0763 23.4815L16.0763 22.7408L26.0217 22.7408C28.2188 22.7408 29.9998 21.0162 29.9998 18.8889V13.1111C29.9998 10.9838 28.2188 9.25928 26.0217 9.25928L23.7266 9.25928V12.5185C23.7266 14.6459 21.9455 16.3704 19.7485 16.3704L12.4042 16.3704C10.5451 16.3704 9.03809 17.8296 9.03809 19.6296L9.03809 26.1482C9.03809 28.2755 10.8192 30 13.0162 30H18.9834ZM19.9015 25.2593C19.1409 25.2593 18.5244 25.8562 18.5244 26.5926C18.5244 27.329 19.1409 27.9259 19.9015 27.9259C20.662 27.9259 21.2785 27.329 21.2785 26.5926C21.2785 25.8562 20.662 25.2593 19.9015 25.2593Z" fill="url(#paint1_linear_87_8204)"/>
+                    <defs>
+                    <linearGradient id="paint0_linear_87_8204" x1="12.4809" y1="2" x2="12.4809" y2="22.7407" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#327EBD"/>
+                    <stop offset="1" stop-color="#1565A7"/>
+                    </linearGradient>
+                    <linearGradient id="paint1_linear_87_8204" x1="19.519" y1="9.25928" x2="19.519" y2="30" gradientUnits="userSpaceOnUse">
+                    <stop stop-color="#FFDA4B"/>
+                    <stop offset="1" stop-color="#F9C600"/>
+                    </linearGradient>
+                    </defs>
+                  </svg>
                   <span>YouBike Python Repository</span>
               </a>
           </div>
@@ -1295,6 +1483,10 @@ body.dark-mode #routeModal .bike-item p {
           mainContent.style.display = "block"; 
           mainContent.offsetHeight;
           mainContent.classList.add('fade-in'); 
+          // 確保在橫向模式下也能正確顯示
+          if(window.innerWidth > window.innerHeight) {
+               mainContent.style.display = "flex";
+          }
           mainContent.style.overflowY = 'auto'; 
           document.getElementById('updateCountdown').style.display = navigator.onLine ? "flex" : "none";
           setTimeout(() => {
