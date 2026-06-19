@@ -1,0 +1,162 @@
+*, *::before, *::after {
+  transition: var(--color-transition);
+  box-sizing: border-box; 
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  margin: 0;
+  background: #f4f4f4;
+  color: #333;
+  transition: background 0.5s ease, color 0.5s ease;
+  height: 100dvh;
+  width: 100vw;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+#app-container {
+  width: 100%;
+  height: 100%;
+  display: block; 
+}
+
+/* 預設隱藏，由 .visible 控制顯示 */
+#mainContent {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #fff5f0;
+  height: 40vh;
+  min-height: 200px;
+  max-height: 85dvh;
+  z-index: 20; 
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  padding-top: 0;
+  width: 85%;
+  max-width: 1000px;
+  margin: 0 auto;
+  left: 50%;
+  transform: translateX(-50%);
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  transition: height 0.2s ease, background-color 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease-in-out;
+  display: none; /* 預設完全不顯示 */
+  opacity: 0;
+}
+
+/* 當載入完成後由 JS 附加此 class */
+#mainContent.visible {
+  display: block;
+}
+
+#mainContent::-webkit-scrollbar {
+  display: none;
+}
+
+#mainContent.fade-in {
+  opacity: 1;
+}
+
+#map-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative; 
+}
+
+#map {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  touch-action: none;
+}
+
+#mapControls {
+  position: fixed;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999 !important;
+  width: 90%;
+  max-width: 800px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+}
+
+#mapControls > * {
+  pointer-events: auto;
+}
+
+#mapControls h1 {
+  color: #007BFF;
+  background-color: transparent;
+  display: inline;
+  padding: 0;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease; /* 增加透明度過渡，使背景淡出更柔和 */
+}
+
+.overlay.show {
+  display: block;
+  opacity: 1;
+}
+
+#loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9998;
+  transition: opacity 0.5s ease;
+  opacity: 1;
+}
+
+#loadingOverlay.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#loadingContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#loadingText {
+  font-size: 1.5em;
+  color: #007BFF;
+  text-align: center;
+}

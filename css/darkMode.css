@@ -1,0 +1,220 @@
+body.dark-mode {
+  background: #333;
+  color: #ffffff;
+}
+
+body.dark-mode h1 {
+  color: #90CAF9;
+}
+
+body.dark-mode .main-title {
+  color: #90CAF9;
+}
+
+body.dark-mode #mainContent {
+  background: #222;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+}
+
+body.dark-mode #searchContainer {
+  background-color: #1e1e1e;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode #keyword {
+  color: #ffffff;
+  border-color: #90caf9;
+}
+
+body.dark-mode #keyword::placeholder {
+  color: #888;
+}
+
+body.dark-mode #searchIcon {
+  color: #ccc;
+}
+
+body.dark-mode #searchIcon:hover {
+  color: #ffffff;
+}
+
+body.dark-mode #locationSwitchContainer {
+  background-color: rgba(30, 30, 30, 0.9);
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode #locationSwitchText {
+  color: #90CAF9;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+body.dark-mode button {
+  background-color: #90caf9;
+  color: #121212;
+}
+
+body.dark-mode button:hover {
+  background-color: #64b5f6;
+}
+
+body.dark-mode .station {
+  background-color: #444;
+  border-color: #555;
+  color: #ffffff;
+}
+
+body.dark-mode .station h3 {
+  color: #90CAF9;
+}
+
+body.dark-mode .station p {
+  color: #cccccc;
+}
+
+body.dark-mode .navigate-button {
+  color: #90CAF9;
+  background-color: transparent;
+}
+
+body.dark-mode .navigate-button:hover {
+  color: #64b5f6;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .modal {
+  background-color: #333;
+  color: #ffffff;
+}
+
+body.dark-mode .overlay {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+body.dark-mode #loadingOverlay {
+  background-color: rgba(51, 51, 51, 1);
+}
+
+body.dark-mode #loadingText {
+  color: #ffffff;
+}
+
+body.dark-mode #noticeBox {
+  background-color: #000;
+  color: #000;
+  border: 1px solid #444;
+}
+
+body.dark-mode #locationNotification {
+  background-color: #d0bcff; 
+  color: #1c1b1f; 
+  box-shadow: 0 4px 8px rgba(255,255,255,0.2); 
+}
+
+body.dark-mode #dragHandle::before {
+  background: #888;
+  box-shadow: 0 1px 3px rgba(255,255,255,0.1);
+}
+
+body.dark-mode #dragHandle:hover::before {
+  background: #aaa;
+  box-shadow: 0 2px 5px rgba(255,255,255,0.2);
+}
+
+body.dark-mode #updateCountdown {
+  background-color: #e8def8;
+  color: #1c1b1f;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+body.dark-mode #updateCountdown:hover {
+  background-color: #d0bcff;
+  color: #1c1b1f;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+}
+
+body.dark-mode #settingsButton {
+  background-color: #e8def8;
+  color: #1c1b1f;
+  box-shadow: 0 3px 5px rgba(0,0,0,0.3);
+}
+
+body.dark-mode #settingsButton:hover {
+  background-color: #d0bcff;
+  color: #1c1b1f;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+}
+
+body.dark-mode #mapControls h1 {
+  color: #90CAF9;
+  text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000;
+}
+
+body.dark-mode #centralSettingsPanel {
+  background: rgba(30, 30, 30, 0.95);
+  transition: background-color 0.1s ease;
+}
+
+body.dark-mode .settings-group {
+  border-color: #fff;
+  color: #fff;
+  background: transparent;
+}
+
+body.dark-mode .setting-item {
+  background: #455a64;
+}
+
+body.dark-mode #closeCentralSettings {
+  color: #fff;
+}
+
+body.dark-mode #closeCentralSettings:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode #centralRegionSelect {
+  background-color: #555;
+  color: #fff;
+  border: 1px solid #777;
+}
+
+body.dark-mode #centralRegionSelect option {
+  background-color: #555;
+  color: #fff;
+}
+
+body.dark-mode .github-link {
+  color: #90CAF9;
+}
+
+body.dark-mode #settingsPanelTitle {
+  color: #fff;
+}
+
+body.dark-mode #routeModal {
+  background-color: rgba(30, 30, 30, 0.95); 
+  color: #ffffff;
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1); 
+}
+
+body.dark-mode #routeModal h3 {
+  color: #90CAF9;
+}
+
+body.dark-mode #routeModal .bike-item {
+  background-color: #444 !important; 
+  color: #fff !important;
+  box-shadow: 0 4px 8px rgba(255,255,255,0.1) !important;
+}
+
+body.dark-mode #routeModal .bike-item p {
+  color: #fff !important;
+}
+
+body.dark-mode #closeRouteModal {
+  color: #ccc;
+}
+
+body.dark-mode #closeRouteModal:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}

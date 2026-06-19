@@ -1,0 +1,13 @@
+export const overlay = document.querySelector('.overlay');
+export const modal = document.querySelector('.modal');
+export const modalText = document.getElementById('modalText');
+export const modalButton = document.getElementById('modalButton');
+export const resultsDiv = document.getElementById('results');
+export const keywordInput = document.getElementById('keyword');
+export const clearTextBtn = document.getElementById('clearTextBtn');
+export const mainContent = document.getElementById("mainContent");
+export const dragHandle = document.getElementById('dragHandle');
+export const settingsButton = document.getElementById('settingsButton');
+export const centralSettingsPanel = document.getElementById('centralSettingsPanel');
+export const closeCentralSettings = document.getElementById('closeCentralSettings');
+export const settingsIcon = settingsButton.querySelector('.material-icons');
