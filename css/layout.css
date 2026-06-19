@@ -26,7 +26,6 @@ body {
   display: block; 
 }
 
-/* 預設隱藏，由 .visible 控制顯示 */
 #mainContent {
   position: fixed;
   bottom: 0;
@@ -51,11 +50,10 @@ body {
   -webkit-overflow-scrolling: touch;
   overflow-y: auto;
   transition: height 0.2s ease, background-color 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease-in-out;
-  display: none; /* 預設完全不顯示 */
+  display: none; 
   opacity: 0;
 }
 
-/* 當載入完成後由 JS 附加此 class */
 #mainContent.visible {
   display: block;
 }
@@ -120,7 +118,7 @@ body {
   z-index: 999;
   display: none;
   opacity: 0;
-  transition: opacity 0.3s ease; /* 增加透明度過渡，使背景淡出更柔和 */
+  transition: opacity 0.3s ease;
 }
 
 .overlay.show {
@@ -159,4 +157,99 @@ body {
   font-size: 1.5em;
   color: #007BFF;
   text-align: center;
+}
+
+/* --- 精準對齊 Leaflet 按鈕的最終樣式 --- */
+
+/* 控制項區塊整體向上移動 */
+.leaflet-top.leaflet-left {
+    top: 5px; 
+}
+
+/* 縮小控制項之間的垂直間距 (預設是 10px) */
+.leaflet-top .leaflet-control {
+    margin-top: 4px;
+}
+
+/* 容器樣式 */
+.leaflet-bar {
+  box-shadow: 0 1px 5px rgba(0,0,0,0.65);
+  border-radius: 4px;
+}
+
+/* 通用按鈕樣式 */
+.leaflet-bar a, 
+.leaflet-bar a:hover {
+    background-color: #fff;
+    color: #333;
+    border-bottom: 1px solid #ccc;
+    width: 30px; 
+    height: 30px; 
+    line-height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+}
+
+/* 移除最後一個按鈕的邊框 */
+.leaflet-bar a:last-child {
+    border-bottom: none;
+}
+
+/* 滑鼠懸停效果 */
+.leaflet-bar a:hover {
+    background-color: #f4f4f4;
+}
+
+/* 自訂按鈕中的圖示 */
+.leaflet-control-custom .material-icons {
+    font-size: 16px; 
+    color: #333;
+}
+
+/* --- 按鈕狀態 --- */
+
+/* 啟用 (跟隨中) 狀態 */
+.leaflet-control-custom.active .material-icons {
+    color: #007BFF !important;
+}
+
+/* 禁用狀態 */
+.leaflet-control-custom.disabled {
+    cursor: not-allowed;
+    background-color: #e0e0e0 !important;
+}
+
+.leaflet-control-custom.disabled .material-icons {
+    color: #999 !important;
+}
+
+/* --- 深色模式 --- */
+
+.dark-mode .leaflet-bar a,
+.dark-mode .leaflet-bar a:hover {
+    background-color: #383838;
+    color: #ddd;
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.dark-mode .leaflet-bar a:hover {
+    background-color: #4a4a4a;
+}
+
+.dark-mode .leaflet-control-custom .material-icons {
+    color: #ddd;
+}
+
+.dark-mode .leaflet-control-custom.active .material-icons {
+    color: #4dabf7 !important; 
+}
+
+.dark-mode .leaflet-control-custom.disabled {
+    background-color: #555 !important;
+}
+
+.dark-mode .leaflet-control-custom.disabled .material-icons {
+    color: #777 !important;
 }

@@ -9,6 +9,38 @@ import { updateResultsOrder } from './pinService.js';
 let locationMarker = null;
 let pulsingMarker = null;
 
+// 創建並導出 Leaflet 控制項的函式
+export function createLocateControl() {
+    const LocateControl = L.Control.extend({
+        onAdd: function(map) {
+            const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+            const btn = L.DomUtil.create('a', 'leaflet-control-custom', container);
+            
+            btn.id = 'locateButton'; // 保留 ID 以便於選取
+            btn.innerHTML = '<span class="material-icons">my_location</span>';
+            btn.href = '#';
+            btn.role = 'button';
+            btn.setAttribute('aria-label', state.currentLang === "en" ? "My Location" : "我的位置");
+
+            L.DomEvent.disableClickPropagation(container);
+            L.DomEvent.on(btn, 'click', L.DomEvent.stop);
+            L.DomEvent.on(btn, 'click', toggleTracking);
+
+            setTimeout(() => updateLocateButtonTitle(), 0);
+
+            return container;
+        },
+        onRemove: function(map) {
+            const btn = document.getElementById('locateButton');
+            if (btn) {
+                L.DomEvent.off(btn, 'click', L.DomEvent.stop);
+                L.DomEvent.off(btn, 'click', toggleTracking);
+            }
+        }
+    });
+    return new LocateControl({ position: 'topleft' });
+}
+
 export async function getLocation() {
     const isLocationServiceOn = dom.centralLocationToggle?.checked;
     let locationSet = false; 
@@ -71,7 +103,6 @@ function updateLocationMarkersOnMap(mapInstance) {
             radius: 10, fillColor: '#2196F3', fillOpacity: 0.8, color: '#ffffff', weight: 3, pane: 'markerPane' 
         }).addTo(mapInstance);
         
-        // 修正：回歸 Leaflet 容器最原生乾淨的 <div class="pulse"> 節點，由 css/components.css 對其渲染與產生動畫
         const pulsingIcon = L.divIcon({
             className: 'pulsing-icon', 
             html: '<div class="pulse"></div>', 
@@ -185,15 +216,18 @@ export function updateLocateButtonTitle() {
     const locateButton = document.getElementById('locateButton');
     if (locateButton) {
         const isLocationServiceOn = dom.centralLocationToggle?.checked; 
+
+        locateButton.classList.remove('active', 'disabled');
+
         if (!isLocationServiceOn) {
             locateButton.title = state.currentLang === "en" ? "Location service off (using default region)" : "定位服務已關閉 (使用預設地區)";
-            locateButton.style.color = '#666'; 
+            locateButton.classList.add('disabled');
         } else if (state.isFollowingUser) {
             locateButton.title = state.currentLang === "en" ? "Following your location" : "正在跟隨您的位置";
-            locateButton.style.color = '#007BFF'; 
+            locateButton.classList.add('active');
         } else {
             locateButton.title = state.currentLang === "en" ? "Go to my location" : "定位到我目前位置";
-            locateButton.style.color = '#333'; 
+            // No class needed for default state
         }
     }
 }

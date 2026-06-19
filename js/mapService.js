@@ -1,6 +1,7 @@
 import { state, config } from './config.js';
 import { queryVehicleData } from './apiYoubike.js';
 import { showNotification } from './loadingService.js';
+import { createLocateControl } from './locationTracker.js'; // 引入新的控制項創建函式
 
 let leafletMap, markerClusterGroup, tileLayer;
 
@@ -32,21 +33,8 @@ export function initMap(stations) {
     markerClusterGroup = L.markerClusterGroup();
     leafletMap.addLayer(markerClusterGroup);
     
-    let locateControl = L.control({ position: 'topleft' });
-    locateControl.onAdd = function() {
-        let btn = L.DomUtil.create('button', 'leaflet-bar leaflet-control leaflet-control-custom');
-        btn.id = 'locateButton';
-        btn.innerHTML = '<i class="material-icons" style="font-size:18px; line-height:30px;">my_location</i>';
-        btn.style.cssText = 'width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; padding: 0; cursor: pointer;';
-        btn.title = state.currentLang === "en" ? "Go to my location" : "定位到我目前位置"; 
-        
-        L.DomEvent.on(btn, 'click', function(e) {
-            L.DomEvent.stopPropagation(e); 
-            L.DomEvent.preventDefault(e); 
-            import('./locationTracker.js').then(module => module.toggleTracking()); 
-        });
-        return btn;
-    };
+    // 修正：將定位按鈕的創建和添加，統一到 locationTracker.js 中管理
+    const locateControl = createLocateControl();
     locateControl.addTo(leafletMap);
     
     leafletMap.on('dragstart', disableFollowingOnManualInteraction);
