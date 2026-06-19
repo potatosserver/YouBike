@@ -1,13 +1,30 @@
-export const overlay = document.querySelector('.overlay');
-export const modal = document.querySelector('.modal');
-export const modalText = document.getElementById('modalText');
-export const modalButton = document.getElementById('modalButton');
-export const resultsDiv = document.getElementById('results');
-export const keywordInput = document.getElementById('keyword');
-export const clearTextBtn = document.getElementById('clearTextBtn');
-export const mainContent = document.getElementById("mainContent");
-export const dragHandle = document.getElementById('dragHandle');
-export const settingsButton = document.getElementById('settingsButton');
-export const centralSettingsPanel = document.getElementById('centralSettingsPanel');
-export const closeCentralSettings = document.getElementById('closeCentralSettings');
-export const settingsIcon = settingsButton.querySelector('.material-icons');
+export const dom = {
+    overlay: document.querySelector('.overlay'),
+    permissionModal: document.getElementById('permissionModal'),
+    modalText: document.getElementById('modalText'),
+    modalButton: document.getElementById('modalButton'),
+    resultsDiv: document.getElementById('results'),
+    keywordInput: document.getElementById('keyword'),
+    clearTextBtn: document.getElementById('clearTextBtn'),
+    mainContent: document.getElementById('mainContent'),
+    loadingOverlay: document.getElementById('loadingOverlay'),
+    loadingContent: document.getElementById('loadingContent'),
+    loadingText: document.getElementById('loadingText'),
+    noticeBox: document.getElementById('noticeBox'),
+    locationNotification: document.getElementById('locationNotification'),
+    updateCountdown: document.getElementById('updateCountdown'),
+    updateCountdownText: document.getElementById('updateCountdownText'),
+    settingsButton: document.getElementById('settingsButton'),
+    centralSettingsPanel: document.getElementById('centralSettingsPanel'),
+    closeCentralSettings: document.getElementById('closeCentralSettings'),
+    searchIcon: document.getElementById('searchIcon'),
+    dragHandle: document.getElementById('dragHandle'),
+    routeModal: document.getElementById('routeModal'),
+    routeDetailsDiv: document.getElementById('routeDetails'),
+    closeRouteModalButton: document.getElementById('closeRouteModal'),
+    routeModalTitle: document.getElementById('routeModalTitle'),
+    centralRegionSelect: document.getElementById('centralRegionSelect'),
+    centralLocationToggle: document.getElementById('centralLocationToggle'),
+    centralDarkModeToggle: document.getElementById('centralDarkModeToggle'),
+    centralLangToggle: document.getElementById('centralLangToggle')
+};
