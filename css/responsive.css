@@ -20,7 +20,7 @@
     margin: 0 !important;
     border-radius: 24px !important;
     box-shadow: -2px 0 15px rgba(0,0,0,0.1) !important; /* Adjusted shadow for right side */
-    z-index: 100 !important;
+    z-index: 200 !important;
     display: flex !important;
     flex-direction: column !important;
     padding: 0 !important;
@@ -57,7 +57,7 @@
     overflow: hidden !important; 
     position: relative !important;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1) !important;
-    z-index: 1 !important;
+    z-index: 100!important;
   }
 
   #map {
@@ -139,14 +139,24 @@
 }
 
 @media (max-width: 480px) {
+  #mainContent h1 {
+    top: 5px !important; 
+    font-size: 1.2em !important;
+  }
 
   #results {
     padding: 0 16px;
   }
 
-  .station {
-    width: calc(100% - 20px) !important; /* Added !important */
-    margin: 10px auto;
+  #results .station {
+    width: calc(100% - 20px) !important;
+    margin: 8px auto !important;
+    padding: 12px !important;
+  }
+
+  #results .station h3 {
+    font-size: 1em !important;
+    margin-bottom: 5px !important;
   }
 
   #searchContainer {
