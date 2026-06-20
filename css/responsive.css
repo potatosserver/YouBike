@@ -1,18 +1,17 @@
 @media (orientation: landscape) {
-  /* This block remains, it handles the desktop/widescreen layout */
   #app-container {
     display: flex !important;
-    flex-direction: row !important;
+    flex-direction: row-reverse !important; /* Swapped from row to row-reverse */
     padding: var(--app-padding, 12px) !important;
     gap: var(--app-gap, 12px) !important;
     box-sizing: border-box !important;
     overflow: hidden !important; 
   }
 
-  /* In landscape, the main content is a sidebar */
   #mainContent {
     position: relative !important; 
-    width: 320px !important; 
+    width: 320px !important; /* Set width to 320px */
+    min-width: 0; /* Allow the element to shrink below its content size */
     height: 100% !important;
     max-height: 100% !important;
     min-height: 0 !important;
@@ -20,7 +19,7 @@
     transform: none !important;
     margin: 0 !important;
     border-radius: 24px !important;
-    box-shadow: 2px 0 15px rgba(0,0,0,0.1) !important;
+    box-shadow: -2px 0 15px rgba(0,0,0,0.1) !important; /* Adjusted shadow for right side */
     z-index: 100 !important;
     display: flex !important;
     flex-direction: column !important;
@@ -40,13 +39,12 @@
     align-content: flex-start !important; 
   }
 
-  /* hide the drag handle in landscape mode */
   #dragHandle {
     display: none !important;
   }
 
   #searchContainer {
-    margin-top: 20px !important;
+    margin-top: 0 !important; /* Set top margin to 0 to remove the gap */
     width: calc(100% - 24px) !important; 
     margin-left: auto !important;
     margin-right: auto !important;
@@ -93,21 +91,16 @@
   }
 }
 
-
-/* Pulsing icon style, keep it */
 .pulsing-icon {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
 }
 
-
-/* Cleanup for old mobile styles. Most are now handled by the mobile-first approach in layout.css */
 @media (max-width: 768px) {
   
   .station {
-    /* This might still be useful if you want two columns on a tablet */
-    width: calc(50% - 20px);
+    width: calc(100% - 20px) !important; /* Added !important */
   }
   
   #searchContainer {
@@ -151,9 +144,8 @@
     padding: 0 16px;
   }
 
-  /* Make station cards full width on small phones */
   .station {
-    width: calc(100% - 20px); /* Slightly less than 100% for some spacing */
+    width: calc(100% - 20px) !important; /* Added !important */
     margin: 10px auto;
   }
 
