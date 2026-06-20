@@ -28,7 +28,7 @@ export function initMap(stations) {
     try {
         tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
-            attribution: '© <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            attribution: ''
         }).addTo(leafletMap);
 
         applyMapDarkMode();
