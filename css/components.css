@@ -640,6 +640,10 @@ body.dark-mode #updateCountdown:hover {
   opacity: 0; 
 }
 
+#routeModal p {
+    margin: 0.5em 0;
+}
+
 #routeModal.modal-open {
   animation-name: slideIn; 
 }
