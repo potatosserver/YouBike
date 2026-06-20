@@ -6,9 +6,12 @@ import { getMapInstance } from './mapService.js';
 export const countdownTimer = {
     remaining: 60, 
     updateDisplay: function() {
-        if (!dom.updateCountdownText) return;
-        const text = state.currentLang === "en" ? `${this.remaining} sec update` : `${this.remaining}秒後更新`;
-        dom.updateCountdownText.textContent = text;
+        const countdownTimer = document.getElementById('countdownTimer');
+        const countdownSuffix = document.getElementById('countdownSuffix');
+        if (!countdownTimer || !countdownSuffix) return;
+
+        countdownTimer.textContent = this.remaining;
+        countdownSuffix.textContent = state.currentLang === "en" ? " sec update" : "秒後更新";
     },
     reset: function() {
         if (!dom.updateCountdown) return;
