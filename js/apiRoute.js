@@ -1,3 +1,4 @@
+
 import { dom } from './domElements.js';
 import { state, config } from './config.js';
 import { showNotification } from './loadingService.js';
@@ -46,7 +47,7 @@ export async function getRoute(startLat, startLng, endLat, endLng, stationName) 
 }
 
 function displayRouteDetails(routeData, stationName) {
-    let html = `<h4>${state.currentLang === "en" ? "Route to " : "前往 "}${stationName}</h4>`;
+    let html = '';
     const distanceKm = (routeData.distance / 1000).toFixed(2);
     const timeMinutes = Math.round(routeData.time / 60000); 
     
@@ -54,7 +55,7 @@ function displayRouteDetails(routeData, stationName) {
     html += `<p><span class="material-icons" style="font-size: 18px; vertical-align: middle;">timer</span>${state.currentLang === "en" ? "Estimated Time: " : "預計時間："} ${timeMinutes} ${state.currentLang === "en" ? "minutes" : "分鐘"}</p>`;
     
     if (routeData.instructions && routeData.instructions.length > 0) {
-        html += `<h4>${state.currentLang === "en" ? "Instructions:" : "導航步驟："}</h4><ul>`;
+        html += '<ul>';
         routeData.instructions.forEach(instruction => {
             let iconName = 'arrow_forward'; 
             switch (instruction.sign) {
