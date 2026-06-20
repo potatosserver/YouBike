@@ -23,63 +23,78 @@ body {
 #app-container {
   width: 100%;
   height: 100%;
-  display: block; 
+  display: flex;
+  flex-direction: column;
+}
+
+#map-wrapper {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+/* 
+  The definitive, high-specificity rule to override all other conflicting styles.
+  This version provides a comfortable touch area with a wider visual indicator.
+*/
+body > #app-container > #dragHandle {
+  /* Overriding properties from the culprit rule in components.css */
+  position: static !important; 
+  width: 70% !important; 
+  height: 12px !important; /* A comfortable touch-target height */
+  z-index: auto !important;
+  padding: 0 !important;
+
+  /* Our original styling */
+  margin: 0 auto;
+  background-color: transparent;
+  cursor: ns-resize;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* The visible line, now half the screen's width */
+body > #app-container > #dragHandle::before {
+  content: '' !important;
+  width: 40vw !important; /* 50% of the viewport width */
+  height: 4px !important;
+  background-color: #bbb !important; 
+  border-radius: 2px !important;
+  box-shadow: none !important;
+  transition: none !important;
+}
+
+
+#searchContainer {
+    cursor: default; 
 }
 
 #mainContent {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  flex-basis: 30%;
   background: #fff5f0;
-  height: 40vh;
-  min-height: 200px;
-  max-height: 85dvh;
-  z-index: 20; 
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  padding-top: 0;
-  width: 85%;
-  max-width: 1000px;
-  margin: 0 auto;
-  left: 50%;
-  transform: translateX(-50%);
+  padding-top: 10px;
+  overflow-y: auto;
   touch-action: pan-y;
   -webkit-overflow-scrolling: touch;
-  overflow-y: auto;
-  transition: height 0.2s ease, background-color 0.3s ease, box-shadow 0.3s ease, opacity 0.5s ease-in-out;
-  display: none; 
-  opacity: 0;
-}
-
-#mainContent.visible {
-  display: block;
 }
 
 #mainContent::-webkit-scrollbar {
   display: none;
-}
-
-#mainContent.fade-in {
-  opacity: 1;
-}
-
-#map-wrapper {
-  width: 100%;
-  height: 100%;
-  position: relative; 
-}
-
-#map {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 1;
-  touch-action: none;
 }
 
 #mapControls {
@@ -159,25 +174,19 @@ body {
   text-align: center;
 }
 
-/* --- 精準對齊 Leaflet 按鈕的最終樣式 --- */
-
-/* 控制項區塊整體向上移動 */
 .leaflet-top.leaflet-left {
     top: 5px; 
 }
 
-/* 縮小控制項之間的垂直間距 (預設是 10px) */
 .leaflet-top .leaflet-control {
     margin-top: 4px;
 }
 
-/* 容器樣式 */
 .leaflet-bar {
   box-shadow: 0 1px 5px rgba(0,0,0,0.65);
   border-radius: 4px;
 }
 
-/* 通用按鈕樣式 */
 .leaflet-bar a, 
 .leaflet-bar a:hover {
     background-color: #fff;
@@ -192,30 +201,23 @@ body {
     text-decoration: none;
 }
 
-/* 移除最後一個按鈕的邊框 */
 .leaflet-bar a:last-child {
     border-bottom: none;
 }
 
-/* 滑鼠懸停效果 */
 .leaflet-bar a:hover {
     background-color: #f4f4f4;
 }
 
-/* 自訂按鈕中的圖示 */
 .leaflet-control-custom .material-icons {
     font-size: 16px; 
     color: #333;
 }
 
-/* --- 按鈕狀態 --- */
-
-/* 啟用 (跟隨中) 狀態 */
 .leaflet-control-custom.active .material-icons {
     color: #007BFF !important;
 }
 
-/* 禁用狀態 */
 .leaflet-control-custom.disabled {
     cursor: not-allowed;
     background-color: #e0e0e0 !important;
@@ -224,8 +226,6 @@ body {
 .leaflet-control-custom.disabled .material-icons {
     color: #999 !important;
 }
-
-/* --- 深色模式 --- */
 
 .dark-mode .leaflet-bar a,
 .dark-mode .leaflet-bar a:hover {
