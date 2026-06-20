@@ -540,7 +540,14 @@ body.dark-mode #updateCountdown:hover {
   border-radius: 8px;
   color: inherit;
   transition: background-color 0.2s ease, color 0.2s ease, var(--color-transition);
+  flex-wrap: wrap; /* Allow items to wrap */
+  gap: 10px; /* Add gap between wrapped items */
 }
+
+#centralSettingsPanel select {
+  flex: 1 1 150px; /* Allow select to grow and shrink */
+}
+
 
 #closeCentralSettings {
   position: absolute;
