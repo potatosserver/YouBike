@@ -433,7 +433,7 @@ input:checked + .slider:before {
   bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 800;
+  z-index: 400;
   padding: 8px 16px;
   background-color: #ffdacf;
   color: #333;
