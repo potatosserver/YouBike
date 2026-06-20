@@ -43,9 +43,9 @@ export function updateLanguageTexts() {
     
     if (dom.keywordInput) dom.keywordInput.placeholder = state.currentLang === "en" ? "Please enter station name or address" : "請輸入站點名稱、地址";
     
-    if (dom.updateCountdownText) {
-        dom.updateCountdownText.textContent = state.currentLang === "en" ? "60 sec update" : "60秒後更新";
-        dom.updateCountdownText.parentElement.style.setProperty('--button-width', state.currentLang === "en" ? "145px" : "125px");
+    const countdownSuffix = document.getElementById('countdownSuffix');
+    if (countdownSuffix) {
+        countdownSuffix.textContent = state.currentLang === "en" ? " sec update" : "秒後更新";
     }
     
     const settingsPanelTitle = document.getElementById('settingsPanelTitle');
