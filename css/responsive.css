@@ -1,19 +1,15 @@
 @media (orientation: landscape) {
-  /* 修正：在電腦版（Landscape）下，強制鎖定 app-container 保持 12px 的外邊距與區塊間隙 */
+  /* This block remains, it handles the desktop/widescreen layout */
   #app-container {
     display: flex !important;
     flex-direction: row !important;
-    padding: var(--app-padding, 12px) !important; /* 增加安全回退值 12px */
+    padding: var(--app-padding, 12px) !important;
     gap: var(--app-gap, 12px) !important;
     box-sizing: border-box !important;
     overflow: hidden !important; 
   }
 
-  /* 電腦模式下的顯示控制 */
-  #mainContent.visible {
-    display: flex !important;
-  }
-
+  /* In landscape, the main content is a sidebar */
   #mainContent {
     position: relative !important; 
     width: 320px !important; 
@@ -28,10 +24,9 @@
     z-index: 100 !important;
     display: flex !important;
     flex-direction: column !important;
-    padding-bottom: 0 !important;
+    padding: 0 !important;
     overflow-x: hidden !important; 
     overflow-y: hidden !important; 
-    padding: 0 !important;
   }
   
   #results {
@@ -45,6 +40,7 @@
     align-content: flex-start !important; 
   }
 
+  /* hide the drag handle in landscape mode */
   #dragHandle {
     display: none !important;
   }
@@ -66,7 +62,6 @@
     z-index: 1 !important;
   }
 
-  /* 關鍵修正：確保地圖在橫屏模式下完美縮在 wrapper 內 */
   #map {
     position: absolute !important;
     width: 100% !important;
@@ -98,23 +93,27 @@
   }
 }
 
-/* 修正：確保 Leaflet 原生圖標不會產生白底，破壞定位涟漪效果 */
+
+/* Pulsing icon style, keep it */
 .pulsing-icon {
   background: transparent !important;
   border: none !important;
   box-shadow: none !important;
 }
 
+
+/* Cleanup for old mobile styles. Most are now handled by the mobile-first approach in layout.css */
 @media (max-width: 768px) {
-  #mainContent {
-    width: 80%;
-  }
+  
   .station {
+    /* This might still be useful if you want two columns on a tablet */
     width: calc(50% - 20px);
   }
+  
   #searchContainer {
     padding: 8px 12px;
   }
+
   #keyword {
     width: calc(100% - 34px);
     margin-right: 0;
@@ -123,6 +122,7 @@
     display: block;
     padding: 0 12px;
   }
+
   #searchIcon {
     position: static;
     margin-left: 10px;
@@ -135,41 +135,34 @@
     align-items: center;
     justify-content: center;
   }
+
   #results {
     gap: 10px;
   }
+
   .station {
     margin-bottom: 10px;
   }
 }
 
 @media (max-width: 480px) {
-  #mainContent {
-    width: 100%;
-    padding: 0;
-    max-width: none;
-  }
+
   #results {
     padding: 0 16px;
   }
+
+  /* Make station cards full width on small phones */
   .station {
-    margin: 10px 0;
-    width: calc(100% - 32px);
-    border-radius: 10px;
+    width: calc(100% - 20px); /* Slightly less than 100% for some spacing */
+    margin: 10px auto;
   }
+
   #searchContainer {
     padding: 10px;
   }
+  
   #keyword {
     width: calc(100% - 34px);
     padding: 0 10px;
-  }
-  #results {
-    padding-left: 16px;
-    padding-right: 16px;
-  }
-  .station {
-    margin-left: 8px;
-    margin-right: 8px;
   }
 }
