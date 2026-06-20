@@ -442,8 +442,7 @@ input:checked + .slider:before {
   font-size: 0.9em;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   transition: all 0.3s ease;
-  width: auto;
-  min-width: 120px;
+  width: 140px; /* Set a fixed width */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -470,6 +469,18 @@ body.dark-mode #updateCountdown:hover {
 #updateCountdown .material-icons {
   font-size: 18px;
   vertical-align: middle;
+}
+
+.countdown-text-wrapper {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+}
+
+#countdownTimer {
+    min-width: 20px; /* Adjust as needed */
+    text-align: right;
+    display: inline-block;
 }
 
 #settingsButton {
