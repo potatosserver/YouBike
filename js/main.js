@@ -1,291 +1,174 @@
-import { dom } from './domElements.js';
-import { state, config, regionCoordinates } from './config.js';
-import { simulateLoadingPercentage, showRandomNotice, showOfflineScreen, showNotification } from './loadingService.js';
-import { searchYouBike, fetchBaseStationData } from './apiYoubike.js';
-import { initMap, getMapInstance, applyMapDarkMode } from './mapService.js';
-import { getLocation, updateLocateButtonTitle } from './locationTracker.js';
-import { initUIHandlers } from './uiHandlers.js';
-import { startCountdown } from './countdown.js';
-import { updateLanguageTexts } from './language.js';
+import { state, config } from './config.js';
+import { queryVehicleData } from './apiYoubike.js';
+import { showNotification } from './loadingService.js';
+import { createLocateControl } from './locationTracker.js'; // 引入新的控制項創建函式
 
-// 初始化執行
-window.addEventListener('load', async () => {
-    if (!navigator.onLine) {
-        showOfflineScreen();
-    } else {
-        await initializeApp();
-    }
-});
+let leafletMap, markerClusterGroup, tileLayer;
 
-async function initializeApp() {
-    simulateLoadingPercentage();
-    showRandomNotice();
-    
+// 確保有 STATE.anchors
+const STATE = state || { anchors: [] };
+if (!STATE.anchors) {
+    STATE.anchors = [];
+}
+
+export function getMapInstance() {
+    return leafletMap;
+}
+
+export function initMap(stations) {
+    if (leafletMap) return;
+
+    leafletMap = L.map('map', {
+        dragging: true, tap: true, touchZoom: true,
+        doubleClickZoom: true, scrollWheelZoom: true, zoomControl: true
+    }).setView([config.defaultLatitude, config.defaultLongitude], 18);
+
+    leafletMap.getPanes().popupPane.style.zIndex = "9999";
+
     try {
-        await fetchBaseStationData();
-        initMap(state.allStations);
-        await getLocation();
-        initUIHandlers();
-        startCountdown();
-    } catch (error) {
-        renderInitError(error);
+        tileLayer = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: ''
+        }).addTo(leafletMap);
+
+        applyMapDarkMode();
+    } catch (err) {
+        showNotification(state.currentLang === "en" ? "Map tiles unavailable." : "地圖圖層無法載入。");
     }
+
+    markerClusterGroup = L.markerClusterGroup({
+        showCoverageOnHover: false,
+        maxClusterRadius: 80,
+        disableClusteringAtZoom: 16,
+        spiderfyOnMaxZoom: false,
+        iconCreateFunction: function(cluster) {
+            const childCount = cluster.getChildCount();
+            return L.divIcon({
+                html: `<div>${childCount}</div>`,
+                className: 'marker-cluster marker-cluster-ubike',
+                iconSize: [40, 40]
+            });
+        }
+    });
+    leafletMap.addLayer(markerClusterGroup);
+    state.bikeCluster = markerClusterGroup;
+
+    const locateControl = createLocateControl();
+    locateControl.addTo(leafletMap);
+
+    leafletMap.on('dragstart', disableFollowingOnManualInteraction);
+    leafletMap.on('zoomstart', disableFollowingOnManualInteraction);
+
+    renderMarkers(stations);
 }
 
-function renderInitError(error) {
-    dom.loadingContent.innerHTML = ''; 
-    const isDarkMode = document.body.classList.contains('dark-mode');
-    
-    const errorIcon = document.createElement('span');
-    errorIcon.className = 'material-icons';
-    errorIcon.textContent = 'error_outline';
-    errorIcon.style.cssText = 'font-size: 80px; color: red; margin-bottom: 20px;';
-    
-    const errorText = document.createElement('h2');
-    errorText.textContent = `初始化失敗: ${error.message}`;
-    errorText.style.cssText = 'color: red; font-size: 1.2em;';
-    
-    const retryBtn = document.createElement('button');
-    retryBtn.textContent = '重試';
-    retryBtn.style.cssText = `padding: 12px 24px; font-size: 1.1em; font-weight: 500; cursor: pointer; margin-top: 30px; border-radius: 28px; border: none;`;
-    retryBtn.style.backgroundColor = isDarkMode ? '#e8def8' : '#ffdacf';
-    retryBtn.style.color = isDarkMode ? '#1c1b1f' : '#333';
-    retryBtn.onclick = () => location.reload();
-    
-    dom.loadingContent.appendChild(errorIcon);
-    dom.loadingContent.appendChild(errorText);
-    dom.loadingContent.appendChild(retryBtn);
-}
-
-// 搜尋列事件
-dom.keywordInput.addEventListener('input', () => {
-    dom.clearTextBtn.style.display = dom.keywordInput.value.trim() ? 'inline-flex' : 'none';
-});
-
-dom.clearTextBtn.addEventListener('click', () => {
-    dom.keywordInput.value = '';
-    dom.clearTextBtn.style.display = 'none';
-    if (state.userLocation && getMapInstance()) {
-        state.isMapMovingDueToTracking = true;
-        getMapInstance().setView([state.userLocation.latitude, state.userLocation.longitude], getMapInstance().getZoom() || 18, { animate: true, duration: 0.5 });
-        setTimeout(() => { state.isMapMovingDueToTracking = false; }, 600);
-    }
-    searchYouBike(true, false, getMapInstance());
-    updateLocateButtonTitle();
-});
-
-dom.keywordInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
+function disableFollowingOnManualInteraction() {
+    if (state.isFollowingUser) {
         state.isFollowingUser = false;
-        updateLocateButtonTitle();
-        searchYouBike(true, true, getMapInstance());
-    }
-});
-
-dom.searchIcon.addEventListener('click', () => {
-    state.isFollowingUser = false;
-    updateLocateButtonTitle();
-    searchYouBike(true, true, getMapInstance());
-});
-
-// ==========================================
-// 彈窗與系統設定 UI 事件處理 (修正補全)
-// ==========================================
-
-function clearUrlHash() {
-    if (history.pushState) {
-        history.pushState('', document.title, window.location.pathname + window.location.search);
-    } else {
-        window.location.hash = '';
+        showNotification(state.currentLang === "en" ? "Auto-following stopped." : "已停止自動跟隨。");
+        import('./locationTracker.js').then(m => m.updateLocateButtonTitle());
     }
 }
 
-// 點擊右下角設定按鈕
-dom.settingsButton.addEventListener('click', (e) => {
-    e.stopPropagation();
-    const settingsIcon = dom.settingsButton.querySelector('.material-icons');
-    
-    if (dom.centralSettingsPanel.style.display === 'block') {
-        closeSettingsPanel(settingsIcon);
-    } else {
-        if (dom.routeModal.style.display === 'block') {
-            closeRouteModal();
-            openSettingsPanel(settingsIcon);
+function getVisualPosition(lat, lon) {
+    lat = parseFloat(lat);
+    lon = parseFloat(lon);
+    if (isNaN(lat) || isNaN(lon)) return null;
+    const THRESHOLD = 0.00009; // 約 10m 級距離閾值（經緯度）
+    for (let anchor of STATE.anchors) {
+        const dLat = lat - anchor.lat, dLon = lon - anchor.lon;
+        const distSq = (dLat * dLat) + (dLon * dLon);
+        if (distSq < (THRESHOLD * THRESHOLD)) {
+            // 有接近的 anchor，將新圖釘按環狀偏移
+            anchor.count++;
+            const angle = anchor.count * 2.399;
+            const radius = 0.00010 + (anchor.count * 0.00002);
+            return { lat: anchor.lat + (radius * Math.cos(angle)), lng: anchor.lon + (radius * Math.sin(angle)) };
+        }
+    }
+    // 沒有接近的 anchor：新增一個 anchor 並回傳原始座標
+    STATE.anchors.push({ lat, lon, count: 0 });
+    return { lat, lng: lon };
+}
+
+function createYoubikeMarker(station) {
+    const lat = parseFloat(station.lat);
+    const lng = parseFloat(station.lng);
+    if (isNaN(lat) || isNaN(lng)) return null;
+
+    const iconHtml = `<span class="material-icons">directions_bike</span>`;
+    const bikeIcon = L.divIcon({
+        className: 'custom-icon ubike-icon',
+        html: iconHtml,
+        iconSize: [28, 28],
+        iconAnchor: [14, 14],
+        popupAnchor: [0, -14]
+    });
+
+    const marker = L.marker([lat, lng], { icon: bikeIcon });
+    marker.on('click', async () => {
+        try {
+            let stationInfo = {};
+            if (navigator.onLine) {
+                const vehicleData = await queryVehicleData([station.station_no]);
+                stationInfo = vehicleData[station.station_no] || {};
+            }
+            const content = `
+                <h4>${state.currentLang === "en" ? station.name_en : station.name_tw}</h4>
+                <p>${state.currentLang === "en" ? "Address: " : "地址："} ${state.currentLang === "en" ? station.address_en : station.address_tw}</p>
+                ${navigator.onLine ? `
+                    <p>YouBike 2.0: ${stationInfo.available_2_0 !== undefined ? stationInfo.available_2_0 : (state.currentLang === "en" ? 'Unknown' : '未知')}</p>
+                    <p>YouBike 2.0E: ${stationInfo.available_e !== undefined ? stationInfo.available_e : (state.currentLang === "en" ? 'Unknown' : '未知')}</p>
+                    <p>${state.currentLang === "en" ? "Available Slots: " : "可停空位數："} ${stationInfo.empty_spaces !== undefined ? stationInfo.empty_spaces : (state.currentLang === "en" ? 'Unknown' : '未知')}</p>
+                ` : `<p>${state.currentLang === "en" ? "Offline. Real-time data unavailable." : "離線中，即時資料無法取得。"}</p>`}
+            `;
+            marker.bindPopup(content).openPopup();
+            state.isFollowingUser = false;
+            import('./locationTracker.js').then(m => m.updateLocateButtonTitle());
+        } catch (error) {
+            showNotification(state.currentLang === "en" ? "Failed to get station information." : "無法取得站點資訊。");
+        }
+    });
+    return marker;
+}
+
+function createBikeMarkersFromData(stations) {
+    if (!markerClusterGroup) return;
+    markerClusterGroup.clearLayers();
+    STATE.anchors = []; // 清空之前的 anchors
+
+    stations.forEach(s => {
+        const pos = getVisualPosition(s.lat, s.lng);
+        if (!pos) return;
+        const pseudoStation = Object.assign({}, s, { lat: pos.lat, lng: pos.lng });
+        const m = createYoubikeMarker(pseudoStation);
+        if (m) {
+            markerClusterGroup.addLayer(m);
+        }
+    });
+
+    if (!leafletMap.hasLayer(markerClusterGroup)) {
+        leafletMap.addLayer(markerClusterGroup);
+    }
+}
+
+export function renderMarkers(stations) {
+    createBikeMarkersFromData(stations);
+}
+
+export function updateMapMarkers() {
+    // This function can be simplified or removed, as the new markers are styled via CSS
+}
+
+export function applyMapDarkMode() {
+    const isDarkMode = document.body.classList.contains('dark-mode');
+    if (tileLayer && tileLayer._container) {
+        if (isDarkMode) {
+            tileLayer._container.style.filter = 'invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%)';
         } else {
-            openSettingsPanel(settingsIcon);
+            tileLayer._container.style.filter = 'none';
         }
-    }
-});
-
-// 點擊設定面板右上角 X
-dom.closeCentralSettings.addEventListener('click', () => {
-    const settingsIcon = dom.settingsButton.querySelector('.material-icons');
-    closeSettingsPanel(settingsIcon);
-});
-
-// 點擊路線面板右上角 X
-if (dom.closeRouteModalButton) {
-    dom.closeRouteModalButton.addEventListener('click', () => {
-        closeRouteModal(true);
-    });
-}
-
-// 點擊半透明背景 (Overlay)
-dom.overlay.addEventListener('click', (e) => {
-    e.stopPropagation();
-    if (dom.routeModal.style.display === 'block') {
-        closeRouteModal(true);
-    } else if (dom.centralSettingsPanel.style.display === 'block') {
-        const settingsIcon = dom.settingsButton.querySelector('.material-icons');
-        closeSettingsPanel(settingsIcon);
-    }
-});
-
-// 點擊文件任處 (外部)
-document.addEventListener('click', (e) => {
-    if (dom.centralSettingsPanel.style.display === 'block' &&
-        !dom.centralSettingsPanel.contains(e.target) &&
-        !dom.settingsButton.contains(e.target)) {
-        const settingsIcon = dom.settingsButton.querySelector('.material-icons');
-        closeSettingsPanel(settingsIcon);
-    }
-});
-
-// 手機返回鍵支援
-window.addEventListener('popstate', (event) => {
-    if (dom.centralSettingsPanel.style.display === 'block') {
-        closeSettingsPanel(null, true);
-    }
-    if (dom.routeModal.style.display === 'block') {
-        closeRouteModal(true, true);
-    }
-});
-
-function openSettingsPanel(icon) {
-    dom.centralSettingsPanel.style.display = 'block';
-    dom.centralSettingsPanel.classList.remove('panel-close');
-    dom.centralSettingsPanel.classList.add('panel-open');
-    dom.overlay.classList.add('show');
-    history.pushState({ modalOpen: true, type: 'settings' }, 'Settings', '#settings');
-    
-    if(icon) {
-        // 強制重啟動畫：先移除所有旋轉 class，再添加目標 class
-        icon.classList.remove('rotate-right', 'rotate-left');
-        // 使用 requestAnimationFrame 以確保瀏覽器在下一幀渲染前完成 class 的移除
-        requestAnimationFrame(() => {
-            icon.classList.add('rotate-right');
-        });
+        const attribution = document.querySelector('.leaflet-control-attribution');
+        if (attribution) attribution.style.color = isDarkMode ? '#ccc' : '#333';
     }
 }
-
-function closeSettingsPanel(icon, skipHistoryBack = false) {
-    if (dom.centralSettingsPanel.style.display !== 'block') return;
-
-    dom.centralSettingsPanel.classList.remove('panel-open');
-    dom.centralSettingsPanel.classList.add('panel-close');
-    dom.overlay.classList.remove('show');
-    
-    const animationEndHandler = () => {
-        dom.centralSettingsPanel.style.display = 'none';
-        dom.centralSettingsPanel.classList.remove('panel-close');
-        dom.centralSettingsPanel.removeEventListener('animationend', animationEndHandler);
-        if (!skipHistoryBack) clearUrlHash(); 
-    };
-    dom.centralSettingsPanel.addEventListener('animationend', animationEndHandler);
-    
-    if(icon) {
-        // 強制重啟動畫：先移除所有旋轉 class，再添加目標 class
-        icon.classList.remove('rotate-right', 'rotate-left');
-        requestAnimationFrame(() => {
-            icon.classList.add('rotate-left');
-        });
-    }
-    
-    if (!skipHistoryBack && history.state && history.state.type === 'settings') {
-        history.back();
-    } else {
-        clearUrlHash();
-    }
-}
-
-function closeRouteModal(justClose = false, skipHistoryBack = false) {
-    if (dom.routeModal.style.display !== 'block') return;
-
-    dom.routeModal.classList.remove('modal-open');
-    dom.routeModal.classList.add('modal-close');
-    
-    if (justClose) {
-        dom.overlay.classList.remove('show');
-    }
-
-    const animationEndHandler = () => {
-        dom.routeModal.style.display = 'none';
-        dom.routeModal.classList.remove('modal-close');
-        dom.routeModal.removeEventListener('animationend', animationEndHandler);
-        if (!skipHistoryBack) clearUrlHash();
-    };
-    dom.routeModal.addEventListener('animationend', animationEndHandler);
-    
-    if (!skipHistoryBack && history.state && (history.state.type === 'route' || history.state.type === 'electric')) {
-        history.back();
-    } else if (justClose) {
-        clearUrlHash();
-    }
-}
-
-// 系統預設開關初始化
-document.addEventListener('DOMContentLoaded', () => {
-    const isDarkMode = localStorage.getItem("dark_mode") === "true";
-    if (isDarkMode) document.body.classList.add('dark-mode');
-    dom.centralDarkModeToggle.checked = isDarkMode;
-    
-    state.currentLang = localStorage.getItem("lang") || "zh";
-    dom.centralLangToggle.checked = state.currentLang === "en";
-    updateLanguageTexts();
-    
-    if (localStorage.getItem("useLocation") === null) localStorage.setItem("useLocation", "true");
-    dom.centralLocationToggle.checked = localStorage.getItem("useLocation") === "true";
-    
-    const savedRegion = localStorage.getItem('selectedRegion') || 'kaohsiung';
-    config.defaultRegion = savedRegion;
-    config.defaultLatitude = regionCoordinates[savedRegion].lat;
-    config.defaultLongitude = regionCoordinates[savedRegion].lng;
-    
-    if (dom.centralRegionSelect) dom.centralRegionSelect.value = savedRegion;
-    
-    dom.centralDarkModeToggle.addEventListener('change', () => {
-        const isDark = dom.centralDarkModeToggle.checked;
-        requestAnimationFrame(() => {
-            document.body.classList.toggle('dark-mode', isDark);
-            localStorage.setItem("dark_mode", isDark.toString());
-            applyMapDarkMode();
-        });
-    });
-    
-    dom.centralLangToggle.addEventListener('change', async () => {
-        state.currentLang = state.currentLang === "en" ? "zh" : "en";
-        localStorage.setItem("lang", state.currentLang);
-        updateLanguageTexts();
-        await searchYouBike(false, false, getMapInstance());
-    });
-    
-    dom.centralLocationToggle.addEventListener('change', async function() {
-        localStorage.setItem("useLocation", this.checked);
-        state.hasObtainedRealLocation = false;
-        await getLocation();
-    });
-    
-    dom.centralRegionSelect.addEventListener('change', async function() {
-        const selectedRegion = this.value;
-        config.defaultRegion = selectedRegion;
-        localStorage.setItem('selectedRegion', selectedRegion);
-        
-        config.defaultLatitude = regionCoordinates[selectedRegion].lat;
-        config.defaultLongitude = regionCoordinates[selectedRegion].lng;
-        
-        if (!dom.centralLocationToggle.checked) {
-            state.hasObtainedRealLocation = false;
-            await getLocation();
-        }
-    });
-});
