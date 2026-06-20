@@ -1,53 +1,60 @@
-/* 來自 index.html */
 .custom-icon {
-  border-radius: 50%;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-  transition: transform 0.2s cubic-bezier(.2,.9,.2,1);
-  cursor: pointer;
-}
-
-/* hover 放大效果 */
-.custom-icon:hover {
-  transform: scale(1.2);
-  z-index: 1000 !important;
-}
-
-/* YouBike 主色（原檔為黃）*/
-.ubike-icon {
-  background: #ffd500;
-}
-
-.ubike-icon .material-icons {
-  color: #333;
-  font-size: 20px;
-}
-
-
-/* 聚合（cluster）樣式（marker-cluster-ubike）*/
-.marker-cluster-ubike { 
-    background-color: rgba(255, 213, 0, 0.5) !important; 
-}
-
-.marker-cluster-ubike div {
-    background-color: #ffd500 !important;
-    color: black !important;
+    border-radius: 50%;
+    color: white;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 100%;
-    height: 100%;
-    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+    transition: transform 0.2s cubic-bezier(.2,.9,.2,1);
+    cursor: pointer;
+    box-sizing: border-box; /* 確保邊框不會影響整體大小 */
 }
 
-/* 若要和原頁完全一致可加入相同的大小與字型 */
+.custom-icon:hover {
+    transform: scale(1.2);
+    z-index: 1000 !important;
+}
+
+.ubike-icon {
+    background: #ffd500;
+    border: 2px solid white; /* 加上 2px 的白邊 */
+}
+
+.ubike-icon .material-icons {
+    color: #333;
+    font-size: 18px; /* 稍微縮小圖示以容納邊框 */
+}
+
+/* --- Marker Cluster --- */
+/* 外層光暈 (iconSize: 40x40) */
+.marker-cluster-ubike {
+    background-color: rgba(255, 213, 0, 0.4) !important;
+    border-radius: 50%;
+}
+
+/* 內層實心圓 */
+.marker-cluster-ubike div {
+    width: 32px;
+    height: 32px;
+    margin-left: 4px;
+    margin-top: 4px;
+
+    background-color: #ffd500 !important;
+    color: black !important;
+    border-radius: 50%;
+    border: 2px solid white; /* 加上 2px 的白邊 */
+    box-sizing: border-box;  /* 確保邊框不會影響內部佈局 */
+
+    text-align: center;
+    font-weight: bold;
+    font-size: 14px;
+    line-height: 28px; /* 減去上下邊框的寬度 (32 - 2*2) = 28 */
+}
+
 .ubike-icon .ubike-label {
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 26px;
-  text-align: center;
-  color: white; /* 視需要改為黑色（原 cluster 顯示為黑） */
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 26px;
+    text-align: center;
+    color: white;
 }
