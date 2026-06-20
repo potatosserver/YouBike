@@ -209,7 +209,7 @@
   padding: 25px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
+  z-index: 600;
   text-align: center;
   display: none;
   transition: var(--color-transition);
@@ -245,7 +245,7 @@
   padding: 12px 20px;
   border-radius: 20px; 
   font-size: 14px;
-  z-index: 10001;
+  z-index: 900;
   opacity: 0;
   transform: translateY(-20px);
   transition: all 0.3s ease;
@@ -265,7 +265,7 @@
 #dragHandle {
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 200;
   height: 24px;
   width: 100px;
   cursor: ns-resize;
@@ -277,7 +277,7 @@
 }
 
 #dragHandle::before {
-  content: '';
+  content: ' ';
   width: 100px;
   height: 6px;
   background: #a0a0a0;
@@ -353,7 +353,7 @@ input:checked + .slider:before {
   display: flex;
   flex-direction: row;
   gap: 10px;
-  z-index: 1000;
+  z-index: 800;
   opacity: 0;
   pointer-events: none;
 }
@@ -395,7 +395,7 @@ input:checked + .slider:before {
   display: flex;
   flex-direction: row;
   gap: 10px;
-  z-index: 1200;
+  z-index: 400;
   transform: translateX(100%) scale(0.5);
   opacity: 0;
   transition: all 0.2s ease;
@@ -433,7 +433,7 @@ input:checked + .slider:before {
   bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
-  z-index: 1000;
+  z-index: 800;
   padding: 8px 16px;
   background-color: #ffdacf;
   color: #333;
@@ -487,7 +487,7 @@ body.dark-mode #updateCountdown:hover {
   position: fixed;
   bottom: 60px;
   right: 20px;
-  z-index: 1600;
+  z-index: 700;
   width: 56px;
   height: 56px;
   background: #ffdacf;
@@ -520,7 +520,7 @@ body.dark-mode #updateCountdown:hover {
   border-radius: 20px;
   padding: 25px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-  z-index: 1500;
+  z-index: 600;
   backdrop-filter: blur(10px);
   max-height: calc(100dvh - 80px);
   overflow-y: scroll;
@@ -642,7 +642,7 @@ body.dark-mode #updateCountdown:hover {
   padding: 24px;
   border-radius: 20px; 
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); 
-  z-index: 1001; 
+  z-index: 600; 
   display: none; 
   width: 80%;
   max-width: 360px;
@@ -745,7 +745,7 @@ body.dark-mode #updateCountdown:hover {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  z-index: 999;
+  z-index: 500;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease, visibility 0.3s ease; /* 完美連動關閉過渡 */
@@ -802,4 +802,12 @@ body.dark-mode #updateCountdown:hover {
 @keyframes spin-180 {
   from { transform: rotate(0deg); }
   to { transform: rotate(180deg); }
+}
+
+.leaflet-bottom {
+  z-index: 0 !important;
+}
+
+.leaflet-top {
+  z-index: 400 !important;
 }
