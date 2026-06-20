@@ -46,17 +46,6 @@
 
     <!-- 主要應用程式容器，使用 Flexbox 佈局 -->
     <div id="app-container">
-        <!-- 側邊欄/下方列表 -->
-        <div id="mainContent">
-            <div id="dragHandle"></div>
-            <div id="searchContainer">
-                <input type="text" id="keyword" placeholder="請輸入站點名稱、地址" value="" />
-                <span id="searchIcon" class="material-icons" title="搜尋">search</span>
-                <span id="clearTextBtn" class="material-icons" title="清除" style="display:none; margin-left:10px; cursor:pointer;">close</span>
-            </div>
-            <div id="results"></div>
-        </div>
-
         <!-- 地圖包裹器 -->
         <div id="map-wrapper">
             <div id="map"></div>
@@ -70,6 +59,19 @@
                     <span id="countdownSuffix">秒後更新</span>
                 </div>
             </button>
+        </div>
+
+        <!-- 拖曳桿 -->
+        <div id="dragHandle"></div>
+
+        <!-- 側邊欄/下方列表 -->
+        <div id="mainContent">
+            <div id="searchContainer">
+                <input type="search" id="keyword" placeholder="請輸入站點名稱、地址" value="" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />
+                <span id="searchIcon" class="material-icons" title="搜尋">search</span>
+                <span id="clearTextBtn" class="material-icons" title="清除" style="display:none; margin-left:10px; cursor:pointer;">close</span>
+            </div>
+            <div id="results"></div>
         </div>
     </div>
     
