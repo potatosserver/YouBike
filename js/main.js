@@ -346,6 +346,14 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     function applyLayoutFromY(y) {
+        if (window.getComputedStyle(appContainer).flexDirection !== 'column') {
+            // In horizontal mode, do not apply dynamic styles.
+            // Clear any previously applied inline styles to allow CSS to take over.
+            mapWrapper.style.flexBasis = '';
+            mainContent.style.flexBasis = '';
+            return;
+        }
+
         const containerRect = appContainer.getBoundingClientRect();
         const dragHandleHeight = dragHandle.offsetHeight;
         
@@ -371,7 +379,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setVerticalLayout() {
-        if (window.getComputedStyle(appContainer).flexDirection !== 'column') return;
+        if (window.getComputedStyle(appContainer).flexDirection !== 'column') {
+            // In horizontal mode, do not apply dynamic styles.
+            // Clear any previously applied inline styles to allow CSS to take over.
+            mapWrapper.style.flexBasis = '';
+            mainContent.style.flexBasis = '';
+            return;
+        } 
         
         const containerRect = appContainer.getBoundingClientRect();
         const ratioToApply = currentRatio !== null ? currentRatio : 0.6; 
