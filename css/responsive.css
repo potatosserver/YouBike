@@ -27,6 +27,13 @@
     overflow-x: hidden !important; 
     overflow-y: hidden !important; 
   }
+
+  #mainContent h1 {
+    position: static !important;
+    transform: none !important;
+    margin-top: 15px !important;
+    margin-bottom: 2px !important;
+  }
   
   #results {
     flex: 1 !important;
